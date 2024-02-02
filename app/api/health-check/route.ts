@@ -1,6 +1,5 @@
-import { ExpenseData } from "@/lib/model/expense/expense-data";
 import { ExpenseType } from "@/lib/model/expense/expense-type";
-import { Group } from "@/lib/model/group/group";
+import { Payment } from "@/lib/model/payment/payment";
 import { EqualSplit } from "@/lib/model/split/equal-split";
 import { ExactSplit } from "@/lib/model/split/exact-split";
 import { PercentSplit } from "@/lib/model/split/percent-split";
@@ -12,63 +11,84 @@ import { NextResponse } from "next/server";
 
 export async function GET(_req: Request) {
   try {
-    const group = new Group("Test");
-
-    const user1 = new User("1", "ankit", "u1@gmail.com", "9890098900");
-    const user2 = new User("2", "komal", "u2@gmail.com", "9999999999");
-    const user3 = new User("3", "akash", "u3@gmail.com", "9898989899");
-    const user4 = new User("4", "amit", "u4@gmail.com", "8976478292");
+    const ankit = new User("1", "ankit", "u1@gmail.com", "9890098900");
+    const komal = new User("2", "komal", "u2@gmail.com", "9999999999");
+    const akash = new User("3", "akash", "u3@gmail.com", "9898989899");
+    const amit = new User("4", "amit", "u4@gmail.com", "8976478292");
 
     // Adding Expenses
     const expenseRepository = new ExpenseRepository();
     const userService = new UserService(expenseRepository);
-    userService.addUser(user1);
-    userService.addUser(user2);
-    userService.addUser(user3);
-    userService.addUser(user4);
+    userService.addUser(ankit);
+    userService.addUser(komal);
+    userService.addUser(akash);
+    userService.addUser(amit);
     const service = new SplitWiseService(expenseRepository);
 
     console.log(service.getBalances());
-    console.log(service.getBalance(user1));
+    console.log(service.getBalance(ankit));
     console.log("-----------------");
     service.addExpense(
+      "GoaFlight",
       ExpenseType.EQUAL,
-      1000,
-      user1,
+      new Payment(ankit, 1000),
       [
-        new EqualSplit(user1),
-        new EqualSplit(user2),
-        new EqualSplit(user3),
-        new EqualSplit(user4),
-      ],
-      new ExpenseData("GoaFlight")
+        new EqualSplit(ankit),
+        new EqualSplit(komal),
+        new EqualSplit(akash),
+        new EqualSplit(amit),
+      ]
     );
 
-    console.log(service.getBalance(user1));
-    console.log(service.getBalance(user4));
+    console.log(service.getBalance(ankit));
+    console.log(service.getBalance(amit));
     console.log("-----------------");
     service.addExpense(
+      "Some other",
       ExpenseType.EXACT,
-      1250,
-      user1,
-      [new ExactSplit(user2, 320), new ExactSplit(user3, 880)],
-      new ExpenseData("GoaFlight")
+      new Payment(ankit, 1250),
+      [new ExactSplit(komal, 370), new ExactSplit(akash, 880)]
     );
 
     console.log(service.getBalances());
     console.log("-----------------");
 
     service.addExpense(
+      "Some more",
       ExpenseType.PERCENT,
-      1200,
-      user4,
+      new Payment(amit, 1200),
       [
-        new PercentSplit(user1, 40),
-        new PercentSplit(user2, 20),
-        new PercentSplit(user3, 20),
-        new PercentSplit(user4, 20),
-      ],
-      new ExpenseData("GoaFlight")
+        new PercentSplit(ankit, 40),
+        new PercentSplit(komal, 20),
+        new PercentSplit(akash, 20),
+        new PercentSplit(amit, 20),
+      ]
+    );
+    console.log(service.getBalances());
+    console.log("-----------------");
+    service.addExpense(
+      "Settlement",
+      ExpenseType.EXACT,
+      new Payment(komal, 860),
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 620)]
+    );
+    console.log(service.getBalance(komal));
+    console.log(service.getBalances());
+    console.log("-----------------");
+    service.addExpense(
+      "Settlement",
+      ExpenseType.EXACT,
+      new Payment(akash, 1370),
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 1130)]
+    );
+    console.log(service.getBalance(akash));
+    console.log(service.getBalances());
+    console.log("-----------------");
+    service.addExpense(
+      "Settlement",
+      ExpenseType.PERCENT,
+      new Payment(ankit, 230),
+      [new PercentSplit(amit, 100)]
     );
     console.log(service.getBalances());
     return NextResponse.json({ message: "Server is up" }, { status: 200 });

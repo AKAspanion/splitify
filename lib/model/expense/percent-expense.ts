@@ -1,19 +1,12 @@
-import { EqualSplit } from "../split/equal-split";
-import { ExactSplit } from "../split/exact-split";
+import { Payment } from "../payment/payment";
 import { PercentSplit } from "../split/percent-split";
 import { Split } from "../split/split";
-import { User } from "../user/user";
 import { Expense } from "./expense";
 import { ExpenseData } from "./expense-data";
 
 export class PercentExpense extends Expense {
-  constructor(
-    amount: number,
-    expensePaidBy: User,
-    splits: Split[],
-    expenseData: ExpenseData
-  ) {
-    super(amount, expensePaidBy, splits, expenseData);
+  constructor(name: string, payment: Payment, splits: Split[]) {
+    super(name, payment, splits);
   }
 
   public validate(): boolean {
@@ -23,7 +16,7 @@ export class PercentExpense extends Expense {
       if (!(split instanceof PercentSplit)) return false;
 
       const percentSplit = <PercentSplit>split;
-      totalSplitPercent += percentSplit.getPercent();
+      totalSplitPercent += percentSplit?.getPercent();
     }
 
     return 100 == totalSplitPercent;

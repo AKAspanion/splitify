@@ -1,5 +1,5 @@
 export enum ExpenseType {
-  EQUAL,
-  EXACT,
-  PERCENT,
+  EQUAL = "EQUAL",
+  EXACT = "EXACT",
+  PERCENT = "PERCENT",
 }

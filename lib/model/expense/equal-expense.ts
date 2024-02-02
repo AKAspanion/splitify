@@ -1,17 +1,12 @@
+import { Payment } from "../payment/payment";
 import { EqualSplit } from "../split/equal-split";
 import { Split } from "../split/split";
-import { User } from "../user/user";
 import { Expense } from "./expense";
 import { ExpenseData } from "./expense-data";
 
 export class EqualExpense extends Expense {
-  constructor(
-    amount: number,
-    expensePaidBy: User,
-    splits: Split[],
-    expenseData: ExpenseData
-  ) {
-    super(amount, expensePaidBy, splits, expenseData);
+  constructor(name: string, payment: Payment, splits: Split[]) {
+    super(name, payment, splits);
   }
 
   public validate(): boolean {

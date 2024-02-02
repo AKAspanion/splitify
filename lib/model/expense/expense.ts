@@ -2,25 +2,19 @@ import { uid } from "uid";
 import { User } from "../user/user";
 import { ExpenseData } from "./expense-data";
 import { Split } from "../split/split";
+import { Payment } from "../payment/payment";
 
 export abstract class Expense {
   id: string;
-  amount: number;
-  expensePaidBy: User;
+  payment: Payment;
   splits: Split[];
-  expenseData: ExpenseData;
+  name: string;
 
-  constructor(
-    amount: number,
-    expensePaidBy: User,
-    splits: Split[],
-    expenseData: ExpenseData
-  ) {
+  constructor(name: string, payment: Payment, splits: Split[]) {
+    this.name = name;
     this.id = uid();
-    this.amount = amount;
-    this.expensePaidBy = expensePaidBy;
+    this.payment = payment;
     this.splits = splits;
-    this.expenseData = expenseData;
   }
 
   public getId() {
@@ -28,19 +22,19 @@ export abstract class Expense {
   }
 
   public getAmount() {
-    return this.amount;
+    return this.payment.getAmount();
   }
 
   public setAmount(amount: number) {
-    this.amount = amount;
+    this.payment.setAmount(amount);
   }
 
   public getExpensePaidBy() {
-    return this.expensePaidBy;
+    return this.payment.getUser();
   }
 
   public setExpensePaidBy(expensePaidBy: User) {
-    this.expensePaidBy = expensePaidBy;
+    return this.payment.setUser(expensePaidBy);
   }
 
   public getSplits() {
@@ -51,13 +45,13 @@ export abstract class Expense {
     this.splits = splits;
   }
 
-  public getExpenseData() {
-    return this.expenseData;
-  }
+  // public getExpenseData() {
+  //   return this.expenseData;
+  // }
 
-  public setExpenseData(expenseData: ExpenseData) {
-    this.expenseData = expenseData;
-  }
+  // public setExpenseData(expenseData: ExpenseData) {
+  //   this.expenseData = expenseData;
+  // }
 
   public abstract validate(): boolean;
 }

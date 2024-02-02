@@ -1,6 +1,7 @@
 import { Expense } from "../model/expense/expense";
 import { ExpenseData } from "../model/expense/expense-data";
 import { ExpenseType } from "../model/expense/expense-type";
+import { Payment } from "../model/payment/payment";
 import { Split } from "../model/split/split";
 import { User } from "../model/user/user";
 import { ExpenseService } from "../service/expense-service";
@@ -26,22 +27,20 @@ export class ExpenseRepository {
   }
 
   public addExpense(
+    name: string,
     expenseType: ExpenseType,
-    amount: number,
-    paidBy: User,
-    splits: Split[],
-    expenseData: ExpenseData
+    payment: Payment,
+    splits: Split[]
   ): void {
-    if (this.userMap.get(paidBy.getUserId()) === undefined) {
+    if (this.userMap.get(payment.getUser().getUserId()) === undefined) {
       return;
     }
 
     const expense = ExpenseService.createExpense(
+      name,
       expenseType,
-      amount,
-      this.userMap.get(paidBy.getUserId())!,
-      splits,
-      expenseData
+      payment,
+      splits
     );
     if (expense == null) {
       return;
@@ -50,7 +49,7 @@ export class ExpenseRepository {
     for (const split of expense.getSplits()) {
       const paidTo = split.getUser().getUserId();
 
-      let balances = this.balanceSheet.get(paidBy.getUserId());
+      let balances = this.balanceSheet.get(payment.getUser().getUserId());
       if (balances) {
         if (balances?.get(paidTo) === undefined) {
           balances.set(paidTo, 0.0);
@@ -60,12 +59,12 @@ export class ExpenseRepository {
 
         balances = this.balanceSheet.get(paidTo);
         if (balances) {
-          if (balances.get(paidBy.getUserId()) === undefined) {
-            balances.set(paidBy.getUserId(), 0.0);
+          if (balances.get(payment.getUser().getUserId()) === undefined) {
+            balances.set(payment.getUser().getUserId(), 0.0);
           }
           balances.set(
-            paidBy.getUserId(),
-            balances.get(paidBy.getUserId())! - split.getAmount()
+            payment.getUser().getUserId(),
+            balances.get(payment.getUser().getUserId())! - split.getAmount()
           );
         }
       }
