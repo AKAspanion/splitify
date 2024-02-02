@@ -1,6 +1,5 @@
 import { uid } from "uid";
 import { User } from "../user/user";
-import { ExpenseData } from "./expense-data";
 import { Split } from "../split/split";
 import { Payment } from "../payment/payment";
 

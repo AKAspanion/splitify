@@ -1,5 +1,3 @@
-import { split } from "postcss/lib/list";
-import { ExpenseData } from "../model/expense/expense-data";
 import { ExpenseType } from "../model/expense/expense-type";
 import { Payment } from "../model/payment/payment";
 import { Split } from "../model/split/split";

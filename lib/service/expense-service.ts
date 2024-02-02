@@ -1,6 +1,5 @@
 import { EqualExpense } from "../model/expense/equal-expense";
 import { ExactExpense } from "../model/expense/exact-expense";
-import { ExpenseData } from "../model/expense/expense-data";
 import { ExpenseType } from "../model/expense/expense-type";
 import { PercentExpense } from "../model/expense/percent-expense";
 import { Payment } from "../model/payment/payment";

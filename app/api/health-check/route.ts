@@ -6,7 +6,6 @@ import { PercentSplit } from "@/lib/model/split/percent-split";
 import { User } from "@/lib/model/user/user";
 import { ExpenseRepository } from "@/lib/repository/expense-repository";
 import { SplitWiseService } from "@/lib/service/splitwise-service";
-import { UserService } from "@/lib/service/user-service";
 import { NextResponse } from "next/server";
 
 export async function GET(_req: Request) {
@@ -18,11 +17,10 @@ export async function GET(_req: Request) {
 
     // Adding Expenses
     const expenseRepository = new ExpenseRepository();
-    const userService = new UserService(expenseRepository);
-    userService.addUser(ankit);
-    userService.addUser(komal);
-    userService.addUser(akash);
-    userService.addUser(amit);
+    expenseRepository.addUser(ankit);
+    expenseRepository.addUser(komal);
+    expenseRepository.addUser(akash);
+    expenseRepository.addUser(amit);
     const service = new SplitWiseService(expenseRepository);
 
     console.log(service.getBalances());

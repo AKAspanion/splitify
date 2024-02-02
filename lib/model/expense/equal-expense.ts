@@ -2,7 +2,6 @@ import { Payment } from "../payment/payment";
 import { EqualSplit } from "../split/equal-split";
 import { Split } from "../split/split";
 import { Expense } from "./expense";
-import { ExpenseData } from "./expense-data";
 
 export class EqualExpense extends Expense {
   constructor(name: string, payment: Payment, splits: Split[]) {
