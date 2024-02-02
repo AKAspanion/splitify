@@ -1,4 +1,5 @@
 import { ExpenseType } from "@/lib/model/expense/expense-type";
+import { Group } from "@/lib/model/group/group";
 import { Payment } from "@/lib/model/payment/payment";
 import { EqualSplit } from "@/lib/model/split/equal-split";
 import { ExactSplit } from "@/lib/model/split/exact-split";
@@ -15,12 +16,14 @@ export async function GET(_req: Request) {
     const akash = new User("3", "akash", "u3@gmail.com", "9898989899");
     const amit = new User("4", "amit", "u4@gmail.com", "8976478292");
 
+    const group = new Group("Split");
+    group.addUser(ankit);
+    group.addUser(komal);
+    group.addUser(akash);
+    group.addUser(amit);
+
     // Adding Expenses
-    const expenseRepository = new ExpenseRepository();
-    expenseRepository.addUser(ankit);
-    expenseRepository.addUser(komal);
-    expenseRepository.addUser(akash);
-    expenseRepository.addUser(amit);
+    const expenseRepository = new ExpenseRepository(group);
     const service = new SplitWiseService(expenseRepository);
 
     console.log(service.getBalances());
