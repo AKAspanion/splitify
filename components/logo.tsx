@@ -4,9 +4,10 @@ import localFont from "next/font/local";
 
 import { cn } from "@/lib/utils";
 
-export const Logo = () => {
+export const Logo = (props: { to?: string }) => {
+  const { to = "/" } = props;
   return (
-    <Link className="hidden md:flex" href="/">
+    <Link className="hidden sm:flex" href={to}>
       <div className="hover:opacity-75 transition items-center flex gap-2 ">
         <Image
           src="/logo-512x512.webp"
@@ -17,7 +18,7 @@ export const Logo = () => {
         />
         <p
           className={cn(
-            "text-md text-neutral-700 dark:text-neutral-200 uppercase font-thin"
+            "text-md text-neutral-700 dark:text-neutral-50 uppercase font-light pt-0.5"
           )}
         >
           Splitify

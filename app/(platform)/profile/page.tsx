@@ -26,7 +26,7 @@ const ProfilePage = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <div className="w-full px-8 md:px-12 sticky top-0 flex itemx-center justify-between gap-4">
-            <Link href="/">
+            <Link href="/dashboard">
               <Button variant="outline" size="icon">
                 <ArrowLeftIcon />
                 <span className="sr-only">Back</span>
@@ -40,7 +40,7 @@ const ProfilePage = () => {
               Sign out
             </Button>
           </div>
-          <div className="w-fit flex items-start justify-center px-12">
+          <div className="w-fit flex items-start justify-center px-12 pb-12">
             <UserProfile />
           </div>
         </ClerkLoaded>
