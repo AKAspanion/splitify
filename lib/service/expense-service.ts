@@ -51,7 +51,7 @@ export class ExpenseService {
         }
       }
       default:
-        return null;
+        throw new Error("Type of expense not found");
     }
   }
 }

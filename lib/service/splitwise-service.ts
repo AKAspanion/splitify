@@ -17,7 +17,7 @@ export class SplitWiseService {
   public addExpense(
     name: string,
     expenseType: ExpenseType,
-    payment: Payment,
+    payments: Payment[],
     splits: Split[]
   ) {
     if (!this.validateSplits(expenseType, splits)) {
@@ -26,7 +26,54 @@ export class SplitWiseService {
           expenseType.toString()
       );
     }
-    this.expenseRepository.addExpense(name, expenseType, payment, splits);
+
+    switch (expenseType) {
+      case ExpenseType.EQUAL:
+      case ExpenseType.PERCENT:
+        for (const payment of payments) {
+          this.expenseRepository.addExpense(name, expenseType, payment, splits);
+        }
+        break;
+      case ExpenseType.EXACT:
+        if (payments.length === 1) {
+          this.expenseRepository.addExpense(
+            name,
+            expenseType,
+            payments[0],
+            splits
+          );
+          return;
+        }
+
+        let totalSplits = 0;
+        let totalPayments = 0;
+        for (const split of splits) {
+          totalSplits += split.getAmount();
+        }
+        for (const payment of payments) {
+          totalPayments += payment.getAmount();
+        }
+
+        if (totalSplits !== totalPayments) {
+          throw new Error("Validation failed for exact total amount");
+        }
+
+        for (const payment of payments) {
+          this.expenseRepository.addExpense(
+            name,
+            ExpenseType.PERCENT,
+            payment,
+            splits.map((s) => {
+              const percent = (s.getAmount() / totalPayments) * 100.0;
+              return new PercentSplit(s.getUser(), percent);
+            })
+          );
+        }
+
+        break;
+      default:
+        throw new Error("Handling for this type of expense not found");
+    }
   }
 
   private validateSplits(expenseType: ExpenseType, splits: Split[]) {

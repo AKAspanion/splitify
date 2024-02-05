@@ -12,7 +12,6 @@ export class ExactExpense extends Expense {
     const totalAmount = this.getAmount();
     let totalSplitAmount = 0;
     for (const split of this.getSplits()) {
-      console.log(split instanceof ExactSplit);
       if (!(split instanceof ExactSplit)) return false;
       const exactSplit = <ExactSplit>split;
       totalSplitAmount += exactSplit.getAmount();
