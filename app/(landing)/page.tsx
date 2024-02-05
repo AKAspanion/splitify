@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, useUser } from "@clerk/nextjs";
+import Spinner from "@/components/ui/spinner";
 
 const textFont = Poppins({
   subsets: ["latin"],
@@ -14,7 +15,7 @@ const textFont = Poppins({
 const LandingPage = () => {
   const { user } = useUser();
   return (
-    <div className="flex items-center justify-center flex-col">
+    <div className="flex items-center justify-center flex-col pt-12">
       <div className={cn("flex items-center justify-center flex-col")}>
         <h1 className="uppercase text-3xl font-extralight md:text-6xl text-center text-neutral-800dark:text-neutral-200 mb-6">
           Spliting Expenses
@@ -32,11 +33,13 @@ const LandingPage = () => {
         Keep track of your shared expenses and balances with housemates, trips,
         groups, friends, and family.
       </div>
-      {user ? null : (
-        <Button className="mt-6" size="lg" asChild>
-          <Link href="/sign-up">Join Splitify for free</Link>
-        </Button>
-      )}
+      <ClerkLoaded>
+        {user ? null : (
+          <Button className="mt-6" size="lg" asChild>
+            <Link href="/sign-up">Join Splitify for free</Link>
+          </Button>
+        )}
+      </ClerkLoaded>
     </div>
   );
 };
