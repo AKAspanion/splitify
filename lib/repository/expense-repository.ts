@@ -1,3 +1,4 @@
+import { fixedNum } from "@/utils/validate";
 import { Expense } from "../model/expense/expense";
 import { ExpenseType } from "../model/expense/expense-type";
 import { Group } from "../model/group/group";
@@ -100,10 +101,18 @@ export class ExpenseRepository {
     const user1Name = this.getUser(user1Id)?.getUserName();
     const user2Name = this.getUser(user2Id)?.getUserName();
     if (amount < 0) {
-      return user1Name + " owes " + user2Name + ": " + Math.abs(amount);
+      return (
+        user1Name + " owes " + user2Name + ": " + fixedNum(Math.abs(amount))
+      );
     } else if (amount > 0) {
-      return user2Name + " owes " + user1Name + ": " + Math.abs(amount);
+      return (
+        user2Name + " owes " + user1Name + ": " + fixedNum(Math.abs(amount))
+      );
     }
     return "";
+  }
+
+  public getBalanceSheets() {
+    return this.group.getBalanceSheets();
   }
 }

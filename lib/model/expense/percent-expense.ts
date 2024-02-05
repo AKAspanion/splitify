@@ -18,6 +18,6 @@ export class PercentExpense extends Expense {
       totalSplitPercent += percentSplit?.getPercent();
     }
 
-    return 100 == totalSplitPercent;
+    return 100 == Math.round(totalSplitPercent);
   }
 }

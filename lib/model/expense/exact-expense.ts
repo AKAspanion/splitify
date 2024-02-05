@@ -16,6 +16,6 @@ export class ExactExpense extends Expense {
       const exactSplit = <ExactSplit>split;
       totalSplitAmount += exactSplit.getAmount();
     }
-    return totalAmount == totalSplitAmount;
+    return Math.round(totalAmount) == Math.round(totalSplitAmount);
   }
 }

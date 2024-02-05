@@ -6,6 +6,7 @@ import { ExpenseRepository } from "../repository/expense-repository";
 import { EqualSplit } from "../model/split/equal-split";
 import { ExactSplit } from "../model/split/exact-split";
 import { PercentSplit } from "../model/split/percent-split";
+import { fixedNum } from "@/utils/validate";
 
 export class SplitWiseService {
   expenseRepository: ExpenseRepository;
@@ -27,24 +28,40 @@ export class SplitWiseService {
       );
     }
 
+    if (payments.length === 1) {
+      this.expenseRepository.addExpense(name, expenseType, payments[0], splits);
+      return;
+    }
+
     switch (expenseType) {
       case ExpenseType.EQUAL:
-      case ExpenseType.PERCENT:
         for (const payment of payments) {
-          this.expenseRepository.addExpense(name, expenseType, payment, splits);
+          const totalSplits = splits.length;
+          this.expenseRepository.addExpense(
+            name,
+            ExpenseType.PERCENT,
+            payment,
+            splits.map((s) => {
+              const percent = fixedNum((1 / totalSplits) * 100);
+              return new PercentSplit(s.getUser(), percent);
+            })
+          );
         }
         break;
-      case ExpenseType.EXACT:
-        if (payments.length === 1) {
+      case ExpenseType.PERCENT:
+        for (const payment of payments) {
           this.expenseRepository.addExpense(
             name,
             expenseType,
-            payments[0],
-            splits
+            payment,
+            splits.map(
+              (s) =>
+                new PercentSplit(s.getUser(), (s as PercentSplit).getPercent())
+            )
           );
-          return;
         }
-
+        break;
+      case ExpenseType.EXACT:
         let totalSplits = 0;
         let totalPayments = 0;
         for (const split of splits) {
@@ -64,7 +81,7 @@ export class SplitWiseService {
             ExpenseType.PERCENT,
             payment,
             splits.map((s) => {
-              const percent = (s.getAmount() / totalPayments) * 100.0;
+              const percent = fixedNum((s.getAmount() / totalPayments) * 100.0);
               return new PercentSplit(s.getUser(), percent);
             })
           );
@@ -103,7 +120,7 @@ export class SplitWiseService {
     if (balances.length === 0) {
       return "No balance for " + user?.getUserName();
     } else {
-      return balances.join("\n");
+      return balances.join("\n ");
     }
   }
 
@@ -112,7 +129,11 @@ export class SplitWiseService {
     if (balances.length === 0) {
       return "No balances";
     } else {
-      return balances.join("\n");
+      return balances.join("\n ");
     }
+  }
+
+  public getBalanceSheets() {
+    return this.expenseRepository.getBalanceSheets();
   }
 }

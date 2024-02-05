@@ -2,9 +2,10 @@ import { User } from "../user/user";
 
 export abstract class Split {
   private user: User;
-  amount?: number;
+  private amount: number;
 
-  constructor(user: User) {
+  constructor(user: User, amount = 0) {
+    this.amount = amount;
     this.user = user;
   }
 
