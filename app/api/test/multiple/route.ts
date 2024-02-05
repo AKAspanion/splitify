@@ -30,38 +30,35 @@ export async function GET(_req: Request) {
     console.log("-----------------");
     service.addExpense(
       "GoaFlight",
-      ExpenseType.PERCENT,
+      ExpenseType.EXACT,
       [new Payment(aloke, 500)],
       [
-        new PercentSplit(ankit, 20),
-        new PercentSplit(aloke, 30),
-        new PercentSplit(akash, 50),
+        new ExactSplit(ankit, 100),
+        new ExactSplit(aloke, 150),
+        new ExactSplit(akash, 250),
       ]
     );
     service.addExpense(
       "GoaFlight",
-      ExpenseType.PERCENT,
+      ExpenseType.EXACT,
       [new Payment(akash, 1000)],
       // [new Payment(akash, 1000), new Payment(aloke, 500)],
       [
-        new PercentSplit(ankit, 20),
-        new PercentSplit(aloke, 30),
-        new PercentSplit(akash, 50),
+        new ExactSplit(ankit, 200),
+        new ExactSplit(aloke, 300),
+        new ExactSplit(akash, 500),
       ]
     );
     service.addExpense(
       "GoaFlight",
-      ExpenseType.PERCENT,
+      ExpenseType.EXACT,
       [new Payment(akash, 1000), new Payment(aloke, 500)],
       [
-        new PercentSplit(ankit, 20),
-        new PercentSplit(aloke, 30),
-        new PercentSplit(akash, 50),
+        new ExactSplit(ankit, 300),
+        new ExactSplit(aloke, 450),
+        new ExactSplit(akash, 750),
       ]
     );
-    console.log(service.getBalance(ankit));
-    console.log(service.getBalance(aloke));
-    console.log(service.getBalance(akash));
     // service.addExpense(
     //   "GoaFlight",
     //   ExpenseType.PERCENT,
