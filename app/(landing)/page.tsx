@@ -35,9 +35,11 @@ const LandingPage = () => {
       </div>
       <ClerkLoaded>
         {user ? null : (
-          <Button className="mt-6" size="lg" asChild>
-            <Link href="/sign-up">Join Splitify for free</Link>
-          </Button>
+          <Link href="/sign-up">
+            <Button className="mt-6" size="lg">
+              Join Splitify for free
+            </Button>
+          </Link>
         )}
       </ClerkLoaded>
     </div>

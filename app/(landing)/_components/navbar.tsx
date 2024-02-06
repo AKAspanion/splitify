@@ -10,6 +10,7 @@ import Spinner from "@/components/ui/spinner";
 
 export const Navbar = () => {
   const { user } = useUser();
+  // const user: any = { imageUrl: "" };
   return (
     <div className="fixed top-0 w-full h-16 px-4 border-b shadow-sm  flex items-center">
       <div className="md:max-w-screen-2xl mx-auto flex items-center w-full">
@@ -34,13 +35,15 @@ export const Navbar = () => {
                 </div>
               </ClerkLoading>
               <ClerkLoaded>
-                <Button size="sm" variant="outline" asChild>
-                  <Link href="/sign-in">Login</Link>
-                </Button>
-                <div className="flex gap-4 items-center justify-center">
-                  <Button size="sm" asChild>
-                    <Link href="/sign-up">Sign up</Link>
+                <Link href="/sign-in">
+                  <Button size="sm" variant="outline">
+                    Login
                   </Button>
+                </Link>
+                <div className="flex gap-4 items-center justify-center">
+                  <Link href="/sign-up">
+                    <Button size="sm">Sign up</Button>
+                  </Link>
                 </div>
               </ClerkLoaded>
             </div>
