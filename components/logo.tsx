@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export const Logo = (props: { to?: string }) => {
   const { to = "/" } = props;
   return (
-    <Link className="hidden sm:flex" href={to}>
+    <Link className="flex" href={to}>
       <div className="hover:opacity-75 transition items-center flex gap-2 ">
         <Image
           src="/logo-512x512.webp"
