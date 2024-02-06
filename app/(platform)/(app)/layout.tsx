@@ -7,10 +7,12 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <>
       <Navbar />
-      <div className="pt-16">{children}</div>
+      <div className="mt-16 h-[calc(100vh-64px-73px)] sm:h-[calc(100vh-64px)] overflow-y-auto">
+        {children}
+      </div>
       <NavbarBottom />
-    </div>
+    </>
   );
 }

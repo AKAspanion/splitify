@@ -6,9 +6,9 @@ export default function PlatformLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <>
       {children}
       <AddExpenseFab />
-    </div>
+    </>
   );
 }

@@ -10,12 +10,9 @@ export const Form = () => {
   const router = useRouter();
   const { execute, fieldErrors } = useAction(createGroup, {
     onSuccess: (data) => {
-      // console.log("data", data);
       router.push(`/groups/${data.id}`);
     },
-    onError: (error) => {
-      // console.log("error", error);
-    },
+    onError: () => {},
   });
 
   const onSubmit = (formData: FormData) => {
@@ -27,7 +24,7 @@ export const Form = () => {
 
   return (
     <form className="flex flex-col gap-6" action={onSubmit}>
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <FormInput
           label="Group name"
           id="title"

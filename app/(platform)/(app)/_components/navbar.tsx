@@ -10,7 +10,7 @@ import { useUser } from "@clerk/nextjs";
 export const Navbar = () => {
   const { user } = useUser();
   return (
-    <div className="fixed top-0 w-full h-16 px-8 border-b shadow-sm  flex items-center">
+    <div className="fixed z-10 bg-background top-0 w-full h-16 px-8 border-b shadow-sm  flex items-center">
       <div className="md:max-w-screen-2xl mx-auto flex items-center w-full">
         <Logo to="/dashboard" />
         <div className="hidden sm:flex items-center pl-8">

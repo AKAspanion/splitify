@@ -9,7 +9,7 @@ import { useUser } from "@clerk/nextjs";
 export const NavbarBottom = () => {
   const { user } = useUser();
   return (
-    <div className="block sm:hidden fixed bottom-0 w-screen p-4 px-8 border-t">
+    <div className="bg-background z-10 block sm:hidden fixed bottom-0 w-screen p-4 px-8 border-t">
       <div className="md:max-w-screen-2xl mx-auto flex items-center w-full justify-between">
         <div className="flex items-center justify-between w-full">
           <Link href="/groups">

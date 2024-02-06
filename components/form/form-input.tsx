@@ -18,13 +18,15 @@ export const FormInput = (props: FormInputProps) => {
           {label}
         </Label>
       ) : null}
-      <Input
-        id={id}
-        {...rest}
-        disabled={pending || disabled}
-        aria-describedby={`${id}-error`}
-      />
-      <FormErrors id={id} errors={errors} />
+      <div className={label ? "mt-1" : ""}>
+        <Input
+          id={id}
+          {...rest}
+          disabled={pending || disabled}
+          aria-describedby={`${id}-error`}
+        />
+        <FormErrors id={id} errors={errors} />
+      </div>
     </div>
   );
 };
