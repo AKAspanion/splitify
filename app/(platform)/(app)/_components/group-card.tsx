@@ -3,13 +3,13 @@ import { ListIcon } from "lucide-react";
 import Link from "next/link";
 
 type GroupCardProps = {
-  group: Group;
+  group: Group | null;
 };
 
 export const GroupCard = (props: GroupCardProps) => {
   const { group } = props;
 
-  return (
+  return !group ? null : (
     <Link href={`/groups/${group.id}`}>
       <div className="rounded">
         <div className="flex items-stretch gap-4">

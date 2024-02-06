@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -9,16 +10,27 @@ import { useUser } from "@clerk/nextjs";
 
 export const Navbar = () => {
   const { user } = useUser();
+  const pathname = usePathname();
   return (
     <div className="fixed z-10 bg-background top-0 w-full h-16 px-8 border-b shadow-sm  flex items-center">
       <div className="md:max-w-screen-2xl mx-auto flex items-center w-full">
         <Logo to="/dashboard" />
         <div className="hidden sm:flex items-center pl-8">
           <Link href="/groups">
-            <Button variant="link">Groups</Button>
+            <Button
+              className={pathname.includes("groups") ? "underline" : ""}
+              variant="link"
+            >
+              Groups
+            </Button>
           </Link>
           <Link href="/friends">
-            <Button variant="link">Friends</Button>
+            <Button
+              className={pathname.includes("friends") ? "underline" : ""}
+              variant="link"
+            >
+              Friends
+            </Button>
           </Link>
         </div>
         <div className="flex-1" />
@@ -29,8 +41,8 @@ export const Navbar = () => {
                 className="rounded-full"
                 src={user?.imageUrl}
                 alt="Profile logo"
-                height={40}
-                width={40}
+                height={36}
+                width={36}
               />
             </Link>
           ) : null}

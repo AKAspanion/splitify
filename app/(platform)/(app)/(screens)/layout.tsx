@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { AddExpenseFab } from "../_components/add-expense-fab";
+import { ScreenSkeleton } from "../_components/screen-skeleton";
 
 export default function PlatformLayout({
   children,
@@ -7,7 +9,7 @@ export default function PlatformLayout({
 }) {
   return (
     <>
-      {children}
+      <Suspense fallback={<ScreenSkeleton />}>{children}</Suspense>
       <AddExpenseFab />
     </>
   );
