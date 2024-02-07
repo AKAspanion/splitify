@@ -11,18 +11,46 @@ datasource db {
   relationMode = "prisma"
 }
 
+model User {
+  id                Int           @id @default(autoincrement())
+  clerk_id          String        @unique
+  email             String        @unique
+  name              String?
+  image_url         String?
+  profile_image_url String?
+  Expense           Expense[]
+  UserExpense       UserExpense[]
+
+  @@index([id])
+}
+
 model Expense {
-  id      String  @id @default(uuid())
-  desc    String
-  amount  Decimal @db.Decimal(9, 2)
-  group   Group?  @relation(fields: [groupId], references: [id])
-  groupId String?
+  id          Int           @id @default(autoincrement())
+  description String
+  amount      Float
+  groupId     Int
+  payers      UserExpense[]
+  userId      Int?
+  Group       Group         @relation(fields: [groupId], references: [id])
+  User        User?         @relation(fields: [userId], references: [id])
 
   @@index([groupId])
+  @@index([userId])
+}
+
+model UserExpense {
+  userId    Int     @map("user_id")
+  expenseId Int     @map("expense_id")
+  user      User    @relation(fields: [userId], references: [id])
+  expense   Expense @relation(fields: [expenseId], references: [id])
+
+  @@id([userId, expenseId])
+  @@index([userId])
+  @@index([expenseId])
 }
 
 model Group {
-  id      String    @id @default(uuid())
+  id      Int       @id @default(autoincrement())
   title   String
   type    String?
   Expense Expense[]
