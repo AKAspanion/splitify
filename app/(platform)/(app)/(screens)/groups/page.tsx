@@ -4,9 +4,15 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { GroupCard } from "../../_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
+import { auth } from "@clerk/nextjs";
 
 const GroupsPage = async () => {
-  const groups = await db.group.findMany();
+  const { userId } = auth();
+  const data = await db.user.findUnique({
+    where: { clerk_id: userId || "null" },
+    include: { groups: true },
+  });
+
   return (
     <AutoContainer
       header={
@@ -26,7 +32,7 @@ const GroupsPage = async () => {
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {groups.map((g) => {
+        {data?.groups.map((g) => {
           return <GroupCard key={g.id} group={g} />;
         })}
       </div>

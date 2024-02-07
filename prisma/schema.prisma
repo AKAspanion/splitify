@@ -20,6 +20,7 @@ model User {
   profile_image_url String?
   Expense           Expense[]
   UserExpense       UserExpense[]
+  groups            Group[]
   friends           User[]        @relation("UserFriends")
 
   // This second "side" of the UserFriends relation exists solely 
@@ -28,14 +29,6 @@ model User {
 
   @@index([id])
 }
-
-// model Friend {
-//   id       String @id @default(uuid())
-//   user     User   @relation(fields: [friendId], references: [clerk_id])
-//   friendId String
-
-//   @@unique([friendId])
-// }
 
 model Expense {
   id          String        @id @default(uuid())
@@ -67,4 +60,5 @@ model Group {
   title   String
   type    String?
   Expense Expense[]
+  users   User[]
 }

@@ -5,7 +5,7 @@ import { InputType, ReturnType } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
-import { CreateGroup } from "./schema";
+import { UpdateGroup } from "./schema";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId: userClerkId } = auth();
@@ -14,16 +14,15 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { title, type } = data;
+  const { groupId, memberClerkId } = data;
 
   let group;
   try {
-    group = await db.group.create({
+    group = await db.group.update({
+      where: { id: groupId },
       data: {
-        title,
-        type,
         users: {
-          connect: [{ clerk_id: userClerkId }],
+          connect: [{ clerk_id: memberClerkId }],
         },
       },
     });
@@ -33,8 +32,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/groups/add`);
   revalidatePath(`/groups/${group.id}`);
+  revalidatePath(`/groups/${group.id}/settings`);
+  revalidatePath(`/groups/${group.id}/add-member`);
   return { data: group };
-  //   redirect(`/groups/${group.id}`);
 };
 
-export const createGroup = createSafeAction(CreateGroup, handler);
+export const updateGroupMembers = createSafeAction(UpdateGroup, handler);

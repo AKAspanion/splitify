@@ -1,3 +1,4 @@
+import { ListItem } from "@/components/list-item";
 import { User } from "@prisma/client";
 import Image from "next/image";
 
@@ -10,8 +11,11 @@ export const UserCard = (props: UserCardProps) => {
   const { user, actions } = props;
 
   return !user ? null : (
-    <div className="flex justify-between items-center gap-4">
-      <div className="flex items-center gap-4">
+    <ListItem
+      actions={actions}
+      title={user?.name || "-"}
+      subtitle={user?.email}
+      icon={
         <Image
           alt="profile pic"
           width={40}
@@ -19,16 +23,7 @@ export const UserCard = (props: UserCardProps) => {
           className="rounded-full"
           src={user.profile_image_url || ""}
         />
-        <div className="flex items-center">
-          <div className="flex flex-col">
-            <div className="font-normal text-sm">{user?.name || "-"}</div>
-            {user?.email ? (
-              <div className="text-xs font-light">{user?.email}</div>
-            ) : null}
-          </div>
-        </div>
-      </div>
-      {actions ? <div>{actions}</div> : null}
-    </div>
+      }
+    />
   );
 };
