@@ -20,18 +20,22 @@ model User {
   profile_image_url String?
   Expense           Expense[]
   UserExpense       UserExpense[]
-  friends           Friend[]
+  friends           User[]        @relation("UserFriends")
+
+  // This second "side" of the UserFriends relation exists solely 
+  // to satisfy prisma's requirements; we won't access it directly.
+  symmetricFriends User[] @relation("UserFriends")
 
   @@index([id])
 }
 
-model Friend {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+// model Friend {
+//   id       String @id @default(uuid())
+//   user     User   @relation(fields: [friendId], references: [clerk_id])
+//   friendId String
 
-  @@unique([userId])
-}
+//   @@unique([friendId])
+// }
 
 model Expense {
   id          String        @id @default(uuid())

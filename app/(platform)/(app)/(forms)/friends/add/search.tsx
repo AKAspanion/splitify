@@ -8,11 +8,17 @@ import { FormSubmit } from "@/components/form/form-submit";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { UserCard } from "../../../_components/user-card";
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Action } from "./action";
+import { useUser } from "@clerk/nextjs";
 
 const Search = () => {
+  const { user } = useUser();
   const { execute, data, fieldErrors } = useAction(searchUser, {
     onSuccess: (data) => {
-      //   console.log("data", data);
+      // console.log("data", data);
     },
     onError: () => {},
   });
@@ -28,7 +34,12 @@ const Search = () => {
       <div className="flex w-full justify-between items-center">
         <div className="w-full font-semibold text-lg">
           <form action={onSubmit}>
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
+              <Link href="/friends">
+                <Button type="button" variant={"ghost"} size={"icon"}>
+                  <ArrowLeftIcon />
+                </Button>
+              </Link>
               <FormInput
                 id="email"
                 name="email"
@@ -43,9 +54,27 @@ const Search = () => {
               </div>
             </FormLoading>
             <FormLoaded>
-              {data?.map((d) => (
-                <UserCard user={d} key={d.id} />
-              ))}
+              <div className="py-6 flex flex-col gap-6">
+                {data?.map((d) => (
+                  <UserCard
+                    user={d}
+                    key={d.id}
+                    actions={
+                      <Action
+                        id={d.clerk_id}
+                        isFriend={
+                          !!d?.friends?.find((u) => u.clerk_id === user?.id)
+                        }
+                      />
+                    }
+                  />
+                ))}
+              </div>
+              <div className="text-center text-sm">
+                {data !== undefined && data.length === 0
+                  ? "No search results found"
+                  : null}
+              </div>
             </FormLoaded>
           </form>
         </div>

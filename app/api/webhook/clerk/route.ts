@@ -19,7 +19,11 @@ export async function POST(request: Request) {
         await db.user.create({ data: user });
         break;
       case "user.updated":
-        console.log("TODO Update");
+        await db.user.upsert({
+          where: { clerk_id: user.clerk_id },
+          update: { ...user },
+          create: { ...user },
+        });
         break;
       default:
         break;

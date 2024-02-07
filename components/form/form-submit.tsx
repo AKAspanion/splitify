@@ -11,7 +11,7 @@ export const FormSubmit = ({
 }: FormSubmitProps) => {
   const { pending } = useFormStatus();
   return (
-    <div className="flex justify-end items-center mb-6">
+    <div className="flex justify-end items-center">
       <Button
         {...rest}
         loading={pending}

@@ -17,7 +17,7 @@ export const UserCard = (props: UserCardProps) => {
           width={40}
           height={40}
           className="rounded-full"
-          src={user.image_url || ""}
+          src={user.profile_image_url || ""}
         />
         <div className="flex items-center">
           <div className="flex flex-col">

@@ -9,7 +9,7 @@ export const FormInput = (props: FormInputProps) => {
   const { id, label, disabled, errors, ...rest } = props;
   const { pending } = useFormStatus();
   return (
-    <>
+    <div className="w-full">
       {label ? (
         <Label
           htmlFor={id}
@@ -27,6 +27,6 @@ export const FormInput = (props: FormInputProps) => {
         />
         <FormErrors id={id} errors={errors} />
       </div>
-    </>
+    </div>
   );
 };
