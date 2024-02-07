@@ -28,7 +28,6 @@ export const useAction = <TInput, TOutput>(
         const results = await action(input);
 
         if (!results) {
-          setLoading(false);
           return;
         }
 
@@ -44,6 +43,8 @@ export const useAction = <TInput, TOutput>(
           options?.onSuccess?.(results.data);
         }
       } catch (error) {
+        setLoading(false);
+      } finally {
         setLoading(false);
         options?.onComplete?.();
       }

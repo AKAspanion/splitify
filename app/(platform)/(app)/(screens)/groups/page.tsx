@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { SearchIcon, UserPlusIcon } from "lucide-react";
+import { SearchIcon, UserRoundPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { GroupCard } from "../../_components/group-card";
@@ -18,7 +18,7 @@ const GroupsPage = async () => {
             </Button>
             <Link href="/groups/add">
               <Button variant="ghost" size="icon">
-                <UserPlusIcon />
+                <UserRoundPlusIcon />
               </Button>
             </Link>
           </div>
