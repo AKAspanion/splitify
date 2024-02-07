@@ -5,14 +5,22 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const payload: WebhookEvent = await request.json();
-    console.log(payload);
-    console.log((payload.data as any).email_addresses);
-
+    const data = payload.data as any;
+    const email = data?.email_addresses?.[0];
+    const user = {
+      clerk_id: data?.id || "",
+      email: email?.email_address || "",
+      name: [data?.first_name || "", data?.last_name || ""].join(" "),
+      image_url: data?.image_url,
+      profile_image_url: data?.profile_image_url,
+    };
     switch (payload?.type) {
       case "user.created":
-        // db.
+        await db.user.create({ data: user });
         break;
-
+      case "user.updated":
+        console.log("TODO Update");
+        break;
       default:
         break;
     }

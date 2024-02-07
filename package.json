@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "studio": "npx prisma studio",
+    "postinstall": "npx prisma generate",
+    "dev:ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 3000"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.6",
@@ -22,7 +25,6 @@
     "next-themes": "^0.2.1",
     "react": "^18",
     "react-dom": "^18",
-    "svix": "^1.16.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uid": "^2.0.2",

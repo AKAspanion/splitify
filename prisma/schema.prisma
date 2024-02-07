@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id                Int           @id @default(autoincrement())
+  id                String        @id @default(uuid())
   clerk_id          String        @unique
   email             String        @unique
   name              String?
@@ -25,22 +25,22 @@ model User {
 }
 
 model Expense {
-  id          Int           @id @default(autoincrement())
+  id          String        @id @default(uuid())
   description String
   amount      Float
-  groupId     Int
-  payers      UserExpense[]
-  userId      Int?
-  Group       Group         @relation(fields: [groupId], references: [id])
+  groupId     String
+  userId      String?
+  Group       Group?        @relation(fields: [groupId], references: [id])
   User        User?         @relation(fields: [userId], references: [id])
+  payers      UserExpense[]
 
   @@index([groupId])
   @@index([userId])
 }
 
 model UserExpense {
-  userId    Int     @map("user_id")
-  expenseId Int     @map("expense_id")
+  userId    String  @map("user_id")
+  expenseId String  @map("expense_id")
   user      User    @relation(fields: [userId], references: [id])
   expense   Expense @relation(fields: [expenseId], references: [id])
 
@@ -50,7 +50,7 @@ model UserExpense {
 }
 
 model Group {
-  id      Int       @id @default(autoincrement())
+  id      String    @id @default(uuid())
   title   String
   type    String?
   Expense Expense[]
