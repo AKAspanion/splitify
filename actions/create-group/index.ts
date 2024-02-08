@@ -34,7 +34,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   revalidatePath(`/groups/add`);
   revalidatePath(`/groups/${group.id}`);
   return { data: group };
-  //   redirect(`/groups/${group.id}`);
 };
 
 export const createGroup = createSafeAction(CreateGroup, handler);

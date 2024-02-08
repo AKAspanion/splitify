@@ -37,4 +37,4 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   return { data: group };
 };
 
-export const updateGroupMembers = createSafeAction(UpdateGroup, handler);
+export const updateGroupMember = createSafeAction(UpdateGroup, handler);

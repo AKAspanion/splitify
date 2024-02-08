@@ -1,6 +1,6 @@
 "use client";
 
-import { updateGroupMembers } from "@/actions/update-group-member";
+import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { CheckIcon } from "lucide-react";
@@ -14,7 +14,7 @@ export const Action = ({
   memberClerkId: string;
   isInGroup?: boolean;
 }) => {
-  const { execute, loading } = useAction(updateGroupMembers, {
+  const { execute, loading } = useAction(updateGroupMember, {
     onSuccess: (data) => {
       // console.log("data", data);
     },

@@ -12,39 +12,63 @@ datasource db {
 }
 
 model User {
-  id                String        @id @default(uuid())
-  clerk_id          String        @unique
-  email             String        @unique
+  id                String  @id @default(uuid())
+  clerk_id          String  @unique
+  email             String  @unique
   name              String?
   image_url         String?
   profile_image_url String?
-  Expense           Expense[]
-  UserExpense       UserExpense[]
   groups            Group[]
-  friends           User[]        @relation("UserFriends")
+  friends           User[]  @relation("UserFriends")
 
   // This second "side" of the UserFriends relation exists solely 
   // to satisfy prisma's requirements; we won't access it directly.
   symmetricFriends User[] @relation("UserFriends")
+
+  Expense     Expense[]
+  UserSplit   UserSplit[]
+  UserPayment UserPayment[]
 
   @@index([id])
 }
 
 model Expense {
   id          String        @id @default(uuid())
-  description String
   amount      Float
-  groupId     String
-  userId      String?
+  description String
+  type        ExpenseType
+  groupId     String?
+  createrId   String
+  payers      UserPayment[]
+  splits      UserSplit[]
   Group       Group?        @relation(fields: [groupId], references: [id])
-  User        User?         @relation(fields: [userId], references: [id])
-  payers      UserExpense[]
+  User        User          @relation(fields: [createrId], references: [id])
 
   @@index([groupId])
-  @@index([userId])
+  @@index([createrId])
 }
 
-model UserExpense {
+enum ExpenseType {
+  EQUAL
+  EXACT
+  PERCENT
+}
+
+model UserPayment {
+  amount    Float
+  userId    String  @map("user_id")
+  expenseId String  @map("expense_id")
+  user      User    @relation(fields: [userId], references: [id])
+  expense   Expense @relation(fields: [expenseId], references: [id])
+
+  @@id([userId, expenseId])
+  @@index([userId])
+  @@index([expenseId])
+}
+
+model UserSplit {
+  amount    Float
+  percent   Float
   userId    String  @map("user_id")
   expenseId String  @map("expense_id")
   user      User    @relation(fields: [userId], references: [id])

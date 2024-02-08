@@ -1,12 +1,29 @@
+import { AutoContainer } from "@/components/container/auto-container";
 import { Input } from "@/components/ui/input";
+import { Form } from "./form";
+import { auth } from "@clerk/nextjs";
+import { db } from "@/lib/db";
+import { Group } from "@prisma/client";
 
-const ExpenseFormPage = () => {
+const ExpenseFormPage = async () => {
+  const { userId } = auth();
+  const data = await db.user.findUnique({
+    where: { clerk_id: userId || "null" },
+    include: { groups: true },
+  });
+
+  const groups = data?.groups || [];
+
   return (
-    <div className="p-6 px-8">
-      <form>
-        <Input id="desc" name="desc" />
-      </form>
-    </div>
+    <AutoContainer
+      header={
+        <div className="flex justify-between items-center">
+          <div className="font-semibold text-lg">Add an expense</div>
+        </div>
+      }
+    >
+      <Form groups={groups} />
+    </AutoContainer>
   );
 };
 
