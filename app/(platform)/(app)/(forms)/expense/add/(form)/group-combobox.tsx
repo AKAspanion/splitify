@@ -18,13 +18,14 @@ import {
 } from "@/components/ui/popover";
 import { Group } from "@prisma/client";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { GroupWIthUsers } from "./type";
 
 type GroupComboboxProps = {
   label?: string;
   value: string;
   open?: boolean;
-  groups?: Group[];
   disabled?: boolean;
+  groups?: GroupWIthUsers[];
   setOpen?: (open: boolean) => void;
   setValue: (value: string) => void;
 };

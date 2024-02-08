@@ -68,7 +68,7 @@ model UserPayment {
 
 model UserSplit {
   amount    Float
-  percent   Float
+  percent   Float?
   userId    String  @map("user_id")
   expenseId String  @map("expense_id")
   user      User    @relation(fields: [userId], references: [id])

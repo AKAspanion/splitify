@@ -10,9 +10,15 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExpenseType } from "@prisma/client";
+import { ExpenseType, User } from "@prisma/client";
+import { ArrowLeftIcon } from "lucide-react";
 
-export const SplitDrawer = () => {
+type SplitDrawerProps = {
+  users?: User[];
+};
+
+export const SplitDrawer = (props: SplitDrawerProps) => {
+  const { users = [] } = props;
   return (
     <Drawer>
       <DrawerTrigger>
@@ -23,7 +29,14 @@ export const SplitDrawer = () => {
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle className="px-4">Split amount</DrawerTitle>
+          <DrawerTitle className="px-4 flex gap-4 items-center">
+            <DrawerClose>
+              <Button type="button" variant="outline" size="icon">
+                <ArrowLeftIcon />
+              </Button>
+            </DrawerClose>
+            <div>Split amount</div>
+          </DrawerTitle>
         </DrawerHeader>
         <Tabs
           defaultValue={ExpenseType.EQUAL}
