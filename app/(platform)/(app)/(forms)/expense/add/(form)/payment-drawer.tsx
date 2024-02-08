@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { User } from "@prisma/client";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon } from "lucide-react";
+import Image from "next/image";
 import { useMemo } from "react";
 
 type PaymentDrawerProps = {
@@ -29,7 +30,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
   }, [payment]);
 
   const paidBy = useMemo(() => {
-    let text = "Someone";
+    const res = { text: "Someone", img: "" };
 
     const values = Object.entries(payment)
       .map(([key, value]) => ({
@@ -39,16 +40,20 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
       .filter((a) => !!a.value);
 
     if (values.length === 1) {
+      const u = users.find((u) => u.id === values[0]?.key);
       if (values[0]?.key === currUserId) {
-        text = "You";
+        res.text = "You";
+        res.img = u?.profile_image_url || res.img;
       } else {
-        text = users.find((u) => u.id === values[0]?.key)?.name || text;
+        res.text = u?.name || res.text;
+        res.img = u?.profile_image_url || res.img;
       }
     } else {
-      text = `${values.length} People`;
+      res.text = `${values.length} People`;
+      res.img = "";
     }
 
-    return text;
+    return res;
   }, [currUserId, payment, users]);
 
   const balance = total - used;
@@ -57,20 +62,44 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
   return (
     <Drawer>
       <DrawerTrigger>
-        <Button type="button" variant={"outline"}>
-          {paidBy}
+        <Button
+          type="button"
+          className="flex items-center gap-3"
+          variant={"outline"}
+        >
+          {paidBy?.img ? (
+            <div className="flex gap-2 items-center">
+              <Image
+                alt="profile"
+                className="rounded-full"
+                src={paidBy.img}
+                width={24}
+                height={24}
+              />
+              <div className="text-sm">{paidBy.text}</div>
+            </div>
+          ) : (
+            paidBy.text
+          )}
+          <div className="font-bold">Paid</div>
         </Button>
-        {"  "}paid
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle className="px-4 flex gap-4 items-center">
-            <DrawerClose>
+          <DrawerTitle className="px-4 flex gap-4 items-center justify-between">
+            <div className="flex items-center gap-4">
+              <DrawerClose>
+                <Button type="button" variant="outline" size="icon">
+                  <ArrowLeftIcon />
+                </Button>
+              </DrawerClose>
+              <div>Paid amount</div>
+            </div>
+            {/* <DrawerClose>
               <Button type="button" variant="outline" size="icon">
-                <ArrowLeftIcon />
+                <CheckIcon />
               </Button>
-            </DrawerClose>
-            <div>Paid amount</div>
+            </DrawerClose> */}
           </DrawerTitle>
         </DrawerHeader>
         <div className="w-full pt-3 pb-6 px-8">

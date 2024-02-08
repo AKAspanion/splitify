@@ -3,3 +3,16 @@ export const fixedNum = (value: number, decimalPlaces = 2) => {
     Math.round(parseFloat(value + "e" + decimalPlaces)) + "e-" + decimalPlaces
   );
 };
+
+export const convertAllValues = <T>(obj: Record<string, T>, value: T) =>
+  Object.keys(obj).reduce((acc, key) => {
+    acc[key] = value;
+    return acc;
+  }, {} as Record<string, T>);
+
+export const convertToObject = <T, S>(arr: T[], key: keyof T, value: S) =>
+  arr?.reduce(
+    // @ts-ignore
+    (obj, item) => Object.assign(obj, { [item[key]]: value }),
+    {}
+  ) || {};

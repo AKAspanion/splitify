@@ -12,6 +12,7 @@ import { SplitDrawer } from "./split-drawer";
 import { GroupWIthUsers } from "./type";
 import { useUser } from "@clerk/nextjs";
 import { FormErrors } from "@/components/form/form-errors";
+import { ExpenseType } from "@prisma/client";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -23,8 +24,11 @@ export const Form = ({ groups }: FormProps) => {
   const [open, setOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
   const [payment, setPayment] = useState<Record<string, number>>({});
+  const [split, setSplit] = useState<
+    Record<ExpenseType, Record<string, number>>
+  >({ EQUAL: {}, EXACT: {}, PERCENT: {} });
   const [selectedGroupId, setSelectedGroupId] = useState(groupId.toString());
-  //   const router = useRouter();
+
   const { execute, fieldErrors } = useAction(createExpense, {
     onSuccess: (data) => {
       // router.push(`/groups/${data.id}`);
@@ -52,8 +56,12 @@ export const Form = ({ groups }: FormProps) => {
   };
 
   const users = useMemo(() => {
-    return groups?.find((g) => g.id === selectedGroupId)?.users;
-  }, [groups, selectedGroupId]);
+    const gs = groups?.find((g) => g.id === selectedGroupId)?.users || [];
+    return [
+      ...gs.filter((u) => u?.clerk_id === user?.id),
+      ...gs.filter((u) => u?.clerk_id !== user?.id),
+    ];
+  }, [groups, selectedGroupId, user?.id]);
 
   const currUserId = useMemo(() => {
     return users?.find((u) => u.clerk_id === user?.id)?.id;
@@ -70,6 +78,17 @@ export const Form = ({ groups }: FormProps) => {
     setPayment((p) => ({ ...p, [id]: parseFloat(value || "0") }));
   };
 
+  const onSplitChange = (type: ExpenseType, values: Record<string, number>) => {
+    setSplit((p) => ({ ...p, [type]: { ...p[type], ...values } }));
+  };
+
+  const onGroupChange = (gid: string) => {
+    setSelectedGroupId(gid);
+    if (currUserId && total) {
+      setPayment((p) => ({ [currUserId]: total }));
+    }
+  };
+
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
       <GroupCombobox
@@ -78,7 +97,7 @@ export const Form = ({ groups }: FormProps) => {
         groups={groups}
         value={selectedGroupId}
         setOpen={setOpen}
-        setValue={setSelectedGroupId}
+        setValue={onGroupChange}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <FormInput
@@ -105,8 +124,14 @@ export const Form = ({ groups }: FormProps) => {
             currUserId={currUserId}
             onChange={onPaymentChange}
           />
-          <div className="pt-1">&</div>
-          <SplitDrawer />
+          <div className="pt-1">and</div>
+          <SplitDrawer
+            users={users}
+            total={total}
+            split={split}
+            currUserId={currUserId}
+            onChange={onSplitChange}
+          />
         </div>
         <FormErrors id="payers" errors={fieldErrors?.payers} />
       </div>
