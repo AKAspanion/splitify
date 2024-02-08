@@ -26,7 +26,7 @@ const ProfilePage = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <div className="w-full px-8 md:px-12 sticky top-0 flex itemx-center justify-between gap-4">
-            <Link href="/dashboard">
+            <Link href="/groups">
               <Button variant="outline" size="icon">
                 <ArrowLeftIcon />
                 <span className="sr-only">Back</span>
