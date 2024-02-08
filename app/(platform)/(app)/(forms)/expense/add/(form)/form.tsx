@@ -8,6 +8,8 @@ import { useState } from "react";
 import { Group } from "@prisma/client";
 import { useAction } from "@/hooks/use-action";
 import { createExpense } from "@/actions/create-expense";
+import { PaymentDrawer } from "./payment-drawer";
+import { SplitDrawer } from "./split-drawer";
 
 type FormProps = { groups: Group[] };
 
@@ -57,6 +59,12 @@ export const Form = ({ groups }: FormProps) => {
           errors={fieldErrors?.amount}
         />
       </div>
+      <div className="flex gap-2 justify-between items-center">
+        <PaymentDrawer />
+        <div className="pt-1">&</div>
+        <SplitDrawer />
+      </div>
+
       <FormSubmit>Create</FormSubmit>
     </form>
   );

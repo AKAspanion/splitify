@@ -1,9 +1,7 @@
 import { AutoContainer } from "@/components/container/auto-container";
-import { Input } from "@/components/ui/input";
-import { Form } from "./form";
+import { Form } from "./(form)/form";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
-import { Group } from "@prisma/client";
 
 const ExpenseFormPage = async () => {
   const { userId } = auth();
