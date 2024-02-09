@@ -29,17 +29,14 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         payments: {
           createMany: {
             data: payments.map((p) => ({ amount: p.amount, userId: p.userId })),
-            // skipDuplicates: true,
           },
         },
         splits: {
           createMany: {
             data: splits.map((p) => ({ amount: p.amount, userId: p.userId })),
-            // skipDuplicates: true,
           },
         },
       },
-      include: { payments: true, splits: true },
     });
   } catch (error) {
     return { error: "Failed to create expense" };

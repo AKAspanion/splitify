@@ -1,10 +1,8 @@
 import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
-import { ArrowLeftIcon, PencilIcon, TrashIcon } from "lucide-react";
-import Link from "next/link";
+import { Actions } from "./actions";
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const groupId = params["id"] || "null";
@@ -18,22 +16,15 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
     },
   });
 
+  const backTo = `/groups/${expense?.groupId || ""}`;
+
   return (
     <AutoContainer
       header={
         <Header
-          backTo={`/groups/${expense?.groupId || ""}`}
+          backTo={backTo}
           title={expense?.description}
-          actions={
-            <>
-              <Button variant="ghost" size="icon">
-                <TrashIcon width={20} />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <PencilIcon width={20} />
-              </Button>
-            </>
-          }
+          actions={<Actions expense={expense} />}
         />
       }
     >

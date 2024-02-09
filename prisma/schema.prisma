@@ -16,6 +16,8 @@ model User {
   id                String    @id @unique
   email             String    @unique
   name              String?
+  firstName         String?
+  lastName          String?
   image_url         String?
   profile_image_url String?
   createdAt         DateTime  @default(now())
@@ -67,7 +69,7 @@ model UserPayment {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   user      User      @relation(fields: [userId], references: [id])
-  expense   Expense?  @relation(fields: [expenseId], references: [id])
+  expense   Expense?  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expenseId])
@@ -82,7 +84,7 @@ model UserSplit {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   user      User      @relation(fields: [userId], references: [id])
-  expense   Expense?  @relation(fields: [expenseId], references: [id])
+  expense   Expense?  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expenseId])

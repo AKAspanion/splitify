@@ -14,7 +14,7 @@ export const Header = (props: HeaderProps) => {
     <div className="flex w-full gap-6 justify-between items-center">
       <div className="flex gap-4 items-center">
         {backTo ? (
-          <Link href="/groups">
+          <Link href={backTo}>
             <Button variant="ghost" size="icon">
               <ArrowLeftIcon />
             </Button>

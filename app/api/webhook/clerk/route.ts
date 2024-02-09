@@ -10,6 +10,8 @@ export async function POST(request: Request) {
     const user = {
       id: data?.id || "",
       email: email?.email_address || "",
+      firstName: data?.first_name || "",
+      lastName: data?.last_name || "",
       name: [data?.first_name || "", data?.last_name || ""].join(" "),
       image_url: data?.image_url,
       profile_image_url: data?.profile_image_url,
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Event received" }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
-      { message: error?.message || "Failed to receive" },
+      { message: error?.message || "Failed to parse event" },
       { status: 400 }
     );
   }

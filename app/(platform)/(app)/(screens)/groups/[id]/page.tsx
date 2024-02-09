@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";

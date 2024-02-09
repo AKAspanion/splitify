@@ -3,14 +3,16 @@ import { Expense, User, UserPayment, UserSplit } from "@prisma/client";
 import { ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+
+export type FullExpense =
+  | (Expense & {
+      payments: UserPaymentWithUser[] | null;
+      splits: UserSplit[] | null;
+    })
+  | null;
 type UserPaymentWithUser = UserPayment & { user: User };
 type ExpenseCardProps = {
-  expense:
-    | (Expense & {
-        payments: UserPaymentWithUser[] | null;
-        splits: UserSplit[] | null;
-      })
-    | null;
+  expense: FullExpense;
 };
 
 export const ExpenseCard = (props: ExpenseCardProps) => {
