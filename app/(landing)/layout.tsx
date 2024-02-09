@@ -9,11 +9,15 @@ export default function LandingLayout({
 }) {
   return (
     <main className="h-full">
-      <Navbar />
+      <Suspense>
+        <Navbar />
+      </Suspense>
       <div className="pt-40 pb-20 min-h-screen">
         <Suspense>{children}</Suspense>
       </div>
-      <Footer />
+      <Suspense>
+        <Footer />
+      </Suspense>
     </main>
   );
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ClerkLoaded, ClerkLoading, useUser } from "@clerk/nextjs";
+import { ClerkLoaded, useUser } from "@clerk/nextjs";
 
 const textFont = Poppins({
   subsets: ["latin"],
