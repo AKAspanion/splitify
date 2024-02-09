@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { Action } from "./action";
+import { Header } from "@/components/container/header";
 
 const Addmember = async ({ params }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
@@ -23,16 +24,10 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
   return (
     <AutoContainer
       header={
-        <div className="flex w-full justify-between items-center">
-          <div className="flex gap-4 items-center">
-            <Link href={`/groups/${id}/settings`}>
-              <Button variant="ghost" size="icon">
-                <ArrowLeftIcon />
-              </Button>
-            </Link>
-            <div className="font-semibold text-lg">Add members to group</div>
-          </div>
-        </div>
+        <Header
+          backTo={`/groups/${id}/settings`}
+          title="Add members to group"
+        />
       }
     >
       <div className="pb-6 flex flex-col gap-6">

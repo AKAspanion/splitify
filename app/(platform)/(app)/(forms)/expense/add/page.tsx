@@ -2,9 +2,7 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { Form } from "./(form)/form";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
-import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Header } from "@/components/container/header";
 
 const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
@@ -19,18 +17,7 @@ const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
   const backTo = groupdId ? `/groups/${groupdId}` : `/groups`;
 
   return (
-    <AutoContainer
-      header={
-        <div className="flex justify-between items-center gap-6">
-          <Link href={backTo}>
-            <Button type="button" variant={"ghost"} size={"icon"}>
-              <ArrowLeftIcon />
-            </Button>
-          </Link>
-          <div className="font-semibold text-lg">Add an expense</div>
-        </div>
-      }
-    >
+    <AutoContainer header={<Header backTo={backTo} title="Add an expense" />}>
       <Form groups={groups} />
     </AutoContainer>
   );

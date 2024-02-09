@@ -17,13 +17,21 @@ import { useMemo } from "react";
 type PaymentDrawerProps = {
   users?: User[];
   total?: number;
+  disabled?: boolean;
   currUserId?: string;
   payment: Record<string, number>;
   onChange: (value: string, userId: string) => void;
 };
 
 export const PaymentDrawer = (props: PaymentDrawerProps) => {
-  const { currUserId, users = [], total = 0, payment = {}, onChange } = props;
+  const {
+    currUserId,
+    disabled,
+    users = [],
+    total = 0,
+    payment = {},
+    onChange,
+  } = props;
 
   const used = useMemo(() => {
     return Object.values(payment).reduce((sum, a) => sum + a, 0);
@@ -61,9 +69,10 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
 
   return (
     <Drawer>
-      <DrawerTrigger>
+      <DrawerTrigger disabled={disabled}>
         <Button
           type="button"
+          disabled={disabled}
           className="flex items-center gap-3"
           variant={"outline"}
         >

@@ -30,7 +30,7 @@ export const Form = ({ groups }: FormProps) => {
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
 
-  const { execute, fieldErrors } = useAction(createExpense, {
+  const { loading, execute, fieldErrors } = useAction(createExpense, {
     onSuccess: (data) => {
       router.push(`/groups/${data?.groupId || ""}`);
       toast.success("Expense created successfully");
@@ -159,6 +159,7 @@ export const Form = ({ groups }: FormProps) => {
             users={users}
             total={total}
             payment={payment}
+            disabled={loading}
             currUserId={currUserId}
             onChange={onPaymentChange}
           />
@@ -166,6 +167,7 @@ export const Form = ({ groups }: FormProps) => {
           <SplitDrawer
             users={users}
             total={total}
+            disabled={loading}
             currUserId={currUserId}
             equalSplit={equalSplit}
             splitType={splitType}
@@ -175,7 +177,7 @@ export const Form = ({ groups }: FormProps) => {
         </div>
         <FormErrors id="payments" errors={fieldErrors?.payments} />
       </div>
-      <FormSubmit>Create</FormSubmit>
+      <FormSubmit>Add</FormSubmit>
     </form>
   );
 };

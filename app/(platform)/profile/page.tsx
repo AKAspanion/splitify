@@ -1,5 +1,6 @@
 "use client";
 
+import { DarkModeToggle } from "@/components/theme/dark-mode-toggle";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import {
@@ -32,7 +33,8 @@ const ProfilePage = () => {
                 <span className="sr-only">Back</span>
               </Button>
             </Link>
-            <div className="flex-1 w-[720px]" />
+            <div className="flex-1 w-[667px]" />
+            <DarkModeToggle />
             <Button
               variant="secondary"
               onClick={() => signOut(() => router.push("/"))}

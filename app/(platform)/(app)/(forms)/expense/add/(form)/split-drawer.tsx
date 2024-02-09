@@ -18,6 +18,7 @@ import { useMemo, useState } from "react";
 type SplitDrawerProps = {
   users?: User[];
   total?: number;
+  disabled?: boolean;
   currUserId?: string;
   equalSplit: Record<string, boolean>;
   onEqualSplitChange: (value: Record<string, boolean>) => void;
@@ -26,12 +27,13 @@ type SplitDrawerProps = {
 };
 
 export const SplitDrawer = (props: SplitDrawerProps) => {
-  const { splitType, onSplitTypeChange } = props;
+  const { splitType, disabled, onSplitTypeChange } = props;
   return (
     <Drawer>
-      <DrawerTrigger>
+      <DrawerTrigger disabled={disabled}>
         <Button
           type="button"
+          disabled={disabled}
           className="flex items-center gap-3"
           variant={"outline"}
         >

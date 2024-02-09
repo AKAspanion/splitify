@@ -1,5 +1,6 @@
 import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
 import { AutoContainer } from "@/components/container/auto-container";
+import { Header } from "@/components/container/header";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { ArrowLeftIcon, PencilIcon, TrashIcon } from "lucide-react";
@@ -20,24 +21,20 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   return (
     <AutoContainer
       header={
-        <div className="flex w-full gap-4 items-center justify-between">
-          <div className="flex gap-4 items-center">
-            <Link href={`/groups/${expense?.groupId || ""}`}>
+        <Header
+          backTo={`/groups/${expense?.groupId || ""}`}
+          title={expense?.description}
+          actions={
+            <>
               <Button variant="ghost" size="icon">
-                <ArrowLeftIcon />
+                <TrashIcon width={20} />
               </Button>
-            </Link>
-            <div className="font-semibold text-lg">{expense?.description}</div>
-          </div>
-          <div className="flex gap-2 ">
-            <Button variant="ghost" size="icon">
-              <TrashIcon width={20} />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <PencilIcon width={20} />
-            </Button>
-          </div>
-        </div>
+              <Button variant="ghost" size="icon">
+                <PencilIcon width={20} />
+              </Button>
+            </>
+          }
+        />
       }
     >
       <ExpenseCard expense={expense} />

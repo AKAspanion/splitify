@@ -6,6 +6,7 @@ import { ArrowLeftIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
+import { Header } from "@/components/container/header";
 
 const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
@@ -23,22 +24,17 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
   return (
     <AutoContainer
       header={
-        <div className="flex w-full gap-4 items-center justify-between">
-          <div className="flex gap-4 items-center">
-            <Link href="/groups">
-              <Button variant="ghost" size="icon">
-                <ArrowLeftIcon />
-              </Button>
-            </Link>
-          </div>
-          <div>
+        <Header
+          backTo="/groups"
+          title={group?.title}
+          actions={
             <Link href={`/groups/${id}/settings`}>
               <Button variant="ghost" size="icon">
                 <SettingsIcon />
               </Button>
             </Link>
-          </div>
-        </div>
+          }
+        />
       }
     >
       <GroupCard group={group} />

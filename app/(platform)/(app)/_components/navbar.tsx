@@ -5,14 +5,13 @@ import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { DarkModeToggle } from "@/components/theme/dark-mode-toggle";
 import { useUser } from "@clerk/nextjs";
 
 export const Navbar = () => {
   const { user } = useUser();
   const pathname = usePathname();
   return (
-    <div className="fixed z-10 bg-background top-0 w-full h-16 px-8 border-b shadow-sm  flex items-center">
+    <div className="fixed hidden sm:flex z-10 bg-background top-0 w-full h-16 px-8 border-b shadow-sm items-center">
       <div className="md:max-w-screen-2xl mx-auto flex items-center w-full">
         <Logo to="/groups" />
         <div className="hidden sm:flex items-center pl-8">
@@ -46,7 +45,6 @@ export const Navbar = () => {
               />
             </Link>
           ) : null}
-          <DarkModeToggle />
         </div>
       </div>
     </div>

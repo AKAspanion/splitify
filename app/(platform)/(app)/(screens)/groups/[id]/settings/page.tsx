@@ -12,6 +12,7 @@ import { auth } from "@clerk/nextjs";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { ListItem } from "@/components/list-item";
+import { Header } from "@/components/container/header";
 
 const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
@@ -24,18 +25,7 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
 
   return (
     <AutoContainer
-      header={
-        <div className="flex w-full gap-4 items-center justify-between">
-          <div className="flex gap-4 items-center">
-            <Link href={`/groups/${id}`}>
-              <Button variant="ghost" size="icon">
-                <ArrowLeftIcon />
-              </Button>
-            </Link>
-            <div className="font-semibold text-lg">Group Settings</div>
-          </div>
-        </div>
-      }
+      header={<Header backTo={`/groups/${id}`} title="Group Settings" />}
     >
       <GroupCard group={group} />
       <div className="pt-6 pb-3 font-semibold text-normal">Group members</div>

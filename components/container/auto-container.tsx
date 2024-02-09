@@ -15,9 +15,9 @@ export const AutoContainer = ({ header, children }: AutoContainerProps) => {
       ) : null}
       <div
         className={cn(
-          "pb-8 px-8 h-[calc(100vh-73px-64px)] sm:h-[calc(100vh-64px)] overflow-y-auto",
+          "pb-8 px-8 h-[calc(100vh-73px)] sm:h-[calc(100vh-64px)] overflow-y-auto",
           header
-            ? "h-[calc(100vh-88px-73px-64px)] sm:h-[calc(100vh-88px-64px)] overflow-y-auto"
+            ? "h-[calc(100vh-88px-73px)] sm:h-[calc(100vh-88px-64px)] overflow-y-auto"
             : "pt-6"
         )}
       >

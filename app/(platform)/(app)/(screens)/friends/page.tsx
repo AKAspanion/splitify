@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs";
 import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
+import { Header } from "@/components/container/header";
 
 const FriendsPage = async () => {
   const { userId } = auth();
@@ -16,16 +17,17 @@ const FriendsPage = async () => {
   return (
     <AutoContainer
       header={
-        <div className="flex w-full justify-between items-center">
-          <div className="font-semibold text-lg">Friends</div>
-          <div className="flex gap-4">
+        <Header
+          backTo={"/friends"}
+          title="Add a friend"
+          actions={
             <Link href="/friends/add">
               <Button variant="ghost" size="icon">
                 <UserPlusIcon />
               </Button>
             </Link>
-          </div>
-        </div>
+          }
+        />
       }
     >
       <div className="pb-6 flex flex-col gap-6">
