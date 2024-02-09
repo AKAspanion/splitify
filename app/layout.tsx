@@ -9,19 +9,7 @@ import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  icons: [
-    {
-      url: "/logo-512x512.webp",
-      href: "/logo-512x512.webp",
-    },
-  ],
-};
+export const metadata: Metadata = siteConfig;
 
 export default function RootLayout({
   children,

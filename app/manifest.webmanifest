@@ -1,0 +1,16 @@
+{
+  "name": "Splitify",
+  "short_name": "Splitify",
+  "icons": [
+    {
+      "src": "/logo-512x512.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ],
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
