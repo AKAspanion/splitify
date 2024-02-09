@@ -18,8 +18,7 @@ const FriendsPage = async () => {
     <AutoContainer
       header={
         <Header
-          backTo={"/friends"}
-          title="Add a friend"
+          title="Friends"
           actions={
             <Link href="/friends/add">
               <Button variant="ghost" size="icon">

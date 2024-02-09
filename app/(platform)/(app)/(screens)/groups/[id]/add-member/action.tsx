@@ -4,6 +4,7 @@ import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { CheckIcon } from "lucide-react";
+import { toast } from "sonner";
 
 export const Action = ({
   groupId,
@@ -15,11 +16,12 @@ export const Action = ({
   isInGroup?: boolean;
 }) => {
   const { execute, loading } = useAction(updateGroupMember, {
-    onSuccess: (data) => {
-      // console.log("data", data);
+    onSuccess: () => {
+      toast.success("Group mmber added successfully");
     },
-    onError: (error) => {
-      // console.log("error", error);
+    onError: (error, debug) => {
+      console.error(error, debug);
+      toast.error(error);
     },
   });
 

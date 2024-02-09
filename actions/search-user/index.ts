@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { SearchUser } from "./schema";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = auth();
@@ -23,7 +24,10 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       include: { friends: true },
     });
   } catch (error) {
-    return { error: "Failed to search user" };
+    return {
+      error: "Failed to search user",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/friends/add`);

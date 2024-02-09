@@ -12,20 +12,19 @@ export const Action = ({
   isFriend?: boolean;
 }) => {
   const { execute, loading } = useAction(createFriend, {
-    onSuccess: (data) => {
-      // console.log("data", data);
+    onSuccess: () => {
       toast.success("Friend added successfully");
     },
-    onError: (error) => {
-      // console.log("error", error);
-      toast.error("Failed to add friend");
+    onError: (error, debug) => {
+      console.error(error, debug);
+      toast.error(error);
     },
   });
 
   const onRequest = async () => {
     if (isFriend) return;
 
-    execute({ friendClerkId: id });
+    execute({ friendId: id });
   };
   return (
     <div>

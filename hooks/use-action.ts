@@ -6,7 +6,7 @@ type Action<TI, TO> = (data: TI) => Promise<ActionState<TI, TO>>;
 
 interface UseActionOptions<TO> {
   onSuccess?: (data: TO) => void;
-  onError?: (error: string) => void;
+  onError?: (error: string, debugMessage?: string) => void;
   onComplete?: () => void;
 }
 
@@ -35,7 +35,7 @@ export const useAction = <TInput, TOutput>(
 
         if (results?.error) {
           setError(results?.error);
-          options?.onError?.(results.error);
+          options?.onError?.(results.error, results.debugMessage || "");
         }
 
         if (results?.data) {

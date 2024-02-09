@@ -4,6 +4,7 @@ import { AppProgressBar } from "next-nprogress-bar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import ConfirmProvider from "./confirm/ConfirmContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
@@ -19,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         options={{ showSpinner: false }}
         shallowRouting
       />
-      {children}
+      <ConfirmProvider>{children}</ConfirmProvider>
     </ClerkProvider>
   );
 }

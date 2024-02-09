@@ -35,8 +35,9 @@ export const Form = ({ groups }: FormProps) => {
       router.push(`/groups/${data?.groupId || ""}`);
       toast.success("Expense created successfully");
     },
-    onError: () => {
-      toast.error("Failed to create expense");
+    onError: (error, debug) => {
+      console.error(debug);
+      toast.error(error);
     },
   });
 

@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/safe-actions";
 import { AddFriend } from "./schema";
 import { revalidatePath } from "next/cache";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = auth();
@@ -13,9 +14,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   if (!userId) {
     return { error: "Unauthorized" };
   }
-  const { friendClerkId } = data;
+  const { friendId } = data;
 
-  if (userId === friendClerkId) {
+  if (userId === friendId) {
     return { error: "You can't be friends with yourself" };
   }
 
@@ -24,15 +25,18 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     await Promise.all([
       db.user.update({
         where: { id: userId },
-        data: { friends: { connect: [{ id: friendClerkId }] } },
+        data: { friends: { connect: [{ id: friendId }] } },
       }),
       db.user.update({
-        where: { id: friendClerkId },
+        where: { id: friendId },
         data: { friends: { connect: [{ id: userId }] } },
       }),
     ]);
   } catch (error) {
-    return { error: "Failed to create friendship" };
+    return {
+      error: "Failed to create friendship",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/friends/add`);

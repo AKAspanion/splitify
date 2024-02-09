@@ -6,43 +6,24 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { DeleteExpense } from "./schema";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId: userClerkId } = auth();
+  const { userId } = auth();
 
-  if (!userClerkId) {
+  if (!userId) {
     return { error: "Unauthorized" };
   }
 
   const { expenseId, groupId } = data;
 
   try {
-    await db.expense.delete({
-      where: { createrId: userClerkId, groupId, id: expenseId },
-    });
-    // expense = await db.expense.create({
-    //   data: {
-    //     amount,
-    //     description,
-    //     type,
-    //     groupId,
-    //     createrId,
-    //     payments: {
-    //       createMany: {
-    //         data: payments.map((p) => ({ amount: p.amount, userId: p.userId })),
-    //         // skipDuplicates: true,
-    //       },
-    //     },
-    //     splits: {
-    //       createMany: {
-    //         data: splits.map((p) => ({ amount: p.amount, userId: p.userId })),
-    //         // skipDuplicates: true,
-    //       },
-    //     },
-    //   },
-    // });
+    await db.expense.delete({ where: { groupId, id: expenseId } });
   } catch (error) {
-    return { error: "Failed to create expense" };
+    return {
+      error: "Failed to delete expense",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/groups/${groupId || ""}`);

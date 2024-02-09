@@ -6,11 +6,12 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { CreateExpense } from "./schema";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId: userClerkId } = auth();
+  const { userId } = auth();
 
-  if (!userClerkId) {
+  if (!userId) {
     return { error: "Unauthorized" };
   }
 
@@ -39,7 +40,10 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
   } catch (error) {
-    return { error: "Failed to create expense" };
+    return {
+      error: "Failed to create expense",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/groups/${groupId || ""}`);

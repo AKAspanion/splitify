@@ -6,11 +6,12 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { UpdateGroup } from "./schema";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId: userClerkId } = auth();
+  const { userId } = auth();
 
-  if (!userClerkId) {
+  if (!userId) {
     return { error: "Unauthorized" };
   }
 
@@ -20,14 +21,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   try {
     group = await db.group.update({
       where: { id: groupId },
-      data: {
-        users: {
-          connect: [{ id: memberClerkId }],
-        },
-      },
+      data: { users: { connect: [{ id: memberClerkId }] } },
     });
   } catch (error) {
-    return { error: "Failed to create group" };
+    return {
+      error: "Failed to add group member",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/groups/add`);
