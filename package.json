@@ -10,6 +10,7 @@
     "format": "prettier --write .",
     "studio": "npx prisma studio",
     "postinstall": "npx prisma generate",
+    "postbuild": "npx prisma generate",
     "dev:ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 3000"
   },
   "dependencies": {

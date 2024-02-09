@@ -1,7 +1,9 @@
+import { Suspense } from "react";
+
 export default function PlatformLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div>{children}</div>;
+  return <Suspense>{children}</Suspense>;
 }

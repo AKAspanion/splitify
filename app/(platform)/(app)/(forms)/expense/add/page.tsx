@@ -3,6 +3,7 @@ import { Form } from "./(form)/form";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
+import { Suspense } from "react";
 
 const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
@@ -18,7 +19,9 @@ const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
 
   return (
     <AutoContainer header={<Header backTo={backTo} title="Add an expense" />}>
-      <Form groups={groups} />
+      <Suspense>
+        <Form groups={groups} />
+      </Suspense>
     </AutoContainer>
   );
 };

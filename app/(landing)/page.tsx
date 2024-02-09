@@ -5,7 +5,6 @@ import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ClerkLoaded, ClerkLoading, useUser } from "@clerk/nextjs";
-import Spinner from "@/components/ui/spinner";
 
 const textFont = Poppins({
   subsets: ["latin"],
@@ -27,7 +26,7 @@ const LandingPage = () => {
       <div
         className={cn(
           "text-sm md:text-xl text-neutral-400 md:mt-8 max-w-xs md:max-w-3xl text-center mx-auto mt-12",
-          textFont.className,
+          textFont.className
         )}
       >
         Keep track of your shared expenses and balances with housemates, trips,

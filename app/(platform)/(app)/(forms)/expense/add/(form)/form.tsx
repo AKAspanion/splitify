@@ -4,7 +4,7 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GroupCombobox } from "./group-combobox";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useAction } from "@/hooks/use-action";
 import { createExpense } from "@/actions/create-expense";
 import { PaymentDrawer } from "./payment-drawer";
@@ -18,11 +18,11 @@ import { toast } from "sonner";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
-export const Form = ({ groups }: FormProps) => {
+const FormComp = ({ groups }: FormProps) => {
   const { user } = useUser();
   const router = useRouter();
-  const params = useSearchParams();
-  const paramsGroupId = params.get("groupId") || "";
+  const searchParams = useSearchParams();
+  const paramsGroupId = searchParams.get("groupId") || "";
 
   const [open, setOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
@@ -182,3 +182,11 @@ export const Form = ({ groups }: FormProps) => {
     </form>
   );
 };
+
+export function Form(props: FormProps) {
+  return (
+    <Suspense>
+      <FormComp {...props} />
+    </Suspense>
+  );
+}
