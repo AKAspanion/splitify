@@ -11,7 +11,7 @@ export class ExpenseService {
     name: string,
     expenseType: ExpenseType,
     payment: Payment,
-    splits: Split[]
+    splits: Split[],
   ) {
     switch (expenseType) {
       case ExpenseType.EXACT: {
@@ -26,7 +26,7 @@ export class ExpenseService {
         for (const split of splits) {
           const percentSplit = <PercentSplit>split;
           split.setAmount(
-            (payment.getAmount() * percentSplit?.getPercent()) / 100.0
+            (payment.getAmount() * percentSplit?.getPercent()) / 100.0,
           );
         }
         const exp = new PercentExpense(name, payment, splits);

@@ -36,7 +36,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 100),
         new ExactSplit(aloke, 150),
         new ExactSplit(akash, 250),
-      ]
+      ],
     );
     service.addExpense(
       "GoaFlight",
@@ -47,7 +47,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 200),
         new ExactSplit(aloke, 300),
         new ExactSplit(akash, 500),
-      ]
+      ],
     );
     service.addExpense(
       "GoaFlight",
@@ -57,7 +57,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 300),
         new ExactSplit(aloke, 450),
         new ExactSplit(akash, 750),
-      ]
+      ],
     );
     // service.addExpense(
     //   "GoaFlight",
@@ -83,12 +83,12 @@ export async function GET(_req: Request) {
 
     return NextResponse.json(
       { message: service.getBalances() },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

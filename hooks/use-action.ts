@@ -6,13 +6,13 @@ type Action<TI, TO> = (data: TI) => Promise<ActionState<TI, TO>>;
 
 interface UseActionOptions<TO> {
   onSuccess?: (data: TO) => void;
-  onError?: (error: string) => void;
+  onError?: (error: string, debugMessage?: string) => void;
   onComplete?: () => void;
 }
 
 export const useAction = <TInput, TOutput>(
   action: Action<TInput, TOutput>,
-  options?: UseActionOptions<TOutput>
+  options?: UseActionOptions<TOutput>,
 ) => {
   const [fieldErrors, setFieldErrors] = useState<
     FieldErrors<TInput> | undefined
@@ -28,7 +28,6 @@ export const useAction = <TInput, TOutput>(
         const results = await action(input);
 
         if (!results) {
-          setLoading(false);
           return;
         }
 
@@ -36,7 +35,7 @@ export const useAction = <TInput, TOutput>(
 
         if (results?.error) {
           setError(results?.error);
-          options?.onError?.(results.error);
+          options?.onError?.(results.error, results.debugMessage || "");
         }
 
         if (results?.data) {
@@ -45,10 +44,12 @@ export const useAction = <TInput, TOutput>(
         }
       } catch (error) {
         setLoading(false);
+      } finally {
+        setLoading(false);
         options?.onComplete?.();
       }
     },
-    [action, options]
+    [action, options],
   );
 
   return {

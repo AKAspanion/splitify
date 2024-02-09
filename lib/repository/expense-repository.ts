@@ -32,7 +32,7 @@ export class ExpenseRepository {
     name: string,
     expenseType: ExpenseType,
     payment: Payment,
-    splits: Split[]
+    splits: Split[],
   ): void {
     if (this.getUser(payment.getUser().getUserId()) === undefined) {
       return;
@@ -42,7 +42,7 @@ export class ExpenseRepository {
       name,
       expenseType,
       payment,
-      splits
+      splits,
     );
     if (expense == null) {
       return;
@@ -66,7 +66,7 @@ export class ExpenseRepository {
           }
           balances.set(
             payment.getUser().getUserId(),
-            balances.get(payment.getUser().getUserId())! - split.getAmount()
+            balances.get(payment.getUser().getUserId())! - split.getAmount(),
           );
         }
       }
@@ -89,7 +89,7 @@ export class ExpenseRepository {
       allBalances.forEach((userBalance, userBalanceKey) => {
         if (userBalance > 0) {
           balances.push(
-            this.checkSign(allBalancesKey, userBalanceKey, userBalance)
+            this.checkSign(allBalancesKey, userBalanceKey, userBalance),
           );
         }
       });

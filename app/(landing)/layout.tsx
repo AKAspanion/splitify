@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Footer } from "./_components/footer";
 import { Navbar } from "./_components/navbar";
 
@@ -8,9 +9,15 @@ export default function LandingLayout({
 }) {
   return (
     <main className="h-full">
-      <Navbar />
-      <div className="pt-40 pb-20 min-h-screen">{children}</div>
-      <Footer />
+      <Suspense>
+        <Navbar />
+      </Suspense>
+      <div className="pt-40 pb-20 min-h-screen">
+        <Suspense>{children}</Suspense>
+      </div>
+      <Suspense>
+        <Footer />
+      </Suspense>
     </main>
   );
 }

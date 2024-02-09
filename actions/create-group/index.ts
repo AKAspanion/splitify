@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { CreateGroup } from "./schema";
+import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = auth();
@@ -18,15 +19,19 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   let group;
   try {
-    group = await db.group.create({ data: { title, type } });
+    group = await db.group.create({
+      data: { title, type, users: { connect: [{ id: userId }] } },
+    });
   } catch (error) {
-    return { error: "Failed to create group" };
+    return {
+      error: "Failed to create group",
+      debugMessage: getErrorMessage(error).message,
+    };
   }
 
   revalidatePath(`/groups/add`);
   revalidatePath(`/groups/${group.id}`);
   return { data: group };
-  //   redirect(`/groups/${group.id}`);
 };
 
 export const createGroup = createSafeAction(CreateGroup, handler);

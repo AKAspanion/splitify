@@ -5,14 +5,19 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { useAction } from "@/hooks/use-action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const Form = () => {
   const router = useRouter();
   const { execute, fieldErrors } = useAction(createGroup, {
     onSuccess: (data) => {
       router.push(`/groups/${data.id}`);
+      toast.success("Group created successfully");
     },
-    onError: () => {},
+    onError: (error, debug) => {
+      console.error(debug);
+      toast.error(error);
+    },
   });
 
   const onSubmit = (formData: FormData) => {

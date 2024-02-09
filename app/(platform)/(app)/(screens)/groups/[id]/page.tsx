@@ -1,36 +1,46 @@
 import { db } from "@/lib/db";
-import { GroupCard } from "../../../_components/group-card";
+import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
-import { AlertTriangleIcon, ArrowLeftIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs";
+import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
+import { Header } from "@/components/container/header";
 
 const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
-  const group = await db.group.findUnique({ where: { id: params["id"] } });
+  const id = params["id"] || "null";
+  const { userId } = auth();
+
+  const group = await db.group.findUnique({
+    where: { id, users: { some: { id: userId || "null" } } },
+  });
+
+  const expenses = await db.expense.findMany({
+    where: { groupId: id },
+    include: { splits: true, payments: { include: { user: true } } },
+  });
+
   return (
     <AutoContainer
       header={
-        <div className="flex w-full gap-4 items-center justify-between">
-          <div className="flex gap-4 items-center">
-            <Link href="/groups">
+        <Header
+          backTo="/groups"
+          title={group?.title}
+          actions={
+            <Link href={`/groups/${id}/settings`}>
               <Button variant="ghost" size="icon">
-                <ArrowLeftIcon />
+                <SettingsIcon />
               </Button>
             </Link>
-            <div className="font-semibold text-lg">{group?.title || ""}</div>
-          </div>
-          <div>
-            <Button variant="ghost" size="icon">
-              <SettingsIcon />
-            </Button>
-          </div>
-        </div>
+          }
+        />
       }
     >
       <GroupCard group={group} />
-      <div className="p-16 flex flex-col items-center gap-2">
-        <AlertTriangleIcon className="text-yellow-500" />
-        <div className="text-center ">No expenses found.</div>
+      <div className="pt-6 pb-3 font-semibold text-normal">Group expenses</div>
+      <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {expenses?.map((e) => <ExpenseCard expense={e} key={e.id} />)}
       </div>
     </AutoContainer>
   );

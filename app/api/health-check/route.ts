@@ -6,7 +6,7 @@ export async function GET(_req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
