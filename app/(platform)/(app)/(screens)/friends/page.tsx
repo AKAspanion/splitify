@@ -9,7 +9,7 @@ import { UserCard } from "../../_components/user-card";
 const FriendsPage = async () => {
   const { userId } = auth();
   const data = await db.user.findUnique({
-    where: { clerk_id: userId || "null" },
+    where: { id: userId || "null" },
     include: { friends: true },
   });
 

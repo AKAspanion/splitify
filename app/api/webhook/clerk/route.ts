@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const data = payload.data as any;
     const email = data?.email_addresses?.[0];
     const user = {
-      clerk_id: data?.id || "",
+      id: data?.id || "",
       email: email?.email_address || "",
       name: [data?.first_name || "", data?.last_name || ""].join(" "),
       image_url: data?.image_url,
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         break;
       case "user.updated":
         await db.user.upsert({
-          where: { clerk_id: user.clerk_id },
+          where: { id: user.id },
           update: { ...user },
           create: { ...user },
         });

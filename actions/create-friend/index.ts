@@ -8,14 +8,14 @@ import { AddFriend } from "./schema";
 import { revalidatePath } from "next/cache";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId: userClerkId } = auth();
+  const { userId } = auth();
 
-  if (!userClerkId) {
+  if (!userId) {
     return { error: "Unauthorized" };
   }
   const { friendClerkId } = data;
 
-  if (userClerkId === friendClerkId) {
+  if (userId === friendClerkId) {
     return { error: "You can't be friends with yourself" };
   }
 
@@ -23,12 +23,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   try {
     await Promise.all([
       db.user.update({
-        where: { clerk_id: userClerkId },
-        data: { friends: { connect: [{ clerk_id: friendClerkId }] } },
+        where: { id: userId },
+        data: { friends: { connect: [{ id: friendClerkId }] } },
       }),
       db.user.update({
-        where: { clerk_id: friendClerkId },
-        data: { friends: { connect: [{ clerk_id: userClerkId }] } },
+        where: { id: friendClerkId },
+        data: { friends: { connect: [{ id: userId }] } },
       }),
     ]);
   } catch (error) {
@@ -36,6 +36,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   revalidatePath(`/friends/add`);
+  revalidatePath(`/friends`);
   return { data: user };
 };
 

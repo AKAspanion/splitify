@@ -23,7 +23,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         title,
         type,
         users: {
-          connect: [{ clerk_id: userClerkId }],
+          connect: [{ id: userClerkId }],
         },
       },
     });

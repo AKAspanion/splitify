@@ -19,7 +19,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   let user;
   try {
     user = await db.user.findMany({
-      where: { email: { equals: email }, clerk_id: { not: userId } },
+      where: { email: { equals: email }, id: { not: userId } },
       include: { friends: true },
     });
   } catch (error) {

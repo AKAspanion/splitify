@@ -18,7 +18,7 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const { userId } = auth();
 
   const group = await db.group.findUnique({
-    where: { id, users: { some: { clerk_id: userId || "null" } } },
+    where: { id, users: { some: { id: userId || "null" } } },
     include: { users: true },
   });
 

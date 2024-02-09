@@ -79,13 +79,13 @@ export const Form = ({ groups }: FormProps) => {
   const users = useMemo(() => {
     const gs = groups?.find((g) => g.id === groupId)?.users || [];
     return [
-      ...gs.filter((u) => u?.clerk_id === user?.id),
-      ...gs.filter((u) => u?.clerk_id !== user?.id),
+      ...gs.filter((u) => u?.id === user?.id),
+      ...gs.filter((u) => u?.id !== user?.id),
     ];
   }, [groups, groupId, user?.id]);
 
   const currUserId = useMemo(() => {
-    return users?.find((u) => u.clerk_id === user?.id)?.id;
+    return users?.find((u) => u.id === user?.id)?.id;
   }, [user?.id, users]);
 
   const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});

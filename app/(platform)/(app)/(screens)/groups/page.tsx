@@ -9,7 +9,7 @@ import { auth } from "@clerk/nextjs";
 const GroupsPage = async () => {
   const { userId } = auth();
   const data = await db.user.findUnique({
-    where: { clerk_id: userId || "null" },
+    where: { id: userId || "null" },
     include: { groups: true },
   });
 

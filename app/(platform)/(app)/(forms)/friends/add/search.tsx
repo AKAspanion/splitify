@@ -19,8 +19,11 @@ const Search = () => {
   const { execute, data, fieldErrors } = useAction(searchUser, {
     onSuccess: (data) => {
       // console.log("data", data);
+      // toast("Friend added successfully");
     },
-    onError: () => {},
+    onError: () => {
+      // toast("Failed to add friend");
+    },
   });
 
   const onSubmit = (formData: FormData) => {
@@ -61,10 +64,8 @@ const Search = () => {
                     key={d.id}
                     actions={
                       <Action
-                        id={d.clerk_id}
-                        isFriend={
-                          !!d?.friends?.find((u) => u.clerk_id === user?.id)
-                        }
+                        id={d.id}
+                        isFriend={!!d?.friends?.find((u) => u.id === user?.id)}
                       />
                     }
                   />

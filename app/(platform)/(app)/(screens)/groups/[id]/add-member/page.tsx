@@ -11,12 +11,12 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
   const { userId } = auth();
   const data = await db.user.findUnique({
-    where: { clerk_id: userId || "null" },
+    where: { id: userId || "null" },
     include: { friends: true },
   });
 
   const group = await db.group.findUnique({
-    where: { id, users: { some: { clerk_id: userId || "null" } } },
+    where: { id, users: { some: { id: userId || "null" } } },
     include: { users: true },
   });
 
@@ -43,10 +43,8 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
             actions={
               <Action
                 groupId={id}
-                memberClerkId={d.clerk_id}
-                isInGroup={
-                  !!group?.users?.find((u) => u.clerk_id === d.clerk_id)
-                }
+                memberClerkId={d.id}
+                isInGroup={!!group?.users?.find((u) => u.id === d.id)}
               />
             }
           />

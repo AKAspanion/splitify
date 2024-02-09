@@ -2,6 +2,7 @@ import { createFriend } from "@/actions/create-friend";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { HandshakeIcon } from "lucide-react";
+import { toast } from "sonner";
 
 export const Action = ({
   id,
@@ -13,9 +14,11 @@ export const Action = ({
   const { execute, loading } = useAction(createFriend, {
     onSuccess: (data) => {
       // console.log("data", data);
+      toast.success("Friend added successfully");
     },
     onError: (error) => {
       // console.log("error", error);
+      toast.error("Failed to add friend");
     },
   });
 

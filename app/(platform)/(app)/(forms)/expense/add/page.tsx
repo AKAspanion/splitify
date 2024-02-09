@@ -9,7 +9,7 @@ import Link from "next/link";
 const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
   const data = await db.user.findUnique({
-    where: { clerk_id: userId || "null" },
+    where: { id: userId || "null" },
     include: { groups: { include: { users: true } } },
   });
 
