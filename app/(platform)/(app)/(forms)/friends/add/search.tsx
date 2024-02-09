@@ -7,7 +7,7 @@ import { FormLoading } from "@/components/form/form-loading";
 import { FormSubmit } from "@/components/form/form-submit";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
-import { UserCard } from "../../../_components/user-card";
+import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";

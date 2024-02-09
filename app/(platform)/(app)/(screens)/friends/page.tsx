@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { UserCard } from "../../_components/user-card";
+import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 
 const FriendsPage = async () => {
   const { userId } = auth();

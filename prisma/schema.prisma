@@ -12,14 +12,16 @@ datasource db {
 }
 
 model User {
-  uid               String  @default(uuid())
-  id                String  @id @unique
-  email             String  @unique
+  uid               String    @default(nanoid())
+  id                String    @id @unique
+  email             String    @unique
   name              String?
   image_url         String?
   profile_image_url String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime? @updatedAt
   groups            Group[]
-  friends           User[]  @relation("UserFriends")
+  friends           User[]    @relation("UserFriends")
 
   // This second "side" of the UserFriends relation exists solely 
   // to satisfy prisma's requirements; we won't access it directly.
@@ -33,13 +35,16 @@ model User {
 }
 
 model Expense {
-  id          String        @id @default(uuid())
+  id          String        @id @default(nanoid())
   amount      Float
   description String
+  category    String?
   type        ExpenseType
   groupId     String?
   createrId   String
-  payers      UserPayment[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime?     @updatedAt
+  payments    UserPayment[]
   splits      UserSplit[]
   Group       Group?        @relation(fields: [groupId], references: [id])
   User        User          @relation(fields: [createrId], references: [id])
@@ -55,34 +60,40 @@ enum ExpenseType {
 }
 
 model UserPayment {
+  id        String    @id @default(nanoid())
   amount    Float
-  userId    String  @map("user_id")
-  expenseId String  @map("expense_id")
-  user      User    @relation(fields: [userId], references: [id])
-  expense   Expense @relation(fields: [expenseId], references: [id])
+  userId    String    @map("user_id")
+  expenseId String?   @map("expense_id")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  expense   Expense?  @relation(fields: [expenseId], references: [id])
 
-  @@id([userId, expenseId])
   @@index([userId])
   @@index([expenseId])
 }
 
 model UserSplit {
+  id        String    @id @default(nanoid())
   amount    Float
   percent   Float?
-  userId    String  @map("user_id")
-  expenseId String  @map("expense_id")
-  user      User    @relation(fields: [userId], references: [id])
-  expense   Expense @relation(fields: [expenseId], references: [id])
+  userId    String    @map("user_id")
+  expenseId String?   @map("expense_id")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  expense   Expense?  @relation(fields: [expenseId], references: [id])
 
-  @@id([userId, expenseId])
   @@index([userId])
   @@index([expenseId])
 }
 
 model Group {
-  id      String    @id @default(uuid())
-  title   String
-  type    String?
-  Expense Expense[]
-  users   User[]
+  id        String    @id @default(nanoid())
+  title     String
+  type      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  Expense   Expense[]
+  users     User[]
 }

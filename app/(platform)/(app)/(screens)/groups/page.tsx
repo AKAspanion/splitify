@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon, UserRoundPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { GroupCard } from "../../_components/group-card";
+import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { auth } from "@clerk/nextjs";
 

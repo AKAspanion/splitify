@@ -1,15 +1,17 @@
 type ListItemProps = {
   title: string;
   subtitle?: string;
+  prefix?: React.ReactNode;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
 };
 
 export const ListItem = (props: ListItemProps) => {
-  const { title, subtitle, icon, actions } = props;
+  const { title, subtitle, prefix, icon, actions } = props;
   return (
     <div className="flex justify-between items-center gap-4">
       <div className="flex items-center gap-4">
+        {prefix}
         {icon ? (
           <div className="w-10 h-10 flex items-center justify-center">
             {icon}
@@ -17,9 +19,9 @@ export const ListItem = (props: ListItemProps) => {
         ) : null}
         <div className="flex items-center">
           <div className="flex flex-col">
-            <div className="font-normal text-sm">{title}</div>
+            <div className="font-normal text-sm truncate">{title}</div>
             {subtitle ? (
-              <div className="text-xs font-light">{subtitle}</div>
+              <div className="text-xs font-light truncate">{subtitle}</div>
             ) : null}
           </div>
         </div>

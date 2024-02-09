@@ -14,25 +14,38 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { description, amount, splits, payers, groupId } = data;
+  const { description, type, amount, splits, payments, groupId, createrId } =
+    data;
 
-  console.log(description, amount, splits, payers);
   let expense;
   try {
-    // expense = db.userPayment.createMany({ data: [{ userId: }] });
-    // group = await db.group.create({
-    //   data: {
-    //     title,
-    //     type,
-    //     users: {
-    //       connect: [{ id: userClerkId }],
-    //     },
-    //   },
-    // });
+    expense = await db.expense.create({
+      data: {
+        amount,
+        description,
+        type,
+        groupId,
+        createrId,
+        payments: {
+          createMany: {
+            data: payments.map((p) => ({ amount: p.amount, userId: p.userId })),
+            // skipDuplicates: true,
+          },
+        },
+        splits: {
+          createMany: {
+            data: splits.map((p) => ({ amount: p.amount, userId: p.userId })),
+            // skipDuplicates: true,
+          },
+        },
+      },
+      include: { payments: true, splits: true },
+    });
   } catch (error) {
     return { error: "Failed to create expense" };
   }
 
+  revalidatePath(`/groups/${groupId || ""}`);
   revalidatePath(`/expense/add`);
   return { data: expense };
 };

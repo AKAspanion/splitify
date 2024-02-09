@@ -2,7 +2,7 @@
 
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GroupCombobox } from "./group-combobox";
 import { useEffect, useMemo, useState } from "react";
 import { useAction } from "@/hooks/use-action";
@@ -13,12 +13,14 @@ import { GroupWIthUsers } from "./type";
 import { useUser } from "@clerk/nextjs";
 import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@prisma/client";
-import { convertToObject } from "@/utils/validate";
+import { convertToObject, fixedNum } from "@/utils/validate";
+import { toast } from "sonner";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
 export const Form = ({ groups }: FormProps) => {
   const { user } = useUser();
+  const router = useRouter();
   const params = useSearchParams();
   const paramsGroupId = params.get("groupId") || "";
 
@@ -30,49 +32,49 @@ export const Form = ({ groups }: FormProps) => {
 
   const { execute, fieldErrors } = useAction(createExpense, {
     onSuccess: (data) => {
-      // router.push(`/groups/${data.id}`);
-      console.log("data", data);
+      router.push(`/groups/${data?.groupId || ""}`);
+      toast.success("Expense created successfully");
     },
-    onError: (error) => {
-      console.log("error", error);
+    onError: () => {
+      toast.error("Failed to create expense");
     },
   });
 
   const onSubmit = (formData: FormData) => {
     const description = formData.get("description") as string;
-    const amount = parseFloat((formData.get("amount") as string) || "0");
+    const total = parseFloat((formData.get("amount") as string) || "0");
 
-    const payers = Object.entries(payment)
+    const payments = Object.entries(payment)
       .map(([key, value]) => ({
         key,
         value,
       }))
       .filter((a) => !!a.value)
       .map(({ key, value }) => {
-        return { amount: value, userId: key };
+        return { amount: fixedNum(value), userId: key };
       });
 
     let splits: { type: ExpenseType; amount: number; userId: string }[] = [];
 
     if (splitType === ExpenseType.EQUAL) {
       const ids = Object.entries(equalSplit).filter(([_, value]) => value);
-      const amount = total / ids.length;
+      const am = total / ids.length;
       splits = ids.map(([userId]) => ({
         type: ExpenseType.EQUAL,
-        amount,
+        amount: fixedNum(am),
         userId,
       }));
-    }
-
-    if (user?.id) {
-      execute({
-        description,
-        amount,
-        payers,
-        splits,
-        groupId,
-        createrId: user?.id,
-      });
+      if (user?.id) {
+        execute({
+          amount: fixedNum(total),
+          description,
+          payments,
+          splits,
+          groupId,
+          createrId: user?.id,
+          type: splitType,
+        });
+      }
     }
   };
 
@@ -171,7 +173,7 @@ export const Form = ({ groups }: FormProps) => {
             onSplitTypeChange={handleSplitTypeChange}
           />
         </div>
-        <FormErrors id="payers" errors={fieldErrors?.payers} />
+        <FormErrors id="payments" errors={fieldErrors?.payments} />
       </div>
       <FormSubmit>Create</FormSubmit>
     </form>
