@@ -108,7 +108,7 @@ const EqualSplit = ({
 
   const equalShare = useMemo(
     () => (total === 0 ? 0 : fixedNum(total / checkedPeople, 2)),
-    [checkedPeople, total]
+    [checkedPeople, total],
   );
 
   return (

@@ -7,7 +7,7 @@ export async function POST(_req: NextApiRequest, res: NextApiResponse) {
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

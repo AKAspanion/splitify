@@ -19,12 +19,12 @@ export class SplitWiseService {
     name: string,
     expenseType: ExpenseType,
     payments: Payment[],
-    splits: Split[]
+    splits: Split[],
   ) {
     if (!this.validateSplits(expenseType, splits)) {
       throw new Error(
         "Splits should be of same type as expense type " +
-          expenseType.toString()
+          expenseType.toString(),
       );
     }
 
@@ -44,7 +44,7 @@ export class SplitWiseService {
             splits.map((s) => {
               const percent = fixedNum((1 / totalSplits) * 100);
               return new PercentSplit(s.getUser(), percent);
-            })
+            }),
           );
         }
         break;
@@ -56,8 +56,8 @@ export class SplitWiseService {
             payment,
             splits.map(
               (s) =>
-                new PercentSplit(s.getUser(), (s as PercentSplit).getPercent())
-            )
+                new PercentSplit(s.getUser(), (s as PercentSplit).getPercent()),
+            ),
           );
         }
         break;
@@ -83,7 +83,7 @@ export class SplitWiseService {
             splits.map((s) => {
               const percent = fixedNum((s.getAmount() / totalPayments) * 100.0);
               return new PercentSplit(s.getUser(), percent);
-            })
+            }),
           );
         }
 

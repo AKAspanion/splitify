@@ -8,7 +8,7 @@ export class User {
     userId: string,
     userName: string,
     email: string,
-    mobileNumber: string
+    mobileNumber: string,
   ) {
     this.userId = userId;
     this.userName = userName;

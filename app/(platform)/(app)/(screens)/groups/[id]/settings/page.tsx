@@ -33,9 +33,7 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
         <Link href={`/groups/${id}/add-member`}>
           <ListItem title="Add members to group" icon={<UserPlus />} />
         </Link>
-        {group?.users?.map((d) => (
-          <UserCard user={d} key={d.id} />
-        ))}
+        {group?.users?.map((d) => <UserCard user={d} key={d.id} />)}
       </div>
     </AutoContainer>
   );

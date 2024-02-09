@@ -16,7 +16,7 @@ export const CreateExpense = z
         type: expenseType,
         amount: z.number(),
         userId: z.string(),
-      })
+      }),
     ),
     description: z
       .string({
@@ -34,11 +34,11 @@ export const CreateExpense = z
       const total = a.payments.reduce((sum, a) => sum + a.amount || 0, 0);
       return total === a.amount;
     },
-    { message: "All paid amount don't add up to total", path: ["payments"] }
+    { message: "All paid amount don't add up to total", path: ["payments"] },
   )
   .refine(
     (a) => {
       return !!a.amount;
     },
-    { message: "Please enter an amount", path: ["amount"] }
+    { message: "Please enter an amount", path: ["amount"] },
   );

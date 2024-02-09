@@ -30,9 +30,7 @@ const FriendsPage = async () => {
       }
     >
       <div className="pb-6 flex flex-col gap-6">
-        {data?.friends?.map((d) => (
-          <UserCard user={d} key={d.id} />
-        ))}
+        {data?.friends?.map((d) => <UserCard user={d} key={d.id} />)}
       </div>
     </AutoContainer>
   );

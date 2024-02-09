@@ -21,7 +21,7 @@ const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({
         actionCallback,
       });
     },
-    []
+    [],
   );
 
   const resetDialog = useCallback(() => {

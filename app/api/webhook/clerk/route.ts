@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Failed to parse event" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

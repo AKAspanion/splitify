@@ -18,7 +18,7 @@ export const AutoContainer = ({ header, children }: AutoContainerProps) => {
           "pb-8 px-8 h-[calc(100vh-73px)] sm:h-[calc(100vh-64px)] overflow-y-auto",
           header
             ? "h-[calc(100vh-88px-73px)] sm:h-[calc(100vh-88px-64px)] overflow-y-auto"
-            : "pt-6"
+            : "pt-6",
         )}
       >
         {children}
