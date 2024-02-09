@@ -5,30 +5,28 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { convertAllValues, convertToObject, fixedNum } from "@/utils/validate";
 import { ExpenseType, User } from "@prisma/client";
 import { ArrowLeftIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-import { boolean } from "zod";
 
 type SplitDrawerProps = {
   users?: User[];
   total?: number;
   currUserId?: string;
-  split: Record<ExpenseType, Record<string, number>>;
-  onChange: (type: ExpenseType, value: Record<string, number>) => void;
+  equalSplit: Record<string, boolean>;
+  onEqualSplitChange: (value: Record<string, boolean>) => void;
+  splitType: ExpenseType;
+  onSplitTypeChange: (value: ExpenseType) => void;
 };
 
 export const SplitDrawer = (props: SplitDrawerProps) => {
-  const { users = [] } = props;
+  const { splitType, onSplitTypeChange } = props;
   return (
     <Drawer>
       <DrawerTrigger>
@@ -53,8 +51,9 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
           </DrawerTitle>
         </DrawerHeader>
         <Tabs
-          defaultValue={ExpenseType.EQUAL}
+          value={splitType}
           className="w-full pt-3 pb-6 px-8"
+          onValueChange={(v) => onSplitTypeChange(v as ExpenseType)}
         >
           <TabsList className="w-full">
             <TabsTrigger value={ExpenseType.EQUAL} className="w-full">
@@ -82,39 +81,24 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
   );
 };
 
-const EqualSplit = (props: SplitDrawerProps) => {
-  const handleChange = () => {};
-  return (
-    <SplitUsers {...props} type={ExpenseType.EQUAL} onChange={handleChange} />
-  );
-};
-
-const SplitUsers = ({
-  type,
+const EqualSplit = ({
   currUserId,
-  split,
   total = 0,
   users = [],
-  onChange,
-}: SplitDrawerProps & {
-  type: ExpenseType;
-  onChange?: (value: Record<string, number>) => void;
-}) => {
-  const [checkedUsers, setCheckedUsers] = useState<Record<string, boolean>>(
-    convertToObject(users || [], "id", true)
-  );
-
+  equalSplit,
+  onEqualSplitChange,
+}: SplitDrawerProps) => {
   const handleEqualChange = (id: string, value: boolean) => {
-    setCheckedUsers((c) => ({ ...c, [id]: value }));
+    onEqualSplitChange({ ...equalSplit, [id]: value });
   };
 
   const handleAllChecked = (v: boolean) => {
-    setCheckedUsers((s) => ({ ...convertAllValues(s, v) }));
+    onEqualSplitChange({ ...convertAllValues(equalSplit, v) });
   };
 
   const checkedPeople = useMemo(() => {
-    return Object.values(checkedUsers).filter((v) => v).length;
-  }, [checkedUsers]);
+    return Object.values(equalSplit).filter((v) => v).length;
+  }, [equalSplit]);
 
   const allChecked = useMemo(() => {
     return checkedPeople === users.length;
@@ -135,28 +119,12 @@ const SplitUsers = ({
             showMail={false}
             currUserId={currUserId}
             actions={
-              type === "EQUAL" ? (
-                <div>
-                  <Checkbox
-                    checked={checkedUsers[d.id]}
-                    onCheckedChange={(e) => handleEqualChange(d.id, !!e)}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <div className="flex gap-3 items-center">
-                    <div className="text-md">₹</div>
-                    <div className="max-w-[120px]">
-                      <Input
-                        type="number"
-                        name="amount"
-                        // value={split[d.id] === 0 ? "" : split[d.id]}
-                        // onChange={(e) => onChange(d.id, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )
+              <div>
+                <Checkbox
+                  checked={equalSplit[d.id]}
+                  onCheckedChange={(e) => handleEqualChange(d.id, !!e)}
+                />
+              </div>
             }
           />
         ))}

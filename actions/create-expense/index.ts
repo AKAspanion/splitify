@@ -14,11 +14,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { description, amount, splits, payers } = data;
+  const { description, amount, splits, payers, groupId } = data;
 
   console.log(description, amount, splits, payers);
   let expense;
   try {
+    // expense = db.userPayment.createMany({ data: [{ userId: }] });
     // group = await db.group.create({
     //   data: {
     //     title,

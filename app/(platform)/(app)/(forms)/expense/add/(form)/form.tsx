@@ -4,7 +4,7 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { useSearchParams } from "next/navigation";
 import { GroupCombobox } from "./group-combobox";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAction } from "@/hooks/use-action";
 import { createExpense } from "@/actions/create-expense";
 import { PaymentDrawer } from "./payment-drawer";
@@ -13,29 +13,28 @@ import { GroupWIthUsers } from "./type";
 import { useUser } from "@clerk/nextjs";
 import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@prisma/client";
+import { convertToObject } from "@/utils/validate";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
 export const Form = ({ groups }: FormProps) => {
   const { user } = useUser();
   const params = useSearchParams();
-  const groupId = params.get("groupId") || "";
+  const paramsGroupId = params.get("groupId") || "";
 
   const [open, setOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
+  const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
-  const [split, setSplit] = useState<
-    Record<ExpenseType, Record<string, number>>
-  >({ EQUAL: {}, EXACT: {}, PERCENT: {} });
-  const [selectedGroupId, setSelectedGroupId] = useState(groupId.toString());
+  const [groupId, setGroupId] = useState(paramsGroupId.toString());
 
   const { execute, fieldErrors } = useAction(createExpense, {
     onSuccess: (data) => {
       // router.push(`/groups/${data.id}`);
-      // console.log(data);
+      console.log("data", data);
     },
     onError: (error) => {
-      // console.log(error);
+      console.log("error", error);
     },
   });
 
@@ -52,25 +51,50 @@ export const Form = ({ groups }: FormProps) => {
       .map(({ key, value }) => {
         return { amount: value, userId: key };
       });
-    execute({ description, amount, payers, splits: [] });
+
+    let splits: { type: ExpenseType; amount: number; userId: string }[] = [];
+
+    if (splitType === ExpenseType.EQUAL) {
+      const ids = Object.entries(equalSplit).filter(([_, value]) => value);
+      const amount = total / ids.length;
+      splits = ids.map(([userId]) => ({
+        type: ExpenseType.EQUAL,
+        amount,
+        userId,
+      }));
+    }
+
+    if (user?.id) {
+      execute({
+        description,
+        amount,
+        payers,
+        splits,
+        groupId,
+        createrId: user?.id,
+      });
+    }
   };
 
   const users = useMemo(() => {
-    const gs = groups?.find((g) => g.id === selectedGroupId)?.users || [];
+    const gs = groups?.find((g) => g.id === groupId)?.users || [];
     return [
       ...gs.filter((u) => u?.clerk_id === user?.id),
       ...gs.filter((u) => u?.clerk_id !== user?.id),
     ];
-  }, [groups, selectedGroupId, user?.id]);
+  }, [groups, groupId, user?.id]);
 
   const currUserId = useMemo(() => {
     return users?.find((u) => u.clerk_id === user?.id)?.id;
   }, [user?.id, users]);
 
+  const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});
+
   const onTotalChange = (value: string) => {
     if (currUserId) {
       setTotal(() => parseFloat(value || "0"));
-      setPayment((p) => ({ ...p, [currUserId]: parseFloat(value || "0") }));
+      setPayment(() => ({ [currUserId]: parseFloat(value || "0") }));
+      setEqualSplit(() => convertToObject(users || [], "id", true));
     }
   };
 
@@ -78,16 +102,28 @@ export const Form = ({ groups }: FormProps) => {
     setPayment((p) => ({ ...p, [id]: parseFloat(value || "0") }));
   };
 
-  const onSplitChange = (type: ExpenseType, values: Record<string, number>) => {
-    setSplit((p) => ({ ...p, [type]: { ...p[type], ...values } }));
+  const handleEqualSplitChange = (values: Record<string, boolean>) => {
+    setEqualSplit((p) => ({ ...p, ...values }));
+  };
+
+  const handleSplitTypeChange = (v: ExpenseType) => {
+    setSplitType(() => v);
   };
 
   const onGroupChange = (gid: string) => {
-    setSelectedGroupId(gid);
+    setGroupId(gid);
     if (currUserId && total) {
-      setPayment((p) => ({ [currUserId]: total }));
+      setPayment(() => ({ [currUserId]: total }));
+      setEqualSplit(() => convertToObject(users || [], "id", true));
     }
   };
+
+  const effectUsers = useMemo(() => JSON.stringify(users), [users]);
+
+  useEffect(() => {
+    setEqualSplit(() => convertToObject(users || [], "id", true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectUsers]);
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
@@ -95,7 +131,7 @@ export const Form = ({ groups }: FormProps) => {
         label="Group name"
         open={open}
         groups={groups}
-        value={selectedGroupId}
+        value={groupId}
         setOpen={setOpen}
         setValue={onGroupChange}
       />
@@ -128,9 +164,11 @@ export const Form = ({ groups }: FormProps) => {
           <SplitDrawer
             users={users}
             total={total}
-            split={split}
             currUserId={currUserId}
-            onChange={onSplitChange}
+            equalSplit={equalSplit}
+            splitType={splitType}
+            onEqualSplitChange={handleEqualSplitChange}
+            onSplitTypeChange={handleSplitTypeChange}
           />
         </div>
         <FormErrors id="payers" errors={fieldErrors?.payers} />

@@ -23,6 +23,8 @@ export const CreateExpense = z
       })
       .min(3, { message: "Minimum 3 chars required" }),
     amount: z.number({ required_error: "Amount is required" }),
+    groupId: z.string().optional(),
+    createrId: z.string({ required_error: "Creator id is required" }),
   })
   .refine(
     (a) => {
