@@ -3,7 +3,7 @@
 import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
-import { CheckIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Action = ({
@@ -40,7 +40,7 @@ export const Action = ({
         onClick={onRequest}
         className={isInGroup ? "text-green-500" : ""}
       >
-        <CheckIcon />
+        <PlusCircleIcon />
       </Button>
     </div>
   );

@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { CreateGroup } from "./schema";
 import { getErrorMessage } from "@/utils/validate";
+import { uploadFiles } from "@/components/uploadthing/uploadthing";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = auth();
@@ -15,12 +16,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { title, type } = data;
+  const { title, type, image_url } = data;
 
   let group;
   try {
     group = await db.group.create({
-      data: { title, type, users: { connect: [{ id: userId }] } },
+      data: { type, title, image_url, users: { connect: [{ id: userId }] } },
     });
   } catch (error) {
     return {

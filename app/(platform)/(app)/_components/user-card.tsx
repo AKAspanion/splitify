@@ -6,17 +6,19 @@ type UserCardProps = {
   showMail?: boolean;
   currUserId?: string;
   user: User | null;
+  disabled?: boolean;
   actions?: React.ReactNode;
 };
 
 export const UserCard = (props: UserCardProps) => {
-  const { currUserId, user, showMail = true, actions } = props;
+  const { currUserId,disabled, user, showMail = true, actions } = props;
 
   const name = currUserId === user?.id ? "You" : user?.name || "-";
 
   return !user ? null : (
     <ListItem
       title={name}
+      disabled={disabled}
       actions={actions}
       subtitle={showMail ? user?.email : ""}
       icon={

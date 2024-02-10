@@ -4,10 +4,11 @@ import Link from "next/link";
 
 type GroupCardProps = {
   group: Group | null;
+  description?: string;
 };
 
 export const GroupCard = (props: GroupCardProps) => {
-  const { group } = props;
+  const { group, description = "No expenses yet" } = props;
 
   return !group ? null : (
     <Link href={`/groups/${group.id}`}>
@@ -19,7 +20,7 @@ export const GroupCard = (props: GroupCardProps) => {
           <div className="flex items-center">
             <div className="flex flex-col">
               <div className="text-md font-semibold">{group?.title || "-"}</div>
-              <div className="text-xs font-light">all settled up</div>
+              <div className="text-xs font-light">{description}</div>
             </div>
           </div>
         </div>

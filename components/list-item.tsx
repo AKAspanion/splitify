@@ -1,5 +1,8 @@
+import { cn } from "@/lib/utils";
+
 type ListItemProps = {
   title: string;
+  disabled?: boolean;
   subtitle?: string;
   prefix?: React.ReactNode;
   icon?: React.ReactNode;
@@ -7,9 +10,13 @@ type ListItemProps = {
 };
 
 export const ListItem = (props: ListItemProps) => {
-  const { title, subtitle, prefix, icon, actions } = props;
+  const { title, subtitle, disabled, prefix, icon, actions } = props;
   return (
-    <div className="flex justify-between items-center gap-4">
+    <div
+      className={cn("flex justify-between items-center gap-4", {
+        "opacity-65": disabled,
+      })}
+    >
       <div className="flex items-center gap-4">
         {prefix}
         {icon ? (

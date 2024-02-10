@@ -20,7 +20,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "You can't be friends with yourself" };
   }
 
-  let user;
   try {
     await Promise.all([
       db.user.update({
@@ -41,7 +40,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/friends/add`);
   revalidatePath(`/friends`);
-  return { data: user };
+  return { data: { message: "Friend added successfully" } };
 };
 
 export const createFriend = createSafeAction(AddFriend, handler);

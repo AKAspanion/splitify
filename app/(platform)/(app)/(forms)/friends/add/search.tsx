@@ -14,17 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Action } from "./action";
 import { useUser } from "@clerk/nextjs";
 
-const Search = () => {
+const Search = ({ backTo }: { backTo: string }) => {
   const { user } = useUser();
-  const { execute, data, fieldErrors } = useAction(searchUser, {
-    onSuccess: (data) => {
-      // console.log("data", data);
-      // toast("Friend added successfully");
-    },
-    onError: () => {
-      // toast("Failed to add friend");
-    },
-  });
+  const { execute, data, fieldErrors } = useAction(searchUser);
 
   const onSubmit = (formData: FormData) => {
     const email = formData.get("email") as string;
@@ -38,7 +30,7 @@ const Search = () => {
         <div className="w-full font-semibold text-lg">
           <form action={onSubmit}>
             <div className="flex items-center gap-4">
-              <Link href="/friends">
+              <Link href={backTo ? backTo : "/friends"}>
                 <Button type="button" variant={"ghost"} size={"icon"}>
                   <ArrowLeftIcon />
                 </Button>
@@ -46,10 +38,10 @@ const Search = () => {
               <FormInput
                 id="email"
                 name="email"
-                placeholder="Enter full email to search"
+                placeholder="Enter your friend's full email to find"
                 errors={fieldErrors?.email}
               />
-              <FormSubmit>Search</FormSubmit>
+              <FormSubmit>Find</FormSubmit>
             </div>
             <FormLoading>
               <div className="p-16 flex items-center justify-center">

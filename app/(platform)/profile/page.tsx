@@ -27,12 +27,10 @@ const ProfilePage = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <div className="w-full px-8 md:px-12 sticky top-0 flex itemx-center justify-between gap-4">
-            <Link href="/groups">
-              <Button variant="outline" size="icon">
-                <ArrowLeftIcon />
-                <span className="sr-only">Back</span>
-              </Button>
-            </Link>
+            <Button variant="outline" size="icon" onClick={() => router.back()}>
+              <ArrowLeftIcon />
+              <span className="sr-only">Back</span>
+            </Button>
             <div className="flex-1 w-[667px]" />
             <DarkModeToggle />
             <Button

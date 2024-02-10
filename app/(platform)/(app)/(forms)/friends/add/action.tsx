@@ -12,8 +12,8 @@ export const Action = ({
   isFriend?: boolean;
 }) => {
   const { execute, loading } = useAction(createFriend, {
-    onSuccess: () => {
-      toast.success("Friend added successfully");
+    onSuccess: (data) => {
+      toast.success(data.message);
     },
     onError: (error, debug) => {
       console.error(error, debug);

@@ -12,7 +12,7 @@ interface UseActionOptions<TO> {
 
 export const useAction = <TInput, TOutput>(
   action: Action<TInput, TOutput>,
-  options?: UseActionOptions<TOutput>,
+  options?: UseActionOptions<TOutput>
 ) => {
   const [fieldErrors, setFieldErrors] = useState<
     FieldErrors<TInput> | undefined
@@ -49,7 +49,7 @@ export const useAction = <TInput, TOutput>(
         options?.onComplete?.();
       }
     },
-    [action, options],
+    [action, options]
   );
 
   return {

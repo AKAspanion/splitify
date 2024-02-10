@@ -25,7 +25,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
   } catch (error) {
     return {
-      error: "Failed to search user",
+      error: "Failed to find user",
       debugMessage: getErrorMessage(error).message,
     };
   }

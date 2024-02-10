@@ -1,12 +1,12 @@
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { AutoContainer } from "@/components/container/auto-container";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
-import { ArrowLeftIcon } from "lucide-react";
+import { CheckIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { Action } from "./action";
 import { Header } from "@/components/container/header";
+import { ListItem } from "@/components/list-item";
 
 const Addmember = async ({ params }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
@@ -21,6 +21,16 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
     include: { users: true },
   });
 
+  const friendsNotInGroup = data?.friends?.filter(
+    (o) => !group?.users?.some(({ id }) => o.id === id)
+  );
+
+  const friendsInGroup = data?.friends?.filter((o) =>
+    group?.users?.some(({ id }) => o.id === id)
+  );
+
+  const noFriendsInGroup = !friendsInGroup || friendsInGroup?.length == 0;
+
   return (
     <AutoContainer
       header={
@@ -31,7 +41,10 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
       }
     >
       <div className="pb-6 flex flex-col gap-6">
-        {data?.friends?.map((d) => (
+        <Link href={`/friends/add?back=/groups/${id}/add-member`}>
+          <ListItem title="Add a friend" icon={<UserPlusIcon />} />
+        </Link>
+        {friendsNotInGroup?.map((d) => (
           <UserCard
             user={d}
             key={d.id}
@@ -44,6 +57,27 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
             }
           />
         ))}
+        <div>
+          {noFriendsInGroup ? null : (
+            <div className="pb-3 font-semibold text-normal">
+              Already in group
+            </div>
+          )}
+          <div className="flex flex-col gap-6">
+            {friendsInGroup?.map((d) => (
+              <UserCard
+                user={d}
+                key={d.id}
+                disabled
+                actions={
+                  <div className="p-2">
+                    <CheckIcon className="text-green-500" />
+                  </div>
+                }
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </AutoContainer>
   );

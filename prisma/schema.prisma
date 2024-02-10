@@ -93,6 +93,7 @@ model UserSplit {
 model Group {
   id        String    @id @default(nanoid())
   title     String
+  image_url String?
   type      String?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
