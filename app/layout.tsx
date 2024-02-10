@@ -13,7 +13,7 @@ export const metadata: Metadata = siteConfig;
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#2f2f31" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090B" },
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };

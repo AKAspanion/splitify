@@ -13,7 +13,7 @@ export const GroupCard = (props: GroupCardProps) => {
     <Link href={`/groups/${group.id}`}>
       <div className="rounded">
         <div className="flex items-stretch gap-4">
-          <div className="flex flex-col items-stretch justify-center rounded bg-gradient-to-r from-green-500/40 to-lime-500/40 p-3">
+          <div className="flex flex-col items-stretch justify-center rounded bg-gradient-to-r from-green-500/70 to-lime-500/70 p-3">
             <ListIcon className="w-8 h-8" />
           </div>
           <div className="flex items-center">

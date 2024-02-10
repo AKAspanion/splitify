@@ -16,7 +16,7 @@ export const CreateExpense = z
         type: expenseType,
         amount: z.number(),
         userId: z.string(),
-      }),
+      })
     ),
     description: z
       .string({
@@ -25,7 +25,7 @@ export const CreateExpense = z
       })
       .min(3, { message: "Minimum 3 chars required" }),
     amount: z.number({ required_error: "Amount is required" }),
-    groupId: z.string().optional(),
+    groupId: z.string({ required_error: "Group is required" }),
     createrId: z.string({ required_error: "Creator id is required" }),
     type: expenseType,
   })
@@ -34,11 +34,13 @@ export const CreateExpense = z
       const total = a.payments.reduce((sum, a) => sum + a.amount || 0, 0);
       return total === a.amount;
     },
-    { message: "All paid amount don't add up to total", path: ["payments"] },
+    { message: "All paid amount don't add up to total", path: ["payments"] }
   )
-  .refine(
-    (a) => {
-      return !!a.amount;
-    },
-    { message: "Please enter an amount", path: ["amount"] },
-  );
+  .refine((a) => !!a.amount, {
+    message: "Please enter an amount",
+    path: ["amount"],
+  })
+  .refine((a) => !!a.groupId, {
+    message: "Please select a group",
+    path: ["groupId"],
+  });

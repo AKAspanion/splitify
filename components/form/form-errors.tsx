@@ -7,11 +7,11 @@ export const FormErrors = ({ id, errors }: FormErrorsProps) => {
     <div
       id={`${id}-error`}
       aria-live="polite"
-      className="text-red-400 text-sm mt-2"
+      className="text-red-500 text-sm mt-2"
     >
       {errors?.map((e) => (
         <p
-          className="rounded-sm flex items-center gap-2 font-medium p-2 border border-red-400 bg-red-400/10"
+          className="rounded-sm flex items-center gap-2 font-medium p-2 border border-red-500 bg-red-500/10"
           key={e}
         >
           <XCircleIcon className="h-4 w-4" />

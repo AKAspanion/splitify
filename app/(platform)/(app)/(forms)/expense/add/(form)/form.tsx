@@ -130,14 +130,17 @@ const FormComp = ({ groups }: FormProps) => {
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
-      <GroupCombobox
-        label="Group name"
-        open={open}
-        groups={groups}
-        value={groupId}
-        setOpen={setOpen}
-        setValue={onGroupChange}
-      />
+      <div>
+        <GroupCombobox
+          label="Group name"
+          open={open}
+          groups={groups}
+          value={groupId}
+          setOpen={setOpen}
+          setValue={onGroupChange}
+        />
+        <FormErrors id="group" errors={fieldErrors?.groupId} />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <FormInput
           id="description"
