@@ -17,10 +17,6 @@ export const siteConfig: Metadata = {
       href: "/images/logo.svg",
     },
   ],
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#2f2f31" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  ],
   applicationName: APP_NAME,
   appleWebApp: {
     capable: true,
@@ -30,8 +26,13 @@ export const siteConfig: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  metadataBase: new URL("https://splitify.spanion.in"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
+    images: "/images/ss/desktop-dark.png",
     siteName: APP_NAME,
     title: {
       default: APP_DEFAULT_TITLE,
@@ -41,6 +42,7 @@ export const siteConfig: Metadata = {
   },
   twitter: {
     card: "summary",
+    images: "/images/ss/desktop-dark.png",
     title: {
       default: APP_DEFAULT_TITLE,
       template: APP_TITLE_TEMPLATE,
