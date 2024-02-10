@@ -35,12 +35,26 @@
   "shortcuts": [
     {
       "name": "Profile",
-      "url": "/profile"
+      "url": "/profile",
+      "icons": [
+        {
+          "src": "/images/logo-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Add group",
       "url": "/groups/add",
-      "description": "Add a new group"
+      "description": "Add a new group",
+      "icons": [
+        {
+          "src": "/images/logo-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [
@@ -48,28 +62,32 @@
       "src": "images/ss/desktop-dark.png",
       "sizes": "2048x1282",
       "type": "image/png",
-      "platform": "wide"
+      "form_factor": "wide"
     },
     {
       "src": "images/ss/desktop-light.png",
       "sizes": "2048x1282",
       "type": "image/png",
-      "platform": "wide"
+      "form_factor": "wide"
     },
     {
       "src": "images/ss/mobile-light.png",
       "sizes": "750x1334",
       "type": "image/png",
-      "platform": "narrow"
+      "form_factor": "narrow"
     },
     {
       "src": "images/ss/mobile-light.png",
       "sizes": "750x1334",
       "type": "image/png",
-      "platform": "narrow"
+      "form_factor": "narrow"
     }
   ],
   "scope_extensions": [{ "origin": "*.google.com" }],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "handle_links": "preferred",
   "edge_side_panel": {
     "preferred_width": 400
   }

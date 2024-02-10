@@ -17,11 +17,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <Suspense>
         <AppProgressBar
-          height="2px"
-          color="#355714"
+          height="3px"
+          color="#32CD32"
           options={{ showSpinner: false }}
           shallowRouting
-        />
+        />  
       </Suspense>
       <Suspense>
         <ConfirmProvider>{children}</ConfirmProvider>
