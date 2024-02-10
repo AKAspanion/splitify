@@ -11,7 +11,10 @@ export const AddExpenseFab = () => {
 
   const query = groupId ? `?groupId=${groupId}` : "";
 
-  return (
+  // TODO remove when indivialu expense ready
+  const hidden = !groupId;
+
+  return hidden ? null : (
     <div className="fixed z-20 bottom-[104px] right-8 sm:bottom-8">
       <Link href={`/expense/add${query}`}>
         <Button>

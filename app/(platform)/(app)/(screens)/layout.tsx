@@ -10,7 +10,9 @@ export default function PlatformLayout({
   return (
     <>
       <Suspense fallback={<ScreenSkeleton />}>{children}</Suspense>
-      <AddExpenseFab />
+      <Suspense>
+        <AddExpenseFab />
+      </Suspense>
     </>
   );
 }
