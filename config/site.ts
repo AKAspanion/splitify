@@ -12,8 +12,8 @@ export const siteConfig = {
   },
   icons: [
     {
-      url: "/images/logo-512x512.webp",
-      href: "/images/logo-512x512.webp",
+      url: "/images/logo.svg",
+      href: "/images/logo.svg",
     },
   ],
   metadata: {
