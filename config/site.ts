@@ -1,7 +1,7 @@
 const APP_NAME = "Splitify";
 const APP_DEFAULT_TITLE = "Splitify";
 const APP_TITLE_TEMPLATE = "%s - Splitify App";
-const APP_DESCRIPTION = "Simplify and manage splitsthe easy way!";
+const APP_DESCRIPTION = "Simplify and manage splits, the easy way!";
 
 export const siteConfig = {
   name: APP_NAME,
@@ -12,8 +12,8 @@ export const siteConfig = {
   },
   icons: [
     {
-      url: "/logo-512x512.webp",
-      href: "/logo-512x512.webp",
+      url: "/images/logo-512x512.webp",
+      href: "/images/logo-512x512.webp",
     },
   ],
   metadata: {

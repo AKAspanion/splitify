@@ -29,7 +29,7 @@ const LandingPage = () => {
           textFont.className
         )}
       >
-        Keep track of your shared expenses and balances with housemates, trips,
+        Keep track of your shared expenses and balances with roommates, trips,
         groups, friends, and family.
       </div>
       <ClerkLoaded>

@@ -1,16 +1,76 @@
 {
   "name": "Splitify",
   "short_name": "Splitify",
+  "scope": "https://splitify.spanion.in",
   "icons": [
     {
-      "src": "/logo-512x512.webp",
+      "src": "/images/logo-512x512.webp",
       "sizes": "512x512",
       "type": "image/webp"
+    },
+    {
+      "src": "/images/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "theme_color": "#FFFFFF",
+  "theme_color": "#2f2f31",
   "background_color": "#FFFFFF",
   "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait"
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
+  "id": "splitify",
+  "description": "Simplify and manage splits, the easy way!",
+  "dir": "ltr",
+  "lang": "en",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "categories": ["education", "finance", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Profile",
+      "url": "/profile"
+    },
+    {
+      "name": "Add group",
+      "url": "/groups/add",
+      "description": "Add a new group"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/ss/desktop-dark.png",
+      "sizes": "2048x1282",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "images/ss/desktop-light.png",
+      "sizes": "2048x1282",
+      "type": "image/png",
+      "platform": "wide"
+    },
+    {
+      "src": "images/ss/mobile-light.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow"
+    },
+    {
+      "src": "images/ss/mobile-light.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow"
+    }
+  ],
+  "scope_extensions": [{ "origin": "*.google.com" }],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
