@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme/provider";
 import { siteConfig } from "@/config/site";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
+import { Launch } from "./launch";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,19 +26,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Providers>
-            <Suspense>{children}</Suspense>
-          </Providers>
-        </ThemeProvider>
-        <Suspense>
-          <Toaster />
-        </Suspense>
+        <Providers>
+          <Suspense>{children}</Suspense>
+          <Suspense>
+            <Launch />
+          </Suspense>
+          <Suspense>
+            <Toaster />
+          </Suspense>
+        </Providers>
       </body>
     </html>
   );
