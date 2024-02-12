@@ -21,9 +21,9 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#FFFFFF",
+  "theme_color": "#09090B",
   "background_color": "#FFFFFF",
-  "start_url": "/groups",
+  "start_url": "./groups",
   "display": "standalone",
   "orientation": "any",
   "id": "splitify",
