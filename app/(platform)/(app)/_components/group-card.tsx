@@ -18,8 +18,8 @@ export const GroupCard = (props: GroupCardProps) => {
           {group?.image_url ? (
             <div className="w-16 h-16 relative rounded overflow-hidden">
               <Image
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: "cover" }}
                 src={group?.image_url}
                 alt="bg image"
               />

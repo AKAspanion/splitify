@@ -72,7 +72,7 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
             <NoData
               title="You are alone here"
               action={
-                <Link href={`/groups/${group.id}/add-member`}>
+                <Link href={`/groups/${group.id}/add-member?back=/groups/${group.id}`}>
                   <Button type="button" variant={"outline"}>
                     <div className="flex gap-4 items-center">
                       <div>Add members</div>

@@ -29,7 +29,7 @@ export const Form = () => {
     const type = formData.get("type") as string;
     // const imgFile = formData.get("image") as File;
 
-    const imageId = randomNumber(1, 20);
+    const imageId = randomNumber(1, 10);
     let image_url = `/images/placeholder/groups/${imageId}.png`;
     // if (imgFile) {
     //   try {

@@ -35,6 +35,16 @@ const FriendsPage = async () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {data?.friends?.map((d) => <UserCard user={d} key={d.id} />)}
       </div>
+      <div className="flex justify-center py-8">
+        <Link href="/friends/add">
+          <Button type="button" variant={"outline"}>
+            <div className="flex gap-4 items-center">
+              <div>Add a friend</div>
+              <UserPlusIcon />
+            </div>
+          </Button>
+        </Link>
+      </div>
       {noData ? (
         <NoData
           title="Your friends and group mates will show up here"

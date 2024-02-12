@@ -21,11 +21,11 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#09090B",
+  "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
-  "start_url": "/",
-  "display": "fullscreen",
-  "orientation": "portrait-primary",
+  "start_url": "/groups",
+  "display": "standalone",
+  "orientation": "any",
   "id": "splitify",
   "description": "Simplify and manage splits, the easy way!",
   "dir": "ltr",

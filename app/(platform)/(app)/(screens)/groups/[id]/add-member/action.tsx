@@ -17,7 +17,7 @@ export const Action = ({
 }) => {
   const { execute, loading } = useAction(updateGroupMember, {
     onSuccess: () => {
-      toast.success("Group mmber added successfully");
+      toast.success("Group member added successfully");
     },
     onError: (error, debug) => {
       console.error(error, debug);
