@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import localFont from "next/font/local";
 
 import { cn } from "@/lib/utils";
 
@@ -10,7 +9,7 @@ export const Logo = (props: { to?: string }) => {
     <Link className="flex" href={to}>
       <div className="hover:opacity-75 transition items-center flex gap-2 ">
         <Image
-          src="/images/logo-512x512.png"
+          src="/images/logo.svg"
           className="dark:invert rounded"
           alt="Logo"
           height={30}
