@@ -1,13 +1,6 @@
 import { db } from "@/lib/db";
 import { AutoContainer } from "@/components/container/auto-container";
-import { Button } from "@/components/ui/button";
-import {
-  AlertTriangleIcon,
-  ArrowLeftIcon,
-  SettingsIcon,
-  TrashIcon,
-  UserPlus,
-} from "lucide-react";
+import { TrashIcon, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
@@ -15,8 +8,12 @@ import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { ListItem } from "@/components/list-item";
 import { Header } from "@/components/container/header";
 
-const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
+const GroupDetailsPage = async ({
+  params,
+  searchParams,
+}: ServerSideComponentProp) => {
   const id = params["id"] || "null";
+  const backTo = searchParams["back"];
   const { userId } = auth();
 
   const group = await db.group.findUnique({
@@ -26,7 +23,12 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
 
   return (
     <AutoContainer
-      header={<Header backTo={`/groups/${id}`} title="Group Settings" />}
+      header={
+        <Header
+          backTo={backTo ? backTo : `/groups/${id}`}
+          title="Group Settings"
+        />
+      }
     >
       <GroupCard group={group} description={group?.type || ""} />
       <div className="pt-6 pb-3 font-semibold text-normal">Group members</div>

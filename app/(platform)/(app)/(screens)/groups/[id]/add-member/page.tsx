@@ -8,8 +8,9 @@ import { Action } from "./action";
 import { Header } from "@/components/container/header";
 import { ListItem } from "@/components/list-item";
 
-const Addmember = async ({ params }: ServerSideComponentProp) => {
+const Addmember = async ({ params, searchParams }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
+  const backTo = searchParams["back"];
   const { userId } = auth();
   const data = await db.user.findUnique({
     where: { id: userId || "null" },
@@ -35,7 +36,7 @@ const Addmember = async ({ params }: ServerSideComponentProp) => {
     <AutoContainer
       header={
         <Header
-          backTo={`/groups/${id}/settings`}
+          backTo={backTo ? backTo : `/groups/${id}/settings`}
           title="Add members to group"
         />
       }

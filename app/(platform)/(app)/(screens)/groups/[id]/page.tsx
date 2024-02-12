@@ -56,7 +56,7 @@ const GroupDetailsPage = async ({ params }: ServerSideComponentProp) => {
             users={group?.users}
             action={
               <div className="h-10 flex items-center justify-center">
-                <Link href={`/groups/${id}/add-member`}>
+                <Link href={`/groups/${id}/add-member?back=/groups/${id}`}>
                   <Button variant="ghost" size="icon">
                     <PlusCircleIcon />
                   </Button>

@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { CreateGroup } from "./schema";
 import { getErrorMessage } from "@/utils/validate";
-import { uploadFiles } from "@/components/uploadthing/uploadthing";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = auth();

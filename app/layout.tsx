@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import { Launch } from "./launch";
+import { ThemeProvider } from "@/components/theme/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,15 +27,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={inter.className}>
-        <Providers>
-          <Suspense>{children}</Suspense>
-          <Suspense>
-            <Launch />
-          </Suspense>
-          <Suspense>
-            <Toaster />
-          </Suspense>
-        </Providers>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <Suspense>{children}</Suspense>
+            <Suspense>
+              <Launch />
+            </Suspense>
+            <Suspense>
+              <Toaster />
+            </Suspense>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

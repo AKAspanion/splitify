@@ -17,13 +17,13 @@ export const UserAvatars = (props: UserAvatarsProps) => {
           height={40}
           title={u.name || ""}
           className="rounded-full border-secondary border-2 absolute"
-          style={{ zIndex: `${index + 1}`, left: `${index * 20}px` }}
+          style={{ zIndex: `${index + 1}`, left: `${index * 28}px` }}
           src={u.profile_image_url || ""}
         />
       ))}
       <div
         className="absolute"
-        style={{ left: `${(users?.length || 0) * 20 + 32}px` }}
+        style={{ left: `${(users?.length || 0) * 28 + 32}px` }}
       >
         {action}
       </div>

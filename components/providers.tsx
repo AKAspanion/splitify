@@ -5,18 +5,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 import ConfirmProvider from "./confirm/ConfirmContext";
-import { ThemeProvider } from "@/components/theme/provider";
 import { Suspense } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
       <ClerkProvider
         appearance={{
           baseTheme: resolvedTheme === "dark" ? dark : undefined,
@@ -34,6 +27,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <ConfirmProvider>{children}</ConfirmProvider>
         </Suspense>
       </ClerkProvider>
-    </ThemeProvider>
   );
 }

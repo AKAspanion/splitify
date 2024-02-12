@@ -5,13 +5,14 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { uploadFiles } from "@/components/uploadthing/uploadthing";
 import { useAction } from "@/hooks/use-action";
+import { randomNumber } from "@/utils/func";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export const Form = () => {
   const router = useRouter();
-  const [state, setLoading] = useState(false);
+  // const [state, setLoading] = useState(false);
   const { execute, fieldErrors } = useAction(createGroup, {
     onSuccess: (data) => {
       router.push(`/groups/${data.id}`);
@@ -26,9 +27,10 @@ export const Form = () => {
   const onSubmit = async (formData: FormData) => {
     const title = formData.get("title") as string;
     const type = formData.get("type") as string;
-    const imgFile = formData.get("image") as File;
+    // const imgFile = formData.get("image") as File;
 
-    let image_url = "/images/logo-192x192.png";
+    const imageId = randomNumber(1, 20);
+    let image_url = `/images/placeholder/groups/${imageId}.png`;
     // if (imgFile) {
     //   try {
     //     setLoading(true);
