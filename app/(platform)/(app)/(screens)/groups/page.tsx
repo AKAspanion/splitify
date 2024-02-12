@@ -42,32 +42,31 @@ const GroupsPage = async () => {
           return <GroupCard key={g.id} group={g} />;
         })}
       </div>
-      <div className="w-full flex justify-center py-8">
-        <Link href="/groups/add">
-          <Button type="button" variant={"outline"}>
-            <div className="flex gap-4 items-center">
-              <div>Create a group</div>
-              <UserRoundPlusIcon />
-            </div>
-          </Button>
-        </Link>
-      </div>
+
       {noData ? (
         <NoData
           title="Groups you create or are added to will show up here"
-          action={
-            <Link href="/groups/add">
-              <Button type="button" variant={"outline"}>
-                <div className="flex gap-4 items-center">
-                  <div>Create a group</div>
-                  <UserRoundPlusIcon />
-                </div>
-              </Button>
-            </Link>
-          }
+          action={<CreateButton />}
         />
-      ) : null}
+      ) : (
+        <div className="w-full flex justify-center py-8">
+          <CreateButton />
+        </div>
+      )}
     </AutoContainer>
+  );
+};
+
+const CreateButton = () => {
+  return (
+    <Link href="/groups/add">
+      <Button type="button" variant={"outline"}>
+        <div className="flex gap-4 items-center">
+          <div>Create a group</div>
+          <UserRoundPlusIcon />
+        </div>
+      </Button>
+    </Link>
   );
 };
 
