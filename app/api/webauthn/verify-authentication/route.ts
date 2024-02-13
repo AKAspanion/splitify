@@ -11,9 +11,9 @@ import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
-const rpID = process.env.AUTHN_RP_ID || "localhost";
+const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 const expectedOrigin =
-  process.env.AUTHN_EXPECTED_ORIGIN || "http://localhost:3000";
+  process.env.AUTHN_EXPECTED_ORIGIN || "https://splitify.spanion.in";
 export async function POST(req: Request) {
   try {
     const { userId } = auth();

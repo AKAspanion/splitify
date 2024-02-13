@@ -3,10 +3,6 @@ import { readFile, writeFile } from "fs/promises";
 
 type DevicesStore = Record<string, AuthenticatorDevice[]>;
 
-// // TODO storethis in DB
-// const deviceFilePath =
-//   "/Users/ankitkumarpandit/Documents/stuff/splitwise-clone/public/devices.json";
-
 const Service = {
   async getDevices(store: DevicesStore): Promise<DevicesStore> {
     try {
