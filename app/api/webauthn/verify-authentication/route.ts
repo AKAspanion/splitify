@@ -30,7 +30,6 @@ export async function POST(req: Request) {
     );
     const expectedChallenge = session.currentChallenge;
 
-    console.log("auth", expectedChallenge);
 
     const devices = await DevicesService.getDevice(userId);
 

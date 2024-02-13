@@ -17,7 +17,6 @@ const Service = {
     userId: string
   ): Promise<AuthenticatorDevice[]> {
     try {
-      console.log(store);
       return store[userId] || [];
     } catch (error) {
       console.trace(error);

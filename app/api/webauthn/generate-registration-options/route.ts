@@ -71,7 +71,6 @@ export async function GET(_req: Request) {
     session.currentChallenge = data?.challenge;
     await session.save();
 
-    console.log("reg", session.currentChallenge);
 
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {

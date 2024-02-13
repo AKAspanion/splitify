@@ -33,7 +33,6 @@ export async function POST(req: Request) {
       { password: "supersecretamazingpassword123456", cookieName: "challenge" }
     );
     const expectedChallenge = session.currentChallenge;
-    console.log("reg", expectedChallenge);
 
     let verification: VerifiedRegistrationResponse;
     try {
