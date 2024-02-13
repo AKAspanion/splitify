@@ -16,7 +16,6 @@ export const notification = <T>(options: {
     });
 
     notification.onclick = function (ev: Event) {
-      console.log(this);
       onClick && onClick(this, ev);
     };
   }

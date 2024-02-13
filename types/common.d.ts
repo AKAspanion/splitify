@@ -3,6 +3,11 @@
 //   searchParams: SearchParams;
 // }
 
+declare global {
+  interface Window {}
+}
+
+
 type ServerSideComponentProp = {
   params: Params;
   searchParams?: SearchParams;

@@ -19,7 +19,6 @@ export const Launch = () => {
       const noNotify = localStorage.getItem("no-notify") === "true";
       if (!noNotify) {
         Notification.requestPermission().then((result) => {
-          console.log(result);
           if (result === "denied") {
             localStorage.setItem("no-notify", "true");
           }
