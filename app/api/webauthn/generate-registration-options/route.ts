@@ -7,7 +7,7 @@ import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
 import DevicesService from "@/lib/auth/service/devices";
 import { db } from "@/lib/db";
 
-export const rpID = process.env.AUTHN_RP_ID || "localhost";
+const rpID = process.env.AUTHN_RP_ID || "localhost";
 
 export async function GET(_req: Request) {
   try {
