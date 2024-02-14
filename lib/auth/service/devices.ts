@@ -1,89 +1,64 @@
+import { db } from "@/lib/db";
+import { User } from "@prisma/client";
 import type { AuthenticatorDevice } from "@simplewebauthn/types";
-import { readFile, writeFile } from "fs/promises";
 
-type DevicesStore = Record<string, AuthenticatorDevice[]>;
+const parseDevices = (obj: string): AuthenticatorDevice[] => {
+  try {
+    if (!obj) return [];
+    const parsed: AuthenticatorDevice[] = JSON.parse(obj);
 
-const Service = {
-  async getDevices(store: DevicesStore): Promise<DevicesStore> {
-    try {
-      return store;
-    } catch (error) {
-      console.trace(error);
-      return {};
-    }
-  },
-  async getDevice(
-    store: DevicesStore,
-    userId: string
-  ): Promise<AuthenticatorDevice[]> {
-    try {
-      return store[userId] || [];
-    } catch (error) {
-      console.trace(error);
-      return [];
-    }
-  },
-  async pushDevice(
-    store: DevicesStore,
-    userId: string,
-    device: AuthenticatorDevice
-  ) {
-    try {
-      const devices = store[userId];
-      if (devices && Array.isArray(devices)) {
-        devices.push(device);
-      } else {
-        store[userId] = [device];
-      }
-    } catch (error) {
-      console.trace(error);
-      return {};
-    }
-  },
+    return parsed?.map((parsedobj) => {
+      const unit8Values = Object.entries(parsedobj.credentialPublicKey).map(
+        ([_, v]) => v
+      );
+      const unit32Values = Object.entries(parsedobj.credentialID).map(
+        ([_, v]) => v
+      );
+      const credentialPublicKey = new Uint8Array(unit8Values);
+      const credentialID = new Uint8Array(unit32Values);
+      return {
+        credentialPublicKey,
+        credentialID,
+        counter: parsedobj.counter,
+        transports: parsedobj.transports,
+      } as AuthenticatorDevice;
+    });
+  } catch (error) {
+    console.trace(error);
+    console.error("Parsing failed");
+    return [];
+  }
 };
 
-const createService = () => {
-  const store: DevicesStore = {};
-  return {
-    getDevice: (userId: string) => Service.getDevice(store, userId),
-    pushDevice: (userId: string, device: AuthenticatorDevice) =>
-      Service.pushDevice(store, userId, device),
-  };
+const getDevice = async (user: User): Promise<AuthenticatorDevice[]> => {
+  try {
+    const devices = parseDevices((user?.devices || "").toString("utf8"));
+    return devices || [];
+  } catch (error) {
+    console.trace(error);
+    return [];
+  }
 };
 
-export default createService();
+const pushDevice = async (user: User, device: AuthenticatorDevice) => {
+  try {
+    let devices = parseDevices((user?.devices || "").toString("utf8"));
+    if (devices && Array.isArray(devices)) {
+      devices.push(device);
+    } else {
+      devices = [device];
+    }
+    const stringifiedDevices = JSON.stringify(devices);
+    await db.user.update({
+      where: { id: user.id },
+      data: { devices: Buffer.from(stringifiedDevices, "utf8") },
+    });
+  } catch (error) {
+    console.trace(error);
+    return {};
+  }
+};
 
-// export const DevicesService = {
-//   async getDevices(): Promise<DevicesStore> {
-//     try {
-//       const devices = JSON.parse(await readFile(deviceFilePath, "utf-8"));
-//       return devices;
-//     } catch (error) {
-//       console.trace(error);
-//       return {};
-//     }
-//   },
-//   async getDevice(userId: string): Promise<AuthenticatorDevice[]> {
-//     try {
-//       const devices = JSON.parse(await readFile(deviceFilePath, "utf-8"));
-//       return devices[userId] || [];
-//     } catch (error) {
-//       console.trace(error);
-//       return [];
-//     }
-//   },
-//   async pushDevice(userId: string, device: AuthenticatorDevice) {
-//     try {
-//       const devices = JSON.parse(await readFile(deviceFilePath, "utf-8"));
-//       if (devices[userId] && Array.isArray(devices[userId])) {
-//         devices[userId].push(device);
-//       } else {
-//         devices[userId] = [device];
-//       }
-//       await writeFile(deviceFilePath, JSON.stringify(devices, null, 2));
-//     } catch (error) {
-//       console.trace(error);
-//       return {};
-//     }
-//   },
-// };
+const DevicesService = { getDevice, pushDevice };
+
+export default DevicesService;

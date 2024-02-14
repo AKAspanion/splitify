@@ -20,7 +20,7 @@ model User {
   lastName          String?
   image_url         String?
   profile_image_url String?
-  devices           String?
+  devices           Bytes?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime? @updatedAt
   groups            Group[]

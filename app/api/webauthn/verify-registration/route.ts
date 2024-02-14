@@ -14,6 +14,7 @@ import { auth } from "@clerk/nextjs";
 import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
+import { db } from "@/lib/db";
 
 const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 const expectedOrigin =
@@ -25,6 +26,13 @@ export async function POST(req: Request) {
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
+    const user = await db.user.findUnique({ where: { id: userId } });
+
+    if (!user?.name) {
+      return NextResponse.json({ message: "User not found" }, { status: 401 });
+    }
+
 
     const body: RegistrationResponseJSON = await req.json();
 
@@ -58,7 +66,7 @@ export async function POST(req: Request) {
     if (verified && registrationInfo) {
       const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-      const devices = await DevicesService.getDevice(userId);
+      const devices = await DevicesService.getDevice(user);
       const existingDevice = devices.find((device) =>
         isoUint8Array.areEqual(device.credentialID, credentialID)
       );
@@ -73,7 +81,7 @@ export async function POST(req: Request) {
           counter,
           transports: body.response.transports,
         };
-        DevicesService.pushDevice(userId, newDevice);
+        DevicesService.pushDevice(user, newDevice);
       }
     }
 

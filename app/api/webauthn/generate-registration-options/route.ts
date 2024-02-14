@@ -17,13 +17,13 @@ export async function GET(_req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const devices = await DevicesService.getDevice(userId);
-
     const user = await db.user.findUnique({ where: { id: userId } });
 
     if (!user?.name) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ message: "User not found" }, { status: 401 });
     }
+
+    const devices = await DevicesService.getDevice(user);
 
     const opts: GenerateRegistrationOptionsOpts = {
       rpName: "SimpleWebAuthn Example",
@@ -70,7 +70,6 @@ export async function GET(_req: Request) {
     );
     session.currentChallenge = data?.challenge;
     await session.save();
-
 
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
