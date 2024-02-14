@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { User } from "@prisma/client";
 import type { AuthenticatorDevice } from "@simplewebauthn/types";
 
 const parseDevices = (obj: string): AuthenticatorDevice[] => {
@@ -30,9 +29,10 @@ const parseDevices = (obj: string): AuthenticatorDevice[] => {
   }
 };
 
-const getDevice = async (user: User): Promise<AuthenticatorDevice[]> => {
+const getDevice = async (userId: string): Promise<AuthenticatorDevice[]> => {
   try {
-    const devices = parseDevices((user?.devices || "").toString("utf8"));
+    const deviceBlob = await db.authnDevice.findUnique({ where: { userId } });
+    const devices = parseDevices((deviceBlob?.data || "").toString("utf8"));
     return devices || [];
   } catch (error) {
     console.trace(error);
@@ -40,22 +40,41 @@ const getDevice = async (user: User): Promise<AuthenticatorDevice[]> => {
   }
 };
 
-const pushDevice = async (user: User, device: AuthenticatorDevice) => {
+const pushDevice = async (userId: string, device: AuthenticatorDevice) => {
   try {
-    let devices = parseDevices((user?.devices || "").toString("utf8"));
+    const deviceBlob = await getAuthnDevice(userId);
+    let devices = parseDevices((deviceBlob?.data || "").toString("utf8"));
     if (devices && Array.isArray(devices)) {
       devices.push(device);
     } else {
       devices = [device];
     }
+
     const stringifiedDevices = JSON.stringify(devices);
-    await db.user.update({
-      where: { id: user.id },
-      data: { devices: Buffer.from(stringifiedDevices, "utf8") },
-    });
+    if (deviceBlob?.id) {
+      await db.authnDevice.update({
+        where: { id: deviceBlob.id },
+        data: { data: Buffer.from(stringifiedDevices, "utf8") },
+      });
+    } else {
+      await db.authnDevice.create({
+        data: {
+          data: Buffer.from(stringifiedDevices, "utf8"),
+          user: { connect: { id: userId } },
+        },
+      });
+    }
   } catch (error) {
     console.trace(error);
     return {};
+  }
+};
+
+const getAuthnDevice = async (userId: string) => {
+  try {
+    return await db.authnDevice.findUnique({ where: { userId } });
+  } catch (error) {
+    return undefined;
   }
 };
 

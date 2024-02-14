@@ -12,19 +12,19 @@ datasource db {
 }
 
 model User {
-  uid               String    @default(nanoid())
-  id                String    @id @unique
-  email             String    @unique
+  uid               String       @default(nanoid())
+  id                String       @id @unique
+  email             String       @unique
   name              String?
   firstName         String?
   lastName          String?
   image_url         String?
   profile_image_url String?
-  devices           Bytes?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime? @updatedAt
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime?    @updatedAt
   groups            Group[]
-  friends           User[]    @relation("UserFriends")
+  friends           User[]       @relation("UserFriends")
+  devices           AuthnDevice?
 
   // This second "side" of the UserFriends relation exists solely 
   // to satisfy prisma's requirements; we won't access it directly.
@@ -100,4 +100,11 @@ model Group {
   updatedAt DateTime? @updatedAt
   Expense   Expense[]
   users     User[]
+}
+
+model AuthnDevice {
+  id     String @id @default(nanoid())
+  data   Bytes
+  userId String    @unique
+  user   User   @relation(fields: [userId], references: [id])
 }

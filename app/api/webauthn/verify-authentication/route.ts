@@ -10,7 +10,6 @@ import { auth } from "@clerk/nextjs";
 import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { db } from "@/lib/db";
 
 const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 const expectedOrigin =
@@ -23,12 +22,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({ where: { id: userId } });
-
-    if (!user?.name) {
-      return NextResponse.json({ message: "User not found" }, { status: 401 });
-    }
-
     const body: AuthenticationResponseJSON = await req.json();
 
     const session = await getIronSession<{ currentChallenge?: string }>(
@@ -37,7 +30,7 @@ export async function POST(req: Request) {
     );
     const expectedChallenge = session.currentChallenge;
 
-    const devices = await DevicesService.getDevice(user);
+    const devices = await DevicesService.getDevice(userId);
 
     let dbAuthenticator;
     const bodyCredIDBuffer = isoBase64URL.toBuffer(body.rawId);

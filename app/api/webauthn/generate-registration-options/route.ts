@@ -1,11 +1,10 @@
-import { auth } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
 import DevicesService from "@/lib/auth/service/devices";
-import { db } from "@/lib/db";
 
 const rpID = process.env.AUTHN_RP_ID || "localhost";
 
@@ -17,19 +16,19 @@ export async function GET(_req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({ where: { id: userId } });
+    const user = await clerkClient.users.getUser(userId);
 
-    if (!user?.name) {
-      return NextResponse.json({ message: "User not found" }, { status: 401 });
-    }
+    const devices = await DevicesService.getDevice(userId);
 
-    const devices = await DevicesService.getDevice(user);
+    const name =
+      [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() ||
+      userId;
 
     const opts: GenerateRegistrationOptionsOpts = {
-      rpName: "SimpleWebAuthn Example",
+      rpName: "Splitify WebAuthn",
       rpID,
       userID: userId,
-      userName: user?.name,
+      userName: name,
       timeout: 60000,
       attestationType: "none",
       /**

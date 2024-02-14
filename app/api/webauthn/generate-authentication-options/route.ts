@@ -1,5 +1,4 @@
 import DevicesService from "@/lib/auth/service/devices";
-import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import {
   GenerateAuthenticationOptionsOpts,
@@ -18,13 +17,7 @@ export async function GET(_req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({ where: { id: userId } });
-
-    if (!user?.name) {
-      return NextResponse.json({ message: "User not found" }, { status: 401 });
-    }
-
-    const devices = await DevicesService.getDevice(user);
+    const devices = await DevicesService.getDevice(userId);
 
     const opts: GenerateAuthenticationOptionsOpts = {
       timeout: 60000,

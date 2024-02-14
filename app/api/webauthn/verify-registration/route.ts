@@ -27,13 +27,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({ where: { id: userId } });
-
-    if (!user?.name) {
-      return NextResponse.json({ message: "User not found" }, { status: 401 });
-    }
-
-
     const body: RegistrationResponseJSON = await req.json();
 
     const session = await getIronSession<{ currentChallenge?: string }>(
@@ -66,7 +59,7 @@ export async function POST(req: Request) {
     if (verified && registrationInfo) {
       const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-      const devices = await DevicesService.getDevice(user);
+      const devices = await DevicesService.getDevice(userId);
       const existingDevice = devices.find((device) =>
         isoUint8Array.areEqual(device.credentialID, credentialID)
       );
@@ -81,7 +74,7 @@ export async function POST(req: Request) {
           counter,
           transports: body.response.transports,
         };
-        DevicesService.pushDevice(user, newDevice);
+        DevicesService.pushDevice(userId, newDevice);
       }
     }
 

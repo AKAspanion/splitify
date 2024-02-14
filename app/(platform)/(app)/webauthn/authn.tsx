@@ -153,36 +153,6 @@ export const Authn = () => {
   };
 
   const setup = async () => {
-    /**
-     * Conditional UI test
-     *
-     * 1. Start Chrome Canary 105+ with the requisite Conditional UI flag:
-     *
-     * open -a /Applications/Google\ Chrome\ Canary.app --args --enable-features=WebAuthenticationConditionalUI
-     *
-     * 2. Create an entry in chrome://settings/passwords (temporary requirement) e.g.:
-     *
-     *   - Site: https://example.simplewebauthn.dev/
-     *   - Username: user@example.simplewebauthn.dev
-     *   - Password: whatever
-     *
-     * 3. Register a credential
-     *
-     * 4. Reload the page
-     *
-     * 5. Interact with the username field above the Authenticate button
-     *
-     * Notes:
-     *
-     * I'm currently trying to get to calling WebAuthn as fast as I can here, there's a
-     * Chrome race condition with autofill that sometimes prevents a credential from appearing.
-     *
-     * See: https://bugs.chromium.org/p/chromium/issues/detail?id=1322967&q=component%3ABlink%3EWebAuthentication&can=2
-     *
-     * I've been assured this race condition is temporary, at which point we'll probably be able
-     * to include this just before </body> as we'd typically do. And at that point we can
-     * probably use async/await as well for more sane-looking code.
-     */
     fetch("/api/webauthn/generate-authentication-options")
       .then((resp) => resp.json())
       .then(({ data }) => {
