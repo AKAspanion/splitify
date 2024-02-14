@@ -9,7 +9,7 @@ import {
   UserProfile,
   useClerk,
 } from "@clerk/nextjs";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, FingerprintIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -18,10 +18,10 @@ const ProfilePage = () => {
   const router = useRouter();
 
   return (
-    <div className="flex items-start justify-center w-full">
+    <div className="flex items-start justify-center w-screen md:max-w-screen-2xl mx-auto">
       <div className="px-0 pt-6 md:pb-12 flex flex-col items-center gap-6 overflow-x-hidden -mb-12">
         <ClerkLoading>
-          <div className="p-8 w-[880px] h-[calc(100vh-80px)] flex items-center justify-center">
+          <div className="p-8 h-[calc(100vh-80px)] flex items-center justify-center">
             <Spinner />
           </div>
         </ClerkLoading>
@@ -31,7 +31,7 @@ const ProfilePage = () => {
               <ArrowLeftIcon />
               <span className="sr-only">Back</span>
             </Button>
-            <div className="flex-1 w-[667px]" />
+            <div className="flex-1" />
             <DarkModeToggle />
             <Button
               variant="secondary"
@@ -40,8 +40,41 @@ const ProfilePage = () => {
               Sign out
             </Button>
           </div>
-          <div className="w-fit flex items-start justify-center px-12 pb-12">
-            <UserProfile />
+
+          <div className="w-full">
+            <div className="w-full px-8 md:px-12 flex gap-6 justify-end items-center">
+              <Link href="/webauthn/register">
+                <Button>
+                  <FingerprintIcon />
+                  <div>Register Biometrics</div>
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="w-screen">
+            <hr />
+          </div>
+          <div className="flex items-start justify-center">
+            <UserProfile
+              appearance={{
+                elements: {
+                  rootBox: {
+                    padding: "0px 20px 24px 24px",
+                    boxShadow: "none",
+                    width: "100vw",
+                  },
+                  card: {
+                    width: "100%",
+                    maxWidth: "100%",
+                    boxShadow: "none",
+                    background: "transparent",
+                  },
+                  navbar: {
+                    border: "none",
+                  },
+                },
+              }}
+            />
           </div>
         </ClerkLoaded>
       </div>

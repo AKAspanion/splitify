@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   startAuthentication,
   startRegistration,
-  browserSupportsWebAuthn,
 } from "@simplewebauthn/browser";
 
 import "./authn.css";
