@@ -1,12 +1,12 @@
-import { ExpenseType } from "@/lib/model/expense/expense-type";
-import { Group } from "@/lib/model/group/group";
-import { Payment } from "@/lib/model/payment/payment";
-import { EqualSplit } from "@/lib/model/split/equal-split";
-import { ExactSplit } from "@/lib/model/split/exact-split";
-import { PercentSplit } from "@/lib/model/split/percent-split";
-import { User } from "@/lib/model/user/user";
-import { ExpenseRepository } from "@/lib/repository/expense-repository";
-import { SplitWiseService } from "@/lib/service/splitwise-service";
+import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
+import { Group } from "@/lib/splitify/model/group/group";
+import { Payment } from "@/lib/splitify/model/payment/payment";
+import { EqualSplit } from "@/lib/splitify/model/split/equal-split";
+import { ExactSplit } from "@/lib/splitify/model/split/exact-split";
+import { PercentSplit } from "@/lib/splitify/model/split/percent-split";
+import { User } from "@/lib/splitify/model/user/user";
+import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository";
+import { SplitifyService } from "@/lib/splitify/service/splitify-service";
 import { NextResponse } from "next/server";
 
 export async function GET(_req: Request) {
@@ -24,7 +24,7 @@ export async function GET(_req: Request) {
 
     // Adding Expenses
     const expenseRepository = new ExpenseRepository(group);
-    const service = new SplitWiseService(expenseRepository);
+    const service = new SplitifyService(expenseRepository);
 
     console.log(service.getBalances());
     console.log(service.getBalance(ankit));
@@ -38,7 +38,7 @@ export async function GET(_req: Request) {
         new EqualSplit(komal),
         new EqualSplit(akash),
         new EqualSplit(amit),
-      ],
+      ]
     );
 
     console.log(service.getBalance(ankit));
@@ -48,7 +48,7 @@ export async function GET(_req: Request) {
       "Some other",
       ExpenseType.EXACT,
       [new Payment(ankit, 1250)],
-      [new ExactSplit(komal, 370), new ExactSplit(akash, 880)],
+      [new ExactSplit(komal, 370), new ExactSplit(akash, 880)]
     );
 
     console.log(service.getBalances());
@@ -63,7 +63,7 @@ export async function GET(_req: Request) {
         new PercentSplit(komal, 20),
         new PercentSplit(akash, 20),
         new PercentSplit(amit, 20),
-      ],
+      ]
     );
     console.log(service.getBalances());
     console.log("-----------------");
@@ -71,7 +71,7 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.EXACT,
       [new Payment(komal, 860)],
-      [new ExactSplit(amit, 240), new ExactSplit(ankit, 620)],
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 620)]
     );
     console.log(service.getBalance(komal));
     console.log(service.getBalances());
@@ -80,7 +80,7 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.EXACT,
       [new Payment(akash, 1370)],
-      [new ExactSplit(amit, 240), new ExactSplit(ankit, 1130)],
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 1130)]
     );
     console.log(service.getBalance(akash));
     console.log(service.getBalances());
@@ -89,17 +89,17 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.PERCENT,
       [new Payment(ankit, 230)],
-      [new PercentSplit(amit, 100)],
+      [new PercentSplit(amit, 100)]
     );
     console.log(service.getBalances());
     return NextResponse.json(
       { message: service.getBalances() },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

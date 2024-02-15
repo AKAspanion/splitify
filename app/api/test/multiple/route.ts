@@ -1,12 +1,12 @@
-import { ExpenseType } from "@/lib/model/expense/expense-type";
-import { Group } from "@/lib/model/group/group";
-import { Payment } from "@/lib/model/payment/payment";
-import { EqualSplit } from "@/lib/model/split/equal-split";
-import { ExactSplit } from "@/lib/model/split/exact-split";
-import { PercentSplit } from "@/lib/model/split/percent-split";
-import { User } from "@/lib/model/user/user";
-import { ExpenseRepository } from "@/lib/repository/expense-repository";
-import { SplitWiseService } from "@/lib/service/splitwise-service";
+import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
+import { Group } from "@/lib/splitify/model/group/group";
+import { Payment } from "@/lib/splitify/model/payment/payment";
+import { EqualSplit } from "@/lib/splitify/model/split/equal-split";
+import { ExactSplit } from "@/lib/splitify/model/split/exact-split";
+import { PercentSplit } from "@/lib/splitify/model/split/percent-split";
+import { User } from "@/lib/splitify/model/user/user";
+import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository";
+import { SplitifyService } from "@/lib/splitify/service/splitify-service";
 import { NextResponse } from "next/server";
 
 export async function GET(_req: Request) {
@@ -24,7 +24,7 @@ export async function GET(_req: Request) {
 
     // Adding Expenses
     const expenseRepository = new ExpenseRepository(group);
-    const service = new SplitWiseService(expenseRepository);
+    const service = new SplitifyService(expenseRepository);
 
     console.log(service.getBalances());
     console.log("-----------------");
@@ -36,7 +36,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 100),
         new ExactSplit(aloke, 150),
         new ExactSplit(akash, 250),
-      ],
+      ]
     );
     service.addExpense(
       "GoaFlight",
@@ -47,7 +47,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 200),
         new ExactSplit(aloke, 300),
         new ExactSplit(akash, 500),
-      ],
+      ]
     );
     service.addExpense(
       "GoaFlight",
@@ -57,7 +57,7 @@ export async function GET(_req: Request) {
         new ExactSplit(ankit, 300),
         new ExactSplit(aloke, 450),
         new ExactSplit(akash, 750),
-      ],
+      ]
     );
     // service.addExpense(
     //   "GoaFlight",
@@ -83,12 +83,12 @@ export async function GET(_req: Request) {
 
     return NextResponse.json(
       { message: service.getBalances() },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
