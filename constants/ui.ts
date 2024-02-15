@@ -11,5 +11,4 @@ export const EXPENSE_CATEGORY_TYPES = [
 
 export type ExpenseCategoryType = (typeof GROUP_TYPES)[number];
 
-
 export const RUPPEE_SYMBOL = "₹";

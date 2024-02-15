@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { auth } from "@clerk/nextjs";
 
-export const Balance = async ({
+const Balance = async ({
   expense,
   groupId,
 }: {
@@ -37,3 +37,5 @@ export const Balance = async ({
     </div>
   );
 };
+
+export default Balance;

@@ -1,6 +1,6 @@
-import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
+import { UISpinner } from "@/components/ui-spinner";
 import { db } from "@/lib/db";
 import { Actions } from "./actions";
 import { auth } from "@clerk/nextjs";
@@ -9,7 +9,19 @@ import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { RUPPEE_SYMBOL } from "@/constants/ui";
-import { Balance } from "./balance";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const Balance = dynamic(() => import("./balance"), {
+  loading: () => (
+    <div className="flex flex-col gap-2">
+      <Skeleton className="h-9 w-[100px]" />
+      <Skeleton className="h-5 w-[160px]" />
+      <Skeleton className="h-5 w-[120px]" />
+      <Skeleton className="h-5 w-[100px]" />
+    </div>
+  ),
+});
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const { userId } = auth();

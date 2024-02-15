@@ -1,16 +1,35 @@
 import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { PlusCircleIcon, SettingsIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
-import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
 import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
-import { UserAvatars } from "../../../_components/user-avatars";
-import { ExpensesList } from "./expenses-list";
 import { urlEncode } from "@/utils/func";
+import dynamic from "next/dynamic";
+import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
+
+const ExpensesList = dynamic(() => import("./expenses-list"), {
+  loading: () => (
+    <div>
+      <Skeleton className="h-6 mt-6 mb-3 w-[90px]" />
+      <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex gap-4 items-center">
+            <Skeleton className="rounded-full w-10 h-10" />
+            <div>
+              <Skeleton className="h-4 mt-0.5 w-[90px]" />
+              <Skeleton className="h-3 mt-1 w-[120px]" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ),
+});
 
 const GroupDetailsPage = async ({
   params,

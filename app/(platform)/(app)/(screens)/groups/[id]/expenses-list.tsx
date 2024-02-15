@@ -2,7 +2,7 @@ import { ExpenseCard } from "@/app/(platform)/(app)/_components/expense-card";
 import { NoData } from "@/components/no-data";
 import { db } from "@/lib/db";
 
-export const ExpensesList = async ({ id }: { id: string }) => {
+const ExpensesList = async ({ id }: { id: string }) => {
   const expenses = await db.expense.findMany({
     where: { groupId: id },
     include: { splits: true, payments: { include: { user: true } } },
@@ -29,3 +29,5 @@ export const ExpensesList = async ({ id }: { id: string }) => {
     </>
   );
 };
+
+export default ExpensesList;
