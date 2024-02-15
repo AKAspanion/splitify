@@ -1,6 +1,7 @@
 import { createFriend } from "@/actions/create-friend";
 import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { HandshakeIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ export const Action = ({
         onClick={onRequest}
         className={isFriend ? "text-green-500" : ""}
       >
-        <HandshakeIcon />
+        {loading ? <Spinner size="sm" /> : <HandshakeIcon />}
       </Button>
     </div>
   );

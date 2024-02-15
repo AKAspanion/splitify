@@ -2,6 +2,7 @@
 
 import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { PlusCircleIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ export const Action = ({
         onClick={onRequest}
         className={isInGroup ? "text-green-500" : ""}
       >
-        <PlusCircleIcon />
+        {loading ? <Spinner size="sm" /> : <PlusCircleIcon />}
       </Button>
     </div>
   );

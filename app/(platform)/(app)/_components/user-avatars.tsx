@@ -8,7 +8,7 @@ export const UserAvatars = (props: UserAvatarsProps) => {
   const { users, action } = props;
 
   return !users ? null : (
-    <div className="flex h-10 relative w-full">
+    <div className="flex h-10 relative w-full items-center">
       {users?.map((u, index) => (
         <Image
           key={u.id}

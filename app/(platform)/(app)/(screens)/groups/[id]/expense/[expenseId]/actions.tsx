@@ -3,6 +3,7 @@ import { deleteExpense } from "@/actions/delete-expense";
 import { FullExpense } from "@/app/(platform)/(app)/_components/expense-card";
 import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -45,7 +46,9 @@ export const Actions = ({ expense }: { expense: FullExpense }) => {
         size="icon"
         onClick={handleDelete}
       >
-        <TrashIcon width={20} />
+        <div className="text-red-500">
+          {loading ? <Spinner size="sm" /> : <TrashIcon width={20} />}
+        </div>
       </Button>
       <Button disabled variant="ghost" size="icon">
         <PencilIcon width={20} />

@@ -10,3 +10,6 @@ export const EXPENSE_CATEGORY_TYPES = [
 ] as const;
 
 export type ExpenseCategoryType = (typeof GROUP_TYPES)[number];
+
+
+export const RUPPEE_SYMBOL = "₹";
