@@ -1,19 +1,19 @@
 import { User } from "../user/user";
 
 export abstract class Split {
-  private user: User;
+  private user: string;
   private amount: number;
 
-  constructor(user: User, amount = 0) {
+  constructor(user: string, amount = 0) {
     this.amount = amount;
     this.user = user;
   }
 
-  public getUser(): User {
+  public getUser(): string {
     return this.user;
   }
 
-  public setUser(user: User): void {
+  public setUser(user: string): void {
     this.user = user;
   }
 

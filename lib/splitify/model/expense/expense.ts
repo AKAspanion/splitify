@@ -32,7 +32,7 @@ export abstract class Expense {
     return this.payment.getUser();
   }
 
-  public setExpensePaidBy(expensePaidBy: User) {
+  public setExpensePaidBy(expensePaidBy: string) {
     return this.payment.setUser(expensePaidBy);
   }
 

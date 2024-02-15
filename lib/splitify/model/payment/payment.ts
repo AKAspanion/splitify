@@ -1,19 +1,19 @@
 import { User } from "../user/user";
 
 export class Payment {
-  private user: User;
+  private user: string;
   private amount: number;
 
-  constructor(user: User, amount: number) {
-    this.user = user;
+  constructor(userId: string, amount: number) {
+    this.user = userId;
     this.amount = amount;
   }
 
-  public getUser(): User {
+  public getUser(): string {
     return this.user;
   }
 
-  public setUser(user: User): void {
+  public setUser(user: string): void {
     this.user = user;
   }
 

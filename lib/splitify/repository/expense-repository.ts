@@ -6,6 +6,7 @@ import { Payment } from "../model/payment/payment";
 import { Split } from "../model/split/split";
 import { User } from "../model/user/user";
 import { ExpenseService } from "../service/expense-service";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 
 export class ExpenseRepository {
   group: Group;
@@ -34,7 +35,7 @@ export class ExpenseRepository {
     payment: Payment,
     splits: Split[],
   ): void {
-    if (this.getUser(payment.getUser().getUserId()) === undefined) {
+    if (this.getUser(payment.getUser()) === undefined) {
       return;
     }
 
@@ -49,9 +50,9 @@ export class ExpenseRepository {
     }
     this.expenses.push(expense);
     for (const split of expense.getSplits()) {
-      const paidTo = split.getUser().getUserId();
+      const paidTo = split.getUser();
 
-      let balances = this.getBalanceSheet(payment.getUser().getUserId());
+      let balances = this.getBalanceSheet(payment.getUser());
       if (balances) {
         if (balances?.get(paidTo) === undefined) {
           balances.set(paidTo, 0.0);
@@ -61,12 +62,12 @@ export class ExpenseRepository {
 
         balances = this.getBalanceSheet(paidTo);
         if (balances) {
-          if (balances.get(payment.getUser().getUserId()) === undefined) {
-            balances.set(payment.getUser().getUserId(), 0.0);
+          if (balances.get(payment.getUser()) === undefined) {
+            balances.set(payment.getUser(), 0.0);
           }
           balances.set(
-            payment.getUser().getUserId(),
-            balances.get(payment.getUser().getUserId())! - split.getAmount(),
+            payment.getUser(),
+            balances.get(payment.getUser())! - split.getAmount(),
           );
         }
       }
@@ -102,11 +103,21 @@ export class ExpenseRepository {
     const user2Name = this.getUser(user2Id)?.getUserName();
     if (amount < 0) {
       return (
-        user1Name + " owes " + user2Name + ": " + fixedNum(Math.abs(amount))
+        user1Name +
+        " owes " +
+        user2Name +
+        ": " +
+        RUPPEE_SYMBOL +
+        fixedNum(Math.abs(amount))
       );
     } else if (amount > 0) {
       return (
-        user2Name + " owes " + user1Name + ": " + fixedNum(Math.abs(amount))
+        user2Name +
+        " owes " +
+        user1Name +
+        ": " +
+        RUPPEE_SYMBOL +
+        fixedNum(Math.abs(amount))
       );
     }
     return "";

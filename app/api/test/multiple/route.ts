@@ -31,53 +31,53 @@ export async function GET(_req: Request) {
     service.addExpense(
       "GoaFlight",
       ExpenseType.EXACT,
-      [new Payment(aloke, 500)],
+      [new Payment("4", 500)],
       [
-        new ExactSplit(ankit, 100),
-        new ExactSplit(aloke, 150),
-        new ExactSplit(akash, 250),
+        new ExactSplit("1", 100),
+        new ExactSplit("4", 150),
+        new ExactSplit("3", 250),
       ],
     );
     service.addExpense(
       "GoaFlight",
       ExpenseType.EXACT,
-      [new Payment(akash, 1000)],
-      // [new Payment(akash, 1000), new Payment(aloke, 500)],
+      [new Payment("3", 1000)],
+      // [new Payment("3", 1000), new Payment("4", 500)],
       [
-        new ExactSplit(ankit, 200),
-        new ExactSplit(aloke, 300),
-        new ExactSplit(akash, 500),
+        new ExactSplit("1", 200),
+        new ExactSplit("4", 300),
+        new ExactSplit("3", 500),
       ],
     );
     service.addExpense(
       "GoaFlight",
       ExpenseType.EXACT,
-      [new Payment(akash, 1000), new Payment(aloke, 500)],
+      [new Payment("3", 1000), new Payment("4", 500)],
       [
-        new ExactSplit(ankit, 300),
-        new ExactSplit(aloke, 450),
-        new ExactSplit(akash, 750),
+        new ExactSplit("1", 300),
+        new ExactSplit("4", 450),
+        new ExactSplit("3", 750),
       ],
     );
     // service.addExpense(
     //   "GoaFlight",
     //   ExpenseType.PERCENT,
-    //   [new Payment(akash, 1000), new Payment(aloke, 500)],
+    //   [new Payment("3", 1000), new Payment("4", 500)],
     //   [
-    //     new PercentSplit(ankit, 30),
-    //     new PercentSplit(aloke, 20),
-    //     new PercentSplit(akash, 50),
+    //     new PercentSplit("1", 30),
+    //     new PercentSplit("4", 20),
+    //     new PercentSplit("3", 50),
     //   ]
     // );
     // service.addExpense(
     //   "GoaFlight",
     //   ExpenseType.EXACT,
-    //   [new Payment(akash, 1000), new Payment(aloke, 500)],
-    //   // [new Payment(ankit, 1500)],
+    //   [new Payment("3", 1000), new Payment("4", 500)],
+    //   // [new Payment("1", 1500)],
     //   [
-    //     new ExactSplit(ankit, 450),
-    //     new ExactSplit(aloke, 750),
-    //     new ExactSplit(akash, 300),
+    //     new ExactSplit("1", 450),
+    //     new ExactSplit("4", 750),
+    //     new ExactSplit("3", 300),
     //   ]
     // );
 

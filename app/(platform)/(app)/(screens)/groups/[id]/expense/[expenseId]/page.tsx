@@ -9,6 +9,7 @@ import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { Balance } from "./balance";
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const { userId } = auth();
@@ -36,7 +37,7 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
     ? format(expense?.createdAt, "d LLLL, yyyy")
     : "";
 
-  const users = expense?.payments?.map((p) => p.user);
+  const users = expense?.payments?.map((p) => p.user) || [];
 
   return (
     <AutoContainer
@@ -49,7 +50,7 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
       }
     >
       <div className="flex flex-col gap-6">
-        <div className={"pl-14"}>
+        <div className={""}>
           <div className="font-bold text-lg">₹ {expense?.amount}</div>
           <div className="font-thin text-sm">
             Added by {addedBy} on {createDate}
@@ -63,7 +64,7 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
             </div>
           }
         />
-        <div className={"pl-14"}>
+        <div className={""}>
           <div className="flex flex-col gap-2">
             {expense?.payments?.map((p) => (
               <div
@@ -74,6 +75,7 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
           </div>
         </div>
         <hr />
+        <Balance groupId={groupId} expense={expense} />
       </div>
     </AutoContainer>
   );

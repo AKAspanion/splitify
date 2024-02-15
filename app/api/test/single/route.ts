@@ -29,8 +29,8 @@ export async function GET(_req: Request) {
     service.addExpense(
       "Fifa",
       ExpenseType.EQUAL,
-      [new Payment(ankit, 500), new Payment(amit, 1000)],
-      [new EqualSplit(ankit), new EqualSplit(akash), new EqualSplit(amit)],
+      [new Payment("1", 500), new Payment("4", 1000)],
+      [new EqualSplit("1"), new EqualSplit("3"), new EqualSplit("4")],
     );
 
     // const group = new Group("Split");

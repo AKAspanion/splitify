@@ -133,6 +133,10 @@ export class SplitifyService {
     }
   }
 
+  public getBalancesTable(): string[] {
+    return this.expenseRepository.getBalances();
+  }
+
   public getBalanceSheets() {
     return this.expenseRepository.getBalanceSheets();
   }

@@ -3,7 +3,7 @@ import { Split } from "./split";
 
 export class PercentSplit extends Split {
   percent: number;
-  constructor(user: User, percent: number) {
+  constructor(user: string, percent: number) {
     super(user);
     this.percent = percent;
   }
