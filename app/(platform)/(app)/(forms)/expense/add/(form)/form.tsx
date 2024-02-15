@@ -15,6 +15,7 @@ import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@prisma/client";
 import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
+import { CategoryCombobox } from "./category-combobox";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -24,8 +25,10 @@ const FormComp = ({ groups }: FormProps) => {
   const searchParams = useSearchParams();
   const paramsGroupId = searchParams.get("groupId") || "";
 
-  const [open, setOpen] = useState(false);
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
+  const [category, setCategory] = useState<string>("");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
@@ -121,6 +124,10 @@ const FormComp = ({ groups }: FormProps) => {
     }
   };
 
+  const onCategoryChange = (c: string) => {
+    setCategory(() => c);
+  };
+
   const effectUsers = useMemo(() => JSON.stringify(users), [users]);
 
   useEffect(() => {
@@ -130,18 +137,28 @@ const FormComp = ({ groups }: FormProps) => {
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
-      <div>
-        <GroupCombobox
-          label="Group name"
-          open={open}
-          groups={groups}
-          value={groupId}
-          setOpen={setOpen}
-          setValue={onGroupChange}
-        />
-        <FormErrors id="group" errors={fieldErrors?.groupId} />
-      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div>
+          <GroupCombobox
+            label="Group name"
+            open={groupOpen}
+            groups={groups}
+            value={groupId}
+            setOpen={setGroupOpen}
+            setValue={onGroupChange}
+          />
+          <FormErrors id="group" errors={fieldErrors?.groupId} />
+        </div>
+        <div>
+          <CategoryCombobox
+            label="Category"
+            open={categoryOpen}
+            value={category}
+            setOpen={setCategoryOpen}
+            setValue={onCategoryChange}
+          />
+          <FormErrors id="group" errors={fieldErrors?.category} />
+        </div>
         <FormInput
           id="description"
           name="description"

@@ -15,8 +15,16 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { description, type, amount, splits, payments, groupId, createrId } =
-    data;
+  const {
+    description,
+    category,
+    type,
+    amount,
+    splits,
+    payments,
+    groupId,
+    createrId,
+  } = data;
 
   let expense;
   try {
@@ -26,6 +34,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         description,
         type,
         groupId,
+        category,
         createrId,
         payments: {
           createMany: {
