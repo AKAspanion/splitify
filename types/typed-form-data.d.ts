@@ -75,12 +75,12 @@ interface TypedFormData<T extends Record<string, TypedFormDataValue>> {
 
   forEach<K extends keyof T>(
     callbackfn: (value: T[K], key: K, parent: TypedFormData<T>) => void,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void;
 }
 
 function getTypedFormData<T extends Record<string, TypedFormDataValue>>(
-  form?: HTMLFormElement | null
+  form?: HTMLFormElement | null,
 ): TypedFormData<T> {
   return new FormData(form || undefined) as unknown as TypedFormData<T>;
 }

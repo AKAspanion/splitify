@@ -24,11 +24,11 @@ const Addmember = async ({ params, searchParams }: ServerSideComponentProp) => {
   });
 
   const friendsNotInGroup = data?.friends?.filter(
-    (o) => !group?.users?.some(({ id }) => o.id === id)
+    (o) => !group?.users?.some(({ id }) => o.id === id),
   );
 
   const friendsInGroup = data?.friends?.filter((o) =>
-    group?.users?.some(({ id }) => o.id === id)
+    group?.users?.some(({ id }) => o.id === id),
   );
 
   const noFriendsInGroup = !friendsInGroup || friendsInGroup?.length == 0;

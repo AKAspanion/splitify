@@ -26,7 +26,7 @@ const LandingPage = () => {
       <div
         className={cn(
           "text-sm md:text-xl text-neutral-400 md:mt-8 max-w-xs md:max-w-3xl text-center mx-auto mt-12",
-          textFont.className
+          textFont.className,
         )}
       >
         Keep track of your shared expenses and balances with roommates, trips,

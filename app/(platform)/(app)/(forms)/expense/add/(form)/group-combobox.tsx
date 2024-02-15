@@ -80,7 +80,7 @@ export function GroupCombobox(props: GroupComboboxProps) {
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === group.id ? "opacity-100" : "opacity-0"
+                    value === group.id ? "opacity-100" : "opacity-0",
                   )}
                 />
                 <div className="truncate w-full">{group.title}</div>

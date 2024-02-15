@@ -19,7 +19,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   if (userId === friendId) {
     return { error: "You can't be friends with yourself" };
   }
-  console.log(groupId);
 
   try {
     const promises: any[] = [
@@ -38,7 +37,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         db.group.update({
           where: { id: groupId },
           data: { users: { connect: [{ id: friendId }] } },
-        })
+        }),
       );
     }
     await Promise.all(promises);

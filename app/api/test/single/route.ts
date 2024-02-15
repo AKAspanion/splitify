@@ -38,7 +38,7 @@ export async function GET(_req: Request) {
         new EqualSplit(komal),
         new EqualSplit(akash),
         new EqualSplit(amit),
-      ]
+      ],
     );
 
     console.log(service.getBalance(ankit));
@@ -48,7 +48,7 @@ export async function GET(_req: Request) {
       "Some other",
       ExpenseType.EXACT,
       [new Payment(ankit, 1250)],
-      [new ExactSplit(komal, 370), new ExactSplit(akash, 880)]
+      [new ExactSplit(komal, 370), new ExactSplit(akash, 880)],
     );
 
     console.log(service.getBalances());
@@ -63,7 +63,7 @@ export async function GET(_req: Request) {
         new PercentSplit(komal, 20),
         new PercentSplit(akash, 20),
         new PercentSplit(amit, 20),
-      ]
+      ],
     );
     console.log(service.getBalances());
     console.log("-----------------");
@@ -71,7 +71,7 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.EXACT,
       [new Payment(komal, 860)],
-      [new ExactSplit(amit, 240), new ExactSplit(ankit, 620)]
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 620)],
     );
     console.log(service.getBalance(komal));
     console.log(service.getBalances());
@@ -80,7 +80,7 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.EXACT,
       [new Payment(akash, 1370)],
-      [new ExactSplit(amit, 240), new ExactSplit(ankit, 1130)]
+      [new ExactSplit(amit, 240), new ExactSplit(ankit, 1130)],
     );
     console.log(service.getBalance(akash));
     console.log(service.getBalances());
@@ -89,17 +89,17 @@ export async function GET(_req: Request) {
       "Settlement",
       ExpenseType.PERCENT,
       [new Payment(ankit, 230)],
-      [new PercentSplit(amit, 100)]
+      [new PercentSplit(amit, 100)],
     );
     console.log(service.getBalances());
     return NextResponse.json(
       { message: service.getBalances() },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -65,7 +65,10 @@ export async function GET(_req: Request) {
      */
     const session = await getIronSession<{ currentChallenge?: string }>(
       cookies(),
-      { password: "supersecretamazingpassword123456", cookieName: "challenge" }
+      {
+        password: "supersecretamazingpassword123456",
+        cookieName: "challenge",
+      },
     );
     session.currentChallenge = data?.challenge;
     await session.save();
@@ -75,7 +78,7 @@ export async function GET(_req: Request) {
     console.trace(error);
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

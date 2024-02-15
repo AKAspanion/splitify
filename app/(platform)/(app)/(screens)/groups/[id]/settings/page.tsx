@@ -7,6 +7,7 @@ import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { ListItem } from "@/components/list-item";
 import { Header } from "@/components/container/header";
+import { DeleteGroup } from "./delete";
 
 const GroupDetailsPage = async ({
   params,
@@ -46,9 +47,7 @@ const GroupDetailsPage = async ({
         ))}
         <hr />
 
-        <div className="text-red-500 cursor-pointer">
-          <ListItem title="Delete group" icon={<TrashIcon width={20} />} />
-        </div>
+        <DeleteGroup id={group?.id} />
       </div>
     </AutoContainer>
   );

@@ -4,7 +4,6 @@ import { FullExpense } from "@/app/(platform)/(app)/_components/expense-card";
 import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
-import { useUser } from "@clerk/nextjs";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

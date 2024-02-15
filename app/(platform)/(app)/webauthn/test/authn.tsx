@@ -22,7 +22,7 @@ export const Authn = () => {
   const printDebug = (
     setter: Dispatch<SetStateAction<string>>,
     title: string,
-    output = ""
+    output = "",
   ) => {
     setter((d) => (d += "\n"));
     setter((d) => (d += `// ${title}\n`));
@@ -42,7 +42,7 @@ export const Authn = () => {
       printDebug(
         setReqDebug,
         "Registration Options",
-        JSON.stringify(data, null, 2)
+        JSON.stringify(data, null, 2),
       );
 
       // hideAuthForm();
@@ -51,14 +51,14 @@ export const Authn = () => {
       printDebug(
         setReqDebug,
         "Registration Response",
-        JSON.stringify(attResp, null, 2)
+        JSON.stringify(attResp, null, 2),
       );
     } catch (e) {
       const error = e as Error;
       if (error.name === "InvalidStateError") {
         printDebug(
           setElemError,
-          "Error: Authenticator was probably already registered by user"
+          "Error: Authenticator was probably already registered by user",
         );
       } else {
         printDebug(setElemError, error.message);
@@ -79,7 +79,7 @@ export const Authn = () => {
     printDebug(
       setReqDebug,
       "Server Response",
-      JSON.stringify(verificationJSON, null, 2)
+      JSON.stringify(verificationJSON, null, 2),
     );
 
     if (verificationJSON && verificationJSON.verified) {
@@ -88,7 +88,7 @@ export const Authn = () => {
       printDebug(
         setElemError,
         `Oh no, something went wrong!`,
-        JSON.stringify(verificationJSON)
+        JSON.stringify(verificationJSON),
       );
     }
   };
@@ -105,7 +105,7 @@ export const Authn = () => {
       printDebug(
         setAuthDebug,
         "Authentication Options",
-        JSON.stringify(data, null, 2)
+        JSON.stringify(data, null, 2),
       );
 
       // hideAuthForm();
@@ -114,7 +114,7 @@ export const Authn = () => {
       printDebug(
         setAuthDebug,
         "Authentication Response",
-        JSON.stringify(asseResp, null, 2)
+        JSON.stringify(asseResp, null, 2),
       );
     } catch (e) {
       const error = e as Error;
@@ -130,14 +130,14 @@ export const Authn = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(asseResp),
-      }
+      },
     );
 
     const { data: verificationJSON } = await verificationResp.json();
     printDebug(
       setAuthDebug,
       "Server Response",
-      JSON.stringify(verificationJSON, null, 2)
+      JSON.stringify(verificationJSON, null, 2),
     );
 
     if (verificationJSON && verificationJSON.verified) {
@@ -146,7 +146,7 @@ export const Authn = () => {
       printDebug(
         setElemError,
         `Oh no, something went wrong!`,
-        JSON.stringify(verificationJSON)
+        JSON.stringify(verificationJSON),
       );
     }
   };
@@ -166,7 +166,7 @@ export const Authn = () => {
             printDebug(
               setAuthDebug,
               "Authentication Response (Autofill)",
-              JSON.stringify(asseResp, null, 2)
+              JSON.stringify(asseResp, null, 2),
             );
 
             const verificationResp = await fetch(
@@ -177,14 +177,14 @@ export const Authn = () => {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify(asseResp),
-              }
+              },
             );
 
             const { data: verificationJSON } = await verificationResp.json();
             printDebug(
               setAuthDebug,
               "Server Response (Autofill)",
-              JSON.stringify(verificationJSON, null, 2)
+              JSON.stringify(verificationJSON, null, 2),
             );
 
             if (verificationJSON && verificationJSON.verified) {
@@ -193,7 +193,7 @@ export const Authn = () => {
               printDebug(
                 setElemError,
                 `Oh no, something went wrong!`,
-                JSON.stringify(verificationJSON)
+                JSON.stringify(verificationJSON),
               );
             }
           })

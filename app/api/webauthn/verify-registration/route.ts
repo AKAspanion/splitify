@@ -31,7 +31,10 @@ export async function POST(req: Request) {
 
     const session = await getIronSession<{ currentChallenge?: string }>(
       cookies(),
-      { password: "supersecretamazingpassword123456", cookieName: "challenge" }
+      {
+        password: "supersecretamazingpassword123456",
+        cookieName: "challenge",
+      },
     );
     const expectedChallenge = session.currentChallenge;
 
@@ -50,7 +53,7 @@ export async function POST(req: Request) {
       console.trace(error);
       return NextResponse.json(
         { message: _error?.message || "Somethig went wrong" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,7 +64,7 @@ export async function POST(req: Request) {
 
       const devices = await DevicesService.getDevice(userId);
       const existingDevice = devices.find((device) =>
-        isoUint8Array.areEqual(device.credentialID, credentialID)
+        isoUint8Array.areEqual(device.credentialID, credentialID),
       );
 
       if (!existingDevice) {
@@ -86,7 +89,7 @@ export async function POST(req: Request) {
     console.trace(error);
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

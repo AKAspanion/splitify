@@ -8,10 +8,10 @@ const parseDevices = (obj: string): AuthenticatorDevice[] => {
 
     return parsed?.map((parsedobj) => {
       const unit8Values = Object.entries(parsedobj.credentialPublicKey).map(
-        ([_, v]) => v
+        ([_, v]) => v,
       );
       const unit32Values = Object.entries(parsedobj.credentialID).map(
-        ([_, v]) => v
+        ([_, v]) => v,
       );
       const credentialPublicKey = new Uint8Array(unit8Values);
       const credentialID = new Uint8Array(unit32Values);

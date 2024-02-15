@@ -10,22 +10,22 @@ import { Suspense } from "react";
 export function Providers({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
   return (
-      <ClerkProvider
-        appearance={{
-          baseTheme: resolvedTheme === "dark" ? dark : undefined,
-        }}
-      >
-        <Suspense>
-          <AppProgressBar
-            height="3px"
-            color="#32CD32"
-            options={{ showSpinner: false }}
-            shallowRouting
-          />
-        </Suspense>
-        <Suspense>
-          <ConfirmProvider>{children}</ConfirmProvider>
-        </Suspense>
-      </ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: resolvedTheme === "dark" ? dark : undefined,
+      }}
+    >
+      <Suspense>
+        <AppProgressBar
+          height="3px"
+          color="#32CD32"
+          options={{ showSpinner: false }}
+          shallowRouting
+        />
+      </Suspense>
+      <Suspense>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </Suspense>
+    </ClerkProvider>
   );
 }

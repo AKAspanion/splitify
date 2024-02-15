@@ -17,17 +17,17 @@ export const CollectionOfUserAuthenticators: Array<SingleUserAuthenticator> =
 export const AuthenticatorsService = {
   getCollectionOfUserAuthenticators() {
     return JSON.parse(
-      readFileSync("users-authenticators.json", "utf-8")
+      readFileSync("users-authenticators.json", "utf-8"),
     ) as SingleUserAuthenticator[];
   },
   getUserAuthenticatorsIndex(userId: string) {},
   getUserAuthenticators(userId: string) {},
   async storeUserAuthenticator(
     userId: string,
-    newAuthenticator: AuthenticatorType
+    newAuthenticator: AuthenticatorType,
   ) {},
   getAuthenticatorByCredentialId(
     userAuthenticators: AuthenticatorType[],
-    autheticatorCredentialIdB64URL: string
+    autheticatorCredentialIdB64URL: string,
   ) {},
 };

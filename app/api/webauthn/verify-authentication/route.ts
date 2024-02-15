@@ -26,7 +26,10 @@ export async function POST(req: Request) {
 
     const session = await getIronSession<{ currentChallenge?: string }>(
       cookies(),
-      { password: "supersecretamazingpassword123456", cookieName: "challenge" }
+      {
+        password: "supersecretamazingpassword123456",
+        cookieName: "challenge",
+      },
     );
     const expectedChallenge = session.currentChallenge;
 
@@ -45,7 +48,7 @@ export async function POST(req: Request) {
     if (!dbAuthenticator) {
       return NextResponse.json(
         { message: "Authenticator is not registered with this site" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -65,7 +68,7 @@ export async function POST(req: Request) {
       console.trace(_error);
       return NextResponse.json(
         { message: _error?.message || "Somethig went wrong" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -84,7 +87,7 @@ export async function POST(req: Request) {
     console.trace(error);
     return NextResponse.json(
       { message: error?.message || "Somethig went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

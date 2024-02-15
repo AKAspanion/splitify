@@ -30,8 +30,6 @@ export const Action = ({
     await execute({ friendId: id, groupId });
   };
 
-  console.log(groupId);
-  
   return (
     <div>
       <Button

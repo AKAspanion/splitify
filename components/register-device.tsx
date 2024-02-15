@@ -11,7 +11,7 @@ const handleDeviceRegistration = async () => {
       `/api/webauthn/get-reg-device-options`,
       {
         email,
-      }
+      },
     );
   } catch (error) {
     alert("oopsie!! an error occured during registration");
