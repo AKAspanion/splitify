@@ -14,14 +14,15 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   if (!userId) {
     return { error: "Unauthorized" };
   }
-  const { friendId } = data;
+  const { friendId, groupId } = data;
 
   if (userId === friendId) {
     return { error: "You can't be friends with yourself" };
   }
+  console.log(groupId);
 
   try {
-    await Promise.all([
+    const promises: any[] = [
       db.user.update({
         where: { id: userId },
         data: { friends: { connect: [{ id: friendId }] } },
@@ -30,7 +31,17 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         where: { id: friendId },
         data: { friends: { connect: [{ id: userId }] } },
       }),
-    ]);
+    ];
+
+    if (groupId) {
+      promises.push(
+        db.group.update({
+          where: { id: groupId },
+          data: { users: { connect: [{ id: friendId }] } },
+        })
+      );
+    }
+    await Promise.all(promises);
   } catch (error) {
     return {
       error: "Failed to create friendship",
@@ -40,6 +51,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/friends/add`);
   revalidatePath(`/friends`);
+  if (groupId) {
+    revalidatePath(`/groups/add`);
+    revalidatePath(`/groups/${groupId}`);
+    revalidatePath(`/groups/${groupId}/settings`);
+    revalidatePath(`/groups/${groupId}/add-member`);
+  }
   return { data: { message: "Friend added successfully" } };
 };
 

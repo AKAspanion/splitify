@@ -14,14 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Action } from "./action";
 import { useUser } from "@clerk/nextjs";
 
-const Search = ({ backTo }: { backTo: string }) => {
+const Search = ({ backTo, groupId }: { backTo: string; groupId?: string }) => {
   const { user } = useUser();
   const { execute, data, fieldErrors } = useAction(searchUser);
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit = async (formData: FormData) => {
     const email = formData.get("email") as string;
 
-    execute({ email });
+    await execute({ email });
   };
 
   return (
@@ -57,6 +57,7 @@ const Search = ({ backTo }: { backTo: string }) => {
                     actions={
                       <Action
                         id={d.id}
+                        groupId={groupId}
                         isFriend={!!d?.friends?.find((u) => u.id === user?.id)}
                       />
                     }

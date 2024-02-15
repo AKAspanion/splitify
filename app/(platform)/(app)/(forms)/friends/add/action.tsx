@@ -1,4 +1,5 @@
 import { createFriend } from "@/actions/create-friend";
+import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { HandshakeIcon } from "lucide-react";
@@ -6,9 +7,11 @@ import { toast } from "sonner";
 
 export const Action = ({
   id,
+  groupId,
   isFriend,
 }: {
   id: string;
+  groupId?: string;
   isFriend?: boolean;
 }) => {
   const { execute, loading } = useAction(createFriend, {
@@ -24,8 +27,11 @@ export const Action = ({
   const onRequest = async () => {
     if (isFriend) return;
 
-    execute({ friendId: id });
+    await execute({ friendId: id, groupId });
   };
+
+  console.log(groupId);
+  
   return (
     <div>
       <Button

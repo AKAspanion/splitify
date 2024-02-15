@@ -10,12 +10,11 @@ import { NoData } from "@/components/no-data";
 
 const GroupsPage = async () => {
   const { userId } = auth();
-  const data = await db.user.findUnique({
-    where: { id: userId || "null" },
-    include: { groups: true },
+  const groups = await db.group.findMany({
+    where: { users: { some: { id: userId || "null" } } },
   });
 
-  const noData = !data?.groups || data?.groups?.length === 0;
+  const noData = !groups || groups?.length === 0;
 
   return (
     <AutoContainer
@@ -38,7 +37,7 @@ const GroupsPage = async () => {
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data?.groups?.map((g) => {
+        {groups?.map((g) => {
           return <GroupCard key={g.id} group={g} />;
         })}
       </div>

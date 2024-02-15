@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Action } from "./action";
 import { Header } from "@/components/container/header";
 import { ListItem } from "@/components/list-item";
+import { urlEncode } from "@/utils/func";
 
 const Addmember = async ({ params, searchParams }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
@@ -32,17 +33,26 @@ const Addmember = async ({ params, searchParams }: ServerSideComponentProp) => {
 
   const noFriendsInGroup = !friendsInGroup || friendsInGroup?.length == 0;
 
+  const backUrl = urlEncode({
+    path: `/groups/${id}/add-member`,
+    query: searchParams,
+  });
+
+  const addFriendUrl = urlEncode({
+    path: `/friends/add`,
+    query: { groupId: id, back: backUrl },
+  });
+
+  const backToUrl = urlEncode({
+    path: backTo ? backTo : `/groups/${id}/settings`,
+  });
+
   return (
     <AutoContainer
-      header={
-        <Header
-          backTo={backTo ? backTo : `/groups/${id}/settings`}
-          title="Add members to group"
-        />
-      }
+      header={<Header backTo={backToUrl} title="Add members to group" />}
     >
       <div className="pb-6 flex flex-col gap-6">
-        <Link href={`/friends/add?back=/groups/${id}/add-member`}>
+        <Link href={addFriendUrl}>
           <ListItem title="Add a friend" icon={<UserPlusIcon />} />
         </Link>
         {friendsNotInGroup?.map((d) => (

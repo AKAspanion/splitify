@@ -49,7 +49,7 @@ model Expense {
   updatedAt   DateTime?     @updatedAt
   payments    UserPayment[]
   splits      UserSplit[]
-  Group       Group?        @relation(fields: [groupId], references: [id])
+  Group       Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
   User        User          @relation(fields: [createrId], references: [id])
 
   @@index([groupId])
