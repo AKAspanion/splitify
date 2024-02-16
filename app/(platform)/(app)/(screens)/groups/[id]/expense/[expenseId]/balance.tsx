@@ -1,4 +1,4 @@
-import { calcGroupSplits } from "@/app/(platform)/(app)/_utils/calculation";
+import { calcExpenseSplits } from "@/app/(platform)/(app)/_utils/calculation";
 import { db } from "@/lib/db";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { auth } from "@clerk/nextjs";

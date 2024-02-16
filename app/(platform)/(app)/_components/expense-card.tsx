@@ -14,14 +14,15 @@ export type FullExpense =
   | null;
 type ExpenseCardProps = {
   expense: FullExpense;
+  currUserId?: string;
 };
 
 export const ExpenseCard = (props: ExpenseCardProps) => {
-  const { expense } = props;
+  const { expense, currUserId } = props;
 
   const whoPaid = useMemo(() => {
-    return whoPaidExpense(expense?.amount, expense?.payments || []);
-  }, [expense?.amount, expense?.payments]);
+    return whoPaidExpense(expense?.amount, expense?.payments || [], currUserId);
+  }, [expense?.amount, expense?.payments, currUserId]);
 
   return expense ? (
     <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>

@@ -1,4 +1,4 @@
-import { fixedNum } from "@/utils/validate";
+import { fixedNum, getOwsKeyword } from "@/utils/validate";
 import { Expense } from "../model/expense/expense";
 import { ExpenseType } from "../model/expense/expense-type";
 import { Group } from "../model/group/group";
@@ -77,7 +77,8 @@ export class ExpenseRepository {
   public getBalance(userId: string) {
     const balances: string[] = [];
     this.getBalanceSheet(userId)?.forEach((userBalance, userBalanceKey) => {
-      if (userBalance != 0) {
+      const ub = fixedNum(userBalance, 0);
+      if (ub != 0) {
         balances.push(this.checkSign(userId, userBalanceKey, userBalance));
       }
     });
@@ -88,7 +89,8 @@ export class ExpenseRepository {
     const balances: string[] = [];
     this.group.getBalanceSheets().forEach((allBalances, allBalancesKey) => {
       allBalances.forEach((userBalance, userBalanceKey) => {
-        if (userBalance > 0) {
+        const ub = fixedNum(userBalance, 0);
+        if (ub > 0) {
           balances.push(
             this.checkSign(allBalancesKey, userBalanceKey, userBalance),
           );
@@ -102,7 +104,8 @@ export class ExpenseRepository {
     const balances: OweBalanceResult[] = [];
     this.group.getBalanceSheets().forEach((allBalances, allBalancesKey) => {
       allBalances.forEach((userBalance, userBalanceKey) => {
-        if (userBalance > 0) {
+        const ub = fixedNum(userBalance, 0);
+        if (ub > 0) {
           const b = this.checkSignObj(
             allBalancesKey,
             userBalanceKey,
@@ -120,10 +123,11 @@ export class ExpenseRepository {
   private checkSign(user1Id: string, user2Id: string, amount: number): string {
     const user1Name = this.getUser(user1Id)?.getUserName();
     const user2Name = this.getUser(user2Id)?.getUserName();
-    if (amount < 0) {
-      return `${user1Name} owes ${user2Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
-    } else if (amount > 0) {
-      return `${user2Name} owes ${user1Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
+    const am = fixedNum(amount, 0);
+    if (am < 0) {
+      return `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
+    } else if (am > 0) {
+      return `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
     }
     return "";
   }
@@ -135,7 +139,8 @@ export class ExpenseRepository {
   ): OweBalanceResult | undefined {
     const user1Name = this.getUser(user1Id)?.getUserName() || "";
     const user2Name = this.getUser(user2Id)?.getUserName() || "";
-    if (amount < 0) {
+    const am = fixedNum(amount, 0);
+    if (am < 0) {
       return {
         user1Name,
         user2Name,
@@ -143,7 +148,7 @@ export class ExpenseRepository {
         user2Id,
         owes: Math.abs(amount),
       };
-    } else if (amount > 0) {
+    } else if (am > 0) {
       return {
         user1Name: user2Name,
         user2Name: user1Name,

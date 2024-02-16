@@ -20,10 +20,26 @@ const ExpensesList = dynamic(() => import("./expenses-list"), {
   ),
 });
 
+const Balances = dynamic(() => import("./balances"), {
+  loading: () => (
+    <div className="pt-6">
+      <div className="flex gap-6 justify-between">
+        <Skeleton className="h-6 mb-3 w-[90px]" />
+        <Skeleton className="h-6 mb-3 w-[60px]" />
+      </div>
+      <div className="pb-8 grid grid-cols-1 gap-2">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-5 mt-1 w-[180px]" />
+        ))}
+      </div>
+    </div>
+  ),
+});
+
 const ExpensesTabs = ({ id }: { id: string }) => {
   return (
     <>
-      <Tabs value={"Expenses"} className="w-full py-6">
+      <Tabs defaultValue="Expenses" className="w-full py-6">
         <TabsList className="w-full">
           <TabsTrigger value={"Expenses"} className="w-full">
             Expenses
@@ -31,19 +47,19 @@ const ExpensesTabs = ({ id }: { id: string }) => {
           <TabsTrigger value={"Balances"} className="w-full">
             Balances
           </TabsTrigger>
-          <TabsTrigger value={"Totals"} className="w-full">
+          {/* <TabsTrigger value={"Totals"} className="w-full">
             Totals
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
         <TabsContent value={"Expenses"}>
           <ExpensesList id={id} />
         </TabsContent>
         <TabsContent value={"Balances"}>
-          {/* <SplitUsers {...props} /> */}
+          <Balances id={id} />
         </TabsContent>
-        <TabsContent value={"Totals"}>
-          {/* <SplitUsers {...props} /> */}
-        </TabsContent>
+        {/* <TabsContent value={"Totals"}>
+          Totals
+        </TabsContent> */}
       </Tabs>
     </>
   );

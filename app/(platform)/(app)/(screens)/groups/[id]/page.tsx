@@ -9,12 +9,22 @@ import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import { urlEncode } from "@/utils/func";
 import dynamic from "next/dynamic";
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import Spinner from "@/components/ui/spinner";
+import { UISpinner } from "@/components/ui-spinner";
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
-  loading: () => <Spinner />,
+  loading: () => <UISpinner />,
 });
+
+const UserAvatars = dynamic(
+  () =>
+    import("@/app/(platform)/(app)/_components/user-avatars").then(
+      (d) => d.UserAvatars,
+    ),
+  {
+    loading: () => <Spinner />,
+  },
+);
 
 const GroupDetailsPage = async ({
   params,

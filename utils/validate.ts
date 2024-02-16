@@ -39,3 +39,7 @@ export const getErrorMessage = (
 
   return generic;
 };
+
+export const getOwsKeyword = (name?: string) => {
+  return name?.toLowerCase() === "you" ? "owe" : "owes";
+};

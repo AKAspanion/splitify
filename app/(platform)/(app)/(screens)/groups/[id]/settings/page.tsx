@@ -33,7 +33,7 @@ const GroupDetailsPage = async ({
     >
       <GroupCard group={group} description={group?.type || ""} />
       <div className="pt-6 pb-3 font-semibold text-normal">Group members</div>
-      <div className="pb-6 flex flex-col gap-6">
+      <div className="pb-6 flex flex-col gap-4">
         <Link href={`/groups/${id}/add-member`}>
           <ListItem title="Add members to group" icon={<UserPlus />} />
         </Link>

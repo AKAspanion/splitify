@@ -50,9 +50,6 @@ export const Actions = ({ expense }: { expense: FullExpense }) => {
           {loading ? <Spinner size="sm" /> : <TrashIcon width={20} />}
         </div>
       </Button>
-      <Button disabled variant="ghost" size="icon">
-        <PencilIcon width={20} />
-      </Button>
     </>
   ) : null;
 };
