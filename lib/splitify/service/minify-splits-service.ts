@@ -6,12 +6,14 @@ export class MinifySplitsService {
   solved: boolean;
   balances: OweBalanceResultIndex[];
   users: string[];
+  counter: number;
 
   constructor(users: string[]) {
     this.balances = [];
     this.solved = false;
     this.users = users;
     this.N = users.length;
+    this.counter = 0;
   }
 
   getMin(arr: number[]) {
@@ -131,7 +133,7 @@ export class MinifySplitsService {
         .forEach((b) => {
           const columnIndex = userIdsArr.findIndex((x) => x === b.user2Id);
           if (columnIndex >= 0) {
-            graph[rowIndex][columnIndex] = b.owes;
+            graph[rowIndex][columnIndex] = fixedNum(b.owes);
           }
         });
     }

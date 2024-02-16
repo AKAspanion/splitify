@@ -11,6 +11,7 @@ import { urlEncode } from "@/utils/func";
 import dynamic from "next/dynamic";
 import Spinner from "@/components/ui/spinner";
 import { UISpinner } from "@/components/ui-spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   loading: () => <UISpinner />,
@@ -22,7 +23,14 @@ const UserAvatars = dynamic(
       (d) => d.UserAvatars,
     ),
   {
-    loading: () => <Spinner />,
+    loading: () => (
+      <div className="flex items-center">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <Skeleton className="w-10 h-10 rounded-full -translate-x-3" />
+        <Skeleton className="w-10 h-10 rounded-full -translate-x-6" />
+        <Skeleton className="w-6 h-6 rounded-full translate-x-1" />
+      </div>
+    ),
   },
 );
 

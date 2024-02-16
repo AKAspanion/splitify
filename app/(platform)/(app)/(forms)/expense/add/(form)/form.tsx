@@ -140,6 +140,7 @@ const FormComp = ({ groups }: FormProps) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <GroupCombobox
+            disabled={loading}
             label="Group name"
             open={groupOpen}
             groups={groups}
@@ -151,6 +152,7 @@ const FormComp = ({ groups }: FormProps) => {
         </div>
         <div>
           <CategoryCombobox
+            disabled={loading}
             label="Category"
             open={categoryOpen}
             value={category}
@@ -170,6 +172,7 @@ const FormComp = ({ groups }: FormProps) => {
           name="amount"
           label="Amount (₹)"
           type="number"
+          step={0.01}
           errors={fieldErrors?.amount}
           onChange={(e) => onTotalChange(e.target.value)}
         />

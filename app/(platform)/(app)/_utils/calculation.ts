@@ -43,38 +43,48 @@ export const calcExpenseSplits = (
   splits: UserSplit[],
   detailed = false,
 ) => {
-  if (!expense) return [];
-  const users = dbUsers.map(
-    (u) =>
-      new User(u.id, currUserId === u.id ? "You" : u.name || "-", u.email, "0"),
-  );
-  const group = new Group("Group");
-
-  users.forEach((u) => group.addUser(u));
-
-  const N = users.length;
-
-  const expenseRepository = new ExpenseRepository(group);
-  const service = new SplitifyService(expenseRepository);
-
-  evaluateExpense(service, expense, payments, splits);
-
-  if (detailed) {
-    return service.getBalancesList();
-  } else {
-    const userIdsArr = users.map((u) => u.userId);
-    const userNamesArr = users.map((u) => u.userName);
-
-    const minifyService = new MinifySplitsService(userNamesArr);
-    minifyService.execute(
-      MinifySplitsService.createGraph(
-        N,
-        userIdsArr,
-        service.getBalancesTable(),
-      ),
+  try {
+    if (!expense) return [];
+    const users = dbUsers.map(
+      (u) =>
+        new User(
+          u.id,
+          currUserId === u.id ? "You" : u.name || "-",
+          u.email,
+          "0",
+        ),
     );
+    const group = new Group("Group");
 
-    return minifyService.getBalancesList();
+    users.forEach((u) => group.addUser(u));
+
+    const N = users.length;
+
+    const expenseRepository = new ExpenseRepository(group);
+    const service = new SplitifyService(expenseRepository);
+
+    evaluateExpense(service, expense, payments, splits);
+
+    if (detailed) {
+      return service.getBalancesList();
+    } else {
+      const userIdsArr = users.map((u) => u.userId);
+      const userNamesArr = users.map((u) => u.userName);
+
+      const minifyService = new MinifySplitsService(userNamesArr);
+      minifyService.execute(
+        MinifySplitsService.createGraph(
+          N,
+          userIdsArr,
+          service.getBalancesTable(),
+        ),
+      );
+
+      return minifyService.getBalancesList();
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };
 
@@ -84,39 +94,49 @@ export const calcGroupSplits = (
   dbUsers: DBUser[],
   detailed = false,
 ) => {
-  if (!expenses) return [];
-  const users = dbUsers.map(
-    (u) =>
-      new User(u.id, currUserId === u.id ? "You" : u.name || "-", u.email, "0"),
-  );
-  const group = new Group("Group");
+  try {
+    if (!expenses) return [];
+    const users = dbUsers.map(
+      (u) =>
+        new User(
+          u.id,
+          currUserId === u.id ? "You" : u.name || "-",
+          u.email,
+          "0",
+        ),
+    );
+    const group = new Group("Group");
 
-  users.forEach((u) => group.addUser(u));
+    users.forEach((u) => group.addUser(u));
 
-  const N = users.length;
+    const N = users.length;
 
-  const expenseRepository = new ExpenseRepository(group);
-  const service = new SplitifyService(expenseRepository);
+    const expenseRepository = new ExpenseRepository(group);
+    const service = new SplitifyService(expenseRepository);
 
-  for (const expense of expenses) {
-    evaluateExpense(service, expense, expense?.payments, expense?.splits);
-  }
+    for (const expense of expenses) {
+      evaluateExpense(service, expense, expense?.payments, expense?.splits);
+    }
 
-  if (detailed) {
-    return service.getBalancesList();
-  } else {
-    const userIdsArr = users.map((u) => u.userId);
-    const userNamesArr = users.map((u) => u.userName);
+    if (detailed) {
+      return service.getBalancesList();
+    } else {
+      const userIdsArr = users.map((u) => u.userId);
+      const userNamesArr = users.map((u) => u.userName);
 
-    const minifyService = new MinifySplitsService(userNamesArr);
-    minifyService.execute(
-      MinifySplitsService.createGraph(
+      const graph = MinifySplitsService.createGraph(
         N,
         userIdsArr,
         service.getBalancesTable(),
-      ),
-    );
+      );
 
-    return minifyService.getBalancesList();
+      const minifyService = new MinifySplitsService(userNamesArr);
+      minifyService.execute(graph);
+
+      return minifyService.getBalancesList();
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };

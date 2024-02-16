@@ -5,7 +5,6 @@ import { db } from "@/lib/db";
 import { Actions } from "./actions";
 import { auth } from "@clerk/nextjs";
 import { format } from "date-fns";
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { RUPPEE_SYMBOL } from "@/constants/ui";
@@ -22,6 +21,23 @@ const Balance = dynamic(() => import("./balance"), {
     </div>
   ),
 });
+
+const UserAvatars = dynamic(
+  () =>
+    import("@/app/(platform)/(app)/_components/user-avatars").then(
+      (d) => d.UserAvatars,
+    ),
+  {
+    loading: () => (
+      <div className="flex items-center">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <Skeleton className="w-10 h-10 rounded-full -translate-x-3" />
+        <Skeleton className="w-10 h-10 rounded-full -translate-x-6" />
+        <Skeleton className="w-[120px] h-6 rounded-full translate-x-1" />
+      </div>
+    ),
+  },
+);
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const { userId } = auth();
@@ -68,14 +84,16 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
             Added by {addedBy} on {createDate}
           </div>
         </div>
-        <UserAvatars
-          users={users}
-          action={
-            <div className="text-sm">
-              {whoPaidExpense(expense?.amount, expense?.payments || [])}
-            </div>
-          }
-        />
+        {users?.length ? (
+          <UserAvatars
+            users={users}
+            action={
+              <div className="text-sm">
+                {whoPaidExpense(expense?.amount, expense?.payments || [])}
+              </div>
+            }
+          />
+        ) : null}
         <div className={""}>
           <div className="flex flex-col gap-2">
             {expense?.payments?.map((p) => (
