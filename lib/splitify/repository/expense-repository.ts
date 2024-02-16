@@ -121,23 +121,9 @@ export class ExpenseRepository {
     const user1Name = this.getUser(user1Id)?.getUserName();
     const user2Name = this.getUser(user2Id)?.getUserName();
     if (amount < 0) {
-      return (
-        user1Name +
-        " owes " +
-        user2Name +
-        ": " +
-        RUPPEE_SYMBOL +
-        fixedNum(Math.abs(amount))
-      );
+      return `${user1Name} owes ${user2Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
     } else if (amount > 0) {
-      return (
-        user2Name +
-        " owes " +
-        user1Name +
-        ": " +
-        RUPPEE_SYMBOL +
-        fixedNum(Math.abs(amount))
-      );
+      return `${user2Name} owes ${user1Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
     }
     return "";
   }
