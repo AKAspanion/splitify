@@ -9,13 +9,13 @@ import { useAction } from "@/hooks/use-action";
 import { createExpense } from "@/actions/create-expense";
 import { PaymentDrawer } from "./payment-drawer";
 import { SplitDrawer } from "./split-drawer";
-import { GroupWIthUsers } from "./type";
 import { useUser } from "@clerk/nextjs";
 import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@prisma/client";
 import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
+import { GroupWIthUsers } from "@/types/shared";
 
 type FormProps = { groups: GroupWIthUsers[] };
 

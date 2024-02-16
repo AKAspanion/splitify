@@ -25,9 +25,9 @@ export class ExpenseService {
       case ExpenseType.PERCENT: {
         for (const split of splits) {
           const percentSplit = <PercentSplit>split;
-          split.setAmount(
-            (payment.getAmount() * percentSplit?.getPercent()) / 100.0,
-          );
+          const splitAmount =
+            (payment.getAmount() * percentSplit?.getPercent()) / 100.0;
+          split.setAmount(splitAmount);
         }
         const exp = new PercentExpense(name, payment, splits);
         if (exp.validate()) {

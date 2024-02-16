@@ -98,6 +98,25 @@ export class ExpenseRepository {
     return balances;
   }
 
+  public getBalancesTable(): OweBalanceResult[] {
+    const balances: OweBalanceResult[] = [];
+    this.group.getBalanceSheets().forEach((allBalances, allBalancesKey) => {
+      allBalances.forEach((userBalance, userBalanceKey) => {
+        if (userBalance > 0) {
+          const b = this.checkSignObj(
+            allBalancesKey,
+            userBalanceKey,
+            userBalance,
+          );
+          if (b) {
+            balances.push(b);
+          }
+        }
+      });
+    });
+    return balances;
+  }
+
   private checkSign(user1Id: string, user2Id: string, amount: number): string {
     const user1Name = this.getUser(user1Id)?.getUserName();
     const user2Name = this.getUser(user2Id)?.getUserName();
@@ -121,6 +140,33 @@ export class ExpenseRepository {
       );
     }
     return "";
+  }
+
+  private checkSignObj(
+    user1Id: string,
+    user2Id: string,
+    amount: number,
+  ): OweBalanceResult | undefined {
+    const user1Name = this.getUser(user1Id)?.getUserName() || "";
+    const user2Name = this.getUser(user2Id)?.getUserName() || "";
+    if (amount < 0) {
+      return {
+        user1Name,
+        user2Name,
+        user1Id,
+        user2Id,
+        owes: Math.abs(amount),
+      };
+    } else if (amount > 0) {
+      return {
+        user1Name: user2Name,
+        user2Name: user1Name,
+        user1Id: user2Id,
+        user2Id: user1Id,
+        owes: Math.abs(amount),
+      };
+    }
+    return undefined;
   }
 
   public getBalanceSheets() {

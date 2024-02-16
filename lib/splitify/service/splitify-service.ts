@@ -42,7 +42,7 @@ export class SplitifyService {
             ExpenseType.PERCENT,
             payment,
             splits.map((s) => {
-              const percent = fixedNum((1 / totalSplits) * 100);
+              const percent = (1 / totalSplits) * 100;
               return new PercentSplit(s.getUser(), percent);
             }),
           );
@@ -81,7 +81,7 @@ export class SplitifyService {
             ExpenseType.PERCENT,
             payment,
             splits.map((s) => {
-              const percent = fixedNum((s.getAmount() / totalPayments) * 100.0);
+              const percent = (s.getAmount() / totalPayments) * 100.0;
               return new PercentSplit(s.getUser(), percent);
             }),
           );
@@ -133,8 +133,12 @@ export class SplitifyService {
     }
   }
 
-  public getBalancesTable(): string[] {
+  public getBalancesList(): string[] {
     return this.expenseRepository.getBalances();
+  }
+
+  public getBalancesTable(): OweBalanceResult[] {
+    return this.expenseRepository.getBalancesTable();
   }
 
   public getBalanceSheets() {

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { Group } from "@prisma/client";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { GroupWIthUsers } from "./type";
+import { GroupWIthUsers } from "@/types/shared";
 
 type GroupComboboxProps = {
   label?: string;
