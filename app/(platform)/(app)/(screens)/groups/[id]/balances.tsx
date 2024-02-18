@@ -2,7 +2,13 @@ import { db } from "@/lib/db";
 import { BalancesList } from "./balances-list";
 import { auth } from "@clerk/nextjs";
 
-const Balances = async ({ id }: { id: string }) => {
+const Balances = async ({
+  id,
+  onlyList,
+}: {
+  id: string;
+  onlyList?: boolean;
+}) => {
   const { userId } = auth();
   const expenses = await db.expense.findMany({
     where: { groupId: id },
@@ -19,7 +25,7 @@ const Balances = async ({ id }: { id: string }) => {
     include: { users: true },
   });
 
-  return <BalancesList expenses={expenses} group={group} />;
+  return <BalancesList expenses={expenses} group={group} onlyList={onlyList} />;
 };
 
 export default Balances;

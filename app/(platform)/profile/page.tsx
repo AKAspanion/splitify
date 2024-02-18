@@ -72,6 +72,9 @@ const ProfilePage = () => {
                   navbar: {
                     border: "none",
                   },
+                  pageScrollBox: {
+                    padding: "0px 18px 24px 18px",
+                  },
                 },
               }}
             />

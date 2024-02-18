@@ -9,22 +9,32 @@ import { useUser } from "@clerk/nextjs";
 export const BalancesList = ({
   group,
   expenses,
+  onlyList = false,
 }: {
+  onlyList?: boolean;
   group: GroupWIthUsers | null;
   expenses: ExpenseWithPaymentWithSplit[] | null;
 }) => {
   const { user } = useUser();
   const [detailed, setDetailed] = useState(false);
-  const balance = useMemo(() => {
-    return user?.id
-      ? calcGroupSplits(
-          user?.id,
-          expenses || [],
-          group?.users || [],
-          detailed,
-        ) || []
-      : [];
-  }, [detailed, expenses, group?.users, user?.id]);
+
+  const balanceList = useMemo(
+    () =>
+      user?.id
+        ? calcGroupSplits(
+            user?.id,
+            expenses || [],
+            group?.users || [],
+            detailed,
+          ) || []
+        : [],
+    [detailed, expenses, group?.users, user?.id],
+  );
+
+  const balances = useMemo(
+    () => (onlyList ? balanceList.slice(0, 2) : balanceList),
+    [balanceList, onlyList],
+  );
 
   const handleCheck = () => {
     setDetailed((s) => !s);
@@ -32,27 +42,29 @@ export const BalancesList = ({
 
   return (
     <div>
-      <div className="pb-3 pt-6 font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
+      <div className="font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
         <div className="flex flex-col gap-2">
-          {balance?.map((s, i) => (
+          {balances?.map((s, i) => (
             <div className="font-medium" key={i}>
               {s}
             </div>
           ))}
         </div>
         <div className="flex-1" />
-        <div>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="airplane-mode" className="text-sm">
-              Detailed
-            </Label>
-            <Switch
-              checked={detailed}
-              onCheckedChange={handleCheck}
-              id="airplane-mode"
-            />
+        {onlyList ? null : (
+          <div>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="airplane-mode" className="text-sm">
+                Detailed
+              </Label>
+              <Switch
+                checked={detailed}
+                onCheckedChange={handleCheck}
+                id="airplane-mode"
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

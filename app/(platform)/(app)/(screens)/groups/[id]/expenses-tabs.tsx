@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
+import { BalancesLoader } from "./balances-loader";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
   loading: () => (
@@ -21,18 +22,7 @@ const ExpensesList = dynamic(() => import("./expenses-list"), {
 });
 
 const Balances = dynamic(() => import("./balances"), {
-  loading: () => (
-    <div className="py-6">
-      <div className="flex gap-6 justify-between">
-        <div className="pb-8 grid grid-cols-1 gap-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-5 mt-1 w-[180px]" />
-          ))}
-        </div>
-        <Skeleton className="h-6 mb-3 w-[60px]" />
-      </div>
-    </div>
-  ),
+  loading: () => <BalancesLoader />,
 });
 
 const Totals = dynamic(() => import("./totals"), {
@@ -67,7 +57,9 @@ const ExpensesTabs = ({ id }: { id: string }) => {
           <ExpensesList id={id} />
         </TabsContent>
         <TabsContent value={"Balances"}>
-          <Balances id={id} />
+          <div className="py-6">
+            <Balances id={id} />
+          </div>
         </TabsContent>
         <TabsContent value={"Totals"}>
           <Totals id={id} />
