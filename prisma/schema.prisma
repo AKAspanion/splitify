@@ -42,6 +42,7 @@ model Expense {
   amount      Float
   description String
   category    String?
+  settlement  Boolean?
   type        ExpenseType
   groupId     String?
   createrId   String
@@ -105,6 +106,6 @@ model Group {
 model AuthnDevice {
   id     String @id @default(nanoid())
   data   Bytes
-  userId String    @unique
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 }

@@ -140,3 +140,27 @@ export const calcGroupSplits = (
     return [];
   }
 };
+
+export const evaluateTotals = (
+  expenses: ExpenseWithPaymentWithSplit[] | null,
+  userId?: string,
+) => {
+  let yours = 0;
+  if (userId) {
+    const totals =
+      expenses
+        ?.map((e) =>
+          e?.payments?.reduce((total, p) => {
+            if (p?.userId === userId) {
+              yours += p.amount;
+            }
+            return p.amount + total;
+          }, 0),
+        )
+        ?.reduce((t, x) => t + x, 0) || 0;
+
+    return { totals, yours };
+  } else {
+    return { yours, totals: 0 };
+  }
+};

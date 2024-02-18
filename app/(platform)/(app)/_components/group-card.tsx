@@ -5,11 +5,11 @@ import Link from "next/link";
 
 type GroupCardProps = {
   group: Group | null;
-  description?: string;
+  description?: React.ReactNode;
 };
 
 export const GroupCard = (props: GroupCardProps) => {
-  const { group, description = "No expenses yet" } = props;
+  const { group, description } = props;
 
   return !group ? null : (
     <Link href={`/groups/${group.id}`}>
@@ -31,8 +31,12 @@ export const GroupCard = (props: GroupCardProps) => {
           )}
           <div className="flex items-center">
             <div className="flex flex-col">
-              <div className="text-md font-semibold">{group?.title || "-"}</div>
-              <div className="text-xs font-light">{description}</div>
+              <div className="text-md font-semibold">
+                {group?.title || "-"}{" "}
+              </div>
+              {description ? (
+                <div className="text-xs font-light">{description}</div>
+              ) : null}
             </div>
           </div>
         </div>

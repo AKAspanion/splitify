@@ -9,9 +9,9 @@ import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import { urlEncode } from "@/utils/func";
 import dynamic from "next/dynamic";
-import Spinner from "@/components/ui/spinner";
 import { UISpinner } from "@/components/ui-spinner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   loading: () => <UISpinner />,
@@ -74,7 +74,14 @@ const GroupDetailsPage = async ({
       }
     >
       <div className="flex flex-col gap-6">
-        <GroupCard group={group} />
+        <GroupCard
+          group={group}
+          description={
+            <div className="pt-0.5">
+              {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+            </div>
+          }
+        />
 
         {noUsers ? null : (
           <UserAvatars

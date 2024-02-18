@@ -18,8 +18,8 @@ const ProfilePage = () => {
   const router = useRouter();
 
   return (
-    <div className="flex items-start justify-center w-screen md:max-w-screen-2xl mx-auto">
-      <div className="px-0 pt-6 md:pb-12 flex flex-col items-center gap-6 overflow-x-hidden -mb-12">
+    <div className="flex items-start justify-center md:max-w-screen-2xl mx-auto">
+      <div className="w-full px-0 pt-6 md:pb-12 flex flex-col items-center gap-6 overflow-x-hidden -mb-12">
         <ClerkLoading>
           <div className="p-8 h-[calc(100vh-80px)] flex items-center justify-center">
             <Spinner />
@@ -51,10 +51,10 @@ const ProfilePage = () => {
               </Link>
             </div>
           </div>
-          <div className="w-screen">
+          <div className="w-full">
             <hr />
           </div>
-          <div className="flex items-start justify-center">
+          <div className="w-full flex items-start justify-center">
             <UserProfile
               appearance={{
                 elements: {

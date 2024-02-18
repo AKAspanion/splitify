@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
   loading: () => (
-    <div className="pt-6">
+    <div className="py-6">
       <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="flex gap-4 items-center">
@@ -22,16 +22,28 @@ const ExpensesList = dynamic(() => import("./expenses-list"), {
 
 const Balances = dynamic(() => import("./balances"), {
   loading: () => (
-    <div className="pt-6">
+    <div className="py-6">
       <div className="flex gap-6 justify-between">
-        <Skeleton className="h-6 mb-3 w-[90px]" />
+        <div className="pb-8 grid grid-cols-1 gap-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-5 mt-1 w-[180px]" />
+          ))}
+        </div>
         <Skeleton className="h-6 mb-3 w-[60px]" />
       </div>
-      <div className="pb-8 grid grid-cols-1 gap-2">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-5 mt-1 w-[180px]" />
-        ))}
-      </div>
+    </div>
+  ),
+});
+
+const Totals = dynamic(() => import("./totals"), {
+  loading: () => (
+    <div className="py-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {[1, 2].map((i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="h-6 w-[180px]" />
+          <Skeleton className="h-6 w-[90px]" />
+        </div>
+      ))}
     </div>
   ),
 });
@@ -47,9 +59,9 @@ const ExpensesTabs = ({ id }: { id: string }) => {
           <TabsTrigger value={"Balances"} className="w-full">
             Balances
           </TabsTrigger>
-          {/* <TabsTrigger value={"Totals"} className="w-full">
+          <TabsTrigger value={"Totals"} className="w-full">
             Totals
-          </TabsTrigger> */}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
           <ExpensesList id={id} />
@@ -57,9 +69,9 @@ const ExpensesTabs = ({ id }: { id: string }) => {
         <TabsContent value={"Balances"}>
           <Balances id={id} />
         </TabsContent>
-        {/* <TabsContent value={"Totals"}>
-          Totals
-        </TabsContent> */}
+        <TabsContent value={"Totals"}>
+          <Totals id={id} />
+        </TabsContent>
       </Tabs>
     </>
   );

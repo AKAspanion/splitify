@@ -33,9 +33,9 @@ export const BalancesList = ({
   return (
     <div>
       <div className="pb-3 pt-6 font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
-        <div className="flex flex-col gap-2 mt-1">
+        <div className="flex flex-col gap-2">
           {balance?.map((s, i) => (
-            <div className="text-sm font-medium opacity-90" key={i}>
+            <div className="font-medium" key={i}>
               {s}
             </div>
           ))}
