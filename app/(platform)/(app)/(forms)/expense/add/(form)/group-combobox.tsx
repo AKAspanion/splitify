@@ -19,6 +19,7 @@ import {
 import { Group } from "@prisma/client";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { GroupWIthUsers } from "@/types/shared";
+import { useFormStatus } from "react-dom";
 
 type GroupComboboxProps = {
   label?: string;
@@ -40,6 +41,7 @@ export function GroupCombobox(props: GroupComboboxProps) {
     setOpen,
     setValue,
   } = props;
+  const { pending } = useFormStatus();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,7 +55,7 @@ export function GroupCombobox(props: GroupComboboxProps) {
           <Button
             variant="outline"
             role="combobox"
-            disabled={disabled}
+            disabled={pending || disabled}
             aria-expanded={open}
             className="w-full justify-between"
           >

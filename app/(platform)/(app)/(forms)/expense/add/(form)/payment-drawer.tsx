@@ -9,6 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { fixedNum } from "@/utils/validate";
 import { User } from "@prisma/client";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import Image from "next/image";
@@ -34,7 +35,10 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
   } = props;
 
   const used = useMemo(() => {
-    return Object.values(payment).reduce((sum, a) => sum + a, 0);
+    return fixedNum(
+      Object.values(payment).reduce((sum, a) => sum + (isNaN(a) ? 0 : a), 0) ||
+        0,
+    );
   }, [payment]);
 
   const paidBy = useMemo(() => {
@@ -64,7 +68,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
     return res;
   }, [currUserId, payment, users]);
 
-  const balance = total - used;
+  const balance = fixedNum(total - used);
   const balanceText = balance >= 0 ? "left" : "over";
 
   return (
@@ -85,7 +89,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                 width={24}
                 height={24}
               />
-              <div className="text-sm">{paidBy.text}</div>
+              <div className="text-sm truncate">{paidBy.text}</div>
             </div>
           ) : (
             paidBy.text
@@ -126,7 +130,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                       <Input
                         type="number"
                         name="amount"
-                        value={payment[d.id] === 0 ? "" : payment[d.id]}
+                        value={payment[d.id]}
                         onChange={(e) => onChange(d.id, e.target.value)}
                       />
                     </div>

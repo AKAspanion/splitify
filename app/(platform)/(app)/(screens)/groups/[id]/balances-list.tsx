@@ -5,6 +5,7 @@ import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { NoData } from "@/components/no-data";
 
 export const BalancesList = ({
   group,
@@ -36,6 +37,16 @@ export const BalancesList = ({
     [balanceList, onlyList],
   );
 
+  const noDataText = useMemo(() => {
+    let text = "";
+    if (!expenses?.length) {
+      text = "No expenses yet";
+    } else if (!balanceList?.length) {
+      text = "All settled up";
+    }
+    return text;
+  }, [balanceList?.length, expenses?.length]);
+
   const handleCheck = () => {
     setDetailed((s) => !s);
   };
@@ -44,11 +55,13 @@ export const BalancesList = ({
     <div>
       <div className="font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
         <div className="flex flex-col gap-2">
-          {balances?.map((s, i) => (
-            <div className="font-medium" key={i}>
-              {s}
-            </div>
-          ))}
+          {noDataText
+            ? noDataText
+            : balances?.map((s, i) => (
+                <div className="font-medium" key={i}>
+                  {s}
+                </div>
+              ))}
         </div>
         <div className="flex-1" />
         {onlyList ? null : (

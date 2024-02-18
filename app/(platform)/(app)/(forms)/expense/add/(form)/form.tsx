@@ -28,7 +28,7 @@ const FormComp = ({ groups }: FormProps) => {
   const [groupOpen, setGroupOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<string>("General");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
@@ -46,7 +46,7 @@ const FormComp = ({ groups }: FormProps) => {
 
   const onSubmit = (formData: FormData) => {
     const description = formData.get("description") as string;
-    const total = parseFloat((formData.get("amount") as string) || "0");
+    const total = parseFloat((formData.get("amount") as string) || "");
 
     const payments = Object.entries(payment)
       .map(([key, value]) => ({
@@ -98,14 +98,14 @@ const FormComp = ({ groups }: FormProps) => {
 
   const onTotalChange = (value: string) => {
     if (currUserId) {
-      setTotal(() => parseFloat(value || "0"));
-      setPayment(() => ({ [currUserId]: parseFloat(value || "0") }));
+      setTotal(() => parseFloat(value || ""));
+      // setPayment(() => ({ [currUserId]: parseFloat(value || "") }));
       setEqualSplit(() => convertToObject(users || [], "id", true));
     }
   };
 
   const onPaymentChange = (id: string, value: string) => {
-    setPayment((p) => ({ ...p, [id]: parseFloat(value || "0") }));
+    setPayment((p) => ({ ...p, [id]: parseFloat(value || "") }));
   };
 
   const handleEqualSplitChange = (values: Record<string, boolean>) => {

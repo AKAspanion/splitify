@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { EXPENSE_CATEGORY_TYPES } from "@/constants/ui";
+import { useFormStatus } from "react-dom";
 
 type CategoryComboboxProps = {
   label?: string;
@@ -29,6 +30,7 @@ type CategoryComboboxProps = {
 
 export function CategoryCombobox(props: CategoryComboboxProps) {
   const { label, value, open, disabled, setOpen, setValue } = props;
+  const { pending } = useFormStatus();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,7 +44,7 @@ export function CategoryCombobox(props: CategoryComboboxProps) {
           <Button
             variant="outline"
             role="combobox"
-            disabled={disabled}
+            disabled={pending || disabled}
             aria-expanded={open}
             className="w-full justify-between capitalize"
           >
