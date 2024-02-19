@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { Group } from "@prisma/client";
 import { ListIcon } from "lucide-react";
 import Image from "next/image";
@@ -42,5 +43,17 @@ export const GroupCard = (props: GroupCardProps) => {
         </div>
       </div>
     </Link>
+  );
+};
+
+export const GroupCardLoading = () => {
+  return (
+    <div className="flex space-y-3 gap-4">
+      <Skeleton className="h-[64px] w-[64px] rounded" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[150px]" />
+        <Skeleton className="h-5 w-[60px] rounded-full" />
+      </div>
+    </div>
   );
 };

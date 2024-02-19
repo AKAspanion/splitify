@@ -16,9 +16,9 @@ export const BalancesLoader = ({
       })}
     >
       <div
-        className={cn("grid grid-cols-1 gap-2", {
-          "pb-0": dense,
-          "pb-8": !dense,
+        className={cn("grid grid-cols-1", {
+          "pb-0 gap-1": dense,
+          "pb-8 gap-2": !dense,
         })}
       >
         {[1, 2].map((i) => (

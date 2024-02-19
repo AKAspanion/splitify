@@ -1,11 +1,23 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import React from "react";
 
-export const ScreenSkeleton = () => {
+export const ScreenSkeleton = ({ card }: { card?: React.ReactNode }) => {
   return (
     <div className="px-8 py-6">
+      <div className="flex justify-between items-center gap-4 pb-6">
+        <Skeleton className="w-[100px] h-8 rounded-md" />
+        <div className="flex justify-between gap-4">
+          <Skeleton className="w-10 h-10 rounded-md" />
+          <Skeleton className="w-10 h-10 rounded-md" />
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((g) => {
-          return <SkeletonCard key={g} />;
+        {[1, 2, 3, 4].map((g) => {
+          return (
+            <React.Fragment key={g}>
+              {card ? card : <SkeletonCard />}
+            </React.Fragment>
+          );
         })}
       </div>
     </div>

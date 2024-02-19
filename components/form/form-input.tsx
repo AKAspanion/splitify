@@ -2,6 +2,7 @@ import { Input, InputProps } from "@/components/ui/input";
 import { useFormStatus } from "react-dom";
 import { Label } from "../ui/label";
 import { FormErrors } from "./form-errors";
+import { Skeleton } from "../ui/skeleton";
 
 type FormInputProps = { label?: string; errors?: string[] } & InputProps;
 

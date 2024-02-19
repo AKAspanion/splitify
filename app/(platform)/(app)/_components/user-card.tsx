@@ -1,4 +1,5 @@
 import { ListItem } from "@/components/list-item";
+import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@prisma/client";
 import Image from "next/image";
 
@@ -31,5 +32,17 @@ export const UserCard = (props: UserCardProps) => {
         />
       }
     />
+  );
+};
+
+export const UserCardLoading = () => {
+  return (
+    <div className="flex items-center gap-4">
+      <Skeleton className="h-10 w-10 rounded-full" />
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-4 w-[150px]" />
+        <Skeleton className="h-3 w-[60px]" />
+      </div>
+    </div>
   );
 };

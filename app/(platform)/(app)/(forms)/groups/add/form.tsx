@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const Form = () => {
+const Form = () => {
   const router = useRouter();
   const [type, setType] = useState("");
   const { execute, fieldErrors } = useAction(createGroup, {
@@ -91,3 +91,5 @@ export const Form = () => {
     </form>
   );
 };
+
+export default Form;
