@@ -73,7 +73,7 @@ const ProfilePage = () => {
                     border: "none",
                   },
                   pageScrollBox: {
-                    padding: "0px 18px 24px 18px",
+                    padding: "0px 12px 24px 6px",
                   },
                 },
               }}

@@ -99,8 +99,6 @@ const FormComp = ({ groups }: FormProps) => {
   const onTotalChange = (value: string) => {
     if (currUserId) {
       setTotal(() => parseFloat(value || ""));
-      // setPayment(() => ({ [currUserId]: parseFloat(value || "") }));
-      setEqualSplit(() => convertToObject(users || [], "id", true));
     }
   };
 

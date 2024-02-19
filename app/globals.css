@@ -78,5 +78,19 @@
 @media screen and (max-width: 640px) {
   ::-webkit-scrollbar {
     -webkit-appearance: none;
+    width: 0px;
+    height: 0px;
+  }
+  ::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+  }
+  ::-webkit-scrollbar-track-piece {
+    width: 0px;
+    height: 0px;
+  }
+  ::-webkit-scrollbar-thumb {
+    width: 0px;
+    height: 0px;
   }
 }
