@@ -23,7 +23,7 @@ const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   ),
 });
 
-const PageDetails = async ({
+const GroupDetails = async ({
   id,
   backUrl,
 }: {
@@ -109,4 +109,4 @@ const PageDetails = async ({
   );
 };
 
-export default PageDetails;
+export default GroupDetails;

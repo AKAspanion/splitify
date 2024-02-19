@@ -4,7 +4,7 @@ import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card"
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const PageDetails = dynamic(() => import("./page-details"), {
+const GroupDetails = dynamic(() => import("./group-details"), {
   loading: () => (
     <div className="flex flex-col gap-6 py-6 px-8">
       <div className="flex justify-between">
@@ -28,7 +28,7 @@ const GroupDetailsPage = async ({
     query: searchParams,
   });
 
-  return <PageDetails id={id} backUrl={backUrl} />;
+  return <GroupDetails id={id} backUrl={backUrl} />;
 };
 
 export default GroupDetailsPage;

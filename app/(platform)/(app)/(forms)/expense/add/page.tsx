@@ -1,29 +1,34 @@
-import { AutoContainer } from "@/components/container/auto-container";
-import { Form } from "./(form)/form";
-import { auth } from "@clerk/nextjs";
-import { db } from "@/lib/db";
-import { Header } from "@/components/container/header";
-import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { FormInputLoading } from "@/components/form/form-input-loading";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const ExpenseFormPage = async ({ searchParams }: ServerSideComponentProp) => {
-  const { userId } = auth();
-  const data = await db.user.findUnique({
-    where: { id: userId || "null" },
-    include: { groups: { include: { users: true } } },
-  });
+const AddExpense = dynamic(() => import("./add-expense"), {
+  loading: () => (
+    <div className="flex flex-col gap-4 py-6 px-8">
+      <div className="flex justify-between items-center gap-4 mb-3">
+        <Skeleton className="w-10 h-10 rounded-md" />
+      </div>
+      <FormInputLoading />
+      <FormInputLoading />
+      <FormInputLoading />
+      <FormInputLoading />
+      <div className="flex justify-between items-center gap-4">
+        <Skeleton className="w-[100px] h-10 rounded-md" />
+        <Skeleton className="w-10 h-5 rounded-md" />
+        <Skeleton className="w-[100px] h-10 rounded-md" />
+      </div>
+      <div className="flex justify-end items-center gap-4">
+        <Skeleton className="w-[50px] h-10 rounded-md" />
+      </div>
+    </div>
+  ),
+});
 
-  const groups = data?.groups || [];
-
-  const groupdId = searchParams["groupId"] || "";
-  const backTo = groupdId ? `/groups/${groupdId}` : `/groups`;
-
-  return (
-    <AutoContainer header={<Header backTo={backTo} title="Add an expense" />}>
-      <Suspense>
-        <Form groups={groups} />
-      </Suspense>
-    </AutoContainer>
-  );
+const ExpenseFormPage = async ({
+  params,
+  searchParams,
+}: ServerSideComponentProp) => {
+  return <AddExpense params={params} searchParams={searchParams} />;
 };
 
 export default ExpenseFormPage;

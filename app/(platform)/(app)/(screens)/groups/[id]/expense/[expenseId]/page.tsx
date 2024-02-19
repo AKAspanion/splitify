@@ -1,117 +1,28 @@
-import { AutoContainer } from "@/components/container/auto-container";
-import { Header } from "@/components/container/header";
-import { db } from "@/lib/db";
-import { Actions } from "./actions";
-import { auth } from "@clerk/nextjs";
-import { format } from "date-fns";
-import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
-import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 
-const Balance = dynamic(() => import("./balance"), {
+const ExpenseDetails = dynamic(() => import("./expense-details"), {
   loading: () => (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between gap-6 mb-1">
-        <Skeleton className="h-6 w-[64px]" />
-        <Skeleton className="h-6 w-[108px]" />
+    <div className="flex flex-col gap-6 py-6 px-8">
+      <div className="flex justify-between items-center gap-4">
+        <Skeleton className="w-[100px] h-8 rounded-md" />
+        <div className="flex justify-between gap-4">
+          <Skeleton className="w-10 h-10 rounded-md" />
+          <Skeleton className="w-10 h-10 rounded-md" />
+        </div>
       </div>
-      <Skeleton className="h-5 w-[160px]" />
-      <Skeleton className="h-5 w-[120px]" />
-      <Skeleton className="h-5 w-[100px]" />
-    </div>
-  ),
-});
-
-const UserAvatars = dynamic(
-  () =>
-    import("@/app/(platform)/(app)/_components/user-avatars").then(
-      (d) => d.UserAvatars,
-    ),
-  {
-    loading: () => (
-      <div className="flex items-center">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <Skeleton className="w-10 h-10 rounded-full -translate-x-3" />
-        <Skeleton className="w-10 h-10 rounded-full -translate-x-6" />
-        <Skeleton className="w-[120px] h-6 rounded-full translate-x-1" />
+      <div>
+        <Skeleton className="w-[60px] h-6 mb-1" />
+        <Skeleton className="w-[250px] h-5" />
       </div>
-    ),
-  },
-);
-
-const BalanceSummary = dynamic(() => import("./balance-summary"), {
-  loading: () => (
-    <div className="flex flex-col gap-2">
-      <Skeleton className="h-4 w-[120px]" />
-      <Skeleton className="h-4 w-[160px]" />
-      <Skeleton className="h-4 w-[60px]" />
+      <UserAvatarsLoading />
     </div>
   ),
 });
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
-  const { userId } = auth();
-  const groupId = params["id"] || "null";
-  const expenseId = params["expenseId"] || "null";
-
-  const expense = await db.expense.findUnique({
-    where: { id: expenseId, groupId },
-    include: {
-      User: true,
-      payments: { include: { user: true } },
-      splits: { include: { user: true } },
-    },
-  });
-
-  const backTo = `/groups/${expense?.groupId || ""}`;
-
-  const addedBy = replaceUserWithYou(
-    userId,
-    expense?.User?.id,
-    expense?.User?.name,
-  );
-
-  const createDate = expense?.createdAt
-    ? format(expense?.createdAt, "d LLLL, yyyy")
-    : "";
-
-  const users = expense?.payments?.map((p) => p.user) || [];
-
-  return (
-    <AutoContainer
-      header={
-        <Header
-          backTo={backTo}
-          title={expense?.description}
-          actions={<Actions expense={expense} />}
-        />
-      }
-    >
-      <div className="flex flex-col gap-6">
-        <div className={""}>
-          <div className="font-bold text-lg">₹ {expense?.amount}</div>
-          <div className="font-thin text-sm">
-            Added by {addedBy} on {createDate}
-          </div>
-        </div>
-        {users?.length ? (
-          <UserAvatars
-            users={users}
-            action={
-              <div className="text-sm">
-                {whoPaidExpense(expense?.amount, expense?.payments || [])}
-              </div>
-            }
-          />
-        ) : null}
-        <BalanceSummary groupId={groupId} expense={expense} />
-        <hr />
-        <Balance groupId={groupId} expense={expense} />
-      </div>
-    </AutoContainer>
-  );
+  return <ExpenseDetails params={params} />;
 };
 
 export default ExpenseDetailsPage;

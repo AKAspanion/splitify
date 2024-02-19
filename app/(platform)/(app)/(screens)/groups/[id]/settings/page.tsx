@@ -1,56 +1,35 @@
-import { db } from "@/lib/db";
-import { AutoContainer } from "@/components/container/auto-container";
-import { TrashIcon, UserPlus } from "lucide-react";
-import Link from "next/link";
-import { auth } from "@clerk/nextjs";
-import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
-import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
-import { ListItem } from "@/components/list-item";
-import { Header } from "@/components/container/header";
-import { DeleteGroup } from "./delete";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
+import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
+import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
 
-const GroupDetailsPage = async ({
+const GroupSettings = dynamic(() => import("./group-settings"), {
+  loading: () => (
+    <div className="flex flex-col gap-6 py-6 px-8">
+      <div className="flex justify-between items-center gap-4">
+        <Skeleton className="w-[100px] h-8 rounded-md" />
+        <div className="flex justify-between gap-4">
+          <Skeleton className="w-10 h-10 rounded-md" />
+          <Skeleton className="w-10 h-10 rounded-md" />
+        </div>
+      </div>
+      <GroupCardLoading />
+      <Skeleton className="w-[100px] h-6 rounded-md" />
+      <div className="flex flex-col gap-4">
+        {[1, 2, 3].map((i) => (
+          <UserCardLoading key={i} />
+        ))}
+      </div>
+    </div>
+  ),
+});
+
+const GroupSettingsPage = async ({
   params,
   searchParams,
 }: ServerSideComponentProp) => {
-  const id = params["id"] || "null";
-  const backTo = searchParams["back"];
-  const { userId } = auth();
-
-  const group = await db.group.findUnique({
-    where: { id, users: { some: { id: userId || "null" } } },
-    include: { users: true },
-  });
-
-  return (
-    <AutoContainer
-      header={
-        <Header
-          backTo={backTo ? backTo : `/groups/${id}`}
-          title="Group Settings"
-        />
-      }
-    >
-      <GroupCard group={group} description={group?.type || ""} />
-      <div className="pt-6 pb-3 font-semibold text-normal">Group members</div>
-      <div className="pb-6 flex flex-col gap-4">
-        <Link href={`/groups/${id}/add-member`}>
-          <ListItem title="Add members to group" icon={<UserPlus />} />
-        </Link>
-        {group?.users?.map((d) => (
-          <UserCard
-            showMail={false}
-            currUserId={userId || ""}
-            user={d}
-            key={d.id}
-          />
-        ))}
-        <hr />
-
-        <DeleteGroup id={group?.id} />
-      </div>
-    </AutoContainer>
-  );
+  return <GroupSettings params={params} searchParams={searchParams} />;
 };
 
-export default GroupDetailsPage;
+export default GroupSettingsPage;
