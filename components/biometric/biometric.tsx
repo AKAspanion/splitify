@@ -90,7 +90,7 @@ export const Biometric = () => {
     if (
       pathname &&
       prevPath !== pathname &&
-      !pathname.includes(publicRoutes.join("**"))
+      !publicRoutes.some((r) => pathname.includes(r))
     ) {
       prevPath = pathname;
       onVerify();
@@ -107,23 +107,20 @@ export const Biometric = () => {
           </DialogTitle>
         </DialogHeader>
         <div>
-          You have opted for biometric authntication. Please wait for
-          verification.
+          You have registered for biometric authentication. <br />
+          Please provide verification.
         </div>
         <DialogFooter>
-          <Link href="/webauthn/register">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={loading}
-              onClick={() => setOpen(false)}
-            >
-              Not able to verify?
+          <div className="w-full flex gap-4 items-center justify-end">
+            <Link href="/webauthn/register" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" disabled={loading}>
+                Not able to proceed?
+              </Button>
+            </Link>
+            <Button loading={loading} title="" type="button" onClick={onVerify}>
+              {loading ? "Verifying" : "Verify"}
             </Button>
-          </Link>
-          <Button loading={loading} title="" type="button" onClick={onVerify}>
-            {loading ? "Verifying" : "Verify"}
-          </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
