@@ -39,9 +39,7 @@ const Authn = () => {
         "/api/webauthn/verify-registration",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(attResp),
         },
       );
@@ -54,8 +52,10 @@ const Authn = () => {
         toast.error("Oh no, something went wrong!");
       }
       setRegisterLoading(false);
+      sessionStorage.setItem("verified", "false");
     } catch (e) {
       setVerifyLoading(false);
+      sessionStorage.setItem("verified", "false");
     }
   };
 
@@ -79,9 +79,7 @@ const Authn = () => {
         "/api/webauthn/verify-authentication",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(asseResp),
         },
       );
@@ -93,9 +91,11 @@ const Authn = () => {
       } else {
         toast.error("Oh no, something went wrong!");
       }
+      sessionStorage.setItem("verified", "false");
       setVerifyLoading(false);
     } catch (e) {
       setVerifyLoading(false);
+      sessionStorage.setItem("verified", "false");
     }
   };
 
@@ -107,15 +107,17 @@ const Authn = () => {
       });
       toast.success("Authentication removed");
       setRemoveLoading(false);
+      sessionStorage.setItem("verified", "false");
     } catch (error) {
       setRemoveLoading(false);
+      sessionStorage.setItem("verified", "false");
     }
   };
 
   const disabled = registerLoading || verifyLoading || removeLoading;
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-wrap gap-6">
       <Button disabled={disabled} loading={registerLoading} onClick={register}>
         Register
       </Button>

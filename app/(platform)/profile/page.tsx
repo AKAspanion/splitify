@@ -46,7 +46,7 @@ const ProfilePage = () => {
               <Link href="/webauthn/register">
                 <Button>
                   <FingerprintIcon />
-                  <div>Register Biometrics</div>
+                  <div>Biometrics</div>
                 </Button>
               </Link>
             </div>
