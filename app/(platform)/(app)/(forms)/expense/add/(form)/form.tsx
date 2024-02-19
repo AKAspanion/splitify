@@ -77,6 +77,16 @@ const FormComp = ({ groups }: FormProps) => {
         amount: fixedNum(am),
         userId,
       }));
+    } else if (splitType === ExpenseType.PERCENT) {
+      const ids = Object.entries(percentSplit).filter(
+        ([_, value]) => !isNaN(value) && value,
+      );
+      splits = ids.map(([userId, percent]) => ({
+        type: ExpenseType.PERCENT,
+        amount: fixedNum((total * percent) / 100),
+        percent: fixedNum(percent),
+        userId,
+      }));
     }
 
     if (user?.id) {
@@ -106,6 +116,7 @@ const FormComp = ({ groups }: FormProps) => {
 
   const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});
   const [exactSplit, setExactSplit] = useState<Record<string, number>>({});
+  const [percentSplit, setPercentSplit] = useState<Record<string, number>>({});
 
   const onTotalChange = (value: string) => {
     if (currUserId) {
@@ -123,6 +134,10 @@ const FormComp = ({ groups }: FormProps) => {
 
   const handleExactSplitChange = (values: Record<string, number>) => {
     setExactSplit((p) => ({ ...p, ...values }));
+  };
+
+  const handlePercentSplitChange = (values: Record<string, number>) => {
+    setPercentSplit((p) => ({ ...p, ...values }));
   };
 
   const handleSplitTypeChange = (v: ExpenseType) => {
@@ -147,8 +162,6 @@ const FormComp = ({ groups }: FormProps) => {
     setEqualSplit(() => convertToObject(users || [], "id", true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectUsers]);
-
-  console.log(exactSplit);
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
@@ -210,13 +223,16 @@ const FormComp = ({ groups }: FormProps) => {
             currUserId={currUserId}
             equalSplit={equalSplit}
             exactSplit={exactSplit}
+            percentSplit={percentSplit}
             splitType={splitType}
             onEqualSplitChange={handleEqualSplitChange}
             onSplitTypeChange={handleSplitTypeChange}
             onExactSplitChange={handleExactSplitChange}
+            onPercentSplitChange={handlePercentSplitChange}
           />
         </div>
         <FormErrors id="payments" errors={fieldErrors?.payments} />
+        <FormErrors id="splits" errors={fieldErrors?.splits} />
       </div>
       <FormSubmit>Add</FormSubmit>
     </form>

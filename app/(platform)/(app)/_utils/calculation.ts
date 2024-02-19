@@ -32,6 +32,7 @@ const evaluateExpense = (
       );
       break;
     case "EXACT":
+    case "PERCENT":
       service.addExpense(
         expense.description,
         ExpenseType.EXACT,

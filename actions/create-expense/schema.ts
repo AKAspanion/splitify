@@ -32,10 +32,29 @@ export const CreateExpense = z
   })
   .refine(
     (a) => {
-      const total = a.payments.reduce((sum, a) => sum + a.amount || 0, 0);
+      const total = a.payments.reduce(
+        (sum, a) => sum + (isNaN(a.amount) ? 0 : a.amount),
+        0,
+      );
       return total === a.amount;
     },
-    { message: "All paid amount don't add up to total", path: ["payments"] },
+    {
+      message: "All paid amount don't add up to total amount",
+      path: ["payments"],
+    },
+  )
+  .refine(
+    (a) => {
+      const total = a.splits.reduce(
+        (sum, a) => sum + (isNaN(a.amount) ? 0 : a.amount),
+        0,
+      );
+      return total === a.amount;
+    },
+    {
+      message: "All split amount don't add up to total amount",
+      path: ["splits"],
+    },
   )
   .refine((a) => !!a.amount, {
     message: "Please enter an amount",

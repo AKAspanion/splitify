@@ -13,13 +13,19 @@ import { ArrowLeftIcon } from "lucide-react";
 import { SplitDrawerProps } from "./split-drawer.types";
 import dynamic from "next/dynamic";
 import { UISpinner } from "@/components/ui-spinner";
+import { EqualLoader } from "./_splits/equal-loader";
+import { ExactLoader } from "./_splits/exact-loader";
 
 const EqualSplit = dynamic(() => import("./_splits/equal"), {
-  loading: () => <UISpinner />,
+  loading: () => <EqualLoader />,
 });
 
 const ExactSplit = dynamic(() => import("./_splits/exact"), {
-  loading: () => <UISpinner />,
+  loading: () => <ExactLoader />,
+});
+
+const PercentSplit = dynamic(() => import("./_splits/percent"), {
+  loading: () => <ExactLoader />,
 });
 
 export const SplitDrawer = (props: SplitDrawerProps) => {
@@ -79,7 +85,7 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
             <ExactSplit {...props} />
           </TabsContent>
           <TabsContent value={ExpenseType.PERCENT}>
-            {/* <SplitUsers {...props} /> */}
+            <PercentSplit {...props} />
           </TabsContent>
         </Tabs>
       </DrawerContent>

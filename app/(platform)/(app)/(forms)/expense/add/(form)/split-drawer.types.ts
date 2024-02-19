@@ -9,6 +9,8 @@ export type SplitDrawerProps = {
   onEqualSplitChange?: (value: Record<string, boolean>) => void;
   exactSplit?: Record<string, number>;
   onExactSplitChange?: (value: Record<string, number>) => void;
+  percentSplit?: Record<string, number>;
+  onPercentSplitChange?: (value: Record<string, number>) => void;
   splitType: ExpenseType;
   onSplitTypeChange: (value: ExpenseType) => void;
 };

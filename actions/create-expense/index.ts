@@ -43,7 +43,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         },
         splits: {
           createMany: {
-            data: splits.map((p) => ({ amount: p.amount, userId: p.userId })),
+            data: splits.map((p) => ({
+              amount: p.amount,
+              userId: p.userId,
+              percent: p.percent,
+            })),
           },
         },
       },
