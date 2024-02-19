@@ -43,3 +43,7 @@ export const getErrorMessage = (
 export const getOwsKeyword = (name?: string) => {
   return name?.toLowerCase() === "you" ? "owe" : "owes";
 };
+
+export const getVerbKeyword = (name?: string) => {
+  return name?.toLowerCase() === "you" ? "are" : "is";
+};

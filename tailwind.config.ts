@@ -45,6 +45,10 @@ const config = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        sparkle: {
+          DEFAULT: "hsl(var(--sparkle))",
+          foreground: "hsl(var(--sparkle-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

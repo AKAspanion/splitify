@@ -2,6 +2,7 @@ import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
 import { Group } from "@/lib/splitify/model/group/group";
 import { Payment } from "@/lib/splitify/model/payment/payment";
 import { EqualSplit } from "@/lib/splitify/model/split/equal-split";
+import { ExactSplit } from "@/lib/splitify/model/split/exact-split";
 import { User } from "@/lib/splitify/model/user/user";
 import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository";
 import { MinifySplitsService } from "@/lib/splitify/service/minify-splits-service";
@@ -28,6 +29,14 @@ const evaluateExpense = (
         ExpenseType.EQUAL,
         payments?.map((p) => new Payment(p.userId, p.amount)) || [],
         splits?.map((s) => new EqualSplit(s.userId)) || [],
+      );
+      break;
+    case "EXACT":
+      service.addExpense(
+        expense.description,
+        ExpenseType.EXACT,
+        payments?.map((p) => new Payment(p.userId, p.amount)) || [],
+        splits?.map((s) => new ExactSplit(s.userId, s.amount)) || [],
       );
       break;
     default:

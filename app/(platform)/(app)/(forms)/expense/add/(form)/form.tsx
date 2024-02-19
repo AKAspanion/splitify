@@ -68,17 +68,27 @@ const FormComp = ({ groups }: FormProps) => {
         amount: fixedNum(am),
         userId,
       }));
-      if (user?.id) {
-        execute({
-          amount: fixedNum(total),
-          description,
-          payments,
-          splits,
-          groupId,
-          createrId: user?.id,
-          type: splitType,
-        });
-      }
+    } else if (splitType === ExpenseType.EXACT) {
+      const ids = Object.entries(exactSplit).filter(
+        ([_, value]) => !isNaN(value) && value,
+      );
+      splits = ids.map(([userId, am]) => ({
+        type: ExpenseType.EXACT,
+        amount: fixedNum(am),
+        userId,
+      }));
+    }
+
+    if (user?.id) {
+      execute({
+        amount: fixedNum(total),
+        description,
+        payments,
+        splits,
+        groupId,
+        createrId: user?.id,
+        type: splitType,
+      });
     }
   };
 
@@ -95,6 +105,7 @@ const FormComp = ({ groups }: FormProps) => {
   }, [user?.id, users]);
 
   const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});
+  const [exactSplit, setExactSplit] = useState<Record<string, number>>({});
 
   const onTotalChange = (value: string) => {
     if (currUserId) {
@@ -108,6 +119,10 @@ const FormComp = ({ groups }: FormProps) => {
 
   const handleEqualSplitChange = (values: Record<string, boolean>) => {
     setEqualSplit((p) => ({ ...p, ...values }));
+  };
+
+  const handleExactSplitChange = (values: Record<string, number>) => {
+    setExactSplit((p) => ({ ...p, ...values }));
   };
 
   const handleSplitTypeChange = (v: ExpenseType) => {
@@ -132,6 +147,8 @@ const FormComp = ({ groups }: FormProps) => {
     setEqualSplit(() => convertToObject(users || [], "id", true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectUsers]);
+
+  console.log(exactSplit);
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
@@ -192,9 +209,11 @@ const FormComp = ({ groups }: FormProps) => {
             disabled={loading}
             currUserId={currUserId}
             equalSplit={equalSplit}
+            exactSplit={exactSplit}
             splitType={splitType}
             onEqualSplitChange={handleEqualSplitChange}
             onSplitTypeChange={handleSplitTypeChange}
+            onExactSplitChange={handleExactSplitChange}
           />
         </div>
         <FormErrors id="payments" errors={fieldErrors?.payments} />

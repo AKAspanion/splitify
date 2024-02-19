@@ -71,7 +71,7 @@ const Addmember = async ({ params, searchParams }: ServerSideComponentProp) => {
         <div>
           {noFriendsInGroup ? null : (
             <div className="pb-3 font-semibold text-normal">
-              Already in group
+              Added in group
             </div>
           )}
           <div className="flex flex-col gap-6">

@@ -1,6 +1,5 @@
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { UISpinner } from "@/components/ui-spinner";
 import { db } from "@/lib/db";
 import { Actions } from "./actions";
 import { auth } from "@clerk/nextjs";
@@ -14,7 +13,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Balance = dynamic(() => import("./balance"), {
   loading: () => (
     <div className="flex flex-col gap-2">
-      <Skeleton className="h-9 w-[100px]" />
+      <div className="flex justify-between gap-6 mb-1">
+        <Skeleton className="h-6 w-[64px]" />
+        <Skeleton className="h-6 w-[108px]" />
+      </div>
       <Skeleton className="h-5 w-[160px]" />
       <Skeleton className="h-5 w-[120px]" />
       <Skeleton className="h-5 w-[100px]" />
@@ -38,6 +40,16 @@ const UserAvatars = dynamic(
     ),
   },
 );
+
+const BalanceSummary = dynamic(() => import("./balance-summary"), {
+  loading: () => (
+    <div className="flex flex-col gap-2">
+      <Skeleton className="h-4 w-[120px]" />
+      <Skeleton className="h-4 w-[160px]" />
+      <Skeleton className="h-4 w-[60px]" />
+    </div>
+  ),
+});
 
 const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
   const { userId } = auth();
@@ -94,16 +106,7 @@ const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
             }
           />
         ) : null}
-        <div className={""}>
-          <div className="flex flex-col gap-2">
-            {expense?.payments?.map((p) => (
-              <div
-                key={p.id}
-                className="text-xs"
-              >{`${replaceUserWithYou(userId, p?.userId, p?.user?.name)} paid ${RUPPEE_SYMBOL}${p?.amount}`}</div>
-            ))}
-          </div>
-        </div>
+        <BalanceSummary groupId={groupId} expense={expense} />
         <hr />
         <Balance groupId={groupId} expense={expense} />
       </div>
