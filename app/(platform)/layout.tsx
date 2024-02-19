@@ -1,3 +1,4 @@
+import { Biometric } from "@/components/biometric/biometric";
 import { Suspense } from "react";
 
 export default function PlatformLayout({
@@ -5,5 +6,12 @@ export default function PlatformLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <Suspense>{children}</Suspense>;
+  return (
+    <>
+      <Suspense>{children}</Suspense>
+      <Suspense>
+        <Biometric />
+      </Suspense>
+    </>
+  );
 }

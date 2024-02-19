@@ -45,7 +45,7 @@ export const UserCardLoading = () => {
           <Skeleton className="h-3 w-[60px]" />
         </div>
       </div>
-      <Skeleton className="h-10 w-10 rounded-md" />
+      <Skeleton className="h-10 w-10 rounded-md sm:invisible" />
     </div>
   );
 };

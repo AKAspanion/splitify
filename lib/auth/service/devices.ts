@@ -70,6 +70,15 @@ const pushDevice = async (userId: string, device: AuthenticatorDevice) => {
   }
 };
 
+const removeDevices = async (userId: string) => {
+  try {
+    await db.authnDevice.deleteMany({ where: { userId } });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 const getAuthnDevice = async (userId: string) => {
   try {
     return await db.authnDevice.findUnique({ where: { userId } });
@@ -78,6 +87,6 @@ const getAuthnDevice = async (userId: string) => {
   }
 };
 
-const DevicesService = { getDevice, pushDevice };
+const DevicesService = { getDevice, pushDevice, removeDevices };
 
 export default DevicesService;

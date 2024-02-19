@@ -8,10 +8,12 @@ const AddExpense = dynamic(() => import("./add-expense"), {
       <div className="flex justify-between items-center gap-4 mb-3">
         <Skeleton className="w-10 h-10 rounded-md" />
       </div>
-      <FormInputLoading />
-      <FormInputLoading />
-      <FormInputLoading />
-      <FormInputLoading />
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <FormInputLoading />
+        <FormInputLoading />
+        <FormInputLoading />
+        <FormInputLoading />
+      </div>
       <div className="flex justify-between items-center gap-4">
         <Skeleton className="w-[100px] h-10 rounded-md" />
         <Skeleton className="w-10 h-5 rounded-md" />
