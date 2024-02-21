@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { NotificationService } from "@/lib/notification/service/onesignal";
+import { NotificationService } from "@/lib/notification/service";
 
 export const Test = () => {
   const testNotification = () => {

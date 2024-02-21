@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { NotificationService } from "@/lib/notification/service/onesignal";
 import { useUser } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

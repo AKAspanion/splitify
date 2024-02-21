@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs";
 
 const ContentType = "application/json";
-// const Authorization =`Basic ${process.env.}`
 
 export class NotificationService {
   public static async sendNotification(
