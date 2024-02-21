@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
+      <Script
+        strategy="afterInteractive"
+        src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+      />
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
