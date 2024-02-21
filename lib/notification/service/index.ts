@@ -1,7 +1,4 @@
-import { db } from "@/lib/db";
-import { GroupWIthUsers } from "@/types/shared";
-import { getYouKeyword } from "@/utils/validate";
-import { Expense, User } from "@prisma/client";
+import { Expense } from "@prisma/client";
 
 const ContentType = "application/json";
 
@@ -9,13 +6,17 @@ export class NotificationService {
   public static async sendNotification(
     heading: string,
     content: string,
-    userIds: string[],
+    external_id: string[],
   ) {
     try {
       await fetch("/api/push-notification", {
         method: "POST",
         headers: { "Content-Type": ContentType },
-        body: JSON.stringify({ heading, content, userIds }),
+        body: JSON.stringify({
+          heading,
+          content,
+          external_id,
+        } satisfies SendNotificationUserbody),
       });
     } catch (error) {
       console.log(error);

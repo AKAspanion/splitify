@@ -112,12 +112,12 @@ export const Biometric = () => {
             <div className="py-1">Authentication Required</div>
           </DialogTitle>
         </DialogHeader>
-        <div>
+        <div className="text-center sm:text-left">
           You have registered for biometric authentication. <br />
           Please provide verification.
         </div>
         <DialogFooter>
-          <div className="w-full flex gap-4 items-center justify-end">
+          <div className="w-full flex gap-4 items-center justify-between sm:justify-end">
             <Link href="/webauthn/register" onClick={() => setOpen(false)}>
               <Button type="button" variant="outline" disabled={loading}>
                 Not able to proceed?

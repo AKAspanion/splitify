@@ -10,10 +10,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body: SendNotificationUserbody = await req.json();
     const heading = body?.heading || "";
     const content = body?.content || "";
-    const external_id = body?.userIds || [];
+    const external_id = body?.external_id || [];
 
     const res = await sendNotification({ heading, content, external_id });
 
