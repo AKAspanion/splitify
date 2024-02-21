@@ -25,3 +25,9 @@ type OweBalanceResultIndex = {
   user2Index: number;
   owes: number;
 };
+
+type SendNotificationUserbody = {
+  heading: string;
+  content: string;
+  external_id: string[];
+};

@@ -7,5 +7,5 @@ import { User } from "@prisma/client";
 export type InputType = z.infer<typeof AddFriend>;
 export type ReturnType = ActionState<
   InputType,
-  { message: string; user?: User; friend?: User }
+  { message: string; userId: string; friendId: string }
 >;

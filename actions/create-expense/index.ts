@@ -61,7 +61,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/groups/${groupId || ""}`);
   revalidatePath(`/expense/add`);
-  return { data: expense };
+  return { data: { expense, userId } };
 };
 
 export const createExpense = createSafeAction(CreateExpense, handler);

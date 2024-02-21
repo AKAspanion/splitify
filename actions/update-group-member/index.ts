@@ -9,7 +9,7 @@ import { UpdateGroup } from "./schema";
 import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId, user } = auth();
+  const { userId } = auth();
 
   if (!userId) {
     return { error: "Unauthorized" };
@@ -22,7 +22,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     group = await db.group.update({
       where: { id: groupId },
       data: { users: { connect: [{ id: memberClerkId }] } },
-      include: { users: { where: { id: memberClerkId } } },
     });
   } catch (error) {
     return {
@@ -35,7 +34,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   revalidatePath(`/groups/${group.id}`);
   revalidatePath(`/groups/${group.id}/settings`);
   revalidatePath(`/groups/${group.id}/add-member`);
-  return { data: { group } };
+  return { data: { groupId, userId, friendId: memberClerkId } };
 };
 
 export const updateGroupMember = createSafeAction(UpdateGroup, handler);

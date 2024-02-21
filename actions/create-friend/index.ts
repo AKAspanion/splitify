@@ -60,8 +60,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   return {
     data: {
       message: "Friend added successfully",
-      user: results?.[0],
-      friend: results?.[1],
+      userId,
+      friendId,
     },
   };
 };

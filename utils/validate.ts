@@ -47,3 +47,7 @@ export const getOwsKeyword = (name?: string) => {
 export const getVerbKeyword = (name?: string) => {
   return name?.toLowerCase() === "you" ? "are" : "is";
 };
+
+export const getYouKeyword = (id1: string, id2: string, name: string) => {
+  return id1 === id2 ? "You" : name || "Someone";
+};

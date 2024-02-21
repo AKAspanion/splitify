@@ -16,6 +16,7 @@ import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
+import { NotificationService } from "@/lib/notification/service";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -34,9 +35,10 @@ const FormComp = ({ groups }: FormProps) => {
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
 
   const { loading, execute, fieldErrors } = useAction(createExpense, {
-    onSuccess: (data) => {
-      router.push(`/groups/${data?.groupId || ""}`);
+    onSuccess: ({ expense, userId }) => {
       toast.success("Expense created successfully");
+      NotificationService.createExpense(userId, expense);
+      router.push(`/groups/${expense?.groupId || ""}`);
     },
     onError: (error, debug) => {
       console.error(debug);

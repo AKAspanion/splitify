@@ -18,17 +18,9 @@ export const Action = ({
   isInGroup?: boolean;
 }) => {
   const { execute, loading } = useAction(updateGroupMember, {
-    onSuccess: ({ group }) => {
+    onSuccess: ({ groupId, userId, friendId }) => {
       toast.success("Group member added successfully");
-      const friend = group?.users?.[0];
-      const friendId = friend?.id;
-      if (friendId) {
-        NotificationService.sendNotification(
-          `Added to group`,
-          `You have been added in group ${group?.title}`,
-          [friendId],
-        );
-      }
+      NotificationService.updateGroupMember(userId, friendId, groupId);
     },
     onError: (error, debug) => {
       console.error(error, debug);

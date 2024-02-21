@@ -6,4 +6,7 @@ import { ActionState } from "@/lib/safe-actions";
 import { CreateExpense } from "./schema";
 
 export type InputType = z.infer<typeof CreateExpense>;
-export type ReturnType = ActionState<InputType, Expense & {}>;
+export type ReturnType = ActionState<
+  InputType,
+  { expense: Expense; userId: string }
+>;

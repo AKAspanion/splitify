@@ -17,22 +17,9 @@ export const Action = ({
   isFriend?: boolean;
 }) => {
   const { execute, loading } = useAction(createFriend, {
-    onSuccess: (data) => {
-      toast.success(data.message);
-      const u1 = data?.user;
-      const u2 = data?.friend;
-      if (u1?.name && u2?.name) {
-        NotificationService.sendNotification(
-          "New friendship",
-          `You have added ${u2?.name} as your friend`,
-          [u1?.id || ""],
-        );
-        NotificationService.sendNotification(
-          "New friendship",
-          `${u1?.name} added you as your friend`,
-          [u2?.id || ""],
-        );
-      }
+    onSuccess: ({ message, userId, friendId }) => {
+      toast.success(message);
+      NotificationService.createFriend(userId, friendId);
     },
     onError: (error, debug) => {
       console.error(error, debug);
