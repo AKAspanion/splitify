@@ -20,6 +20,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "You can't be friends with yourself" };
   }
 
+  let results = [];
   try {
     const promises: any[] = [
       db.user.update({
@@ -40,7 +41,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         }),
       );
     }
-    await Promise.all(promises);
+    results = await Promise.all(promises);
   } catch (error) {
     return {
       error: "Failed to create friendship",
@@ -56,7 +57,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     revalidatePath(`/groups/${groupId}/settings`);
     revalidatePath(`/groups/${groupId}/add-member`);
   }
-  return { data: { message: "Friend added successfully" } };
+  return {
+    data: {
+      message: "Friend added successfully",
+      user: results?.[0],
+      friend: results?.[1],
+    },
+  };
 };
 
 export const createFriend = createSafeAction(AddFriend, handler);

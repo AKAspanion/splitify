@@ -12,8 +12,9 @@ import { startAuthentication } from "@simplewebauthn/browser";
 import { toast } from "sonner";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
-const publicRoutes = ["/webauthn", "/profile"];
+const publicRoutes = ["/webauthn", "/profile", "/sign-in", "/sign-out"];
 
 let prevPath = "";
 
@@ -21,6 +22,7 @@ export const Biometric = () => {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
 
   const begin = async () => {
     const verified = sessionStorage.getItem("verified") === "true";
@@ -88,22 +90,23 @@ export const Biometric = () => {
 
   useEffect(() => {
     if (
+      (user?.id,
       pathname &&
-      prevPath !== pathname &&
-      !publicRoutes.some((r) => pathname.includes(r))
+        prevPath !== pathname &&
+        !publicRoutes.some((r) => pathname.includes(r)))
     ) {
       prevPath = pathname;
       onVerify();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [user?.id, pathname]);
 
   return (
     <Dialog open={open}>
       <DialogContent className="max-w-[90vw] min-w-[90vw] sm:min-w-fit w-fit">
         <DialogHeader>
           <DialogTitle>
-            <div className="py-1">Authentication</div>
+            <div className="py-1">Authentication Required</div>
           </DialogTitle>
         </DialogHeader>
         <div>
