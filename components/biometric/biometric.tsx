@@ -103,7 +103,10 @@ export const Biometric = () => {
 
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-[90vw] min-w-[90vw] sm:min-w-fit w-fit">
+      <DialogContent
+        closable={false}
+        className="max-w-[90vw] min-w-[90vw] sm:min-w-fit w-fit"
+      >
         <DialogHeader>
           <DialogTitle>
             <div className="py-1">Authentication Required</div>

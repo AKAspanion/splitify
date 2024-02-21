@@ -19,7 +19,7 @@ export const Launch = () => {
       OneSignal.init({
         appId,
         safari_web_id,
-        notifyButton: { enable: true },
+        notifyButton: { enable: process.env.NODE_ENV === "development" },
         allowLocalhostAsSecureOrigin: true,
       })
         .then(() => {

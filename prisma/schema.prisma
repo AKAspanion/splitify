@@ -30,9 +30,10 @@ model User {
   // to satisfy prisma's requirements; we won't access it directly.
   symmetricFriends User[] @relation("UserFriends")
 
-  Expense     Expense[]
-  UserSplit   UserSplit[]
-  UserPayment UserPayment[]
+  Expense      Expense[]
+  UserSplit    UserSplit[]
+  UserPayment  UserPayment[]
+  Notification Notification[]
 
   @@index([id])
 }
@@ -104,8 +105,22 @@ model Group {
 }
 
 model AuthnDevice {
-  id     String @id @default(nanoid())
-  data   Bytes
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  id        String    @id @default(nanoid())
+  data      Bytes
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Notification {
+  id        String    @id @default(nanoid())
+  heading   String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  forUserId String
+  forUser   User      @relation(fields: [forUserId], references: [id])
+
+  @@index([forUserId])
 }
