@@ -14,13 +14,23 @@ const Balances = dynamic(() => import("./[id]/balances"), {
   loading: () => <BalancesLoader dense onlyList />,
 });
 
-const GroupList = async () => {
+const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
+  const showAll = searchParams["show"] === "all";
   const { userId } = auth();
-  const groups = await db.group.findMany({
-    where: { users: { some: { id: userId || "null" } } },
-  });
 
-  const noData = !groups || groups?.length === 0;
+  const query = {
+    take: showAll ? undefined : 5,
+    where: { users: { some: { id: userId || "null" } } },
+  };
+  const [groups, count] = await db.$transaction([
+    db.group.findMany({
+      ...query,
+      orderBy: [{ createdAt: "desc" }],
+    }),
+    db.group.count({ where: query.where }),
+  ]);
+
+  const noData = count === 0;
 
   return (
     <AutoContainer
@@ -29,9 +39,9 @@ const GroupList = async () => {
           title="Groups"
           actions={
             <>
-              <Button disabled variant="ghost" size="icon">
+              {/* <Button disabled variant="ghost" size="icon">
                 <SearchIcon />
-              </Button>
+              </Button> */}
               <Link href="/groups/add">
                 <Button variant="ghost" size="icon">
                   <UserRoundPlusIcon />
@@ -64,8 +74,16 @@ const GroupList = async () => {
           action={<CreateButton />}
         />
       ) : (
-        <div className="w-full flex justify-center py-8">
-          <CreateButton />
+        <div className="w-full flex flex-col gap-6 items-center py-8">
+          {!showAll ? (
+            <Link href="/groups?show=all">
+              <Button type="button" variant={"secondary"}>
+                <div>Show all {count} groups</div>
+              </Button>
+            </Link>
+          ) : (
+            <CreateButton />
+          )}
         </div>
       )}
       <div className="h-[72px]" />

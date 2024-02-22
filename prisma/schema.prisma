@@ -98,6 +98,7 @@ model Group {
   title     String
   image_url String?
   type      String?
+  mute      Boolean?  @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   Expense   Expense[]
