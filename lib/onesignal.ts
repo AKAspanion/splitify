@@ -1,3 +1,5 @@
+import { getUrlWithHost } from "@/utils/validate";
+
 const ContentType = "application/json";
 const charset = "utf-8";
 const Authorization = `Basic ${process.env.ONE_SIGNAL_REST_API_KEY || ""}`;
@@ -19,10 +21,11 @@ export const sendNotification = async ({
 }: SendNotificationUserbody) => {
   try {
     const { url } = options;
+    const withHostUrl = getUrlWithHost(url);
     const target_channel = "push";
     const notificationBody = {
-      web_url: url,
-      app_url: url,
+      web_url: withHostUrl,
+      app_url: withHostUrl,
       target_channel,
       contents: { en: content },
       headings: { en: heading },

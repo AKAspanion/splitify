@@ -42,6 +42,7 @@ export async function POST(req: Request) {
           heading: `Expense added`,
           content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
           external_id: [u.id],
+          options: { url: `/groups/${groupId}/expense/${expenseId}` },
         }),
       );
 
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json(
-        { message: "Messages processed" },
+        { message: "Messages processed", data },
         { status: 200 },
       );
     } else {

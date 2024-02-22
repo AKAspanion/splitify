@@ -16,17 +16,20 @@ export async function POST(req: Request) {
     const external_id = body?.external_id || [];
     const options = body?.options || {};
 
-    const res = await sendNotification({
+    const data = await sendNotification({
       heading,
       content,
       external_id,
       options,
     });
 
-    if (res?.errors) {
-      return NextResponse.json({ data: res?.errors }, { status: 400 });
+    if (data?.errors) {
+      return NextResponse.json({ data: data?.errors }, { status: 400 });
     } else {
-      return NextResponse.json({ data: "Message sent" }, { status: 200 });
+      return NextResponse.json(
+        { message: "Message sent", data },
+        { status: 200 },
+      );
     }
   } catch (error: any) {
     return NextResponse.json(

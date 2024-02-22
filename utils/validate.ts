@@ -51,3 +51,9 @@ export const getVerbKeyword = (name?: string) => {
 export const getYouKeyword = (id1: string, id2: string, name: string) => {
   return id1 === id2 ? "You" : name || "Someone";
 };
+
+export const getUrlWithHost = (path?: string) => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_HOST_URL || "https://splitify.spanion.in";
+  return `${baseUrl}${path || "/"}`;
+};

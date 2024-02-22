@@ -35,11 +35,13 @@ export async function POST(req: Request) {
           heading,
           content: `You have been added in group ${group?.title || ""} by ${creator?.firstName || creator?.name || "Someone"}`,
           external_id: [friend?.id],
+          options: { url: `/groups/${groupId}` },
         }),
         sendNotification({
           heading,
           content: `You added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
           external_id: [creator?.id],
+          options: { url: `/groups/${groupId}` },
         }),
       ];
 
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json(
-        { message: "Messages processed" },
+        { message: "Messages processed", data },
         { status: 200 },
       );
     } else {

@@ -40,6 +40,7 @@ export async function POST(req: Request) {
           heading: `Expense deleted`,
           content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} deleted expense ${expenseName} in group ${group?.title}`,
           external_id: [u.id],
+          options: { url: `/groups/${groupId}` },
         }),
       );
 
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json(
-        { message: "Messages processed" },
+        { message: "Messages processed", data },
         { status: 200 },
       );
     } else {

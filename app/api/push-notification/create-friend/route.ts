@@ -29,11 +29,13 @@ export async function POST(req: Request) {
           heading,
           content: `You have added ${friend?.firstName || friend?.name || "Someone"} as your friend`,
           external_id: [creator?.id],
+          options: { url: `/friends` },
         }),
         sendNotification({
           heading,
           content: `${creator?.firstName || creator?.name || "Someone"} added you as your friend}`,
           external_id: [friend?.id],
+          options: { url: `/friends` },
         }),
       ];
 
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
       );
 
       return NextResponse.json(
-        { message: "Messages processed" },
+        { message: "Messages processed", data },
         { status: 200 },
       );
     } else {
