@@ -55,7 +55,7 @@ export class MinifySplitsService {
     if (amount[mxCredit] == 0 && amount[mxDebit] == 0) return;
 
     // Find the minimum of two amounts
-    var min = this.minOf2(-amount[mxDebit], amount[mxCredit]);
+    var min = fixedNum(this.minOf2(-amount[mxDebit], amount[mxCredit]));
     amount[mxCredit] -= min;
     amount[mxDebit] += min;
 
@@ -63,7 +63,7 @@ export class MinifySplitsService {
     this.balances.push({
       user1Index: mxDebit,
       user2Index: mxCredit,
-      owes: fixedNum(min),
+      owes: min,
     });
     // Recur for the amount array.
     // Note that it is guaranteed that
@@ -93,7 +93,7 @@ export class MinifySplitsService {
     for (let p = 0; p < this.N; p++)
       for (let i = 0; i < this.N; i++) amount[p] += graph[i][p] - graph[p][i];
 
-    this.minCashFlowRec(amount);
+    this.minCashFlowRec(amount.map((a) => fixedNum(a)));
   }
 
   getBalancesTable() {
