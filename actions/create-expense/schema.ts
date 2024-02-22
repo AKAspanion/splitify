@@ -1,3 +1,4 @@
+import { fixedNum } from "@/utils/validate";
 import { ExpenseType } from "@prisma/client";
 import { z } from "zod";
 
@@ -36,7 +37,7 @@ export const CreateExpense = z
         (sum, a) => sum + (isNaN(a.amount) ? 0 : a.amount),
         0,
       );
-      return total === a.amount;
+      return fixedNum(total, 0) === fixedNum(a.amount, 0);
     },
     {
       message: "All paid amount don't add up to total amount",
@@ -49,7 +50,7 @@ export const CreateExpense = z
         (sum, a) => sum + (isNaN(a.amount) ? 0 : a.amount),
         0,
       );
-      return total === a.amount;
+      return fixedNum(total, 0) === fixedNum(a.amount, 0);
     },
     {
       message: "All split amount don't add up to total amount",

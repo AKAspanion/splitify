@@ -9,6 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum } from "@/utils/validate";
 import { User } from "@prisma/client";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
@@ -125,7 +126,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                 currUserId={currUserId}
                 actions={
                   <div className="flex gap-3 items-center">
-                    <div className="text-md">₹</div>
+                    <div className="text-md">{RUPPEE_SYMBOL}</div>
                     <div className="max-w-[120px]">
                       <Input
                         type="number"
@@ -141,11 +142,19 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
           </div>
           <div className="text-center text-xs font-semibold pt-6">
             <div>
-              ₹{used} of ₹{total}
+              {RUPPEE_SYMBOL}
+              {used} of {RUPPEE_SYMBOL}
+              {total}
             </div>
             <div className={balance !== 0 ? "text-red-500" : ""}>
-              ₹{Math.abs(balance)} {balanceText}
+              {RUPPEE_SYMBOL}
+              {Math.abs(balance)} {balanceText}
             </div>
+          </div>
+          <div className="flex items-center justify-end mt-6">
+            <DrawerClose>
+              <Button variant={"outline"}>Done</Button>
+            </DrawerClose>
           </div>
         </div>
       </DrawerContent>

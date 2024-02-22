@@ -3,6 +3,7 @@ import { SplitDrawerProps } from "../split-drawer.types";
 import { fixedNum } from "@/utils/validate";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { Input } from "@/components/ui/input";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 
 const ExactSplit = ({
   currUserId,
@@ -39,7 +40,7 @@ const ExactSplit = ({
             currUserId={currUserId}
             actions={
               <div className="flex gap-3 items-center">
-                <div className="text-md">₹</div>
+                <div className="text-md">{RUPPEE_SYMBOL}</div>
                 <div className="max-w-[120px]">
                   <Input
                     type="number"

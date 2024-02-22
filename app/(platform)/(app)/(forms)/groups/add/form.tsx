@@ -5,10 +5,11 @@ import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Badge } from "@/components/ui/badge";
-import { GROUP_TYPES } from "@/constants/ui";
+import { GROUP_CATEGORY_ICONS, GROUP_TYPES } from "@/constants/ui";
 import { useAction } from "@/hooks/use-action";
 import { randomNumber } from "@/utils/func";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,7 +32,7 @@ const Form = () => {
     const title = formData.get("title") as string;
     // const imgFile = formData.get("image") as File;
 
-    const imageId = randomNumber(1, 10);
+    const imageId = randomNumber(1, 20);
     let image_url = `/images/placeholder/groups/${imageId}.png`;
     // if (imgFile) {
     //   try {
@@ -66,6 +67,7 @@ const Form = () => {
           label="Group name"
           id="title"
           name="title"
+          placeholder="Enter a group name"
           errors={fieldErrors?.title}
         />
         <div>
@@ -73,16 +75,20 @@ const Form = () => {
             {"Type"}
           </Label>
           <div className="w-full flex flex-wrap gap-3 items-center pt-3">
-            {GROUP_TYPES.map((b) => (
-              <Badge
-                key={b}
-                className="cursor-pointer"
-                variant={b === type ? "default" : "outline"}
-                onClick={() => handleTypeChange(b)}
-              >
-                {b}
-              </Badge>
-            ))}
+            {GROUP_TYPES.map((b) => {
+              const GroupIcon = GROUP_CATEGORY_ICONS[b];
+              return (
+                <Badge
+                  key={b}
+                  className="cursor-pointer capitalize flex gap-2 items-center"
+                  variant={b === type ? "default" : "outline"}
+                  onClick={() => handleTypeChange(b)}
+                >
+                  <GroupIcon className={"w-4 h-4"} />
+                  {b}
+                </Badge>
+              );
+            })}
           </div>
         </div>
         <FormErrors errors={fieldErrors?.type} />

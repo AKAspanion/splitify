@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { NoData } from "@/components/no-data";
+import { cn } from "@/lib/utils";
 
 export const BalancesList = ({
   group,
@@ -54,7 +55,12 @@ export const BalancesList = ({
   return (
     <div>
       <div className="font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
-        <div className="flex flex-col gap-2">
+        <div
+          className={cn("flex flex-col", {
+            "gap-1": onlyList,
+            "gap-2": !onlyList,
+          })}
+        >
           {noDataText
             ? noDataText
             : balances?.map((s, i) => (

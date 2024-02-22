@@ -75,7 +75,9 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
     >
       <div className="flex flex-col gap-6">
         <div className={""}>
-          <div className="font-bold text-lg">₹ {expense?.amount}</div>
+          <div className="font-bold text-lg">
+            {RUPPEE_SYMBOL} {expense?.amount}
+          </div>
           <div className="font-thin text-sm">
             Added by {addedBy} on {createDate}
           </div>

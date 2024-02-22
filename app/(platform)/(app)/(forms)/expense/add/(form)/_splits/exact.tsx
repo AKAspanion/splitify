@@ -4,6 +4,7 @@ import { convertAllValues, convertToObject, fixedNum } from "@/utils/validate";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 
 const ExactSplit = ({
   currUserId,
@@ -40,7 +41,7 @@ const ExactSplit = ({
             currUserId={currUserId}
             actions={
               <div className="flex gap-3 items-center">
-                <div className="text-md">₹</div>
+                <div className="text-md">{RUPPEE_SYMBOL}</div>
                 <div className="max-w-[120px]">
                   <Input
                     type="number"
@@ -66,10 +67,13 @@ const ExactSplit = ({
       </div>
       <div className="text-center text-xs font-semibold pt-6">
         <div>
-          ₹{used} of ₹{total}
+          {RUPPEE_SYMBOL}
+          {used} of {RUPPEE_SYMBOL}
+          {total}
         </div>
         <div className={balance !== 0 ? "text-red-500" : ""}>
-          ₹{Math.abs(balance)} {balanceText}
+          {RUPPEE_SYMBOL}
+          {Math.abs(balance)} {balanceText}
         </div>
       </div>
     </div>

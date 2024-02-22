@@ -16,8 +16,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   const {
+    category = "General",
     description,
-    category,
     type,
     amount,
     splits,

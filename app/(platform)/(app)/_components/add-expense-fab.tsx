@@ -12,7 +12,7 @@ export const AddExpenseFab = () => {
   const query = groupId ? `?groupId=${groupId}` : "";
 
   // TODO remove when indivialu expense ready
-  const hidden = !groupId;
+  const hidden = false;
 
   return hidden ? null : (
     <div className="fixed z-20 bottom-[104px] right-8 sm:bottom-8">

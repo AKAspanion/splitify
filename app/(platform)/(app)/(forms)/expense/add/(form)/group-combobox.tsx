@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, NotepadText } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
 } from "@/components/ui/command";
 import {
@@ -20,6 +19,7 @@ import { Group } from "@prisma/client";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { GroupWIthUsers } from "@/types/shared";
 import { useFormStatus } from "react-dom";
+import { GROUP_CATEGORY_ICONS, GroupType } from "@/constants/ui";
 
 type GroupComboboxProps = {
   label?: string;
@@ -70,24 +70,31 @@ export function GroupCombobox(props: GroupComboboxProps) {
         <Command>
           <CommandEmpty>No group found.</CommandEmpty>
           <CommandGroup>
-            {groups.map((group) => (
-              <CommandItem
-                key={group.id}
-                value={group.id}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue);
-                  setOpen && setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === group.id ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                <div className="truncate w-full">{group.title}</div>
-              </CommandItem>
-            ))}
+            {groups.map((group) => {
+              const type = group?.type as GroupType;
+              const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
+              return (
+                <CommandItem
+                  key={group.id}
+                  value={group.id}
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : group.id);
+                    setOpen && setOpen(false);
+                  }}
+                >
+                  <GroupIcon className={cn("mr-2 h-4 w-4")} />
+                  <div className="truncate w-full capitalize">
+                    {group.title}
+                  </div>
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === group.id ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </Command>
       </PopoverContent>

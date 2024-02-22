@@ -83,10 +83,17 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
           </TabsContent>
           <TabsContent value={ExpenseType.EXACT}>
             <ExactSplit {...props} />
+            <div className="h-[73px]" />
           </TabsContent>
           <TabsContent value={ExpenseType.PERCENT}>
             <PercentSplit {...props} />
+            <div className="h-[73px]" />
           </TabsContent>
+          <div className="flex items-center justify-end">
+            <DrawerClose>
+              <Button variant={"outline"}>Done</Button>
+            </DrawerClose>
+          </div>
         </Tabs>
       </DrawerContent>
     </Drawer>

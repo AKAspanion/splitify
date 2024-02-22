@@ -5,7 +5,6 @@ import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { NoData } from "@/components/no-data";
 
 export const BalanceList = ({
   expense,

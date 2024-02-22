@@ -68,6 +68,7 @@ const GroupList = async () => {
           <CreateButton />
         </div>
       )}
+      <div className="h-[72px]" />
     </AutoContainer>
   );
 };

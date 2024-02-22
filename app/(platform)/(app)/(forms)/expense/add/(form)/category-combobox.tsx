@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, ReceiptText } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { EXPENSE_CATEGORY_TYPES } from "@/constants/ui";
+import {
+  EXPENSE_CATEGORY_ICONS,
+  EXPENSE_CATEGORY_TYPES,
+  ExpenseCategoryType,
+} from "@/constants/ui";
 import { useFormStatus } from "react-dom";
 
 type CategoryComboboxProps = {
@@ -57,24 +61,31 @@ export function CategoryCombobox(props: CategoryComboboxProps) {
         <Command>
           <CommandEmpty>No Category found.</CommandEmpty>
           <CommandGroup>
-            {EXPENSE_CATEGORY_TYPES.map((c) => (
-              <CommandItem
-                key={c}
-                value={c}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue);
-                  setOpen && setOpen(false);
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === c.toLowerCase() ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                <div className="truncate w-full">{c}</div>
-              </CommandItem>
-            ))}
+            {EXPENSE_CATEGORY_TYPES.map((c) => {
+              const category = c as ExpenseCategoryType;
+
+              const ExpenseIcon =
+                EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
+              return (
+                <CommandItem
+                  key={c}
+                  value={c}
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : currentValue);
+                    setOpen && setOpen(false);
+                  }}
+                >
+                  <ExpenseIcon className={cn("mr-2 h-4 w-4")} />
+                  <div className="truncate w-full capitalize">{c}</div>
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === c.toLowerCase() ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </Command>
       </PopoverContent>

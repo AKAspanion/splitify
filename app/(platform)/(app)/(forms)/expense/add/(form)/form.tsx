@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
 import { NotificationService } from "@/lib/notification/service";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -29,7 +30,7 @@ const FormComp = ({ groups }: FormProps) => {
   const [groupOpen, setGroupOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
-  const [category, setCategory] = useState<string>("General");
+  const [category, setCategory] = useState<string>("general");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
@@ -98,6 +99,7 @@ const FormComp = ({ groups }: FormProps) => {
         payments,
         splits,
         groupId,
+        category,
         createrId: user?.id,
         type: splitType,
       });
@@ -196,14 +198,16 @@ const FormComp = ({ groups }: FormProps) => {
           id="description"
           name="description"
           label="Description"
+          placeholder="Enter a description"
           errors={fieldErrors?.description}
         />
         <FormInput
           id="amount"
           name="amount"
-          label="Amount (₹)"
+          label={`Amount(${RUPPEE_SYMBOL})`}
           type="number"
           step={0.01}
+          placeholder={"0.00"}
           errors={fieldErrors?.amount}
           onChange={(e) => onTotalChange(e.target.value)}
         />
