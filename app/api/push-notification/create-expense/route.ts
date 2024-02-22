@@ -37,16 +37,18 @@ export async function POST(req: Request) {
       ];
 
       const notifyUsers = group.users || [];
-      const notifications = notifyUsers.map((u) => ({
-        heading: `Expense added`,
-        content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
-        external_id: [u.id],
-      }));
+      const notifications = notifyUsers.map((u) =>
+        sendNotification({
+          heading: `Expense added`,
+          content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
+          external_id: [u.id],
+        }),
+      );
 
-      notifications.forEach((n) =>
-        sendNotification(n).then((e) =>
-          APILogger.info(`Expense added ${n.content}`, e),
-        ),
+      const data = await Promise.allSettled(notifications);
+
+      data.forEach(
+        async (n) => await APILogger.info(`Expense added ${n.status}`, n),
       );
 
       return NextResponse.json(

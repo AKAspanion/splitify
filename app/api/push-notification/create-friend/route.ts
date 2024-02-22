@@ -24,16 +24,24 @@ export async function POST(req: Request) {
       ];
       const [friend, creator] = (await Promise.all(promises)) as [User, User];
       const heading = "New friendship";
-      sendNotification({
-        heading,
-        content: `You have added ${friend?.firstName || friend?.name || "Someone"} as your friend`,
-        external_id: [creator?.id],
-      }).then((e) => APILogger.info(`New friendship ${creator.id}`, e));
-      sendNotification({
-        heading,
-        content: `${creator?.firstName || creator?.name || "Someone"} added you as your friend}`,
-        external_id: [friend?.id],
-      }).then((e) => APILogger.info(`New friendship ${friend.id}`, e));
+      const notifications = [
+        sendNotification({
+          heading,
+          content: `You have added ${friend?.firstName || friend?.name || "Someone"} as your friend`,
+          external_id: [creator?.id],
+        }),
+        sendNotification({
+          heading,
+          content: `${creator?.firstName || creator?.name || "Someone"} added you as your friend}`,
+          external_id: [friend?.id],
+        }),
+      ];
+
+      const data = await Promise.allSettled(notifications);
+
+      data.forEach(
+        async (n) => await APILogger.info(`New friendship ${n.status}`, n),
+      );
 
       return NextResponse.json(
         { message: "Messages processed" },

@@ -7,17 +7,20 @@ export class NotificationService {
     heading: string,
     content: string,
     external_id: string[],
+    options?: SendNotificationOptions,
   ) {
     try {
-      await fetch("/api/push-notification", {
+      const data = await fetch("/api/push-notification", {
         method: "POST",
         headers: { "Content-Type": ContentType },
         body: JSON.stringify({
           heading,
           content,
           external_id,
+          options,
         } satisfies SendNotificationUserbody),
       });
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -25,7 +28,7 @@ export class NotificationService {
 
   public static async createFriend(userId: string, friendId: string) {
     try {
-      await fetch("/api/push-notification/update-group-member", {
+      const data = await fetch("/api/push-notification/update-group-member", {
         method: "POST",
         headers: { "Content-Type": ContentType },
         body: JSON.stringify({
@@ -33,6 +36,7 @@ export class NotificationService {
           friendId,
         } satisfies CreateFriendNotificationBody),
       });
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -44,7 +48,7 @@ export class NotificationService {
     groupId: string,
   ) {
     try {
-      await fetch("/api/push-notification/update-group-member", {
+      const data = await fetch("/api/push-notification/update-group-member", {
         method: "POST",
         headers: { "Content-Type": ContentType },
         body: JSON.stringify({
@@ -53,6 +57,7 @@ export class NotificationService {
           groupId,
         } satisfies UpdateGroupMemberNotificationBody),
       });
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -60,7 +65,7 @@ export class NotificationService {
 
   public static async createExpense(userId: string, exp: Expense) {
     try {
-      await fetch("/api/push-notification/create-expense", {
+      const data = await fetch("/api/push-notification/create-expense", {
         method: "POST",
         headers: { "Content-Type": ContentType },
         body: JSON.stringify({
@@ -69,6 +74,7 @@ export class NotificationService {
           userId,
         } satisfies CreateExpenseNotificationBody),
       });
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -80,7 +86,7 @@ export class NotificationService {
     groupId?: string,
   ) {
     try {
-      await fetch("/api/push-notification/delete-expense", {
+      const data = await fetch("/api/push-notification/delete-expense", {
         method: "POST",
         headers: { "Content-Type": ContentType },
         body: JSON.stringify({
@@ -89,6 +95,7 @@ export class NotificationService {
           userId,
         } satisfies DeleteExpenseNotificationBody),
       });
+      return data;
     } catch (error) {
       console.log(error);
     }

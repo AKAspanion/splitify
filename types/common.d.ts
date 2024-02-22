@@ -30,4 +30,9 @@ type SendNotificationUserbody = {
   heading: string;
   content: string;
   external_id: string[];
+  options?: SendNotificationOptions;
+};
+
+type SendNotificationOptions = {
+  url?: string;
 };

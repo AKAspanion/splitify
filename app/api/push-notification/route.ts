@@ -14,8 +14,14 @@ export async function POST(req: Request) {
     const heading = body?.heading || "";
     const content = body?.content || "";
     const external_id = body?.external_id || [];
+    const options = body?.options || {};
 
-    const res = await sendNotification({ heading, content, external_id });
+    const res = await sendNotification({
+      heading,
+      content,
+      external_id,
+      options,
+    });
 
     if (res?.errors) {
       return NextResponse.json({ data: res?.errors }, { status: 400 });

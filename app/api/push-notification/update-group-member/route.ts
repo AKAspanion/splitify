@@ -30,16 +30,24 @@ export async function POST(req: Request) {
         User,
       ];
       const heading = "Added to group";
-      sendNotification({
-        heading,
-        content: `You have been added in group ${group?.title || ""} by ${creator?.firstName || creator?.name || "Someone"}`,
-        external_id: [friend?.id],
-      }).then((e) => APILogger.info(`Update Group ${friend.id}`, e));
-      sendNotification({
-        heading,
-        content: `You added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
-        external_id: [creator?.id],
-      }).then((e) => APILogger.info(`Update Group ${creator.id}`, e));
+      const notifications = [
+        sendNotification({
+          heading,
+          content: `You have been added in group ${group?.title || ""} by ${creator?.firstName || creator?.name || "Someone"}`,
+          external_id: [friend?.id],
+        }),
+        sendNotification({
+          heading,
+          content: `You added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
+          external_id: [creator?.id],
+        }),
+      ];
+
+      const data = await Promise.allSettled(notifications);
+
+      data.forEach(
+        async (n) => await APILogger.info(`Update Group ${n.status}`, n),
+      );
 
       return NextResponse.json(
         { message: "Messages processed" },

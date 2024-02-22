@@ -15,10 +15,14 @@ export const sendNotification = async ({
   content,
   heading,
   external_id,
+  options = {},
 }: SendNotificationUserbody) => {
   try {
+    const { url } = options;
     const target_channel = "push";
     const notificationBody = {
+      web_url: url,
+      app_url: url,
       target_channel,
       contents: { en: content },
       headings: { en: heading },
