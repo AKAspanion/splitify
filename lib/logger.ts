@@ -14,7 +14,8 @@ export class APILogger {
     }
     if (LOG_TO_DB) {
       try {
-        await db.log.create({ data: { type, message, utcTime } });
+        const buff = Buffer.from(log, "utf8");
+        await db.log.create({ data: { type, message, utcTime, body: buff } });
       } catch (error) {
         console.error("Failed to log to db");
       }

@@ -22,9 +22,8 @@ const LogsList = async () => {
       {noData ? (
         <NoData title="No logs found" />
       ) : (
-        <div className="py-8">
+        <div className="">
           <Table>
-            <TableCaption>List of logs.</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">Type</TableHead>
@@ -40,7 +39,9 @@ const LogsList = async () => {
                   <TableCell className="font-medium">{log.type}</TableCell>
                   <TableCell>{log.utcTime}</TableCell>
                   <TableCell>{log.message}</TableCell>
-                  <TableCell>{(log?.body || "").toString("utf8")}</TableCell>
+                  <TableCell>
+                    {(log?.body || "").toString("utf8")}
+                  </TableCell>
                   <TableCell>{String(log.createdAt)}</TableCell>
                 </TableRow>
               ))}
