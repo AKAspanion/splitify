@@ -73,4 +73,24 @@ export class NotificationService {
       console.log(error);
     }
   }
+
+  public static async deleteExpense(
+    userId: string,
+    expenseDesc: string,
+    groupId?: string,
+  ) {
+    try {
+      await fetch("/api/push-notification/delete-expense", {
+        method: "POST",
+        headers: { "Content-Type": ContentType },
+        body: JSON.stringify({
+          groupId: groupId || "",
+          expenseDesc,
+          userId,
+        } satisfies DeleteExpenseNotificationBody),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

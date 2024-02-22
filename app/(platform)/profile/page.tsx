@@ -33,6 +33,9 @@ const ProfilePage = () => {
             </Button>
             <div className="flex-1" />
             <DarkModeToggle />
+            <Button variant="secondary" onClick={() => router.push("/logs")}>
+              Logs
+            </Button>
             <Button
               variant="secondary"
               onClick={() => signOut(() => router.push("/"))}

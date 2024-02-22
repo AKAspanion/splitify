@@ -124,3 +124,18 @@ model Notification {
 
   @@index([forUserId])
 }
+
+model Log {
+  id        String    @id @default(nanoid())
+  type      LogType
+  message   String
+  utcTime   String
+  body      Bytes?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+enum LogType {
+  INFO
+  ERROR
+}

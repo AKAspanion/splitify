@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { Group, User } from "@prisma/client";
 import { db } from "@/lib/db";
+import { APILogger } from "@/lib/logger";
 
 export async function POST(req: Request) {
   try {
@@ -33,12 +34,12 @@ export async function POST(req: Request) {
         heading,
         content: `You have been added in group ${group?.title || ""} by ${creator?.firstName || creator?.name || "Someone"}`,
         external_id: [friend?.id],
-      });
+      }).then((e) => APILogger.info(`Update Group ${friend.id}`, e));
       sendNotification({
         heading,
         content: `You added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
         external_id: [creator?.id],
-      });
+      }).then((e) => APILogger.info(`Update Group ${creator.id}`, e));
 
       return NextResponse.json(
         { message: "Messages processed" },

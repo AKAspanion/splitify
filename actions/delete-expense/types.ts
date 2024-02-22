@@ -8,5 +8,5 @@ import { DeleteExpense } from "./schema";
 export type InputType = z.infer<typeof DeleteExpense>;
 export type ReturnType = ActionState<
   InputType,
-  { message: string; groupId?: string }
+  { message: string; userId: string; groupId?: string; expenseDesc: string }
 >;

@@ -1,5 +1,3 @@
-/** @type {import('next').NextConfig} */
-
 import withSerwistInit from "@serwist/next";
 
 const withSerwist = withSerwistInit({
@@ -8,6 +6,7 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === "development",
 });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [

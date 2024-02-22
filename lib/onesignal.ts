@@ -27,8 +27,6 @@ export const sendNotification = async ({
 
     const data = await postCall("/notifications", notificationBody);
     const res = await data.json();
-    // TODO remove after debugging
-    console.log("Notification res", notificationBody, res);
     return res;
   } catch (e) {
     const error = e as Error;

@@ -5,7 +5,8 @@ import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
-import { PencilIcon, TrashIcon } from "lucide-react";
+import { NotificationService } from "@/lib/notification/service";
+import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -13,9 +14,10 @@ export const Actions = ({ expense }: { expense: FullExpense }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteExpense, {
-    onSuccess: (data) => {
+    onSuccess: ({ userId, groupId, expenseDesc }) => {
       toast.success("Expense deleted successfully");
-      router.push(`/groups/${data?.groupId}`);
+      NotificationService.deleteExpense(userId, expenseDesc, groupId);
+      router.push(`/groups/${groupId}`);
     },
     onError: (error, debug) => {
       console.error(debug);

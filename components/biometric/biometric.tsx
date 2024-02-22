@@ -40,6 +40,7 @@ export const Biometric = () => {
     if (data && data?.length < 1) {
       setOpen(false);
       setLoading(false);
+      sessionStorage.setItem("verified", "true");
       return;
     }
 

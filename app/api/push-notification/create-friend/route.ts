@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { Group, User } from "@prisma/client";
 import { db } from "@/lib/db";
+import { APILogger } from "@/lib/logger";
 
 export async function POST(req: Request) {
   try {
@@ -27,12 +28,12 @@ export async function POST(req: Request) {
         heading,
         content: `You have added ${friend?.firstName || friend?.name || "Someone"} as your friend`,
         external_id: [creator?.id],
-      });
+      }).then((e) => APILogger.info(`New friendship ${creator.id}`, e));
       sendNotification({
         heading,
         content: `${creator?.firstName || creator?.name || "Someone"} added you as your friend}`,
         external_id: [friend?.id],
-      });
+      }).then((e) => APILogger.info(`New friendship ${friend.id}`, e));
 
       return NextResponse.json(
         { message: "Messages processed" },

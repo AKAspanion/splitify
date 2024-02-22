@@ -4,6 +4,12 @@ type CreateExpenseNotificationBody = {
   expenseId: string;
 };
 
+type DeleteExpenseNotificationBody = {
+  userId: string;
+  groupId: string;
+  expenseDesc: string;
+};
+
 type UpdateGroupMemberNotificationBody = {
   userId: string;
   groupId: string;

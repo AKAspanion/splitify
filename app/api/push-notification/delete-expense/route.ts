@@ -15,37 +15,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body: CreateExpenseNotificationBody = await req.json();
+    const body: DeleteExpenseNotificationBody = await req.json();
 
     const groupId = body?.groupId;
-    const expenseId = body?.expenseId;
     const creatorId = body?.userId;
+    const expenseName = body?.expenseDesc;
 
-    if (creatorId && groupId && expenseId) {
+    if (creatorId && groupId && expenseName) {
       const promises = [
         db.group.findUnique({
           where: { id: groupId },
           include: { users: true },
         }),
-        db.expense.findUnique({ where: { id: expenseId } }),
         db.user.findUnique({ where: { id: creatorId } }),
       ];
-      const [group, exp, user] = (await Promise.all(promises)) as [
+      const [group, user] = (await Promise.all(promises)) as [
         GroupWIthUsers,
-        Expense,
         User,
       ];
 
       const notifyUsers = group.users || [];
       const notifications = notifyUsers.map((u) => ({
-        heading: `Expense added`,
-        content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
+        heading: `Expense deleted`,
+        content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} deleted expense ${expenseName} in group ${group?.title}`,
         external_id: [u.id],
       }));
 
       notifications.forEach((n) =>
         sendNotification(n).then((e) =>
-          APILogger.info(`Expense added ${n.content}`, e),
+          APILogger.info(`Expense deleted ${n.content}`, e),
         ),
       );
 

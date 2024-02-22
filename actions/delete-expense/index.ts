@@ -17,8 +17,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   const { expenseId, groupId } = data;
 
+  let expense;
   try {
-    await db.expense.delete({ where: { groupId, id: expenseId } });
+    expense = await db.expense.delete({ where: { groupId, id: expenseId } });
   } catch (error) {
     return {
       error: "Failed to delete expense",
@@ -28,7 +29,14 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/groups/${groupId || ""}`);
   revalidatePath(`/expense/add`);
-  return { data: { message: "Deleted", groupId } };
+  return {
+    data: {
+      message: "Deleted",
+      groupId,
+      userId,
+      expenseDesc: expense?.description || "",
+    },
+  };
 };
 
 export const deleteExpense = createSafeAction(DeleteExpense, handler);
