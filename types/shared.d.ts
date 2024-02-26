@@ -9,3 +9,5 @@ export type ExpenseWithPaymentWithSplit = Expense & {
 };
 
 export type GroupWIthUsers = Group & { users: User[] };
+
+export type GroupWIthExpenses = Group & { expenses: Expense[] };

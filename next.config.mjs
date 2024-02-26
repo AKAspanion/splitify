@@ -1,11 +1,3 @@
-import withSerwistInit from "@serwist/next";
-
-const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-  disable: true,
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -29,4 +21,4 @@ const nextConfig = {
   },
 };
 
-export default withSerwist(nextConfig);
+export default nextConfig;

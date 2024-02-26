@@ -43,7 +43,7 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
   const expense = await db.expense.findUnique({
     where: { id: expenseId, groupId },
     include: {
-      User: true,
+      user: true,
       payments: { include: { user: true } },
       splits: { include: { user: true } },
     },
@@ -53,8 +53,8 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
 
   const addedBy = replaceUserWithYou(
     userId,
-    expense?.User?.id,
-    expense?.User?.name,
+    expense?.user?.id,
+    expense?.user?.name,
   );
 
   const createDate = expense?.createdAt

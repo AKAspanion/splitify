@@ -40,7 +40,6 @@ export const Search = ({
     <div className="relative rounded-md shadow-sm">
       <Input
         value={text}
-        defaultValue={text}
         placeholder="Search groups..."
         onChange={(e) => setText(e.target.value)}
       />

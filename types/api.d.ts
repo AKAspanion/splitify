@@ -20,3 +20,11 @@ type CreateFriendNotificationBody = {
   userId: string;
   friendId: string;
 };
+
+type GenerateGroupReportBody = {
+  groupId: string;
+};
+
+type GenerateExpenseReportBody = {
+  expenseId: string;
+};

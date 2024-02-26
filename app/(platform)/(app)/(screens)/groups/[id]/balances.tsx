@@ -13,8 +13,8 @@ const Balances = async ({
   const expenses = await db.expense.findMany({
     where: { groupId: id },
     include: {
-      User: true,
-      Group: true,
+      user: true,
+      group: true,
       payments: { include: { user: true } },
       splits: { include: { user: true } },
     },

@@ -11,6 +11,7 @@ import { NoData } from "@/components/no-data";
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
+import { DownloadReport } from "./_components/download-report";
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   loading: () => (
@@ -30,11 +31,6 @@ const GroupDetails = async ({
   backUrl: string;
 }) => {
   const { userId } = auth();
-
-  // const group = await db.group.findUnique({
-  //   where: { id, users: { some: { id: userId || "null" } } },
-  //   include: { users: true },
-  // });
 
   const [group, expenseCount] = await db.$transaction([
     db.group.findUnique({
@@ -57,11 +53,14 @@ const GroupDetails = async ({
           backTo="/groups"
           title={""}
           actions={
-            <Link href={`/groups/${id}/settings`}>
-              <Button variant="ghost" size="icon">
-                <SettingsIcon />
-              </Button>
-            </Link>
+            <>
+              <DownloadReport />
+              <Link href={`/groups/${id}/settings`}>
+                <Button variant="ghost" size="icon">
+                  <SettingsIcon />
+                </Button>
+              </Link>
+            </>
           }
         />
       }
@@ -92,7 +91,8 @@ const GroupDetails = async ({
         <>
           {group && noUsers ? (
             <NoData
-              title="You are alone here"
+              title="It's so quiet here"
+              subtitle="Start adding expense and/or group members"
               action={
                 <Link href={`/groups/${group.id}/add-member?back=${backUrl}`}>
                   <Button type="button" variant={"outline"}>

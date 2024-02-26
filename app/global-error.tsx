@@ -11,8 +11,9 @@ export default function GlobalError({
 }) {
   return (
     <html>
-      <body>
+      <body className="p-6">
         <h2>Something went wrong!</h2>
+        <code className="py-4">{error?.message}</code>
         <Button onClick={() => reset()}>Try again</Button>
       </body>
     </html>

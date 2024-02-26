@@ -30,10 +30,10 @@ model User {
   // to satisfy prisma's requirements; we won't access it directly.
   symmetricFriends User[] @relation("UserFriends")
 
-  Expense      Expense[]
-  UserSplit    UserSplit[]
-  UserPayment  UserPayment[]
-  Notification Notification[]
+  expenses      Expense[]
+  userSplits    UserSplit[]
+  userPayments  UserPayment[]
+  notifications Notification[]
 
   @@index([id])
 }
@@ -51,8 +51,8 @@ model Expense {
   updatedAt   DateTime?     @updatedAt
   payments    UserPayment[]
   splits      UserSplit[]
-  Group       Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  User        User          @relation(fields: [createrId], references: [id])
+  group       Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [createrId], references: [id])
 
   @@index([groupId])
   @@index([createrId])
@@ -101,7 +101,7 @@ model Group {
   mute      Boolean?  @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
-  Expense   Expense[]
+  expenses   Expense[]
   users     User[]
 }
 
