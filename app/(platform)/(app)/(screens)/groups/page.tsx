@@ -7,7 +7,7 @@ const GroupList = dynamic(() => import("./group-list"), {
 });
 
 const GroupsPage = async (props: ServerSideComponentProp) => {
-  const keyString = `show=${props.searchParams?.["show"]}`;
+  const keyString = `show=${props.searchParams?.["show"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
   return (
     <Suspense key={keyString} fallback={<ScreenSkeleton />}>
       <GroupList {...props} />

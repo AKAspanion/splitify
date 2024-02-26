@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { SearchIcon, UserRoundPlusIcon } from "lucide-react";
+import { CrossIcon, SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
@@ -9,19 +9,28 @@ import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import dynamic from "next/dynamic";
 import { BalancesLoader } from "./[id]/balances-loader";
+import { urlEncode } from "@/utils/func";
+import { Search } from "../../_components/search";
 
 const Balances = dynamic(() => import("./[id]/balances"), {
   loading: () => <BalancesLoader dense onlyList />,
 });
 
 const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
-  const showAll = searchParams["show"] === "all";
+  const show = searchParams["show"] === "all";
+  const search = searchParams["search"] === "yes";
+  const searchText = searchParams["text"];
+
   const { userId } = auth();
 
   const query = {
-    take: showAll ? undefined : 5,
-    where: { users: { some: { id: userId || "null" } } },
+    take: show ? undefined : 5,
+    where: {
+      users: { some: { id: userId || "null" } },
+      title: { contains: searchText },
+    },
   };
+
   const [groups, count] = await db.$transaction([
     db.group.findMany({
       ...query,
@@ -32,16 +41,54 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
 
   const noData = count === 0;
 
+  const showAll = !show && count > 5;
+
+  const searchUrl = urlEncode({
+    path: "/groups",
+    query: { ...searchParams, search: "yes" },
+  });
+
+  const searchUrlClose = urlEncode({
+    path: "/groups",
+    query: { ...searchParams, search: "", text: "" },
+  });
+
+  const noDataTitle = searchText
+    ? "No results found"
+    : "Groups you create or are added to will show up here";
+
   return (
     <AutoContainer
       header={
         <Header
-          title="Groups"
+          title={"Groups"}
           actions={
             <>
-              {/* <Button disabled variant="ghost" size="icon">
-                <SearchIcon />
-              </Button> */}
+              {search ? (
+                <>
+                  <Search
+                    searchParams={searchParams}
+                    queryText={searchText}
+                    path={"/groups"}
+                  />
+                  <Link href={searchUrlClose}>
+                    <Button
+                      className="text-red-500"
+                      variant="ghost"
+                      size="icon"
+                    >
+                      <XIcon />
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Link href={searchUrl}>
+                  <Button variant="ghost" size="icon">
+                    <SearchIcon />
+                  </Button>
+                </Link>
+              )}
+
               <Link href="/groups/add">
                 <Button variant="ghost" size="icon">
                   <UserRoundPlusIcon />
@@ -60,7 +107,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
               group={g}
               description={
                 <div className={"pt-1"}>
-                  <Balances id={g.id} onlyList />
+                  {search ? null : <Balances id={g.id} onlyList />}
                 </div>
               }
             />
@@ -69,13 +116,10 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
       </div>
 
       {noData ? (
-        <NoData
-          title="Groups you create or are added to will show up here"
-          action={<CreateButton />}
-        />
+        <NoData title={noDataTitle} action={<CreateButton />} />
       ) : (
         <div className="w-full flex flex-col gap-6 items-center py-8">
-          {!showAll ? (
+          {showAll ? (
             <Link href="/groups?show=all">
               <Button type="button" variant={"secondary"}>
                 <div>Show all {count} groups</div>
