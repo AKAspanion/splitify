@@ -30,10 +30,10 @@ model User {
   // to satisfy prisma's requirements; we won't access it directly.
   symmetricFriends User[] @relation("UserFriends")
 
-  expenses      Expense[]
-  userSplits    UserSplit[]
-  userPayments  UserPayment[]
-  notifications Notification[]
+  expenses     Expense[]
+  userSplits   UserSplit[]
+  userPayments UserPayment[]
+  activity     Activity[]
 
   @@index([id])
 }
@@ -94,15 +94,17 @@ model UserSplit {
 }
 
 model Group {
-  id        String    @id @default(nanoid())
-  title     String
-  image_url String?
-  type      String?
-  mute      Boolean?  @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  expenses   Expense[]
-  users     User[]
+  id          String         @id @default(nanoid())
+  title       String
+  description String?
+  image_url   String?
+  type        String?
+  mute        Boolean?       @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime?      @updatedAt
+  users       User[]
+  expenses    Expense[]
+  activity    Activity[]
 }
 
 model AuthnDevice {
@@ -114,16 +116,19 @@ model AuthnDevice {
   updatedAt DateTime? @updatedAt
 }
 
-model Notification {
-  id        String    @id @default(nanoid())
-  heading   String
-  content   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  forUserId String
-  forUser   User      @relation(fields: [forUserId], references: [id])
+model Activity {
+  id        String           @id @default(nanoid())
+  message   String
+  type      ActivityType
+  createdAt DateTime         @default(now())
+  updatedAt DateTime?        @updatedAt
+  groupId   String
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([forUserId])
+  @@index([groupId])
+  @@index([userId])
 }
 
 model Log {
@@ -139,4 +144,13 @@ model Log {
 enum LogType {
   INFO
   ERROR
+}
+
+enum ActivityType {
+  EXPENSE_MINUS
+  EXPENSE_PLUS
+  MEMBER_MINUS
+  MEMBER_PLUS
+  SYSTEM
+  USER
 }

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CrossIcon, SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
+import { SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
@@ -105,8 +105,8 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
             <GroupCard
               key={g.id}
               group={g}
-              description={
-                <div className={"pt-1"}>
+              action={
+                <div className={"pt-1 text-xs font-light"}>
                   {search ? null : <Balances id={g.id} onlyList />}
                 </div>
               }

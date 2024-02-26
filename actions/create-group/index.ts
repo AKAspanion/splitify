@@ -15,12 +15,18 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { title, type, image_url } = data;
+  const { title, type, description, image_url } = data;
 
   let group;
   try {
     group = await db.group.create({
-      data: { type, title, image_url, users: { connect: [{ id: userId }] } },
+      data: {
+        type,
+        title,
+        image_url,
+        description,
+        users: { connect: [{ id: userId }] },
+      },
     });
   } catch (error) {
     return {
@@ -31,7 +37,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/groups/add`);
   revalidatePath(`/groups/${group.id}`);
-  return { data: group };
+  return { data: { group, userId } };
 };
 
 export const createGroup = createSafeAction(CreateGroup, handler);

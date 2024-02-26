@@ -16,6 +16,11 @@ type UpdateGroupMemberNotificationBody = {
   friendId: string;
 };
 
+type CreateGroupNotificationBody = {
+  userId: string;
+  groupId: string;
+};
+
 type CreateFriendNotificationBody = {
   userId: string;
   friendId: string;

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { UserIcon, UsersRoundIcon } from "lucide-react";
+import { ActivityIcon, UserIcon, UsersRoundIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
 export const NavbarBottom = () => {
@@ -28,6 +28,14 @@ export const NavbarBottom = () => {
               size="icon"
             >
               <UserIcon />
+            </Button>
+          </Link>
+          <Link href="/activity">
+            <Button
+              variant={pathname.includes("activity") ? "outline" : "ghost"}
+              size="icon"
+            >
+              <ActivityIcon className="w-5 h-5" />
             </Button>
           </Link>
           {user ? (

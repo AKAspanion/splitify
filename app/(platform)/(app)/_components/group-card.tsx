@@ -7,18 +7,19 @@ import Link from "next/link";
 
 type GroupCardProps = {
   group: Group | null;
+  action?: React.ReactNode;
   description?: React.ReactNode;
 };
 
 export const GroupCard = (props: GroupCardProps) => {
-  const { group, description } = props;
+  const { group, action, description } = props;
 
   const type = group?.type as GroupType;
   const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
 
   return !group ? null : (
     <Link href={`/groups/${group.id}`}>
-      <div className="rounded">
+      <div className="rounded flex justify-between items-center">
         <div className="flex items-stretch gap-4 ">
           {group?.image_url ? (
             <div className="w-16 h-16 relative rounded overflow-hidden">
@@ -43,12 +44,16 @@ export const GroupCard = (props: GroupCardProps) => {
               <div className="text-md font-semibold">
                 {group?.title || "-"}{" "}
               </div>
+              {group?.description ? (
+                <div className="text-xs font-light">{group?.description}</div>
+              ) : null}
               {description ? (
                 <div className="text-xs font-light">{description}</div>
               ) : null}
             </div>
           </div>
         </div>
+        {action ? action : null}
       </div>
     </Link>
   );

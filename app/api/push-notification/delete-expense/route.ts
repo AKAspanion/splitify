@@ -1,8 +1,6 @@
 import { db } from "@/lib/db";
-import { GroupWIthUsers } from "@/types/shared";
 import { getYouKeyword } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
-import { Expense, User } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { APILogger } from "@/lib/logger";
@@ -22,29 +20,35 @@ export async function POST(req: Request) {
     const expenseName = body?.expenseDesc;
 
     if (creatorId && groupId && expenseName) {
-      const promises = [
+      const [group, creator] = await db.$transaction([
         db.group.findUnique({
           where: { id: groupId },
           include: { users: true },
         }),
         db.user.findUnique({ where: { id: creatorId } }),
-      ];
-      const [group, user] = (await Promise.all(promises)) as [
-        GroupWIthUsers,
-        User,
-      ];
+      ]);
 
-      const notifyUsers = group.users || [];
-      const notifications = notifyUsers.map((u) =>
+      const notifyUsers = group?.users || [];
+      const notifications = notifyUsers?.map((u) =>
         sendNotification({
           heading: `Expense deleted`,
-          content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} deleted expense ${expenseName} in group ${group?.title}`,
+          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} deleted expense ${expenseName} in group ${group?.title}`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}` },
         }),
       );
+      const activities = [
+        db.activity.create({
+          data: {
+            groupId,
+            type: "EXPENSE_MINUS",
+            userId: creatorId,
+            message: `${creator?.name || creator?.firstName || "Someone"} added expense deleted expense ${expenseName} in group ${group?.title}`,
+          },
+        }),
+      ];
 
-      const data = await Promise.allSettled(notifications);
+      const data = await Promise.allSettled([...notifications, ...activities]);
 
       data.forEach(
         async (n) => await APILogger.info(`Expense deleted ${n.status}`, n),

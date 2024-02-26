@@ -1,5 +1,6 @@
 import {
   Clapperboard,
+  Folders,
   Heart,
   Home,
   LucideIcon,
@@ -10,11 +11,19 @@ import {
   ReceiptText,
   Star,
   Store,
+  Ticket,
   Train,
   Utensils,
 } from "lucide-react";
 
-export const GROUP_TYPES = ["trip", "home", "couple", "other"] as const;
+export const GROUP_TYPES = [
+  "trip",
+  "home",
+  "couple",
+  "project",
+  "event",
+  "other",
+] as const;
 
 export type GroupType = (typeof GROUP_TYPES)[number];
 
@@ -22,6 +31,8 @@ export const GROUP_CATEGORY_ICONS: Record<GroupType, LucideIcon> = {
   ["trip"]: PlaneTakeoff,
   ["home"]: Home,
   ["couple"]: Heart,
+  ["project"]: Folders,
+  ["event"]: Ticket,
   ["other"]: NotepadText,
 };
 

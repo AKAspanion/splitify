@@ -12,39 +12,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body: UpdateGroupMemberNotificationBody = await req.json();
+    const body: CreateGroupNotificationBody = await req.json();
     const creatorId = body?.userId;
-    const friendId = body?.friendId;
     const groupId = body?.groupId;
 
-    console.log(creatorId, friendId, groupId);
-
-    if (creatorId && friendId && groupId) {
-      const [group, friend, creator] = await db.$transaction([
+    if (creatorId && groupId) {
+      const [group, creator] = await db.$transaction([
         db.group.findUnique({ where: { id: groupId } }),
-        db.user.findUnique({ where: { id: friendId } }),
         db.user.findUnique({ where: { id: creatorId } }),
       ]);
-      const heading = "Added to group";
+      const heading = "Created group";
       const notifications = [
         sendNotification({
           heading,
-          content: `You have been added in group ${group?.title || ""} by ${creator?.firstName || creator?.name || "Someone"}`,
-          external_id: [friend?.id || ""],
-          options: { url: `/groups/${groupId}` },
-        }),
-        sendNotification({
-          heading,
-          content: `You added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
+          content: `You created group ${group?.title || ""}`,
           external_id: [creator?.id || ""],
           options: { url: `/groups/${groupId}` },
         }),
         db.activity.create({
           data: {
             groupId,
-            type: "MEMBER_PLUS",
+            type: "SYSTEM",
             userId: creatorId,
-            message: `${creator?.name || creator?.firstName || "Someone"} added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
+            message: `${creator?.name || creator?.firstName || "Someone"} created group ${group?.title || ""}`,
           },
         }),
       ];

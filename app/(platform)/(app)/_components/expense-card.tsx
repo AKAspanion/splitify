@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { whoPaidExpense } from "../_utils/expense";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { format } from "date-fns";
+import { relativeDate } from "@/utils/date";
 
 type ExpenseCardProps = {
   expense: ExpenseWithUserPayment;
@@ -24,7 +25,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
   const ExpenseIcon = EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
 
   const createDate = expense?.createdAt
-    ? format(expense?.createdAt, "hh:mm aa, d LLL")
+    ? new Date(expense?.createdAt).toString()
     : "";
 
   return expense ? (
@@ -37,7 +38,11 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
         }
         title={expense.description}
         subtitle={whoPaid}
-        actions={<div className="text-[10px] truncate pb-4">{createDate}</div>}
+        actions={
+          <div className="text-[10px] truncate pb-4 capitalize">
+            {relativeDate(createDate)}
+          </div>
+        }
       />
     </Link>
   ) : null;

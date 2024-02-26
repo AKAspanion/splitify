@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 type ListItemProps = {
-  title: string;
+  title: React.ReactNode;
   disabled?: boolean;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   prefix?: React.ReactNode;
   icon?: React.ReactNode;
   actions?: React.ReactNode;

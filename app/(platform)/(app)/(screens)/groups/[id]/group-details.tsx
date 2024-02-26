@@ -2,7 +2,12 @@ import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
-import { PlusCircleIcon, SettingsIcon, UserPlusIcon } from "lucide-react";
+import {
+  ActivityIcon,
+  PlusCircleIcon,
+  SettingsIcon,
+  UserPlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,6 +59,11 @@ const GroupDetails = async ({
           title={""}
           actions={
             <>
+              <Link href={`/groups/${id}/activity`}>
+                <Button variant="ghost" size="icon">
+                  <ActivityIcon />
+                </Button>
+              </Link>
               <DownloadReport groupId={id} />
               <Link href={`/groups/${id}/settings`}>
                 <Button variant="ghost" size="icon">
@@ -69,7 +79,7 @@ const GroupDetails = async ({
         <GroupCard
           group={group}
           description={
-            <div className="pt-0.5">
+            <div className="pt-1 capitalize">
               {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
             </div>
           }

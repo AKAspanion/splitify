@@ -38,8 +38,8 @@ const FormComp = ({ groups }: FormProps) => {
   const { loading, execute, fieldErrors } = useAction(createExpense, {
     onSuccess: ({ expense, userId }) => {
       toast.success("Expense created successfully");
-      NotificationService.createExpense(userId, expense);
       router.push(`/groups/${expense?.groupId || ""}`);
+      NotificationService.createExpense(userId, expense);
     },
     onError: (error, debug) => {
       console.error(debug);

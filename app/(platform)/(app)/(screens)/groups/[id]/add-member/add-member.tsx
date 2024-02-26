@@ -21,7 +21,7 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
     }),
     db.group.findUnique({
       where: { id, users: { some: { id: userId || "null" } } },
-      select: { users: true },
+      include: { users: true },
     }),
   ]);
 
@@ -63,7 +63,7 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
             key={d.id}
             actions={
               <Action
-                groupId={id}
+                groupId={id || group?.id}
                 memberClerkId={d.id}
                 isInGroup={!!group?.users?.find((u) => u.id === d.id)}
               />

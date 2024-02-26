@@ -23,6 +23,14 @@ export const Navbar = () => {
               Groups
             </Button>
           </Link>
+          <Link href="/activity">
+            <Button
+              className={pathname.includes("activity") ? "underline" : ""}
+              variant="link"
+            >
+              Activity
+            </Button>
+          </Link>
           <Link href="/friends">
             <Button
               className={pathname.includes("friends") ? "underline" : ""}

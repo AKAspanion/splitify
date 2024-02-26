@@ -5,22 +5,23 @@ import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Badge } from "@/components/ui/badge";
-import { GROUP_CATEGORY_ICONS, GROUP_TYPES } from "@/constants/ui";
+import { NotificationService } from "@/lib/notification/service";
+import { GROUP_CATEGORY_ICONS, GROUP_TYPES, GroupType } from "@/constants/ui";
 import { useAction } from "@/hooks/use-action";
 import { randomNumber } from "@/utils/func";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const Form = () => {
   const router = useRouter();
-  const [type, setType] = useState("");
+  const [type, setType] = useState<GroupType | undefined>(undefined);
   const { execute, fieldErrors } = useAction(createGroup, {
-    onSuccess: (data) => {
-      router.push(`/groups/${data.id}`);
+    onSuccess: ({ group, userId }) => {
+      router.push(`/groups/${group.id}`);
       toast.success("Group created successfully");
+      NotificationService.createGroup(userId, group.id);
     },
     onError: (error, debug) => {
       console.error(debug);
@@ -30,45 +31,34 @@ const Form = () => {
 
   const onSubmit = async (formData: FormData) => {
     const title = formData.get("title") as string;
-    // const imgFile = formData.get("image") as File;
+    const description = formData.get("description") as string;
 
     const imageId = randomNumber(1, 20);
     let image_url = `/images/placeholder/groups/${imageId}.png`;
-    // if (imgFile) {
-    //   try {
-    //     setLoading(true);
-    //     const images = await uploadFiles("imageUploader", {
-    //       files: [imgFile],
-    //     });
-    //     console.log(images);
-    //     image_url = images?.[0]?.url || image_url;
-    //     setLoading(false);
-    //   } catch (error) {setLoading(false);}
-    // }
 
-    execute({ title, type, image_url });
+    execute({ title, type, image_url, description });
   };
 
-  const handleTypeChange = (t: string) => {
-    setType((s) => (s === t ? "" : t));
+  const handleTypeChange = (t: GroupType) => {
+    setType((s) => (s === t ? undefined : t));
   };
 
   return (
     <form className="flex flex-col gap-6" action={onSubmit}>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
-        {/* <FormInput
-          label="Image"
-          id="image"
-          name="image"
-          type="file"
-          accept="image/png, image/gif, image/jpeg"
-        /> */}
         <FormInput
           label="Group name"
           id="title"
           name="title"
           placeholder="Enter a group name"
           errors={fieldErrors?.title}
+        />
+        <FormInput
+          label="Description"
+          id="escription"
+          name="description"
+          placeholder="Enter a description"
+          errors={fieldErrors?.description}
         />
         <div>
           <Label className="text-sm font-semi-bold text-neutral-700 dark:text-neutral-50">

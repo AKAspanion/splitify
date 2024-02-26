@@ -20,8 +20,8 @@ export const Actions = ({
   const { execute, loading } = useAction(deleteExpense, {
     onSuccess: ({ userId, groupId, expenseDesc }) => {
       toast.success("Expense deleted successfully");
-      NotificationService.deleteExpense(userId, expenseDesc, groupId);
       router.push(`/groups/${groupId}`);
+      NotificationService.deleteExpense(userId, expenseDesc, groupId);
     },
     onError: (error, debug) => {
       console.error(debug);

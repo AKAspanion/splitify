@@ -26,6 +26,22 @@ export class NotificationService {
     }
   }
 
+  public static async createGroup(userId: string, groupId: string) {
+    try {
+      const data = await fetch("/api/push-notification/create-group", {
+        method: "POST",
+        headers: { "Content-Type": ContentType },
+        body: JSON.stringify({
+          userId,
+          groupId,
+        } satisfies CreateGroupNotificationBody),
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   public static async createFriend(userId: string, friendId: string) {
     try {
       const data = await fetch("/api/push-notification/update-group-member", {

@@ -1,8 +1,6 @@
 import { db } from "@/lib/db";
-import { GroupWIthUsers } from "@/types/shared";
 import { getYouKeyword } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
-import { Expense, User } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { APILogger } from "@/lib/logger";
@@ -22,31 +20,37 @@ export async function POST(req: Request) {
     const creatorId = body?.userId;
 
     if (creatorId && groupId && expenseId) {
-      const promises = [
+      const [group, exp, creator] = await db.$transaction([
         db.group.findUnique({
           where: { id: groupId },
           include: { users: true },
         }),
         db.expense.findUnique({ where: { id: expenseId } }),
         db.user.findUnique({ where: { id: creatorId } }),
-      ];
-      const [group, exp, user] = (await Promise.all(promises)) as [
-        GroupWIthUsers,
-        Expense,
-        User,
-      ];
+      ]);
 
-      const notifyUsers = group.users || [];
-      const notifications = notifyUsers.map((u) =>
+      const notifyUsers = group?.users || [];
+      const notifications = notifyUsers?.map((u) =>
         sendNotification({
           heading: `Expense added`,
-          content: `${getYouKeyword(u?.id, creatorId, user?.firstName || user?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
+          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} added expense ${exp?.description} in group ${group?.title}`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}/expense/${expenseId}` },
         }),
       );
 
-      const data = await Promise.allSettled(notifications);
+      const activities = [
+        db.activity.create({
+          data: {
+            groupId,
+            type: "EXPENSE_PLUS",
+            userId: creatorId,
+            message: `${creator?.name || creator?.firstName || "Someone"} added expense ${exp?.description || ""} in group ${group?.title || ""}`,
+          },
+        }),
+      ];
+
+      const data = await Promise.allSettled([...notifications, ...activities]);
 
       data.forEach(
         async (n) => await APILogger.info(`Expense added ${n.status}`, n),
