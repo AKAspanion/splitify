@@ -24,7 +24,7 @@ export const UserAvatars = (props: UserAvatarsProps) => {
       ))}
       <div
         className="absolute"
-        style={{ left: `${(users?.length || 0) * 28 + 32}px` }}
+        style={{ left: `${(users?.length || 0) * 28 + 24}px` }}
       >
         {action}
       </div>

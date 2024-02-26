@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 
@@ -32,16 +31,24 @@ const GroupDetails = async ({
 }) => {
   const { userId } = auth();
 
-  const group = await db.group.findUnique({
-    where: { id, users: { some: { id: userId || "null" } } },
-    include: { users: true },
-  });
+  // const group = await db.group.findUnique({
+  //   where: { id, users: { some: { id: userId || "null" } } },
+  //   include: { users: true },
+  // });
+
+  const [group, expenseCount] = await db.$transaction([
+    db.group.findUnique({
+      where: { id, users: { some: { id: userId || "null" } } },
+      include: { users: true },
+    }),
+    db.expense.count({ where: { groupId: id } }),
+  ]);
 
   const noUsers =
     !group?.users ||
     (group?.users?.length == 1 && group?.users[0].id === userId);
 
-  const noData = !group || noUsers;
+  const noData = !expenseCount ? !group || noUsers : false;
 
   return (
     <AutoContainer
@@ -68,21 +75,18 @@ const GroupDetails = async ({
             </div>
           }
         />
-
-        {noUsers ? null : (
-          <UserAvatars
-            users={group?.users}
-            action={
-              <div className="h-10 flex items-center justify-center">
-                <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
-                  <Button variant="ghost" size="icon">
-                    <PlusCircleIcon className="text-sparkle" />
-                  </Button>
-                </Link>
-              </div>
-            }
-          />
-        )}
+        <UserAvatars
+          users={group?.users}
+          action={
+            <div className="h-10 flex items-center justify-center">
+              <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
+                <Button variant="ghost" size="icon">
+                  <PlusCircleIcon className="text-sparkle" />
+                </Button>
+              </Link>
+            </div>
+          }
+        />
       </div>
       {noData ? (
         <>
