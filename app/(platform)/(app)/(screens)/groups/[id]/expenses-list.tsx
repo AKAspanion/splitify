@@ -7,7 +7,8 @@ const ExpensesList = async ({ id }: { id: string }) => {
   const { userId } = auth();
   const expenses = await db.expense.findMany({
     where: { groupId: id },
-    include: { splits: true, payments: { include: { user: true } } },
+    orderBy: [{ createdAt: "desc" }],
+    include: { payments: { include: { user: true } } },
   });
 
   const noExpenses = !expenses || expenses?.length == 0;

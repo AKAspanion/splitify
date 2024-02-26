@@ -10,20 +10,21 @@ const Balances = async ({
   onlyList?: boolean;
 }) => {
   const { userId } = auth();
-  const expenses = await db.expense.findMany({
-    where: { groupId: id },
-    include: {
-      user: true,
-      group: true,
-      payments: { include: { user: true } },
-      splits: { include: { user: true } },
-    },
-  });
 
-  const group = await db.group.findUnique({
-    where: { id, users: { some: { id: userId || "null" } } },
-    include: { users: true },
-  });
+  const [expenses, group] = await db.$transaction([
+    db.expense.findMany({
+      where: { groupId: id },
+      orderBy: [{ createdAt: "desc" }],
+      include: {
+        payments: { include: { user: true } },
+        splits: { include: { user: true } },
+      },
+    }),
+    db.group.findUnique({
+      where: { id, users: { some: { id: userId || "null" } } },
+      include: { users: true },
+    }),
+  ]);
 
   return <BalancesList expenses={expenses} group={group} onlyList={onlyList} />;
 };

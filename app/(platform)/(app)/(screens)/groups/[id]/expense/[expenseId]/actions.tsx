@@ -1,16 +1,20 @@
 "use client";
 import { deleteExpense } from "@/actions/delete-expense";
-import { FullExpense } from "@/app/(platform)/(app)/_components/expense-card";
 import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { NotificationService } from "@/lib/notification/service";
+import { ExpenseWithUserWithPaymentWithSplit } from "@/types/shared";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const Actions = ({ expense }: { expense: FullExpense }) => {
+export const Actions = ({
+  expense,
+}: {
+  expense: ExpenseWithUserWithPaymentWithSplit | null;
+}) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteExpense, {

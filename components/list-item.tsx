@@ -33,7 +33,7 @@ export const ListItem = (props: ListItemProps) => {
           </div>
         </div>
       </div>
-      {actions ? <div>{actions}</div> : null}
+      {actions ? actions : null}
     </div>
   );
 };

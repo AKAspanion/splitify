@@ -12,7 +12,7 @@ const FriendsPage = async () => {
   const { userId } = auth();
   const data = await db.user.findUnique({
     where: { id: userId || "null" },
-    include: { friends: true },
+    select: { friends: true },
   });
 
   const noData = !data?.friends || data?.friends?.length === 0;

@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { GROUP_CATEGORY_ICONS, GroupType } from "@/constants/ui";
 import { Group } from "@prisma/client";
-import { ListIcon, NotepadText } from "lucide-react";
+import { NotepadText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 

@@ -13,21 +13,23 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
   const backTo = searchParams["back"];
   const { userId } = auth();
-  const data = await db.user.findUnique({
-    where: { id: userId || "null" },
-    include: { friends: true },
-  });
 
-  const group = await db.group.findUnique({
-    where: { id, users: { some: { id: userId || "null" } } },
-    include: { users: true },
-  });
+  const [user, group] = await db.$transaction([
+    db.user.findUnique({
+      where: { id: userId || "null" },
+      select: { friends: true },
+    }),
+    db.group.findUnique({
+      where: { id, users: { some: { id: userId || "null" } } },
+      select: { users: true },
+    }),
+  ]);
 
-  const friendsNotInGroup = data?.friends?.filter(
+  const friendsNotInGroup = user?.friends?.filter(
     (o) => !group?.users?.some(({ id }) => o.id === id),
   );
 
-  const friendsInGroup = data?.friends?.filter((o) =>
+  const friendsInGroup = user?.friends?.filter((o) =>
     group?.users?.some(({ id }) => o.id === id),
   );
 

@@ -8,6 +8,20 @@ export type ExpenseWithPaymentWithSplit = Expense & {
   splits: UserSplitWithUser[];
 };
 
+export type ExpenseWithUserWithPaymentWithSplit =
+  ExpenseWithPaymentWithSplit & {
+    user: User;
+  };
+
+export type ExpenseWithUserPayment = Expense & {
+  payments: UserPaymentWithUser[];
+};
+
+export type PartialExpenseWithPaymentWithSplit = Expense & {
+  payments: Partial<UserPaymentWithUser>[];
+  splits: Partial<UserSplitWithUser>[];
+};
+
 export type GroupWIthUsers = Group & { users: User[] };
 
 export type GroupWIthExpenses = Group & { expenses: Expense[] };

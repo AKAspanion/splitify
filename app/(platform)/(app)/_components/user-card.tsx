@@ -6,7 +6,7 @@ import Image from "next/image";
 type UserCardProps = {
   showMail?: boolean;
   currUserId?: string;
-  user: User | null;
+  user: Partial<User | null>;
   disabled?: boolean;
   actions?: React.ReactNode;
 };

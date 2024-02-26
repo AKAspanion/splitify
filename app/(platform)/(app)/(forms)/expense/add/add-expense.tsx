@@ -9,7 +9,7 @@ const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
   const data = await db.user.findUnique({
     where: { id: userId || "null" },
-    include: { groups: { include: { users: true } } },
+    select: { groups: { include: { users: true } } },
   });
 
   const groups = data?.groups || [];
