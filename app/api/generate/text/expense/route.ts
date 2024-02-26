@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { generateXLS } from "@/lib/excel";
 import { GroupWIthExpenses, GroupWIthUsers } from "@/types/shared";
 import { auth } from "@clerk/nextjs";
+import { Expense } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -27,22 +28,26 @@ export async function POST(req: Request) {
 
       const expenses = group.expenses;
       if (expenses.length > 0) {
-        const xlsBuffer = await generateXLS(
-          `Group 1`,
+        let text = "";
+        const headers: { header: string; key: keyof Expense; width: number }[] =
           [
-            { header: "Description", key: "description", width: 50 },
+            { header: "Description", key: "description", width: 25 },
             { header: "Amount", key: "amount", width: 15 },
             { header: "Category", key: "category", width: 15 },
             { header: "Type", key: "type", width: 15 },
-          ],
-          expenses,
-        );
+          ];
+        text += headers.map((h) => h.header).join(",") + "\n";
+        expenses.forEach((e) => {
+          text += headers?.map(({ key }) => e[key] || "").join(",") + "\n";
+        });
 
-        return new NextResponse(xlsBuffer, {
+        const textBuffer = Buffer.from(text);
+
+        return new NextResponse(textBuffer, {
           status: 200,
           headers: new Headers({
-            "content-disposition": `attachment;filename=${group.title}.xls`,
-            "content-type": "application/vnd.ms-excel",
+            "content-disposition": `attachment;filename=${group.title}.txt`,
+            "content-type": "text/plain",
           }),
         });
       }

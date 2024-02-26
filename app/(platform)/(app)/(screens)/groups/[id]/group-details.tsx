@@ -54,7 +54,7 @@ const GroupDetails = async ({
           title={""}
           actions={
             <>
-              <DownloadReport />
+              <DownloadReport groupId={id} />
               <Link href={`/groups/${id}/settings`}>
                 <Button variant="ghost" size="icon">
                   <SettingsIcon />
