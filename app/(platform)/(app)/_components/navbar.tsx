@@ -17,7 +17,7 @@ export const Navbar = () => {
         <div className="hidden sm:flex items-center pl-8">
           <Link href="/groups">
             <Button
-              className={pathname.includes("groups") ? "underline" : ""}
+              className={pathname.startsWith("/groups") ? "underline" : ""}
               variant="link"
             >
               Groups
@@ -25,7 +25,7 @@ export const Navbar = () => {
           </Link>
           <Link href="/activity">
             <Button
-              className={pathname.includes("activity") ? "underline" : ""}
+              className={pathname.startsWith("/activity") ? "underline" : ""}
               variant="link"
             >
               Activity
@@ -33,7 +33,7 @@ export const Navbar = () => {
           </Link>
           <Link href="/friends">
             <Button
-              className={pathname.includes("friends") ? "underline" : ""}
+              className={pathname.startsWith("/friends") ? "underline" : ""}
               variant="link"
             >
               Friends

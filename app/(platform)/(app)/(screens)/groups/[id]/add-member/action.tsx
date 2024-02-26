@@ -19,7 +19,6 @@ export const Action = ({
 }) => {
   const { execute, loading } = useAction(updateGroupMember, {
     onSuccess: ({ groupId, userId, friendId }) => {
-      console.log(groupId, userId, friendId);
       toast.success("Group member added successfully");
       NotificationService.updateGroupMember(userId, friendId, groupId);
     },

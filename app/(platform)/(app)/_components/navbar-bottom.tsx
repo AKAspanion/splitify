@@ -16,7 +16,7 @@ export const NavbarBottom = () => {
         <div className="flex items-center justify-between w-full">
           <Link href="/groups">
             <Button
-              variant={pathname.includes("groups") ? "outline" : "ghost"}
+              variant={pathname.startsWith("/groups") ? "outline" : "ghost"}
               size="icon"
             >
               <UsersRoundIcon />
@@ -24,7 +24,7 @@ export const NavbarBottom = () => {
           </Link>
           <Link href="/friends">
             <Button
-              variant={pathname.includes("friends") ? "outline" : "ghost"}
+              variant={pathname.startsWith("/friends") ? "outline" : "ghost"}
               size="icon"
             >
               <UserIcon />
@@ -32,7 +32,7 @@ export const NavbarBottom = () => {
           </Link>
           <Link href="/activity">
             <Button
-              variant={pathname.includes("activity") ? "outline" : "ghost"}
+              variant={pathname.startsWith("/activity") ? "outline" : "ghost"}
               size="icon"
             >
               <ActivityIcon className="w-5 h-5" />

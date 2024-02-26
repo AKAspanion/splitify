@@ -17,8 +17,6 @@ export async function POST(req: Request) {
     const friendId = body?.friendId;
     const groupId = body?.groupId;
 
-    console.log(creatorId, friendId, groupId);
-
     if (creatorId && friendId && groupId) {
       const [group, friend, creator] = await db.$transaction([
         db.group.findUnique({ where: { id: groupId } }),
