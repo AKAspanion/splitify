@@ -28,7 +28,7 @@ export const ActivityCard = (props: ActivityCardProps) => {
     ? new Date(activity?.createdAt).toString()
     : "";
 
-  const isCurrUser = currUserId !== activity?.userId;
+  // const isCurrUser = currUserId !== activity?.userId;
 
   const getIcon = () => {
     const type = activity?.type;
