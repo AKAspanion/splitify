@@ -15,7 +15,12 @@ const ActivityList = async (props: ServerSideComponentProp) => {
   });
 
   const activities = await db.activity.findMany({
-    where: { groupId: { in: userGroups.map((u) => u.id) } },
+    where: {
+      OR: [
+        { groupId: { in: userGroups.map((u) => u.id) } },
+        { users: { some: { id: userId || "null" } } },
+      ],
+    },
     orderBy: [{ createdAt: "asc" }],
   });
 

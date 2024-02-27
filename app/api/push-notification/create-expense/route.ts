@@ -44,7 +44,7 @@ export async function POST(req: Request) {
           data: {
             groupId,
             type: "EXPENSE_PLUS",
-            userId: creatorId,
+            users: { connect: [{ id: creatorId }] },
             message: `${creator?.name || creator?.firstName || "Someone"} added expense ${exp?.description || ""} in group ${group?.title || ""}`,
           },
         }),

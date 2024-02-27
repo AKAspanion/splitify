@@ -3,7 +3,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { relativeDate } from "@/utils/date";
 import { Activity } from "@prisma/client";
-import Image from "next/image";
+import {
+  MessageSquareText,
+  FileMinus2,
+  FilePlus2,
+  UserRoundMinus,
+  UserRoundPlus,
+  UserPlus,
+  UserMinus,
+  Info,
+} from "lucide-react";
 
 type ActivityCardProps = {
   currUserId: string | null;
@@ -21,6 +30,28 @@ export const ActivityCard = (props: ActivityCardProps) => {
 
   const isCurrUser = currUserId !== activity?.userId;
 
+  const getIcon = () => {
+    const type = activity?.type;
+    switch (type) {
+      case "GROUP_PLUS":
+        return <UserRoundPlus />;
+      case "GROUP_MINUS":
+        return <UserRoundMinus />;
+      case "MEMBER_PLUS":
+        return <UserPlus />;
+      case "MEMBER_MINUS":
+        return <UserMinus />;
+      case "EXPENSE_PLUS":
+        return <FilePlus2 />;
+      case "EXPENSE_MINUS":
+        return <FileMinus2 />;
+      case "USER":
+        return <MessageSquareText />;
+      default:
+        return <MessageSquareText />;
+    }
+  };
+
   return !activity ? null : (
     <div className={cn()}>
       <ListItem
@@ -30,6 +61,7 @@ export const ActivityCard = (props: ActivityCardProps) => {
         subtitle={
           <div className="capitalize">{relativeDate(activityDate)}</div>
         }
+        prefix={getIcon()}
       />
     </div>
   );

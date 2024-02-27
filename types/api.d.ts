@@ -21,6 +21,12 @@ type CreateGroupNotificationBody = {
   groupId: string;
 };
 
+type DeleteGroupNotificationBody = {
+  userId: string;
+  groupId: string;
+  groupName: string;
+};
+
 type CreateFriendNotificationBody = {
   userId: string;
   friendId: string;

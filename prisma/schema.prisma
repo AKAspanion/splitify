@@ -94,14 +94,14 @@ model UserSplit {
 }
 
 model Group {
-  id          String         @id @default(nanoid())
+  id          String     @id @default(nanoid())
   title       String
   description String?
   image_url   String?
   type        String?
-  mute        Boolean?       @default(false)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime?      @updatedAt
+  mute        Boolean?   @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime?  @updatedAt
   users       User[]
   expenses    Expense[]
   activity    Activity[]
@@ -117,18 +117,16 @@ model AuthnDevice {
 }
 
 model Activity {
-  id        String           @id @default(nanoid())
+  id        String       @id @default(nanoid())
   message   String
   type      ActivityType
-  createdAt DateTime         @default(now())
-  updatedAt DateTime?        @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime?    @updatedAt
   groupId   String
-  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  users     User[]
 
   @@index([groupId])
-  @@index([userId])
 }
 
 model Log {
@@ -151,6 +149,8 @@ enum ActivityType {
   EXPENSE_PLUS
   MEMBER_MINUS
   MEMBER_PLUS
+  GROUP_MINUS
+  GROUP_PLUS
   SYSTEM
   USER
 }

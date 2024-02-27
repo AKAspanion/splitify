@@ -2,6 +2,8 @@ import { Expense } from "@prisma/client";
 
 const ContentType = "application/json";
 
+const options = { method: "POST", headers: { "Content-Type": ContentType } };
+
 export class NotificationService {
   public static async sendNotification(
     heading: string,
@@ -11,8 +13,7 @@ export class NotificationService {
   ) {
     try {
       const data = await fetch("/api/push-notification", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           heading,
           content,
@@ -29,8 +30,7 @@ export class NotificationService {
   public static async createGroup(userId: string, groupId: string) {
     try {
       const data = await fetch("/api/push-notification/create-group", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           userId,
           groupId,
@@ -41,12 +41,30 @@ export class NotificationService {
       console.log(error);
     }
   }
+  public static async deleteGroup(
+    userId: string,
+    groupId: string,
+    groupName: string,
+  ) {
+    try {
+      const data = await fetch("/api/push-notification/delete-group", {
+        ...options,
+        body: JSON.stringify({
+          userId,
+          groupId,
+          groupName,
+        } satisfies DeleteGroupNotificationBody),
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   public static async createFriend(userId: string, friendId: string) {
     try {
       const data = await fetch("/api/push-notification/update-group-member", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           userId,
           friendId,
@@ -65,8 +83,7 @@ export class NotificationService {
   ) {
     try {
       const data = await fetch("/api/push-notification/update-group-member", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           userId,
           friendId,
@@ -82,8 +99,7 @@ export class NotificationService {
   public static async createExpense(userId: string, exp: Expense) {
     try {
       const data = await fetch("/api/push-notification/create-expense", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           groupId: exp?.groupId || "",
           expenseId: exp?.id || "",
@@ -103,8 +119,7 @@ export class NotificationService {
   ) {
     try {
       const data = await fetch("/api/push-notification/delete-expense", {
-        method: "POST",
-        headers: { "Content-Type": ContentType },
+        ...options,
         body: JSON.stringify({
           groupId: groupId || "",
           expenseDesc,

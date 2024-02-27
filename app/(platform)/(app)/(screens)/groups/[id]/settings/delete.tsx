@@ -4,6 +4,7 @@ import useConfirm from "@/components/confirm/useConfirm";
 import { ListItem } from "@/components/list-item";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
+import { NotificationService } from "@/lib/notification/service";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -12,9 +13,10 @@ export const DeleteGroup = ({ id }: { id?: string }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteGroup, {
-    onSuccess: () => {
+    onSuccess: ({ userId, groupId, groupName }) => {
       toast.success("Group deleted successfully");
       router.push(`/groups`);
+      NotificationService.deleteGroup(userId, groupId, groupName);
     },
     onError: (error, debug) => {
       console.error(debug);

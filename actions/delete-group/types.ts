@@ -8,5 +8,5 @@ import { DeleteGroup } from "./schema";
 export type InputType = z.infer<typeof DeleteGroup>;
 export type ReturnType = ActionState<
   InputType,
-  { message: string; groupId?: string }
+  { message: string; groupId: string; groupName: string; userId: string }
 >;

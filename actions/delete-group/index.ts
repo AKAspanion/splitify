@@ -16,18 +16,25 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   const { groupId } = data;
-
+  let group;
   try {
-    await db.group.delete({ where: { id: groupId } });
+    group = await db.group.delete({ where: { id: groupId } });
   } catch (error) {
     return {
-      error: "Failed to delete expense",
+      error: "Failed to delete group",
       debugMessage: getErrorMessage(error).message,
     };
   }
 
   revalidatePath(`/groups`);
-  return { data: { message: "Group deleted", groupId } };
+  return {
+    data: {
+      message: "Group deleted",
+      groupName: group?.title || "",
+      groupId,
+      userId,
+    },
+  };
 };
 
 export const deleteGroup = createSafeAction(DeleteGroup, handler);

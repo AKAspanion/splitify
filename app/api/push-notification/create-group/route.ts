@@ -32,8 +32,8 @@ export async function POST(req: Request) {
         db.activity.create({
           data: {
             groupId,
-            type: "SYSTEM",
-            userId: creatorId,
+            type: "GROUP_PLUS",
+            users: { connect: [{ id: creatorId }] },
             message: `${creator?.name || creator?.firstName || "Someone"} created group ${group?.title || ""}`,
           },
         }),
