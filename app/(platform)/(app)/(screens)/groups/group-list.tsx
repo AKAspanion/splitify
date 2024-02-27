@@ -7,14 +7,8 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { auth } from "@clerk/nextjs";
 import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
-import dynamic from "next/dynamic";
-import { BalancesLoader } from "./[id]/balances-loader";
 import { urlEncode } from "@/utils/func";
 import { Search } from "../../_components/search";
-
-const Balances = dynamic(() => import("./[id]/balances"), {
-  loading: () => <BalancesLoader dense onlyList />,
-});
 
 const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
   const show = searchParams["show"] === "all";
@@ -101,17 +95,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {groups?.map((g) => {
-          return (
-            <GroupCard
-              key={g.id}
-              group={g}
-              action={
-                <div className={"pt-1 text-xs font-light"}>
-                  {search ? null : <Balances id={g.id} onlyList />}
-                </div>
-              }
-            />
-          );
+          return <GroupCard key={g.id} group={g} />;
         })}
       </div>
 

@@ -6,9 +6,9 @@ export default authMiddleware({
     "/api/webhook/clerk",
     "/api/uploadthing",
     "/api/test(.*)",
-    "/api/generate(.*)", // TODO remove
+    "/api/health-check(.*)",
   ],
-  ignoredRoutes: ["/api/webhook/clerk"],
+  ignoredRoutes: ["/api/webhook/clerk", "/api/health-check"],
 });
 
 export const config = {
