@@ -2,25 +2,23 @@ import { db } from "@/lib/db";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
-import {
-  ActivityIcon,
-  PlusCircleIcon,
-  SettingsIcon,
-  UserPlusIcon,
-} from "lucide-react";
+import { ActivityIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Header } from "@/components/container/header";
-import { NoData } from "@/components/no-data";
+import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { DownloadReport } from "./_components/download-report";
 
-const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
+const GroupUsers = dynamic(() => import("./group-users"), {
+  loading: () => <UserAvatarsLoading />,
+});
+
+const GroupExpenses = dynamic(() => import("./group-expenses"), {
   loading: () => (
-    <div className="grid grid-cols-3 gap-2 py-6">
+    <div className="grid grid-cols-3 gap-2 pb-6">
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />
@@ -37,19 +35,9 @@ const GroupDetails = async ({
 }) => {
   const { userId } = auth();
 
-  const [group, expenseCount] = await db.$transaction([
-    db.group.findUnique({
-      where: { id, users: { some: { id: userId || "null" } } },
-      include: { users: true },
-    }),
-    db.expense.count({ where: { groupId: id } }),
-  ]);
-
-  const noUsers =
-    !group?.users ||
-    (group?.users?.length == 1 && group?.users[0].id === userId);
-
-  const noData = !expenseCount ? !group || noUsers : false;
+  const group = await db.group.findUnique({
+    where: { id, users: { some: { id: userId || "null" } } },
+  });
 
   return (
     <AutoContainer
@@ -84,41 +72,9 @@ const GroupDetails = async ({
             </div>
           }
         />
-        <UserAvatars
-          users={group?.users}
-          action={
-            <div className="h-10 flex items-center justify-center">
-              <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
-                <Button variant="ghost" size="icon">
-                  <PlusCircleIcon className="text-sparkle" />
-                </Button>
-              </Link>
-            </div>
-          }
-        />
+        <GroupUsers id={id} backUrl={backUrl} />
+        <GroupExpenses id={id} userId={userId} backUrl={backUrl} />
       </div>
-      {noData ? (
-        <>
-          {group && noUsers ? (
-            <NoData
-              title="It's so quiet here"
-              subtitle="Start adding expense and/or group members"
-              action={
-                <Link href={`/groups/${group.id}/add-member?back=${backUrl}`}>
-                  <Button type="button" variant={"outline"}>
-                    <div className="flex gap-4 items-center">
-                      <div>Add members</div>
-                      <UserPlusIcon />
-                    </div>
-                  </Button>
-                </Link>
-              }
-            />
-          ) : null}
-        </>
-      ) : (
-        <ExpensesTabs id={id} />
-      )}
     </AutoContainer>
   );
 };

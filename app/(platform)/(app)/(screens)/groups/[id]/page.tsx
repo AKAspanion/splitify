@@ -1,7 +1,6 @@
 import { urlEncode } from "@/utils/func";
 import dynamic from "next/dynamic";
 import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
-import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const GroupDetails = dynamic(() => import("./group-details"), {
@@ -16,7 +15,6 @@ const GroupDetails = dynamic(() => import("./group-details"), {
         </div>
       </div>
       <GroupCardLoading />
-      <UserAvatarsLoading />
     </div>
   ),
 });
