@@ -1,13 +1,33 @@
 import { db } from "@/lib/db";
 import { AutoContainer } from "@/components/container/auto-container";
-import { UserPlus } from "lucide-react";
-import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
-import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
-import { ListItem } from "@/components/list-item";
+import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
 import { Header } from "@/components/container/header";
-import { DeleteGroup } from "./delete";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+
+const GroupMembers = dynamic(() => import("./group-members"), {
+  loading: () => (
+    <div className="flex flex-col my-6">
+      <Skeleton className="w-[100px] h-6 rounded-md" />
+      <div className="flex flex-col mt-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <UserCardLoading key={i} />
+        ))}
+      </div>
+    </div>
+  ),
+});
+
+const GroupDelete = dynamic(() => import("./group-delete"), {
+  loading: () => (
+    <div className="my-6">
+      <UserCardLoading />
+    </div>
+  ),
+});
 
 const GroupSettings = async ({
   params,
@@ -19,7 +39,6 @@ const GroupSettings = async ({
 
   const group = await db.group.findUnique({
     where: { id, users: { some: { id: userId || "null" } } },
-    include: { users: true },
   });
 
   return (
@@ -31,24 +50,16 @@ const GroupSettings = async ({
         />
       }
     >
-      <GroupCard group={group} description={group?.type || ""} />
-      <div className="pt-6 pb-3 font-semibold text-normal">Group members</div>
-      <div className="pb-6 flex flex-col gap-4">
-        <Link href={`/groups/${id}/add-member`}>
-          <ListItem title="Add members to group" icon={<UserPlus />} />
-        </Link>
-        {group?.users?.map((d) => (
-          <UserCard
-            showMail={false}
-            currUserId={userId || ""}
-            user={d}
-            key={d.id}
-          />
-        ))}
-        <hr />
-
-        <DeleteGroup id={group?.id} />
-      </div>
+      <GroupCard
+        group={group}
+        description={
+          <div className="pt-1 capitalize">
+            {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+          </div>
+        }
+      />
+      <GroupMembers id={id} userId={userId} />
+      <GroupDelete id={group?.id} />
     </AutoContainer>
   );
 };

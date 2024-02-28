@@ -15,12 +15,6 @@ const GroupSettings = dynamic(() => import("./group-settings"), {
         </div>
       </div>
       <GroupCardLoading />
-      <Skeleton className="w-[100px] h-6 rounded-md" />
-      <div className="flex flex-col gap-4">
-        {[1, 2, 3].map((i) => (
-          <UserCardLoading key={i} />
-        ))}
-      </div>
     </div>
   ),
 });

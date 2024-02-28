@@ -9,7 +9,7 @@ import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const DeleteGroup = ({ id }: { id?: string }) => {
+const GroupDelete = ({ id }: { id?: string }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteGroup, {
@@ -48,3 +48,5 @@ export const DeleteGroup = ({ id }: { id?: string }) => {
     </div>
   );
 };
+
+export default GroupDelete;
