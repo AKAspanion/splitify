@@ -1,23 +1,41 @@
-import { calcExpenseSplits } from "@/app/(platform)/(app)/_utils/calculation";
 import { db } from "@/lib/db";
-import { ExpenseWithPaymentWithSplit } from "@/types/shared";
-import { auth } from "@clerk/nextjs";
 import { BalanceList } from "./balance-list";
+import BalanceSummaryList from "./balance-summary-list";
 
 const Balance = async ({
-  expense,
+  userId,
   groupId,
+  expenseId,
 }: {
+  userId: string | null;
   groupId: string;
-  expense: ExpenseWithPaymentWithSplit | null;
+  expenseId: string;
 }) => {
-  const { userId } = auth();
-  const group = await db.group.findUnique({
-    where: { id: groupId, users: { some: { id: userId || "null" } } },
-    include: { users: true },
-  });
+  const [group, expense] = await db.$transaction([
+    db.group.findUnique({
+      where: { id: groupId, users: { some: { id: userId || "null" } } },
+      select: { users: true },
+    }),
+    db.expense.findUnique({
+      where: { id: expenseId || "null", groupId },
+      include: {
+        payments: { include: { user: true } },
+        splits: { include: { user: true } },
+      },
+    }),
+  ]);
 
-  return <BalanceList expense={expense} group={group} />;
+  return (
+    <>
+      <BalanceSummaryList
+        userId={userId}
+        expense={expense}
+        users={group?.users || []}
+      />
+      <hr />
+      <BalanceList expense={expense} users={group?.users || []} />
+    </>
+  );
 };
 
 export default Balance;

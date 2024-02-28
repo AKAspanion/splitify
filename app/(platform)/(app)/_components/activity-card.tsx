@@ -53,16 +53,21 @@ export const ActivityCard = (props: ActivityCardProps) => {
   };
 
   return !activity ? null : (
-    <div className={cn()}>
-      <ListItem
-        title={activity.message}
-        disabled={disabled}
-        actions={actions}
-        subtitle={
-          <div className="capitalize">{relativeDate(activityDate)}</div>
-        }
-        prefix={getIcon()}
-      />
+    <div>
+      <div className={cn("flex justify-between items-center gap-4")}>
+        <div className="flex items-center gap-4">
+          <div className="w-6 h-6">{getIcon()}</div>
+          <div className="flex items-center">
+            <div className="flex flex-col">
+              <div className="font-normal text-sm">{activity.message}</div>
+              <div className="text-xs font-light">
+                <div className="capitalize">{relativeDate(activityDate)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {actions}
+      </div>
     </div>
   );
 };

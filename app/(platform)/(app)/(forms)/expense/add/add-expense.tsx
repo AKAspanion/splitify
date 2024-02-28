@@ -7,12 +7,12 @@ import { Suspense } from "react";
 
 const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
-  const data = await db.user.findUnique({
-    where: { id: userId || "null" },
-    select: { groups: { include: { users: true } } },
-  });
 
-  const groups = data?.groups || [];
+  const groups = await db.group.findMany({
+    where: { users: { some: { id: userId || "null" } } },
+    include: { users: true },
+    orderBy: [{ createdAt: "desc" }],
+  });
 
   const groupdId = searchParams["groupId"] || "";
   const backTo = groupdId ? `/groups/${groupdId}` : `/groups`;

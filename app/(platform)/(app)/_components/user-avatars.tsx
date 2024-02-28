@@ -1,5 +1,6 @@
 import { ListItem } from "@/components/list-item";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { User } from "@prisma/client";
 import Image from "next/image";
 
@@ -32,11 +33,16 @@ export const UserAvatars = (props: UserAvatarsProps) => {
   );
 };
 
-export const UserAvatarsLoading = () => (
+export const UserAvatarsLoading = ({ lg = false }: { lg?: boolean }) => (
   <div className="flex items-center">
     <Skeleton className="w-10 h-10 rounded-full" />
     <Skeleton className="w-10 h-10 rounded-full -translate-x-3" />
     <Skeleton className="w-10 h-10 rounded-full -translate-x-6" />
-    <Skeleton className="w-6 h-6 rounded-full translate-x-1" />
+    <Skeleton
+      className={cn("h-6 rounded-full translate-x-1", {
+        "w-6": !lg,
+        "w-[120px]": lg,
+      })}
+    />
   </div>
 );

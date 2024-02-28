@@ -5,16 +5,12 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { NotificationService } from "@/lib/notification/service";
-import { ExpenseWithUserWithPaymentWithSplit } from "@/types/shared";
+import { Expense } from "@prisma/client";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const Actions = ({
-  expense,
-}: {
-  expense: ExpenseWithUserWithPaymentWithSplit | null;
-}) => {
+const ExpenseActions = ({ expense }: { expense: Expense | null }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteExpense, {
@@ -59,3 +55,5 @@ export const Actions = ({
     </>
   ) : null;
 };
+
+export default ExpenseActions;

@@ -5,12 +5,13 @@ import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { User } from "@prisma/client";
 
 export const BalanceList = ({
   expense,
-  group,
+  users,
 }: {
-  group: GroupWIthUsers | null;
+  users: User[];
   expense: ExpenseWithPaymentWithSplit | null;
 }) => {
   const { user } = useUser();
@@ -20,13 +21,13 @@ export const BalanceList = ({
       ? calcExpenseSplits(
           user?.id,
           expense,
-          group?.users || [],
+          users || [],
           expense?.payments || [],
           expense?.splits || [],
           detailed,
         ) || []
       : [];
-  }, [detailed, expense, group?.users, user?.id]);
+  }, [detailed, expense, users, user?.id]);
 
   const noDataText = useMemo(() => {
     let text = "";

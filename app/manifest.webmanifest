@@ -32,7 +32,7 @@
   "start_url": "/groups",
   "scope": ".",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait-primary",
   "id": "splitify",
   "description": "Simplify and manage splits, the easy way!",
   "dir": "ltr",

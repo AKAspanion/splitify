@@ -12,11 +12,7 @@ const ExpenseDetails = dynamic(() => import("./expense-details"), {
           <Skeleton className="w-10 h-10 rounded-md" />
         </div>
       </div>
-      <div>
-        <Skeleton className="w-[60px] h-6 mb-1" />
-        <Skeleton className="w-[250px] h-5" />
-      </div>
-      <UserAvatarsLoading />
+      <Skeleton className="w-[60px] h-6 mb-1" />
     </div>
   ),
 });

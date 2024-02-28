@@ -8,7 +8,7 @@ import { NoData } from "@/components/no-data";
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   loading: () => (
-    <div className="grid grid-cols-3 gap-2 py-6">
+    <div className="grid grid-cols-3 gap-2 pb-6">
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />

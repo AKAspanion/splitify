@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { whoPaidExpense } from "../_utils/expense";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
-import { format } from "date-fns";
 import { relativeDate } from "@/utils/date";
 
 type ExpenseCardProps = {

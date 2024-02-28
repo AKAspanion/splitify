@@ -3,7 +3,7 @@ import { UserPaymentWithUser } from "@/types/shared";
 
 export const whoPaidExpense = (
   amount?: number,
-  payments?: UserPaymentWithUser[],
+  payments?: Partial<UserPaymentWithUser>[],
   currUserId?: string,
 ) => {
   let paid = "";
