@@ -6,9 +6,14 @@ import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { auth } from "@clerk/nextjs";
 import { Header } from "@/components/container/header";
-import { NoData } from "@/components/no-data";
 import { urlEncode } from "@/utils/func";
 import { Search } from "../../_components/search";
+import { UISpinner } from "@/components/ui-spinner";
+import dynamic from "next/dynamic";
+
+const GroupCreate = dynamic(() => import("./group-create"), {
+  loading: () => <UISpinner />,
+});
 
 const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
   const show = searchParams["show"] === "all";
@@ -25,17 +30,10 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
     },
   };
 
-  const [groups, count] = await db.$transaction([
-    db.group.findMany({
-      ...query,
-      orderBy: [{ createdAt: "desc" }],
-    }),
-    db.group.count({ where: query.where }),
-  ]);
-
-  const noData = count === 0;
-
-  const showAll = !show && count > 5;
+  const groups = await db.group.findMany({
+    ...query,
+    orderBy: [{ createdAt: "desc" }],
+  });
 
   const searchUrl = urlEncode({
     path: "/groups",
@@ -46,10 +44,6 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
     path: "/groups",
     query: { ...searchParams, search: "", text: "" },
   });
-
-  const noDataTitle = searchText
-    ? "No results found"
-    : "Groups you create or are added to will show up here";
 
   return (
     <AutoContainer
@@ -98,37 +92,9 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
           return <GroupCard key={g.id} group={g} />;
         })}
       </div>
-
-      {noData ? (
-        <NoData title={noDataTitle} action={<CreateButton />} />
-      ) : (
-        <div className="w-full flex flex-col gap-6 items-center py-8">
-          {showAll ? (
-            <Link href="/groups?show=all">
-              <Button type="button" variant={"secondary"}>
-                <div>Show all {count} groups</div>
-              </Button>
-            </Link>
-          ) : (
-            <CreateButton />
-          )}
-        </div>
-      )}
+      <GroupCreate where={query.where} show={show} searchText={searchText} />
       <div className="h-[72px]" />
     </AutoContainer>
-  );
-};
-
-const CreateButton = () => {
-  return (
-    <Link href="/groups/add">
-      <Button type="button" variant={"outline"}>
-        <div className="flex gap-4 items-center">
-          <div>Create a group</div>
-          <UserRoundPlusIcon />
-        </div>
-      </Button>
-    </Link>
   );
 };
 
