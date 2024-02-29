@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { NotificationService } from "@/lib/notification/service";
-import { HandshakeIcon } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Action = ({
@@ -43,7 +43,7 @@ export const Action = ({
         onClick={onRequest}
         className={isFriend ? "text-green-500" : ""}
       >
-        {loading ? <Spinner size="sm" /> : <HandshakeIcon />}
+        {loading ? <Spinner size="sm" /> : <UserPlus />}
       </Button>
     </div>
   );

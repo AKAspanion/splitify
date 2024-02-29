@@ -36,6 +36,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         groupId,
         category,
         createrId,
+        tag: "EXPENSE",
         payments: {
           createMany: {
             data: payments.map((p) => ({ amount: p.amount, userId: p.userId })),

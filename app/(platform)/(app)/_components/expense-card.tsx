@@ -1,6 +1,6 @@
 import { ListItem } from "@/components/list-item";
 import { ExpenseWithUserPayment } from "@/types/shared";
-import { ReceiptText } from "lucide-react";
+import { Handshake, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { whoPaidExpense } from "../_utils/expense";
@@ -21,7 +21,12 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const category = (expense?.category || "General") as ExpenseCategoryType;
 
-  const ExpenseIcon = EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
+  const CategoryExpenseIcon = EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
+
+  const ExpenseIcon =
+    expense?.tag === "SETTLEMENT" || expense?.category === "settlement"
+      ? Handshake
+      : CategoryExpenseIcon;
 
   const createDate = expense?.createdAt
     ? new Date(expense?.createdAt).toString()
