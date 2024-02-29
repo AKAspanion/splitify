@@ -11,7 +11,7 @@ export const whoPaidExpense = (
     const name =
       currUserId === payments[0]?.user?.id
         ? "You"
-        : payments[0]?.user?.name || "-";
+        : payments[0]?.user?.firstName || payments[0]?.user?.name || "-";
 
     paid =
       payments?.length > 1 ? `${payments.length} People paid` : `${name} paid`;

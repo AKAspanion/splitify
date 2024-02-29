@@ -12,6 +12,15 @@ type ServerSideComponentProp = {
   searchParams?: SearchParams;
 };
 
+type FormatedBalanceResult = {
+  message: string;
+  user1Id: string;
+  user1Name: string;
+  user2Id: string;
+  user2Name: string;
+  owes: number;
+};
+
 type OweBalanceResult = {
   user1Id: string;
   user1Name: string;

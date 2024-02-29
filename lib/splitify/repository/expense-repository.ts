@@ -85,15 +85,20 @@ export class ExpenseRepository {
     return balances;
   }
 
-  public getBalances(): string[] {
-    const balances: string[] = [];
+  public getBalances(): FormatedBalanceResult[] {
+    const balances: FormatedBalanceResult[] = [];
     this.group.getBalanceSheets().forEach((allBalances, allBalancesKey) => {
       allBalances.forEach((userBalance, userBalanceKey) => {
         const ub = fixedNum(userBalance, 0);
         if (ub > 0) {
-          balances.push(
-            this.checkSign(allBalancesKey, userBalanceKey, userBalance),
+          const b = this.checkSignObj(
+            allBalancesKey,
+            userBalanceKey,
+            userBalance,
           );
+          if (b) {
+            balances.push(b);
+          }
         }
       });
     });
@@ -136,25 +141,31 @@ export class ExpenseRepository {
     user1Id: string,
     user2Id: string,
     amount: number,
-  ): OweBalanceResult | undefined {
+  ): FormatedBalanceResult | undefined {
     const user1Name = this.getUser(user1Id)?.getUserName() || "";
     const user2Name = this.getUser(user2Id)?.getUserName() || "";
     const am = fixedNum(amount, 0);
     if (am < 0) {
+      const owes = fixedNum(Math.abs(amount));
+      const message = `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPPEE_SYMBOL}${owes}`;
       return {
         user1Name,
         user2Name,
         user1Id,
         user2Id,
-        owes: Math.abs(amount),
+        message,
+        owes,
       };
     } else if (am > 0) {
+      const owes = fixedNum(Math.abs(amount));
+      const message = `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPPEE_SYMBOL}${owes}`;
       return {
+        message,
         user1Name: user2Name,
         user2Name: user1Name,
         user1Id: user2Id,
         user2Id: user1Id,
-        owes: Math.abs(amount),
+        owes,
       };
     }
     return undefined;

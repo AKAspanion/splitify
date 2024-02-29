@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { BalanceList } from "./balance-list";
-import BalanceSummaryList from "./balance-summary-list";
+import { BalanceList } from "./expense-balance-list";
+import BalanceSummaryList from "./expense-balance-summary-list";
 
 const Balance = async ({
   userId,

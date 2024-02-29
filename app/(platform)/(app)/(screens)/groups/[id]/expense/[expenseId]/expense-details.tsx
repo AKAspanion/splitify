@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 
-const Balance = dynamic(() => import("./balance"), {
+const Balance = dynamic(() => import("./expense-balance"), {
   loading: () => (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">

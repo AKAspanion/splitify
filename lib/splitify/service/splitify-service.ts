@@ -133,7 +133,7 @@ export class SplitifyService {
     }
   }
 
-  public getBalancesList(): string[] {
+  public getBalancesList(): FormatedBalanceResult[] {
     return this.expenseRepository.getBalances();
   }
 

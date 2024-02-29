@@ -15,6 +15,7 @@ import { User } from "@prisma/client";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
+import { useFormStatus } from "react-dom";
 
 type PaymentDrawerProps = {
   users?: User[];
@@ -26,14 +27,18 @@ type PaymentDrawerProps = {
 };
 
 export const PaymentDrawer = (props: PaymentDrawerProps) => {
+  const { pending } = useFormStatus();
+
   const {
     currUserId,
-    disabled,
+    disabled: disabledProp,
     users = [],
     total = 0,
     payment = {},
     onChange,
   } = props;
+
+  const disabled = pending || disabledProp;
 
   const used = useMemo(() => {
     return fixedNum(
@@ -58,7 +63,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
         res.text = "You";
         res.img = u?.profile_image_url || res.img;
       } else {
-        res.text = u?.name || res.text;
+        res.text = u?.firstName || u?.name || res.text;
         res.img = u?.profile_image_url || res.img;
       }
     } else {

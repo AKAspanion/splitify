@@ -34,7 +34,7 @@ export async function POST(req: Request) {
             groupId,
             type: "GROUP_MINUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.name || creator?.firstName || "Someone"} deleted group ${groupName || ""}`,
+            message: `${creator?.firstName || creator?.name || "Someone"} deleted group ${groupName || ""}`,
           },
         }),
       ];

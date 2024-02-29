@@ -34,7 +34,7 @@ export async function POST(req: Request) {
             groupId,
             type: "GROUP_PLUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.name || creator?.firstName || "Someone"} created group ${group?.title || ""}`,
+            message: `${creator?.firstName || creator?.name || "Someone"} created group ${group?.title || ""}`,
           },
         }),
       ];

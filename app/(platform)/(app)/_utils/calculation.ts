@@ -59,7 +59,7 @@ export const calcExpenseSplits = (
       (u) =>
         new User(
           u.id,
-          currUserId === u.id ? "You" : u.name || "-",
+          currUserId === u.id ? "You" : u.firstName || u.name || "-",
           u.email,
           "0",
         ),
@@ -81,7 +81,7 @@ export const calcExpenseSplits = (
       const userIdsArr = users.map((u) => u.userId);
       const userNamesArr = users.map((u) => u.userName);
 
-      const minifyService = new MinifySplitsService(userNamesArr);
+      const minifyService = new MinifySplitsService(userNamesArr, userIdsArr);
       minifyService.execute(
         MinifySplitsService.createGraph(
           N,
@@ -110,7 +110,7 @@ export const calcGroupSplits = (
       (u) =>
         new User(
           u.id,
-          currUserId === u.id ? "You" : u.name || "-",
+          currUserId === u.id ? "You" : u.firstName || u.name || "-",
           u.email,
           "0",
         ),
@@ -140,7 +140,7 @@ export const calcGroupSplits = (
         service.getBalancesTable(),
       );
 
-      const minifyService = new MinifySplitsService(userNamesArr);
+      const minifyService = new MinifySplitsService(userNamesArr, userIdsArr);
       minifyService.execute(graph);
 
       return minifyService.getBalancesList();

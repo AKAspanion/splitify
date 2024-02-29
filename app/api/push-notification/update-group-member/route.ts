@@ -42,7 +42,7 @@ export async function POST(req: Request) {
             groupId,
             type: "MEMBER_PLUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.name || creator?.firstName || "Someone"} added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
+            message: `${creator?.firstName || creator?.name || "Someone"} added ${friend?.firstName || friend?.name || "Someone"} in group ${group?.title || ""}`,
           },
         }),
       ];

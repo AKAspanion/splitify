@@ -22,32 +22,32 @@ const ProfilePage = () => {
     <div className="flex items-start justify-center md:max-w-screen-2xl mx-auto">
       <div className="w-full px-0 pt-6 flex flex-col items-center gap-6 overflow-x-hidden -mb-12">
         <ClerkLoading>
-        <div className="w-full flex flex-col gap-6 px-8">
-          <div className="w-full flex gap-4 justify-between">
-            <Skeleton className="w-10 h-10 rounded-md" />
-            <div className="flex gap-4">
+          <div className="w-full flex flex-col gap-6 px-8">
+            <div className="w-full flex gap-4 justify-between">
               <Skeleton className="w-10 h-10 rounded-md" />
-              <Skeleton className="w-[88px] h-10 rounded-md" />
+              <div className="flex gap-4">
+                <Skeleton className="w-10 h-10 rounded-md" />
+                <Skeleton className="w-[88px] h-10 rounded-md" />
+              </div>
             </div>
-          </div>
-          <div className="w-full flex gap-4 justify-end">
-            <Skeleton className="w-[135px] h-10 rounded-md" />
-          </div>
-          <hr />
-          <Skeleton className="w-16 h-6" />
-          <div className="w-full flex flex-col gap-4">
-            <Skeleton className="w-[135px] h-12" />
+            <div className="w-full flex gap-4 justify-end">
+              <Skeleton className="w-[135px] h-10 rounded-md" />
+            </div>
+            <hr />
+            <Skeleton className="w-16 h-6" />
+            <div className="w-full flex flex-col gap-4">
+              <Skeleton className="w-[135px] h-12" />
+              <Skeleton className="w-[200px] h-5" />
+            </div>
+            <Skeleton className="w-16 h-8" />
+            <hr />
+            <Skeleton className="w-[200px] h-5" />
+            <Skeleton className="w-[200px] h-5" />
+            <Skeleton className="w-[200px] h-5" />
+            <Skeleton className="w-[200px] h-5" />
+            <Skeleton className="w-[200px] h-5" />
             <Skeleton className="w-[200px] h-5" />
           </div>
-          <Skeleton className="w-16 h-8" />
-          <hr />
-          <Skeleton className="w-[200px] h-5" />
-          <Skeleton className="w-[200px] h-5" />
-          <Skeleton className="w-[200px] h-5" />
-          <Skeleton className="w-[200px] h-5" />
-          <Skeleton className="w-[200px] h-5" />
-          <Skeleton className="w-[200px] h-5" />
-        </div>
         </ClerkLoading>
         <ClerkLoaded>
           <div className="w-full px-8 md:px-12 sticky top-0 flex items-center justify-between gap-4">

@@ -1,12 +1,13 @@
-import { UISpinner } from "@/components/ui-spinner";
+import { ActivityCardLoading } from "@/app/(platform)/(app)/_components/activity-card";
+import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import dynamic from "next/dynamic";
 
-const GroupActivity = dynamic(() => import("./group-activity"), {
-  loading: () => <UISpinner />,
+const GroupActivityList = dynamic(() => import("./group-activity"), {
+  loading: () => <ScreenSkeleton card={<ActivityCardLoading />} />,
 });
 
 const GroupActivityPage = async (props: ServerSideComponentProp) => {
-  return <GroupActivity {...props} />;
+  return <GroupActivityList {...props} />;
 };
 
 export default GroupActivityPage;

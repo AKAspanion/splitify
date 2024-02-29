@@ -5,8 +5,9 @@ import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { NoData } from "@/components/no-data";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export const BalancesList = ({
   group,
@@ -64,8 +65,18 @@ export const BalancesList = ({
           {noDataText
             ? noDataText
             : balances?.map((s, i) => (
-                <div className="font-medium" key={i}>
-                  {s}
+                <div
+                  className="font-medium flex w-full gap-4 items-center"
+                  key={i}
+                >
+                  <div className="font-medium" key={i}>
+                    {s.message}
+                  </div>
+                  <Link
+                    href={`/groups/${group?.id || ""}/settle?user1Id=${s.user1Id}&user2Id=${s.user2Id}&owes=${s.owes}`}
+                  >
+                    <Badge size="sm">Settle</Badge>
+                  </Link>
                 </div>
               ))}
         </div>

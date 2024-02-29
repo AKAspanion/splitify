@@ -43,7 +43,7 @@ export async function POST(req: Request) {
             groupId,
             type: "EXPENSE_MINUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.name || creator?.firstName || "Someone"} deleted expense ${expenseName} in group ${group?.title}`,
+            message: `${creator?.firstName || creator?.name || "Someone"} deleted expense ${expenseName} in group ${group?.title}`,
           },
         }),
       ];

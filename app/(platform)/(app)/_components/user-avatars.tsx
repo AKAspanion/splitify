@@ -17,7 +17,7 @@ export const UserAvatars = (props: UserAvatarsProps) => {
           alt="profile pic "
           width={40}
           height={40}
-          title={u.name || ""}
+          title={u?.firstName || u?.name || ""}
           className="rounded-full border-secondary border-2 absolute"
           style={{ zIndex: `${index + 1}`, left: `${index * 28}px` }}
           src={u.profile_image_url || ""}

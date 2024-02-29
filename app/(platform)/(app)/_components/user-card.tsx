@@ -14,7 +14,8 @@ type UserCardProps = {
 export const UserCard = (props: UserCardProps) => {
   const { currUserId, disabled, user, showMail = true, actions } = props;
 
-  const name = currUserId === user?.id ? "You" : user?.name || "-";
+  const name =
+    currUserId === user?.id ? "You" : user?.firstName || user?.name || "-";
 
   return !user ? null : (
     <ListItem

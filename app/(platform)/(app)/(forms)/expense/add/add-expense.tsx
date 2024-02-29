@@ -1,9 +1,14 @@
 import { AutoContainer } from "@/components/container/auto-container";
-import { Form } from "./(form)/form";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { UISpinner } from "@/components/ui-spinner";
+
+const Form = dynamic(() => import("./(form)/form"), {
+  loading: () => <UISpinner />,
+});
 
 const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();

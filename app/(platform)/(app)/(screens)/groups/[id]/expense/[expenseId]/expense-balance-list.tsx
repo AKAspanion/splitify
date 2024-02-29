@@ -62,7 +62,7 @@ export const BalanceList = ({
       <div className="flex flex-col gap-2">
         {balanceList?.map((s, i) => (
           <div className="text-sm font-medium opacity-90" key={i}>
-            {s}
+            {s.message}
           </div>
         ))}
       </div>

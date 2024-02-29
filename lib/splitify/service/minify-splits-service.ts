@@ -6,12 +6,14 @@ export class MinifySplitsService {
   solved: boolean;
   balances: OweBalanceResultIndex[];
   users: string[];
+  userIds: string[];
   counter: number;
 
-  constructor(users: string[]) {
+  constructor(users: string[], userIdsArr: string[]) {
     this.balances = [];
     this.solved = false;
     this.users = users;
+    this.userIds = userIdsArr;
     this.N = users.length;
     this.counter = 0;
   }
@@ -97,16 +99,26 @@ export class MinifySplitsService {
   }
 
   getBalancesTable() {
-    return this.balances;
+    return this.balances?.map((s) => ({
+      ...s,
+      user1Index: this.userIds[s.user1Index],
+      user2Index: this.userIds[s.user2Index],
+    }));
   }
 
   getBalancesList() {
-    const balances: string[] = [];
+    const balances: FormatedBalanceResult[] = [];
     this.balances.forEach((b) => {
       const user1 = this.users[b.user1Index];
-      balances.push(
-        `${user1} ${getOwsKeyword(user1)} ${this.users[b.user2Index]} ${RUPPEE_SYMBOL}${fixedNum(b.owes)}`,
-      );
+      const owes = fixedNum(b.owes);
+      balances.push({
+        message: `${user1} ${getOwsKeyword(user1)} ${this.users[b.user2Index]} ${RUPPEE_SYMBOL}${owes}`,
+        user1Id: this.userIds[b.user1Index],
+        user1Name: this.users[b.user1Index],
+        user2Id: this.userIds[b.user2Index],
+        user2Name: this.users[b.user2Index],
+        owes,
+      });
     });
 
     return balances;

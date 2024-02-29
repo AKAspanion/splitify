@@ -25,7 +25,7 @@ const BalanceSummaryList = ({
         expense?.payments?.find((p) => p.userId === u.id)?.amount || 0;
       const owed = expense?.splits?.find((s) => s.userId === u.id)?.amount || 0;
 
-      const name = replaceUserWithYou(userId, u?.id, u?.name);
+      const name = replaceUserWithYou(userId, u?.id, u?.firstName || u?.name);
 
       if (!paid && !owed) {
         return `${name} ${getVerbKeyword(name)} not involved`;

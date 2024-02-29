@@ -30,6 +30,7 @@ const FormComp = ({ groups }: FormProps) => {
   const [groupOpen, setGroupOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
+  const [tag, setTag] = useState<string>("expense");
   const [category, setCategory] = useState<string>("general");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
@@ -246,7 +247,7 @@ const FormComp = ({ groups }: FormProps) => {
   );
 };
 
-export function Form(props: FormProps) {
+export default function Form(props: FormProps) {
   return (
     <Suspense>
       <FormComp {...props} />

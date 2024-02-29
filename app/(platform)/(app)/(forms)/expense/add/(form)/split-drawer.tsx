@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import { UISpinner } from "@/components/ui-spinner";
 import { EqualLoader } from "./_splits/equal-loader";
 import { ExactLoader } from "./_splits/exact-loader";
+import { useFormStatus } from "react-dom";
 
 const EqualSplit = dynamic(() => import("./_splits/equal"), {
   loading: () => <EqualLoader />,
@@ -29,7 +30,10 @@ const PercentSplit = dynamic(() => import("./_splits/percent"), {
 });
 
 export const SplitDrawer = (props: SplitDrawerProps) => {
-  const { splitType, disabled, onSplitTypeChange } = props;
+  const { splitType, disabled: disabledProp, onSplitTypeChange } = props;
+  const { pending } = useFormStatus();
+
+  const disabled = pending || disabledProp;
 
   const splitName =
     splitType === "EXACT"
