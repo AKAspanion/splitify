@@ -1,19 +1,13 @@
 import dynamic from "next/dynamic";
 import { ScreenSkeleton } from "../../_components/screen-skeleton";
-import { Suspense } from "react";
-import { UISpinner } from "@/components/ui-spinner";
+import { ActivityCardLoading } from "../../_components/activity-card";
 
 const ActivityList = dynamic(() => import("./activity-list"), {
-  loading: () => <UISpinner />,
+  loading: () => <ScreenSkeleton card={<ActivityCardLoading />} />,
 });
 
 const ActivityPage = async (props: ServerSideComponentProp) => {
-  const keyString = `show=${props.searchParams?.["show"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
-  return (
-    <Suspense key={keyString} fallback={<ScreenSkeleton />}>
-      <ActivityList {...props} />
-    </Suspense>
-  );
+  return <ActivityList {...props} />;
 };
 
 export default ActivityPage;

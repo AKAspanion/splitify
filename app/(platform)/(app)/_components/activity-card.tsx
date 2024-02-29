@@ -74,15 +74,12 @@ export const ActivityCard = (props: ActivityCardProps) => {
 
 export const ActivityCardLoading = () => {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-10 w-10 rounded-full" />
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 w-[150px]" />
-          <Skeleton className="h-3 w-[60px]" />
-        </div>
+    <div className="flex items-center gap-4">
+      <Skeleton className="h-8 w-8 rounded-full" />
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-4 w-[150px]" />
+        <Skeleton className="h-3 w-[60px]" />
       </div>
-      <Skeleton className="h-10 w-10 rounded-md sm:invisible" />
     </div>
   );
 };

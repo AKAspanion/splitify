@@ -5,10 +5,12 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const Authn = () => {
+const AuthnActions = () => {
+  const router = useRouter();
   const [registerLoading, setRegisterLoading] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
@@ -44,18 +46,20 @@ const Authn = () => {
         },
       );
 
-      const { data: verificationJSON } = await verificationResp.json();
+      const { data: verificationJSON, message } = await verificationResp.json();
 
       if (verificationJSON && verificationJSON.verified) {
         toast.success("Authenticator registered!");
       } else {
-        toast.error("Oh no, something went wrong!");
+        toast.error(message || "Oh no, something went wrong!");
       }
+      router.refresh();
       setRegisterLoading(false);
       sessionStorage.setItem("verified", "false");
     } catch (e) {
-      setVerifyLoading(false);
+      setRegisterLoading(false);
       sessionStorage.setItem("verified", "false");
+      toast.error("Oh no, something went wrong!");
     }
   };
 
@@ -84,18 +88,20 @@ const Authn = () => {
         },
       );
 
-      const { data: verificationJSON } = await verificationResp.json();
+      const { data: verificationJSON, message } = await verificationResp.json();
 
       if (verificationJSON && verificationJSON.verified) {
         toast.success("Authentication successfull!");
       } else {
-        toast.error("Oh no, something went wrong!");
+        toast.error(message || "Oh no, something went wrong!");
       }
+      router.refresh();
       sessionStorage.setItem("verified", "false");
       setVerifyLoading(false);
     } catch (e) {
       setVerifyLoading(false);
       sessionStorage.setItem("verified", "false");
+      toast.error("Oh no, something went wrong!");
     }
   };
 
@@ -106,11 +112,14 @@ const Authn = () => {
         method: "POST",
       });
       toast.success("Authentication removed");
+
       setRemoveLoading(false);
       sessionStorage.setItem("verified", "false");
+      router.refresh();
     } catch (error) {
       setRemoveLoading(false);
       sessionStorage.setItem("verified", "false");
+      toast.error("Oh no, something went wrong!");
     }
   };
 
@@ -136,4 +145,4 @@ const Authn = () => {
   );
 };
 
-export default Authn;
+export default AuthnActions;
