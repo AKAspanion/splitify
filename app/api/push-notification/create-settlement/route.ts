@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { APILogger } from "@/lib/logger";
+import { RUPPEE_SYMBOL } from "@/constants/ui";
 
 export async function POST(req: Request) {
   try {
@@ -13,43 +14,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body: DeleteExpenseNotificationBody = await req.json();
+    const body: CreateSettlementNotificationBody = await req.json();
 
     const groupId = body?.groupId;
+    const expenseId = body?.expenseId;
     const creatorId = body?.userId;
-    const expenseDesc = body?.expenseDesc;
-    const expenseTag = body?.expenseTag;
 
-    if (creatorId && groupId && expenseDesc) {
-      const [group, creator] = await db.$transaction([
+    if (creatorId && groupId && expenseId) {
+      const [group, exp, creator] = await db.$transaction([
         db.group.findUnique({
           where: { id: groupId },
           include: { users: true },
         }),
+        db.expense.findUnique({ where: { id: expenseId } }),
         db.user.findUnique({ where: { id: creatorId } }),
       ]);
 
-      const expenseType =
-        expenseTag === "SETTLEMENT" ? "settlement" : "expense";
       const notifyUsers = group?.users || [];
       const notifications = notifyUsers?.map((u) =>
         sendNotification({
-          heading: `Expense deleted`,
-          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} deleted ${expenseType} ${expenseDesc} in group ${group?.title}`,
+          heading: `Expense added`,
+          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} added settlement ${exp?.description} in group ${group?.title}`,
           external_id: [u.id],
-          options: { url: `/groups/${groupId}` },
+          options: { url: `/groups/${groupId}/expense/${expenseId}` },
         }),
       );
+
       const activities = [
         db.activity.create({
           data: {
             groupId,
-            type:
-              expenseTag === "SETTLEMENT"
-                ? "SETTLEMENT_MINUS"
-                : "EXPENSE_MINUS",
+            type: "SETTLEMENT_PLUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.firstName || creator?.name || "Someone"} deleted ${expenseType} ${expenseDesc} in group ${group?.title}`,
+            message: `${exp?.description || ""} ${RUPPEE_SYMBOL}${exp?.amount || 0} in group ${group?.title || ""}`,
           },
         }),
       ];
@@ -57,7 +54,7 @@ export async function POST(req: Request) {
       const data = await Promise.allSettled([...notifications, ...activities]);
 
       data.forEach(
-        async (n) => await APILogger.info(`Expense deleted ${n.status}`, n),
+        async (n) => await APILogger.info(`Expense added ${n.status}`, n),
       );
 
       return NextResponse.json(

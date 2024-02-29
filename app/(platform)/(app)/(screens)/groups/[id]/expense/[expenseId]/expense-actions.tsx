@@ -14,10 +14,15 @@ const ExpenseActions = ({ expense }: { expense: Expense | null }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
   const { execute, loading } = useAction(deleteExpense, {
-    onSuccess: ({ userId, groupId, expenseDesc }) => {
+    onSuccess: ({ userId, groupId, expenseDesc, expenseTag }) => {
       toast.success("Expense deleted successfully");
       router.push(`/groups/${groupId}`);
-      NotificationService.deleteExpense(userId, expenseDesc, groupId);
+      NotificationService.deleteExpense(
+        userId,
+        expenseDesc,
+        expenseTag,
+        groupId,
+      );
     },
     onError: (error, debug) => {
       console.error(debug);

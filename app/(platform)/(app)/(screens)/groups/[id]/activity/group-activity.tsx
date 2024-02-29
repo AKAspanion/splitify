@@ -11,7 +11,10 @@ const GroupSettingsPage = async ({ params }: ServerSideComponentProp) => {
 
   const backTo = `/groups/${groupId || ""}`;
 
-  const activities = await db.activity.findMany({ where: { groupId } });
+  const activities = await db.activity.findMany({
+    where: { groupId },
+    orderBy: [{ createdAt: "asc" }],
+  });
 
   const noData = !activities || activities?.length === 0;
 

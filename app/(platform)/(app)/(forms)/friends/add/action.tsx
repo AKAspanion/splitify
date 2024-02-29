@@ -1,5 +1,4 @@
 import { createFriend } from "@/actions/create-friend";
-import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";

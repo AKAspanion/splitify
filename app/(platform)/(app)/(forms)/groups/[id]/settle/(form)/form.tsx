@@ -25,7 +25,7 @@ const FormComp = ({ amount, groupId, user1Id, user2Id }: FormProps) => {
       toast.success("Settlement created successfully");
       router.push(`/groups/${expense?.groupId || ""}`);
       if (expense) {
-        NotificationService.createExpense(userId, expense);
+        NotificationService.createSettlement(userId, expense);
       }
     },
     onError: (error, debug) => {

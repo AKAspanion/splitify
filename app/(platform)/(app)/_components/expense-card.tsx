@@ -1,11 +1,12 @@
 import { ListItem } from "@/components/list-item";
 import { ExpenseWithUserPayment } from "@/types/shared";
-import { Handshake, ReceiptText } from "lucide-react";
+import { BanknoteIcon, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { whoPaidExpense } from "../_utils/expense";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { relativeDate } from "@/utils/date";
+import { cn } from "@/lib/utils";
 
 type ExpenseCardProps = {
   expense: ExpenseWithUserPayment;
@@ -25,7 +26,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const ExpenseIcon =
     expense?.tag === "SETTLEMENT" || expense?.category === "settlement"
-      ? Handshake
+      ? BanknoteIcon
       : CategoryExpenseIcon;
 
   const createDate = expense?.createdAt
@@ -37,7 +38,12 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
       <ListItem
         icon={
           <div className="rounded-full w-10 h-10 flex items-center justify-center bg-foreground/10">
-            <ExpenseIcon className="w-5 h-5" />
+            <ExpenseIcon
+              className={cn("w-5 h-5", {
+                "text-green-500": expense?.tag === "SETTLEMENT",
+                "text-blue-500": expense?.tag !== "SETTLEMENT",
+              })}
+            />
           </div>
         }
         title={expense.description}

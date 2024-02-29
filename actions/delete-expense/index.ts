@@ -34,6 +34,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       message: "Deleted",
       groupId,
       userId,
+      expenseTag: expense?.tag || "",
       expenseDesc: expense?.description || "",
     },
   };

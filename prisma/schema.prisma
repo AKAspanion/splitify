@@ -126,6 +126,7 @@ model Activity {
   id        String       @id @default(nanoid())
   message   String
   type      ActivityType
+  link      String?
   createdAt DateTime     @default(now())
   updatedAt DateTime?    @updatedAt
   groupId   String
@@ -151,6 +152,8 @@ enum LogType {
 }
 
 enum ActivityType {
+  SETTLEMENT_MINUS
+  SETTLEMENT_PLUS
   EXPENSE_MINUS
   EXPENSE_PLUS
   MEMBER_MINUS

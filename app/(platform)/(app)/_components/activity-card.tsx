@@ -12,6 +12,8 @@ import {
   UserPlus,
   UserMinus,
   Info,
+  BanknoteIcon,
+  Minus,
 } from "lucide-react";
 
 type ActivityCardProps = {
@@ -34,17 +36,26 @@ export const ActivityCard = (props: ActivityCardProps) => {
     const type = activity?.type;
     switch (type) {
       case "GROUP_PLUS":
-        return <UserRoundPlus />;
+        return <UserRoundPlus className="text-green-500" />;
       case "GROUP_MINUS":
-        return <UserRoundMinus />;
+        return <UserRoundMinus className="text-red-500" />;
       case "MEMBER_PLUS":
-        return <UserPlus />;
+        return <UserPlus className="text-sparkle" />;
       case "MEMBER_MINUS":
-        return <UserMinus />;
+        return <UserMinus className="text-red-500" />;
       case "EXPENSE_PLUS":
-        return <FilePlus2 />;
+        return <FilePlus2 className="text-blue-500" />;
       case "EXPENSE_MINUS":
-        return <FileMinus2 />;
+        return <FileMinus2 className="text-red-500" />;
+      case "SETTLEMENT_PLUS":
+        return <BanknoteIcon className="text-green-500" />;
+      case "SETTLEMENT_MINUS":
+        return (
+          <div className="relative text-red-500">
+            <Minus className="absolute w-10 h-10 -left-2 -top-2 -rotate-45" />
+            <BanknoteIcon />
+          </div>
+        );
       case "USER":
         return <MessageSquareText />;
       default:
@@ -52,14 +63,33 @@ export const ActivityCard = (props: ActivityCardProps) => {
     }
   };
 
+  const canStrikeThrough = () => {
+    const type = activity?.type;
+    switch (type) {
+      case "GROUP_MINUS":
+      case "MEMBER_MINUS":
+      case "EXPENSE_MINUS":
+      case "SETTLEMENT_MINUS":
+        return true;
+      default:
+        return false;
+    }
+  };
+
   return !activity ? null : (
     <div>
       <div className={cn("flex justify-between items-center gap-4")}>
         <div className="flex items-center gap-4">
-          <div className="w-6 h-6">{getIcon()}</div>
+          <div className="w-6 h-6 ml-2">{getIcon()}</div>
           <div className="flex items-center">
             <div className="flex flex-col">
-              <div className="font-normal text-sm">{activity.message}</div>
+              <div
+                className={cn("font-normal text-sm", {
+                  "line-through": canStrikeThrough(),
+                })}
+              >
+                {activity.message}
+              </div>
               <div className="text-xs font-light">
                 <div className="capitalize">{relativeDate(activityDate)}</div>
               </div>

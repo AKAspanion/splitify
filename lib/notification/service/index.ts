@@ -112,9 +112,26 @@ export class NotificationService {
     }
   }
 
+  public static async createSettlement(userId: string, exp: Expense) {
+    try {
+      const data = await fetch("/api/push-notification/create-settlement", {
+        ...options,
+        body: JSON.stringify({
+          groupId: exp?.groupId || "",
+          expenseId: exp?.id || "",
+          userId,
+        } satisfies CreateExpenseNotificationBody),
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   public static async deleteExpense(
     userId: string,
     expenseDesc: string,
+    expenseTag: string,
     groupId?: string,
   ) {
     try {
@@ -123,6 +140,7 @@ export class NotificationService {
         body: JSON.stringify({
           groupId: groupId || "",
           expenseDesc,
+          expenseTag,
           userId,
         } satisfies DeleteExpenseNotificationBody),
       });
