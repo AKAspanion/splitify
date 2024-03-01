@@ -18,7 +18,7 @@ const publicPaths = [
 // set your rate limit.
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, "10 s"),
+  limiter: Ratelimit.slidingWindow(60, "10 s"),
   ephemeralCache: new Map(),
   analytics: true,
 });
