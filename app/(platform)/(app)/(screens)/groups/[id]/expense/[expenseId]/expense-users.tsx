@@ -3,26 +3,29 @@ import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { db } from "@/lib/db";
 
 const ExpenseUsers = async ({
-  groupId,
+  amount,
   expenseId,
 }: {
-  groupId: string;
+  amount?: number;
   expenseId: string;
 }) => {
-  const expense = await db.expense.findUnique({
-    where: { id: expenseId || "null", groupId },
-    select: { amount: true, payments: { include: { user: true } } },
+  const payments = await db.userPayment.findMany({
+    where: { expenseId },
+    include: { user: true },
   });
-
-  const users = expense?.payments?.map((p) => p.user) || [];
+  const users = payments?.map((p) => p.user) || [];
 
   return (
     <UserAvatars
       users={users}
       action={
-        <div className="text-sm">
-          {whoPaidExpense(expense?.amount, expense?.payments || [])}
-        </div>
+        amount ? (
+          <div className="text-sm">
+            {whoPaidExpense(amount, payments || [])}
+          </div>
+        ) : (
+          ""
+        )
       }
     />
   );

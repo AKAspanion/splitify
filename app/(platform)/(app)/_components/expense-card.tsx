@@ -7,6 +7,7 @@ import { whoPaidExpense } from "../_utils/expense";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { relativeDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 type ExpenseCardProps = {
   expense: ExpenseWithUserPayment;
@@ -50,7 +51,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
         subtitle={whoPaid}
         actions={
           <div className="text-[10px] truncate pb-4 capitalize">
-            {relativeDate(createDate)}
+            {format(createDate, "d LLL")}
           </div>
         }
       />

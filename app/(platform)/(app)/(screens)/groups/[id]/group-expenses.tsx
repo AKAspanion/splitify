@@ -17,42 +17,47 @@ const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
 });
 const GroupExpenses = async ({
   id,
-  userId,
+  groupId,
   backUrl,
 }: {
   id: string;
   backUrl: string;
-  userId: string | null;
+  groupId?: string | null;
 }) => {
-  const [group, expenseCount] = await db.$transaction([
-    db.group.findUnique({
-      where: { id, users: { some: { id: userId || "null" } } },
-      include: { users: true },
+  const [userCount, expenseCount] = await db.$transaction([
+    db.user.count({
+      where: { groups: { some: { id: groupId || "null" } } },
     }),
     db.expense.count({ where: { groupId: id } }),
   ]);
 
-  const noUsers =
-    !group?.users ||
-    (group?.users?.length == 1 && group?.users[0].id === userId);
+  const noUsers = userCount <= 1;
+  const noExpenses = expenseCount === 0;
 
-  const noData = !expenseCount ? !group || noUsers : false;
+  const noData = noExpenses;
+
+  const noDataSubtitle =
+    noExpenses && !noUsers
+      ? "Start adding expenses to get started"
+      : "Start adding expenses and/or group members";
 
   return noData ? (
     <>
-      {noUsers ? (
+      {noExpenses ? (
         <NoData
           title="It's so quiet here"
-          subtitle="Start adding expense and/or group members"
+          subtitle={noDataSubtitle}
           action={
-            <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
-              <Button type="button" variant={"outline"}>
-                <div className="flex gap-4 items-center">
-                  <div>Add members</div>
-                  <UserPlusIcon />
-                </div>
-              </Button>
-            </Link>
+            noUsers ? (
+              <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
+                <Button type="button" variant={"outline"}>
+                  <div className="flex gap-4 items-center">
+                    <div>Add members</div>
+                    <UserPlusIcon />
+                  </div>
+                </Button>
+              </Link>
+            ) : null
           }
         />
       ) : null}

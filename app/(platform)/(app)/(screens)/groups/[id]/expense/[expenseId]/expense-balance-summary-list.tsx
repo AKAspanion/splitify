@@ -4,26 +4,28 @@ import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { RUPPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
-import { User } from "@prisma/client";
+import { User, UserPayment, UserSplit } from "@prisma/client";
 import { useMemo, useState } from "react";
 
 const MAX_LIST_COUNT = 2;
 
 const BalanceSummaryList = ({
   userId,
-  expense,
+  payments,
+  splits,
   users,
 }: {
   userId: string | null;
   users: User[] | null;
-  expense: ExpenseWithPaymentWithSplit | null;
+  payments: UserPayment[] | null;
+  splits: UserSplit[] | null;
+  // expense: ExpenseWithPaymentWithSplit | null;
 }) => {
   const [show, setShow] = useState(false);
   const summaryList = useMemo(() => {
     const list = users?.map((u) => {
-      const paid =
-        expense?.payments?.find((p) => p.userId === u.id)?.amount || 0;
-      const owed = expense?.splits?.find((s) => s.userId === u.id)?.amount || 0;
+      const paid = payments?.find((p) => p.userId === u.id)?.amount || 0;
+      const owed = splits?.find((s) => s.userId === u.id)?.amount || 0;
 
       const name = replaceUserWithYou(userId, u?.id, u?.firstName || u?.name);
 
@@ -37,7 +39,7 @@ const BalanceSummaryList = ({
     return (
       list?.sort((a) => (a.includes("not") || a.includes("₹0") ? 1 : -1)) || []
     );
-  }, [expense?.payments, expense?.splits, users, userId]);
+  }, [payments, splits, users, userId]);
 
   const summary = useMemo(
     () => (!show ? summaryList?.slice(0, MAX_LIST_COUNT) : summaryList),

@@ -76,7 +76,7 @@ export const calcExpenseSplits = (
     evaluateExpense(service, expense, payments, splits);
 
     if (detailed) {
-      return service.getBalancesList();
+      return service.getBalancesList().sort((a, b) => b?.owes - a?.owes);
     } else {
       const userIdsArr = users.map((u) => u.userId);
       const userNamesArr = users.map((u) => u.userName);
@@ -90,7 +90,7 @@ export const calcExpenseSplits = (
         ),
       );
 
-      return minifyService.getBalancesList();
+      return minifyService.getBalancesList().sort((a, b) => b?.owes - a?.owes);
     }
   } catch (error) {
     console.error(error);
@@ -129,7 +129,7 @@ export const calcGroupSplits = (
     }
 
     if (detailed) {
-      return service.getBalancesList();
+      return service.getBalancesList().sort((a, b) => b?.owes - a?.owes);
     } else {
       const userIdsArr = users.map((u) => u.userId);
       const userNamesArr = users.map((u) => u.userName);
@@ -143,7 +143,7 @@ export const calcGroupSplits = (
       const minifyService = new MinifySplitsService(userNamesArr, userIdsArr);
       minifyService.execute(graph);
 
-      return minifyService.getBalancesList();
+      return minifyService.getBalancesList().sort((a, b) => b?.owes - a?.owes);
     }
   } catch (error) {
     console.error(error);

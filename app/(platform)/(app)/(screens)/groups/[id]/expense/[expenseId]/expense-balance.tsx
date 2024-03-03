@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { BalanceList } from "./expense-balance-list";
+import BalanceList from "./expense-balance-list-wrapper";
 import BalanceSummaryList from "./expense-balance-summary-list";
 
 const Balance = async ({
@@ -11,29 +11,24 @@ const Balance = async ({
   groupId: string;
   expenseId: string;
 }) => {
-  const [group, expense] = await db.$transaction([
-    db.group.findUnique({
-      where: { id: groupId, users: { some: { id: userId || "null" } } },
-      select: { users: true },
+  const [users, payments, splits] = await db.$transaction([
+    db.user.findMany({
+      where: { groups: { some: { id: groupId } } },
     }),
-    db.expense.findUnique({
-      where: { id: expenseId || "null", groupId },
-      include: {
-        payments: { include: { user: true } },
-        splits: { include: { user: true } },
-      },
-    }),
+    db.userPayment.findMany({ where: { expenseId } }),
+    db.userSplit.findMany({ where: { expenseId } }),
   ]);
 
   return (
     <>
       <BalanceSummaryList
         userId={userId}
-        expense={expense}
-        users={group?.users || []}
+        payments={payments}
+        splits={splits}
+        users={users}
       />
       <hr />
-      <BalanceList expense={expense} users={group?.users || []} />
+      <BalanceList expenseId={expenseId} users={users} />
     </>
   );
 };

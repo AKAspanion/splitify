@@ -17,11 +17,15 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
   const [user, group] = await db.$transaction([
     db.user.findUnique({
       where: { id: userId || "null" },
-      select: { friends: true },
+      select: {
+        friends: {
+          select: { id: true, name: true, firstName: true, profile_image_url: true },
+        },
+      },
     }),
     db.group.findUnique({
       where: { id, users: { some: { id: userId || "null" } } },
-      include: { users: true },
+      include: { users: { select: { id: true } } },
     }),
   ]);
 

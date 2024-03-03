@@ -6,6 +6,7 @@ import { RUPPEE_SYMBOL } from "@/constants/ui";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
+import { BanknoteIcon } from "lucide-react";
 
 const Balance = dynamic(() => import("./expense-balance"), {
   loading: () => (
@@ -57,29 +58,52 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
 
   const backTo = `/groups/${expense?.groupId || ""}`;
 
+  const isSettlement = expense?.tag === "SETTLEMENT";
+
   return (
     <AutoContainer
       header={
         <Header
           backTo={backTo}
-          title={expense?.description}
+          title={isSettlement ? "" : expense?.description}
           actions={<ExpenseActions expense={expense} />}
         />
       }
     >
       <div className="flex flex-col gap-6">
-        <div className={""}>
-          <div className="font-bold text-lg">
-            {RUPPEE_SYMBOL} {expense?.amount}
-          </div>
-          <ExpenseAddedBy
-            userId={userId}
-            groupId={groupId}
-            expenseId={expenseId}
-          />
-        </div>
-        <ExpenseUsers groupId={groupId} expenseId={expenseId} />
-        <Balance userId={userId} groupId={groupId} expenseId={expenseId} />
+        {isSettlement ? (
+          <>
+            <div className="flex items-center gap-6">
+              <BanknoteIcon className="w-10 h-10 text-green-500" />
+              <div>{expense?.description}</div>
+            </div>
+            <div className={""}>
+              <div className="font-bold text-lg">
+                {RUPPEE_SYMBOL} {expense?.amount}
+              </div>
+              <ExpenseAddedBy
+                userId={userId}
+                groupId={groupId}
+                expenseId={expenseId}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={""}>
+              <div className="font-bold text-lg">
+                {RUPPEE_SYMBOL} {expense?.amount}
+              </div>
+              <ExpenseAddedBy
+                userId={userId}
+                groupId={groupId}
+                expenseId={expenseId}
+              />
+            </div>
+            <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
+            <Balance userId={userId} groupId={groupId} expenseId={expenseId} />
+          </>
+        )}
       </div>
     </AutoContainer>
   );

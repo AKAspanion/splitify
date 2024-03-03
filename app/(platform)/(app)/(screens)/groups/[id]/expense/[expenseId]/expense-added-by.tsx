@@ -1,5 +1,6 @@
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { db } from "@/lib/db";
+import { relativeDate } from "@/utils/date";
 import { format } from "date-fns";
 
 const ExpenseAddedBy = async ({
@@ -22,12 +23,12 @@ const ExpenseAddedBy = async ({
   );
 
   const createDate = expense?.createdAt
-    ? format(expense?.createdAt, "d LLLL, yyyy")
+    ? new Date(expense?.createdAt).toString()
     : "";
 
   return (
     <div className="font-thin text-sm">
-      Added by {addedBy} on {createDate}
+      Added by {addedBy} on {relativeDate(createDate)}
     </div>
   );
 };

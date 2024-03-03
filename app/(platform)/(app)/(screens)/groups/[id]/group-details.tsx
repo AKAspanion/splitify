@@ -73,7 +73,7 @@ const GroupDetails = async ({
           }
         />
         <GroupUsers id={id} backUrl={backUrl} />
-        <GroupExpenses id={id} userId={userId} backUrl={backUrl} />
+        <GroupExpenses id={id} groupId={group?.id} backUrl={backUrl} />
       </div>
     </AutoContainer>
   );

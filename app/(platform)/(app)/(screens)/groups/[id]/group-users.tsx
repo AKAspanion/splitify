@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const GroupUsers = async ({ id, backUrl }: { id: string; backUrl: string }) => {
   const users = await db.user.findMany({
+    take: 5,
     where: { groups: { some: { id: id || "null" } } },
   });
 

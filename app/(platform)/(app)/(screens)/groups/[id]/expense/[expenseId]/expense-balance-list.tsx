@@ -1,7 +1,7 @@
 "use client";
 import { Switch } from "@/components/ui/switch";
 import { calcExpenseSplits } from "@/app/(platform)/(app)/_utils/calculation";
-import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
+import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
