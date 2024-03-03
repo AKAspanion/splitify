@@ -4,9 +4,24 @@ import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import { db } from "@/lib/db";
 import { ActivityCard } from "../../_components/activity-card";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const ActivityList = async (props: ServerSideComponentProp) => {
+const ActivityPaginate = dynamic(() => import("./activity-paginate"), {
+  loading: () => (
+    <div className="py-6 flex w-full items-center justify-center">
+      <Skeleton className="h-10 w-[108px]" />
+    </div>
+  ),
+});
+
+const PAGE_COUNT = 10;
+
+const ActivityList = async ({ searchParams }: ServerSideComponentProp) => {
+  const pageNo = searchParams["page"] || "1";
   const { userId } = auth();
+
+  const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
 
   const userGroups = await db.group.findMany({
     where: { users: { some: { id: userId || "null" } } },
@@ -14,17 +29,21 @@ const ActivityList = async (props: ServerSideComponentProp) => {
     orderBy: [{ createdAt: "asc" }],
   });
 
+  const where = {
+    OR: [
+      { groupId: { in: userGroups.map((u) => u.id) } },
+      { users: { some: { id: userId || "null" } } },
+    ],
+  };
   const activities = await db.activity.findMany({
-    where: {
-      OR: [
-        { groupId: { in: userGroups.map((u) => u.id) } },
-        { users: { some: { id: userId || "null" } } },
-      ],
-    },
-    orderBy: [{ createdAt: "asc" }],
+    where,
+    take: page * PAGE_COUNT,
+    orderBy: [{ createdAt: "desc" }],
   });
 
-  const noData = !activities || activities?.length === 0;
+  const count = activities ? activities?.length : 0;
+
+  const noData = count === 0;
 
   return (
     <AutoContainer header={<Header title={"Activity"} />}>
@@ -35,10 +54,16 @@ const ActivityList = async (props: ServerSideComponentProp) => {
         />
       ) : null}
       <div className="flex flex-col-reverse gap-4">
-        {activities?.map((a) => (
-          <ActivityCard key={a.id} currUserId={userId} activity={a} />
-        ))}
+        {activities
+          ?.reverse()
+          ?.map((a) => (
+            <ActivityCard key={a.id} currUserId={userId} activity={a} />
+          ))}
       </div>
+      <div className="py-6">
+        <ActivityPaginate groups={userGroups} count={count} page={page} />
+      </div>
+      <div className="h-16" />
     </AutoContainer>
   );
 };

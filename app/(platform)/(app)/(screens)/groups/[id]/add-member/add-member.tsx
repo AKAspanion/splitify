@@ -19,7 +19,12 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
       where: { id: userId || "null" },
       select: {
         friends: {
-          select: { id: true, name: true, firstName: true, profile_image_url: true },
+          select: {
+            id: true,
+            name: true,
+            firstName: true,
+            profile_image_url: true,
+          },
         },
       },
     }),
