@@ -20,7 +20,7 @@ export const Header = (props: HeaderProps) => {
             </Button>
           </Link>
         ) : null}
-        <div className="font-semibold text-lg line-clamp-2">{title}</div>
+        <div className="font-semibold text-lg line-clamp-1">{title}</div>
       </div>
       {actions ? <div className="flex gap-4">{actions}</div> : null}
     </div>

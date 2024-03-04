@@ -83,7 +83,7 @@ export function GroupCombobox(props: GroupComboboxProps) {
                   }}
                 >
                   <GroupIcon className={cn("mr-2 h-4 w-4")} />
-                  <div className="truncate w-full capitalize">
+                  <div className="line-clamp-1 w-full capitalize">
                     {group.title}
                   </div>
                   <Check

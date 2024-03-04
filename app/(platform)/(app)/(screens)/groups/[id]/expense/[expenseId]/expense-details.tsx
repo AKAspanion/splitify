@@ -59,7 +59,7 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
   });
 
   const backTo = `/groups/${expense?.groupId || ""}`;
-  const editLink = `/expense/${expense?.id || ""}/edit?groupId=${expense?.groupId || ''}`;
+  const editLink = `/expense/${expense?.id || ""}/edit?groupId=${expense?.groupId || ""}`;
 
   const isSettlement = expense?.tag === "SETTLEMENT";
 

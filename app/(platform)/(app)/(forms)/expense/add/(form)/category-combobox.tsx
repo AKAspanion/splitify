@@ -76,7 +76,7 @@ export function CategoryCombobox(props: CategoryComboboxProps) {
                   }}
                 >
                   <ExpenseIcon className={cn("mr-2 h-4 w-4")} />
-                  <div className="truncate w-full capitalize">{c}</div>
+                  <div className="line-clamp-1 w-full capitalize">{c}</div>
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",

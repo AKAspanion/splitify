@@ -95,7 +95,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                 width={24}
                 height={24}
               />
-              <div className="text-sm truncate">{paidBy.text}</div>
+              <div className="text-sm line-clamp-1">{paidBy.text}</div>
             </div>
           ) : (
             paidBy.text
