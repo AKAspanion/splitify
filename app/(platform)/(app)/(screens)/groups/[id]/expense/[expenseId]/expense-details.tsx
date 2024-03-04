@@ -6,7 +6,9 @@ import { RUPPEE_SYMBOL } from "@/constants/ui";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
-import { BanknoteIcon } from "lucide-react";
+import { BanknoteIcon, PencilIcon } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const Balance = dynamic(() => import("./expense-balance"), {
   loading: () => (
@@ -57,6 +59,7 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
   });
 
   const backTo = `/groups/${expense?.groupId || ""}`;
+  const editLink = `/expense/${expense?.id || ""}/edit?groupId=${expense?.groupId || ''}`;
 
   const isSettlement = expense?.tag === "SETTLEMENT";
 
@@ -66,7 +69,18 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
         <Header
           backTo={backTo}
           title={isSettlement ? "" : expense?.description}
-          actions={<ExpenseActions expense={expense} />}
+          actions={
+            <>
+              <ExpenseActions expense={expense} />
+              {isSettlement ? null : (
+                <Link href={editLink}>
+                  <Button variant={"ghost"} size={"icon"}>
+                    <PencilIcon className="w-5 h-5" />
+                  </Button>
+                </Link>
+              )}
+            </>
+          }
         />
       }
     >

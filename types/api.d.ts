@@ -6,7 +6,7 @@ type CreateExpenseNotificationBody = {
 
 type CreateSettlementNotificationBody = CreateExpenseNotificationBody;
 
-type CreateSettlementNotificationBody = CreateExpenseNotificationBody;
+type UpdateExpenseNotificationBody = CreateExpenseNotificationBody;
 
 type DeleteExpenseNotificationBody = {
   userId: string;

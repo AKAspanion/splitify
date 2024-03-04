@@ -5,7 +5,7 @@ import { InputType, ReturnType } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
-import { UpdateGroup } from "./schema";
+import { UpdateExpense } from "./schema";
 import { getErrorMessage } from "@/utils/validate";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
@@ -15,24 +15,25 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { title, type, description = "", groupId } = data;
+  const { description, id } = data;
 
-  let group;
+  let expense;
   try {
-    group = await db.group.update({
-      where: { id: groupId },
-      data: { title, type, description },
+    expense = await db.expense.update({
+      where: { id },
+      data: { description },
     });
   } catch (error) {
     return {
-      error: "Failed to update group",
+      error: "Failed to update expense",
       debugMessage: getErrorMessage(error).message,
     };
   }
 
-  revalidatePath(`/groups/add`);
-  revalidatePath(`/groups/${group.id}`);
-  return { data: { group, userId } };
+  revalidatePath(`/expense/${id}/edit`);
+  revalidatePath(`/group/${expense?.groupId || ""}/`);
+  revalidatePath(`/group/${expense?.groupId || ""}/${id}/${expense?.id || ""}`);
+  return { data: { expense, userId } };
 };
 
-export const updateGroup = createSafeAction(UpdateGroup, handler);
+export const updateExpense = createSafeAction(UpdateExpense, handler);

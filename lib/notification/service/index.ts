@@ -128,6 +128,22 @@ export class NotificationService {
     }
   }
 
+  public static async updateExpense(userId: string, exp: Expense) {
+    try {
+      const data = await fetch("/api/push-notification/update-expense", {
+        ...options,
+        body: JSON.stringify({
+          groupId: exp?.groupId || "",
+          expenseId: exp?.id || "",
+          userId,
+        } satisfies UpdateExpenseNotificationBody),
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   public static async createSettlement(userId: string, exp: Expense) {
     try {
       const data = await fetch("/api/push-notification/create-settlement", {

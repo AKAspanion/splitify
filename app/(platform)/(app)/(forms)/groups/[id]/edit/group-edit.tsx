@@ -13,9 +13,7 @@ const GroupEdit = async ({ params }: ServerSideComponentProp) => {
 
   return (
     <AutoContainer
-      header={
-        <Header backTo={"/groups"} title={`Edit group ${group?.title}`} />
-      }
+      header={<Header backTo={"/groups"} title={`Update group`} />}
     >
       {group ? <Form {...group} /> : null}
     </AutoContainer>

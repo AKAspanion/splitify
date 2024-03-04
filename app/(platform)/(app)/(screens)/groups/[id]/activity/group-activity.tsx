@@ -26,6 +26,7 @@ const GroupSettingsPage = async ({ params }: ServerSideComponentProp) => {
         ))}
       </div>
       {noData ? <NoData title="No activities found" /> : null}
+      <div className="h-16" />
     </AutoContainer>
   );
 };

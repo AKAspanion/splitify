@@ -16,6 +16,7 @@ import {
   Minus,
   SquarePen,
   NotepadText,
+  PencilLine,
 } from "lucide-react";
 
 type ActivityCardProps = {
@@ -60,6 +61,8 @@ export const ActivityCard = (props: ActivityCardProps) => {
         );
       case "GROUP_UPDATE":
         return <SquarePen className="text-blue-500" />;
+      case "EXPENSE_UPDATE":
+        return <PencilLine className="text-blue-500" />;
       case "USER":
         return <MessageSquareText className="text-blue-500" />;
       default:
