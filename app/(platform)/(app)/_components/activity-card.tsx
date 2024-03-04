@@ -14,6 +14,8 @@ import {
   Info,
   BanknoteIcon,
   Minus,
+  SquarePen,
+  NotepadText,
 } from "lucide-react";
 
 type ActivityCardProps = {
@@ -56,10 +58,12 @@ export const ActivityCard = (props: ActivityCardProps) => {
             <BanknoteIcon />
           </div>
         );
+      case "GROUP_UPDATE":
+        return <SquarePen className="text-blue-500" />;
       case "USER":
-        return <MessageSquareText />;
+        return <MessageSquareText className="text-blue-500" />;
       default:
-        return <MessageSquareText />;
+        return <NotepadText className="text-blue-500" />;
     }
   };
 

@@ -7,6 +7,9 @@ import { Header } from "@/components/container/header";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { PencilIcon } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const GroupMembers = dynamic(() => import("./group-members"), {
   loading: () => (
@@ -47,6 +50,13 @@ const GroupSettings = async ({
         <Header
           backTo={backTo ? backTo : `/groups/${id}`}
           title="Group Settings"
+          actions={
+            <Link href={`/groups/${id}/edit`}>
+              <Button variant="ghost" size="icon">
+                <PencilIcon className="w-5 h-5" />
+              </Button>
+            </Link>
+          }
         />
       }
     >

@@ -41,6 +41,22 @@ export class NotificationService {
       console.log(error);
     }
   }
+
+  public static async updateGroup(userId: string, groupId: string) {
+    try {
+      const data = await fetch("/api/push-notification/update-group", {
+        ...options,
+        body: JSON.stringify({
+          userId,
+          groupId,
+        } satisfies UpdateGroupNotificationBody),
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   public static async deleteGroup(
     userId: string,
     groupId: string,

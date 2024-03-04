@@ -160,6 +160,7 @@ enum ActivityType {
   MEMBER_PLUS
   GROUP_MINUS
   GROUP_PLUS
+  GROUP_UPDATE
   SYSTEM
   USER
 }

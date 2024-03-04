@@ -6,6 +6,8 @@ type CreateExpenseNotificationBody = {
 
 type CreateSettlementNotificationBody = CreateExpenseNotificationBody;
 
+type CreateSettlementNotificationBody = CreateExpenseNotificationBody;
+
 type DeleteExpenseNotificationBody = {
   userId: string;
   groupId: string;
@@ -23,6 +25,8 @@ type CreateGroupNotificationBody = {
   userId: string;
   groupId: string;
 };
+
+type UpdateGroupNotificationBody = CreateGroupNotificationBody;
 
 type DeleteGroupNotificationBody = {
   userId: string;
