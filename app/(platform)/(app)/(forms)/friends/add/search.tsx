@@ -13,9 +13,20 @@ import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Action } from "./action";
 import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { urlEncode } from "@/utils/func";
 
-const Search = ({ backTo, groupId }: { backTo: string; groupId?: string }) => {
+const Search = ({
+  backTo,
+  groupId,
+  mail: mailProp,
+}: {
+  backTo: string;
+  groupId?: string;
+  mail?: string;
+}) => {
   const { user } = useUser();
+  const [mail, setMail] = useState(mailProp || "");
   const { execute, data, fieldErrors } = useAction(searchUser);
 
   const onSubmit = async (formData: FormData) => {
@@ -23,6 +34,20 @@ const Search = ({ backTo, groupId }: { backTo: string; groupId?: string }) => {
 
     await execute({ email });
   };
+
+  const getNotFoundLink = () => {
+    return urlEncode({
+      path: "/friends/add/contact",
+      query: { groupId: groupId || "", back: backTo, email: mail },
+    });
+  };
+
+  useEffect(() => {
+    if (mailProp) {
+      execute({ email: mailProp });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -40,6 +65,8 @@ const Search = ({ backTo, groupId }: { backTo: string; groupId?: string }) => {
                 name="email"
                 placeholder="Enter your friend's full email to find"
                 errors={fieldErrors?.email}
+                onChange={(e) => setMail(e.target.value)}
+                defaultValue={mailProp}
               />
               <FormSubmit>Find</FormSubmit>
             </div>
@@ -65,9 +92,17 @@ const Search = ({ backTo, groupId }: { backTo: string; groupId?: string }) => {
                 ))}
               </div>
               <div className="text-center text-sm">
-                {data !== undefined && data.length === 0
-                  ? "No search results found"
-                  : null}
+                {data !== undefined && data.length === 0 ? (
+                  <div className="flex flex-col gap-3">
+                    <div>No search results found</div>
+                    <Link
+                      className="text-sparkle underline"
+                      href={getNotFoundLink()}
+                    >
+                      Add {mail} to splitify?
+                    </Link>
+                  </div>
+                ) : null}
               </div>
             </FormLoaded>
           </form>

@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
 import { Suspense } from "react";
 
 const ExpenseDetails = dynamic(() => import("./expense-details"), {

@@ -77,13 +77,18 @@ export class NotificationService {
     }
   }
 
-  public static async createFriend(userId: string, friendId: string) {
+  public static async createFriend(
+    userId: string,
+    friendId: string,
+    groupId: string,
+  ) {
     try {
       const data = await fetch("/api/push-notification/update-group-member", {
         ...options,
         body: JSON.stringify({
           userId,
           friendId,
+          groupId,
         } satisfies CreateFriendNotificationBody),
       });
       return data;

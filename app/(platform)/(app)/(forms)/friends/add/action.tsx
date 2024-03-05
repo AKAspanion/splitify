@@ -18,7 +18,7 @@ export const Action = ({
   const { execute, loading } = useAction(createFriend, {
     onSuccess: ({ message, userId, friendId }) => {
       toast.success(message);
-      NotificationService.createFriend(userId, friendId);
+      NotificationService.createFriend(userId, friendId, groupId || "");
     },
     onError: (error, debug) => {
       console.error(error, debug);

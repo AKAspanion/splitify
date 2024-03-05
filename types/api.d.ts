@@ -37,6 +37,7 @@ type DeleteGroupNotificationBody = {
 type CreateFriendNotificationBody = {
   userId: string;
   friendId: string;
+  groupId: string;
 };
 
 type GenerateGroupReportBody = {
