@@ -6,6 +6,7 @@ import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
 import { User, UserPayment, UserSplit } from "@prisma/client";
 import { useMemo, useState } from "react";
+import { getInitials } from "@/utils/func";
 
 const MAX_LIST_COUNT = 2;
 
@@ -27,7 +28,9 @@ const BalanceSummaryList = ({
       const paid = payments?.find((p) => p.userId === u.id)?.amount || 0;
       const owed = splits?.find((s) => s.userId === u.id)?.amount || 0;
 
-      const name = replaceUserWithYou(userId, u?.id, u?.firstName || u?.name);
+      const name = getInitials(
+        replaceUserWithYou(userId, u?.id, u?.name || u?.firstName),
+      );
 
       if (!paid && !owed) {
         return `${name} ${getVerbKeyword(name)} not involved`;

@@ -8,12 +8,15 @@ import { ListItem } from "@/components/list-item";
 
 const GroupMembers = async ({
   id,
+  take,
   userId,
 }: {
   id: string;
+  take?: number;
   userId: string | null;
 }) => {
   const users = await db.user.findMany({
+    take,
     where: { groups: { some: { id: id || "null" } } },
   });
 
@@ -34,7 +37,6 @@ const GroupMembers = async ({
             key={d.id}
           />
         ))}
-        <hr />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository"
 import { MinifySplitsService } from "@/lib/splitify/service/minify-splits-service";
 import { SplitifyService } from "@/lib/splitify/service/splitify-service";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
+import { getInitials } from "@/utils/func";
 
 import {
   User as DBUser,
@@ -59,7 +60,9 @@ export const calcExpenseSplits = (
       (u) =>
         new User(
           u.id,
-          currUserId === u.id ? "You" : u.firstName || u.name || "-",
+          getInitials(
+            currUserId === u.id ? "You" : u.name || u.firstName || "-",
+          ),
           u.email,
           "0",
         ),
@@ -110,7 +113,9 @@ export const calcGroupSplits = (
       (u) =>
         new User(
           u.id,
-          currUserId === u.id ? "You" : u.firstName || u.name || "-",
+          getInitials(
+            currUserId === u.id ? "You" : u.name || u.firstName || "-",
+          ),
           u.email,
           "0",
         ),

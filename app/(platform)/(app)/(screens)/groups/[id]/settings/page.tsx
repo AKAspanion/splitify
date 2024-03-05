@@ -1,8 +1,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
-import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
-import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
+import { Suspense } from "react";
 
 const GroupSettings = dynamic(() => import("./group-settings"), {
   loading: () => (
@@ -19,11 +18,13 @@ const GroupSettings = dynamic(() => import("./group-settings"), {
   ),
 });
 
-const GroupSettingsPage = async ({
-  params,
-  searchParams,
-}: ServerSideComponentProp) => {
-  return <GroupSettings params={params} searchParams={searchParams} />;
+const GroupSettingsPage = async (props: ServerSideComponentProp) => {
+  const keyString = `show=${props?.searchParams["show"]}&back=${props?.searchParams["back"]}`;
+  return (
+    <Suspense key={keyString}>
+      <GroupSettings {...props} />
+    </Suspense>
+  );
 };
 
 export default GroupSettingsPage;

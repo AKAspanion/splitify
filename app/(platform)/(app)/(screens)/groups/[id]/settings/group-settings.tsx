@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { urlEncode } from "@/utils/func";
 
 const GroupMembers = dynamic(() => import("./group-members"), {
   loading: () => (
@@ -38,10 +39,18 @@ const GroupSettings = async ({
 }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
   const backTo = searchParams["back"];
+
+  const showAll = searchParams["show"] === "all";
+
   const { userId } = auth();
 
   const group = await db.group.findUnique({
     where: { id, users: { some: { id: userId || "null" } } },
+  });
+
+  const loadMore = urlEncode({
+    path: `/groups/${id}/settings`,
+    query: { back: backTo, show: "all" },
   });
 
   return (
@@ -68,7 +77,15 @@ const GroupSettings = async ({
           </div>
         }
       />
-      <GroupMembers id={id} userId={userId} />
+      <GroupMembers take={showAll ? undefined : 4} id={id} userId={userId} />
+      {!showAll ? (
+        <Link className="text-sparkle underline text-sm" href={loadMore}>
+          Show all
+        </Link>
+      ) : null}
+      <div className="h-6" />
+      <hr />
+      <div className="h-6" />
       <GroupDelete id={group?.id} />
     </AutoContainer>
   );

@@ -9,7 +9,7 @@ const FriendsAddPage = ({ searchParams }: ServerSideComponentProp) => {
 
   const keyString = `back=${searchParams?.["back"]}&groupId=${searchParams?.["groupId"]}&&email=${searchParams?.["email"]}`;
 
-    return (
+  return (
     <AutoContainer key={keyString}>
       <Search backTo={backTo} mail={mail} groupId={groupId} />
     </AutoContainer>

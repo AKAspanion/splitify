@@ -17,12 +17,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   const { email, name } = data;
+  const image_url = "/images/placeholder/avatar.jpeg";
 
   let user;
   try {
     const id = `spuser_${uid(25)}`;
     user = await db.user.create({
-      data: { email, name, id },
+      data: { email, name, id, image_url, profile_image_url: image_url },
     });
   } catch (error) {
     return {
