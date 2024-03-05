@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { fixedNum } from "@/utils/validate";
 
 const YourShare = async ({
   groupId,
@@ -30,7 +31,19 @@ const YourShare = async ({
       return `You are not involved`;
     }
 
-    return `You owe ${RUPPEE_SYMBOL}${owed}`;
+    const normalizedAmount = fixedNum(paid - owed);
+
+    return normalizedAmount > 0 ? (
+      <div className="text-sparkle">
+        You get back {RUPPEE_SYMBOL}
+        {Math.abs(normalizedAmount)}
+      </div>
+    ) : (
+      <div className="text-destructive">
+        You owe {RUPPEE_SYMBOL}
+        {owed}
+      </div>
+    );
   };
 
   return <div className="text-[12px] truncate">{getSummaryList()}</div>;

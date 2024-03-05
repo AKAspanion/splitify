@@ -58,7 +58,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: "Event received" }, { status: 200 });
   } catch (error: any) {
-    console.log(error);
     return NextResponse.json(
       { message: error?.message || "Failed to parse event" },
       { status: 400 },

@@ -52,7 +52,7 @@ export const ExpenseCard = async (props: ExpenseCardProps) => {
         title={expense.description}
         subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
         actions={
-          <div className="text-[10px] text-right flex flex-col gap-1">
+          <div className="text-[10px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
               {format(createDate, "d LLL")}
             </div>

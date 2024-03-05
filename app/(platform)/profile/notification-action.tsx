@@ -55,7 +55,7 @@ export default function NotificationAction() {
       OneSignal.Notifications.requestPermission()
         .then(() => {
           OneSignal.User.PushSubscription.optIn().then(() => {
-            // console.log("Opted in");
+            //
           });
         })
         .catch((err) => {
@@ -65,7 +65,7 @@ export default function NotificationAction() {
       OneSignal.Notifications.requestPermission()
         .then(() => {
           OneSignal.User.PushSubscription.optOut().then(() => {
-            // console.log("Opted out");
+            //
           });
         })
         .catch((err) => {
