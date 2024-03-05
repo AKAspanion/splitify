@@ -1,25 +1,23 @@
 import { ListItem } from "@/components/list-item";
-import { ExpenseWithUserPayment } from "@/types/shared";
 import { BanknoteIcon, ReceiptText } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
-import { whoPaidExpense } from "../_utils/expense";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
-import { relativeDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { Expense } from "@prisma/client";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const WhoPaid = dynamic(() => import("./who-paid"), {
+  loading: () => <Skeleton className="h-4 w-[120px]" />,
+});
 
 type ExpenseCardProps = {
-  expense: ExpenseWithUserPayment;
-  currUserId?: string;
+  expense: Expense;
 };
 
-export const ExpenseCard = (props: ExpenseCardProps) => {
-  const { expense, currUserId } = props;
-
-  const whoPaid = useMemo(() => {
-    return whoPaidExpense(expense?.amount, expense?.payments || [], currUserId);
-  }, [expense?.amount, expense?.payments, currUserId]);
+export const ExpenseCard = async (props: ExpenseCardProps) => {
+  const { expense } = props;
 
   const category = (expense?.category || "General") as ExpenseCategoryType;
 
@@ -48,7 +46,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
           </div>
         }
         title={expense.description}
-        subtitle={whoPaid}
+        subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
         actions={
           <div className="text-[10px] truncate pb-4 capitalize">
             {format(createDate, "d LLL")}

@@ -16,7 +16,7 @@ const GroupUsers = dynamic(() => import("./group-users"), {
   loading: () => <UserAvatarsLoading />,
 });
 
-const GroupExpenses = dynamic(() => import("./group-expenses"), {
+const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
   loading: () => (
     <div className="grid grid-cols-3 gap-2 pb-6">
       <Skeleton className="h-10" />
@@ -73,7 +73,7 @@ const GroupDetails = async ({
           }
         />
         <GroupUsers id={id} backUrl={backUrl} />
-        <GroupExpenses id={id} groupId={group?.id} backUrl={backUrl} />
+        <ExpensesTabs id={id} backUrl={backUrl} />
       </div>
     </AutoContainer>
   );

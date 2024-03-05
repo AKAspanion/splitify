@@ -10,15 +10,19 @@ import {
   UserProfile,
   useClerk,
 } from "@clerk/nextjs";
-import { ArrowLeftIcon, Bell, BellDot, FingerprintIcon } from "lucide-react";
+import { ArrowLeftIcon, FingerprintIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import NotificationAction from "./notification-action";
 
 const ProfilePage = () => {
   const { signOut } = useClerk();
   const router = useRouter();
+
+  const handleSignout = () => {
+    OneSignal.logout();
+    signOut(() => router.push("/"));
+  };
 
   return (
     <div className="flex items-start justify-center md:max-w-screen-2xl mx-auto">
@@ -59,10 +63,7 @@ const ProfilePage = () => {
             </Button>
             <div className="flex-1" />
             <DarkModeToggle />
-            <Button
-              variant="secondary"
-              onClick={() => signOut(() => router.push("/"))}
-            >
+            <Button variant="secondary" onClick={() => handleSignout()}>
               Sign out
             </Button>
           </div>
