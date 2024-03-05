@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       name: [data?.first_name || "", data?.last_name || ""].join(" "),
       image_url: data?.image_url,
       profile_image_url: data?.profile_image_url,
+      fromClerk: true,
     };
 
     switch (payload?.type) {

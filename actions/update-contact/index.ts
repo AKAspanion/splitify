@@ -5,7 +5,7 @@ import { InputType, ReturnType } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
-import { CreateContact } from "./schema";
+import { UpdateContact } from "./schema";
 import { getErrorMessage } from "@/utils/validate";
 import { uid } from "uid";
 
@@ -16,21 +16,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { email, name } = data;
-  const image_url = "/images/placeholder/avatar.jpeg";
+  const { email, name, id } = data;
 
   let user;
   try {
-    const id = `spuser_${uid(25)}`;
-    user = await db.user.create({
-      data: {
-        email,
-        name,
-        id,
-        image_url,
-        fromClerk: false,
-        profile_image_url: image_url,
-      },
+    user = await db.user.update({
+      where: { id: id || "null" },
+      data: { email, name },
     });
   } catch (error) {
     return {
@@ -40,7 +32,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   revalidatePath(`/friends`);
+  revalidatePath(`/friends/${user.id}`);
   return { data: { user, userId } };
 };
 
-export const createContact = createSafeAction(CreateContact, handler);
+export const updateContact = createSafeAction(UpdateContact, handler);

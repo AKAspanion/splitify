@@ -18,7 +18,7 @@ const FriendsPaginate = dynamic(() => import("./friends-paginate"), {
   ),
 });
 
-const PAGE_COUNT = 10;
+const PAGE_COUNT = 6;
 
 const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
   const pageNo = searchParams["page"] || "1";
@@ -51,7 +51,11 @@ const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {friends?.map((d) => <UserCard user={d} key={d.id} />)}
+        {friends?.map((d) => (
+          <Link href={`/friends/${d.id}`} key={d.id}>
+            <UserCard user={d} />
+          </Link>
+        ))}
       </div>
       {noData ? (
         <NoData
@@ -66,6 +70,7 @@ const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
           </div>
         </div>
       )}
+      <div className="h-16" />
     </AutoContainer>
   );
 };

@@ -1,9 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import React from "react";
 
-export const ScreenSkeleton = ({ card }: { card?: React.ReactNode }) => {
+export const ScreenSkeleton = ({
+  card,
+  noPad = false,
+}: {
+  card?: React.ReactNode;
+  noPad?: boolean;
+}) => {
   return (
-    <div className="px-8 py-6">
+    <div className={cn({ "px-8 py-6": !noPad })}>
       <div className="flex justify-between items-center gap-4 pb-6">
         <Skeleton className="w-[100px] h-8 rounded-md" />
         <div className="flex justify-between gap-4">

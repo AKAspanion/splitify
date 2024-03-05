@@ -1,18 +1,21 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { GROUP_CATEGORY_ICONS, GroupType } from "@/constants/ui";
+import { cn } from "@/lib/utils";
 import { Group } from "@prisma/client";
 import { NotepadText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { boolean } from "zod";
 
 type GroupCardProps = {
   group: Group | null;
   action?: React.ReactNode;
   description?: React.ReactNode;
+  compact?: boolean;
 };
 
 export const GroupCard = (props: GroupCardProps) => {
-  const { group, action, description } = props;
+  const { group, action, description, compact = false } = props;
 
   const type = group?.type as GroupType;
   const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
@@ -22,7 +25,12 @@ export const GroupCard = (props: GroupCardProps) => {
       <div className="rounded flex justify-between items-center">
         <div className="flex items-stretch gap-4 ">
           {group?.image_url ? (
-            <div className="w-16 h-16 relative rounded overflow-hidden">
+            <div
+              className={cn("relative rounded overflow-hidden", {
+                "w-16 h-16": !compact,
+                "w-10 h-10": compact,
+              })}
+            >
               <Image
                 fill
                 className="dark:brightness-75"
@@ -30,8 +38,15 @@ export const GroupCard = (props: GroupCardProps) => {
                 src={group?.image_url}
                 alt="bg image"
               />
-              <div className="absolute top-3 left-3 drop-shadow text-white">
-                <GroupIcon className="w-10 h-10" />
+              <div
+                className={cn("absolute drop-shadow text-white", {
+                  "top-3 left-3": !compact,
+                  "top-2 left-2": compact,
+                })}
+              >
+                <GroupIcon
+                  className={cn({ "w-10 h-10": !compact, "w-6 h-6": compact })}
+                />
               </div>
             </div>
           ) : (
@@ -59,13 +74,22 @@ export const GroupCard = (props: GroupCardProps) => {
   );
 };
 
-export const GroupCardLoading = () => {
+export const GroupCardLoading = ({
+  compact = false,
+}: {
+  compact?: boolean;
+}) => {
   return (
-    <div className="flex space-y-3 gap-4">
-      <Skeleton className="h-[64px] w-[64px] rounded" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-[150px]" />
-        <Skeleton className="h-5 w-[60px] rounded-full" />
+    <div className="flex gap-4">
+      <Skeleton
+        className={cn("rounded", {
+          "h-[64px] w-[64px] ": !compact,
+          "h-10 w-10 ": compact,
+        })}
+      />
+      <div className="flex flex-col justify-center gap-1">
+        <Skeleton className={cn("h-5 w-[150px]")} />
+        <Skeleton className={cn("h-4 w-[60px] rounded-md")} />
       </div>
     </div>
   );
