@@ -127,7 +127,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                 actions={
                   <div className="flex gap-3 items-center">
                     <div className="text-md">{RUPPEE_SYMBOL}</div>
-                    <div className="max-w-[120px]">
+                    <div className="max-w-[120px] p-1">
                       <Input
                         type="number"
                         name="amount"

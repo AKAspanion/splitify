@@ -41,7 +41,7 @@ const ExactSplit = ({
             actions={
               <div className="flex gap-3 items-center">
                 <div className="text-md">{RUPPEE_SYMBOL}</div>
-                <div className="max-w-[120px]">
+                <div className="max-w-[120px] p-1">
                   <Input
                     type="number"
                     name="amount"
@@ -53,6 +53,7 @@ const ExactSplit = ({
             }
           />
         ))}
+        <div className="h-[49px]" />
       </div>
       <div className="text-center text-xs font-semibold pt-6">
         <div>

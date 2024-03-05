@@ -12,6 +12,10 @@ const WhoPaid = dynamic(() => import("./who-paid"), {
   loading: () => <Skeleton className="h-4 w-[120px]" />,
 });
 
+const YourShare = dynamic(() => import("./your-share"), {
+  loading: () => <Skeleton className="h-3 w-[120px]" />,
+});
+
 type ExpenseCardProps = {
   expense: Expense;
 };
@@ -23,10 +27,10 @@ export const ExpenseCard = async (props: ExpenseCardProps) => {
 
   const CategoryExpenseIcon = EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
 
-  const ExpenseIcon =
-    expense?.tag === "SETTLEMENT" || expense?.category === "settlement"
-      ? BanknoteIcon
-      : CategoryExpenseIcon;
+  const isSettlement =
+    expense?.tag === "SETTLEMENT" || expense?.category === "settlement";
+
+  const ExpenseIcon = isSettlement ? BanknoteIcon : CategoryExpenseIcon;
 
   const createDate = expense?.createdAt
     ? new Date(expense?.createdAt).toString()
@@ -48,8 +52,13 @@ export const ExpenseCard = async (props: ExpenseCardProps) => {
         title={expense.description}
         subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
         actions={
-          <div className="text-[10px] truncate pb-4 capitalize">
-            {format(createDate, "d LLL")}
+          <div className="text-[10px] text-right flex flex-col gap-1">
+            <div className="truncate capitalize">
+              {format(createDate, "d LLL")}
+            </div>
+            {isSettlement ? null : (
+              <YourShare expenseId={expense?.id} groupId={expense?.groupId} />
+            )}
           </div>
         }
       />

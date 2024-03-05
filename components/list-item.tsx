@@ -26,9 +26,9 @@ export const ListItem = (props: ListItemProps) => {
         ) : null}
         <div className="flex items-center">
           <div className="flex flex-col">
-            <div className="font-normal text-sm truncate">{title}</div>
+            <div className="font-normal text-sm line-clamp-1">{title}</div>
             {subtitle ? (
-              <div className="text-xs font-light truncate">{subtitle}</div>
+              <div className="text-xs font-light line-clamp-1">{subtitle}</div>
             ) : null}
           </div>
         </div>

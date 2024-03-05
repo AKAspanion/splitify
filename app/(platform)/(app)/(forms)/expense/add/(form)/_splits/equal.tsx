@@ -37,22 +37,24 @@ const EqualSplit = ({
   return (
     <div className="w-full pt-3 pb-6">
       <div className="flex flex-col gap-6 max-h-[calc(100vh-420px)] overflow-y-auto">
-        {users?.map((d) => (
-          <UserCard
-            user={d}
-            key={d.id}
-            showMail={false}
-            currUserId={currUserId}
-            actions={
-              <div>
-                <Checkbox
-                  checked={equalSplit[d.id]}
-                  onCheckedChange={(e) => handleEqualChange(d.id, !!e)}
-                />
-              </div>
-            }
-          />
-        ))}
+        <div className="flex flex-col gap-6 max-h-[calc(100vh-420px)] overflow-y-auto">
+          {users?.map((d) => (
+            <UserCard
+              user={d}
+              key={d.id}
+              showMail={false}
+              currUserId={currUserId}
+              actions={
+                <div className="h-12 flex flex-col justify-center">
+                  <Checkbox
+                    checked={equalSplit[d.id]}
+                    onCheckedChange={(e) => handleEqualChange(d.id, !!e)}
+                  />
+                </div>
+              }
+            />
+          ))}
+        </div>
         <hr />
         <div className="flex w-full gap-6 items-center justify-between">
           <div>All</div>
