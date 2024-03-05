@@ -34,8 +34,8 @@ export async function POST(req: Request) {
       const notifyUsers = group?.users || [];
       const notifications = notifyUsers?.map((u) =>
         sendNotification({
-          heading: `Expense deleted`,
-          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} deleted ${expenseType} ${expenseDesc} in group ${group?.title}`,
+          heading: "Expense deleted",
+          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} deleted ${expenseType} "${expenseDesc}" in group "${group?.title}"`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}` },
         }),
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
                 ? "SETTLEMENT_MINUS"
                 : "EXPENSE_MINUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${creator?.firstName || creator?.name || "Someone"} deleted ${expenseType} ${expenseDesc} in group ${group?.title}`,
+            message: `${creator?.firstName || creator?.name || "Someone"} deleted ${expenseType} "${expenseDesc}" in group "${group?.title}"`,
           },
         }),
       ];

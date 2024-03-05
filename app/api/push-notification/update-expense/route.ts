@@ -32,8 +32,8 @@ export async function POST(req: Request) {
       const notifyUsers = group?.users || [];
       const notifications = notifyUsers?.map((u) =>
         sendNotification({
-          heading: `Expense updated`,
-          content: `${getYouKeyword(u?.id, updatorId, updator?.firstName || updator?.name || "")} updated expense ${exp?.description} in group ${group?.title}`,
+          heading: "Expense updated",
+          content: `${getYouKeyword(u?.id, updatorId, updator?.firstName || updator?.name || "")} updated expense "${exp?.description}" in group "${group?.title}"`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}/expense/${expenseId}` },
         }),
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
             groupId,
             type: "EXPENSE_UPDATE",
             users: { connect: [{ id: updatorId }] },
-            message: `${updator?.firstName || updator?.name || "Someone"} updated expense ${exp?.description || ""} in group ${group?.title || ""}`,
+            message: `${updator?.firstName || updator?.name || "Someone"} updated expense "${exp?.description || ""}" in group "${group?.title || ""}"`,
           },
         }),
       ];

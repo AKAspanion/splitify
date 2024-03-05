@@ -33,8 +33,8 @@ export async function POST(req: Request) {
       const notifyUsers = group?.users || [];
       const notifications = notifyUsers?.map((u) =>
         sendNotification({
-          heading: `Settlement added`,
-          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} added settlement ${exp?.description} in group ${group?.title}`,
+          heading: "Settlement added",
+          content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} added settlement "${exp?.description}" in group "${group?.title}"`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}/expense/${expenseId}` },
         }),
