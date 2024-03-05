@@ -28,9 +28,11 @@ const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
 
 const GroupDetails = async ({
   id,
+  tab,
   backUrl,
 }: {
   id: string;
+  tab: string;
   backUrl: string;
 }) => {
   const { userId } = auth();
@@ -73,7 +75,7 @@ const GroupDetails = async ({
           }
         />
         <GroupUsers id={id} backUrl={backUrl} />
-        <ExpensesTabs id={id} backUrl={backUrl} />
+        <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
       </div>
     </AutoContainer>
   );

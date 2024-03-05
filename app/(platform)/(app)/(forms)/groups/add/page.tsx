@@ -1,7 +1,11 @@
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { FormInputLoading } from "@/components/form/form-input-loading";
-import Form from "./form";
+import dynamic from "next/dynamic";
+import GroupFormLoading from "../../../_components/group-form-loading";
+
+const Form = dynamic(() => import("./form"), {
+  loading: () => <GroupFormLoading />,
+});
 
 const GroupAddPage = async () => {
   return (

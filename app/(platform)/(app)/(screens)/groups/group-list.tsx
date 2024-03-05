@@ -8,11 +8,15 @@ import { auth } from "@clerk/nextjs";
 import { Header } from "@/components/container/header";
 import { urlEncode } from "@/utils/func";
 import { Search } from "../../_components/search";
-import { UISpinner } from "@/components/ui-spinner";
 import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GroupCreate = dynamic(() => import("./group-create"), {
-  loading: () => <UISpinner />,
+  loading: () => (
+    <div className="w-full flex justify-center py-6">
+      <Skeleton className="w-[100px] h-10" />
+    </div>
+  ),
 });
 
 const GroupList = async ({ searchParams }: ServerSideComponentProp) => {

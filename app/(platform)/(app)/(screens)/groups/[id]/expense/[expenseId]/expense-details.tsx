@@ -68,7 +68,7 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
       header={
         <Header
           backTo={backTo}
-          title={isSettlement ? "" : expense?.description}
+          title={isSettlement ? "Settlement" : expense?.description}
           actions={
             <>
               <ExpenseActions expense={expense} />

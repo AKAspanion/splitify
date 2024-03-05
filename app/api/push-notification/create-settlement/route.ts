@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       const notifyUsers = group?.users || [];
       const notifications = notifyUsers?.map((u) =>
         sendNotification({
-          heading: `Expense added`,
+          heading: `Settlement added`,
           content: `${getYouKeyword(u?.id, creatorId, creator?.firstName || creator?.name || "")} added settlement ${exp?.description} in group ${group?.title}`,
           external_id: [u.id],
           options: { url: `/groups/${groupId}/expense/${expenseId}` },
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       const data = await Promise.allSettled([...notifications, ...activities]);
 
       data.forEach(
-        async (n) => await APILogger.info(`Expense added ${n.status}`, n),
+        async (n) => await APILogger.info(`Settlement added ${n.status}`, n),
       );
 
       return NextResponse.json(

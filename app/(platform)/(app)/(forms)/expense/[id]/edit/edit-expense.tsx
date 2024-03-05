@@ -1,5 +1,4 @@
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
 import { Suspense } from "react";

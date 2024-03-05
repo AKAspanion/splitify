@@ -38,10 +38,18 @@ const Totals = dynamic(() => import("./totals"), {
   ),
 });
 
-const ExpensesTabs = ({ id, backUrl }: { id: string; backUrl: string }) => {
+const ExpensesTabs = ({
+  id,
+  tab,
+  backUrl,
+}: {
+  id: string;
+  tab: string;
+  backUrl: string;
+}) => {
   return (
     <>
-      <Tabs defaultValue="Expenses" className="w-full pb-6">
+      <Tabs defaultValue={tab} className="w-full pb-6">
         <TabsList className="w-full">
           <TabsTrigger value={"Expenses"} className="w-full">
             Expenses

@@ -25,12 +25,14 @@ const GroupDetailsPage = async ({
 }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
 
+  const tab = searchParams["tab"] || "Expenses";
+
   const backUrl = urlEncode({
     path: `/groups/${id}`,
     query: searchParams,
   });
 
-  return <GroupDetails id={id} backUrl={backUrl} />;
+  return <GroupDetails id={id} backUrl={backUrl} tab={tab} />;
 };
 
 export default GroupDetailsPage;

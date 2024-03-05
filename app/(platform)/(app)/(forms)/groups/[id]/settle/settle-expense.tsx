@@ -2,9 +2,8 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
-import { auth } from "@clerk/nextjs";
 import SettleUsers from "./settle-users";
+import { UISpinner } from "@/components/ui-spinner";
 
 const Form = dynamic(() => import("./(form)/form"), {
   loading: () => <UISpinner />,
@@ -14,9 +13,10 @@ const SettleExpense = async ({
   params,
   searchParams,
 }: ServerSideComponentProp) => {
-  const { userId } = auth();
   const groupId = params["id"] || "";
-  const backTo = groupId ? `/groups/${groupId}` : `/groups`;
+  const backTo = groupId
+    ? `/groups/${groupId}?tab=Balances`
+    : `/groups?tab=Balances`;
 
   const user1Id = searchParams["user1Id"] || "";
   const user2Id = searchParams["user2Id"] || "";

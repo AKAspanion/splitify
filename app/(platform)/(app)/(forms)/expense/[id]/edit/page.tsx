@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
+import ExpenseFormLoading from "@/app/(platform)/(app)/_components/expense-form-loading";
 
 const EditExpense = dynamic(() => import("./edit-expense"), {
-  loading: () => <UISpinner />,
+  loading: () => <ExpenseFormLoading />,
 });
 
 const EditExpenseFormPage = async (props: ServerSideComponentProp) => {

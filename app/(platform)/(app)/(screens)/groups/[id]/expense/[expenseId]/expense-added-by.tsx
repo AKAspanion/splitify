@@ -28,7 +28,7 @@ const ExpenseAddedBy = async ({
 
   return (
     <div className="font-thin text-sm">
-      Added by {addedBy} on {relativeDate(createDate)}
+      Added by {addedBy}, {relativeDate(createDate)}
     </div>
   );
 };

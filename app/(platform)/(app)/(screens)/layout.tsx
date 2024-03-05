@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { AddExpenseFab } from "../_components/add-expense-fab";
-import { ScreenSkeleton } from "../_components/screen-skeleton";
-import { UISpinner } from "@/components/ui-spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PlatformLayout({
   children,
@@ -10,7 +9,13 @@ export default function PlatformLayout({
 }) {
   return (
     <>
-      <Suspense fallback={<UISpinner />}>{children}</Suspense>
+      <Suspense
+        fallback={
+          <Skeleton className="rounded-md h-[100px] w-[calc(100vw-48px)] m-6" />
+        }
+      >
+        {children}
+      </Suspense>
       <Suspense>
         <AddExpenseFab />
       </Suspense>
