@@ -15,7 +15,7 @@ export const BalanceList = ({
   expense: ExpenseWithPaymentWithSplit | null;
 }) => {
   const { user } = useUser();
-  const [detailed, setDetailed] = useState(false);
+  const [detailed] = useState(false);
   const balanceList = useMemo(() => {
     return user?.id
       ? calcExpenseSplits(
@@ -37,16 +37,16 @@ export const BalanceList = ({
     return text;
   }, [balanceList?.length]);
 
-  const handleCheck = () => {
-    setDetailed((s) => !s);
-  };
+  // const handleCheck = () => {
+  //   setDetailed((s) => !s);
+  // };
 
   return (
     <div>
       <div className="pb-3 font-semibold text-normal flex justify-between gap-6 items-center">
         <div>Balance</div>
         <div>
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Label htmlFor="airplane-mode" className="text-sm">
               Detailed
             </Label>
@@ -55,7 +55,7 @@ export const BalanceList = ({
               onCheckedChange={handleCheck}
               id="airplane-mode"
             />
-          </div>
+          </div> */}
         </div>
       </div>
       {noDataText ? <div className="pb-6">{noDataText}</div> : null}

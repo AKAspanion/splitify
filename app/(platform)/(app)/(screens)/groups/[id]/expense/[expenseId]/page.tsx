@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
+import { Suspense } from "react";
 
 const ExpenseDetails = dynamic(() => import("./expense-details"), {
   loading: () => (
@@ -17,8 +18,13 @@ const ExpenseDetails = dynamic(() => import("./expense-details"), {
   ),
 });
 
-const ExpenseDetailsPage = async ({ params }: ServerSideComponentProp) => {
-  return <ExpenseDetails params={params} />;
+const ExpenseDetailsPage = async (props: ServerSideComponentProp) => {
+  const keyString = `balance=${props?.searchParams?.["balance"]}`;
+  return (
+    <Suspense key={keyString}>
+      <ExpenseDetails {...props} />
+    </Suspense>
+  );
 };
 
 export default ExpenseDetailsPage;

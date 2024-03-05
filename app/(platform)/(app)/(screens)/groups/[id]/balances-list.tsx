@@ -19,7 +19,7 @@ export const BalancesList = ({
   expenses: ExpenseWithPaymentWithSplit[] | null;
 }) => {
   const { user } = useUser();
-  const [detailed, setDetailed] = useState(false);
+  const [detailed] = useState(false);
 
   const balanceList = useMemo(
     () =>
@@ -49,9 +49,9 @@ export const BalancesList = ({
     return text;
   }, [balanceList?.length, expenses?.length]);
 
-  const handleCheck = () => {
-    setDetailed((s) => !s);
-  };
+  // const handleCheck = () => {
+  //   setDetailed((s) => !s);
+  // };
 
   return (
     <div>
@@ -81,7 +81,7 @@ export const BalancesList = ({
               ))}
         </div>
         <div className="flex-1" />
-        {onlyList ? null : (
+        {/* {onlyList ? null : (
           <div>
             <div className="flex items-center space-x-2">
               <Label htmlFor="airplane-mode" className="text-sm">
@@ -94,7 +94,7 @@ export const BalancesList = ({
               />
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

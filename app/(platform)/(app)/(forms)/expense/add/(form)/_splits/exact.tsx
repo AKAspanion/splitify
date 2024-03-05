@@ -32,7 +32,7 @@ const ExactSplit = ({
 
   return (
     <div className="w-full pt-3 pb-6">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 max-h-[calc(100vh-420px)] overflow-y-auto">
         {users?.map((d) => (
           <UserCard
             user={d}

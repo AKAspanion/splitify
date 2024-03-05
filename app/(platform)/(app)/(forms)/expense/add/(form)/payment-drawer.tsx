@@ -114,15 +114,10 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
               </DrawerClose>
               <div>Paid amount</div>
             </div>
-            {/* <DrawerClose>
-              <Button type="button" variant="outline" size="icon">
-                <CheckIcon />
-              </Button>
-            </DrawerClose> */}
           </DrawerTitle>
         </DrawerHeader>
         <div className="w-full pt-3 pb-6 px-8">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 max-h-[calc(100vh-380px)] overflow-y-auto">
             {users?.map((d) => (
               <UserCard
                 user={d}

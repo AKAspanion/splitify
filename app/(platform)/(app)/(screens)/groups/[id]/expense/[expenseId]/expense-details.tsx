@@ -18,16 +18,6 @@ const Balance = dynamic(() => import("./expense-balance"), {
         <Skeleton className="h-4 w-[160px]" />
         <Skeleton className="h-4 w-[60px]" />
       </div>
-      <hr />
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between gap-6 mb-1">
-          <Skeleton className="h-6 w-[64px]" />
-          <Skeleton className="h-6 w-[108px]" />
-        </div>
-        <Skeleton className="h-5 w-[160px]" />
-        <Skeleton className="h-5 w-[120px]" />
-        <Skeleton className="h-5 w-[100px]" />
-      </div>
     </div>
   ),
 });
@@ -49,10 +39,15 @@ const ExpenseUsers = dynamic(() => import("./expense-users"), {
   loading: () => <UserAvatarsLoading lg />,
 });
 
-const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
+const ExpenseDetails = async ({
+  params,
+  searchParams,
+}: ServerSideComponentProp) => {
   const { userId } = auth();
   const groupId = params["id"] || "null";
   const expenseId = params["expenseId"] || "null";
+
+  const showBalance = searchParams["balance"] === "yes";
 
   const expense = await db.expense.findUnique({
     where: { id: expenseId, groupId },
@@ -62,6 +57,8 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
   const editLink = `/expense/${expense?.id || ""}/edit?groupId=${expense?.groupId || ""}`;
 
   const isSettlement = expense?.tag === "SETTLEMENT";
+
+  const keyString = `balance=${searchParams?.["balance"]}`;
 
   return (
     <AutoContainer
@@ -115,7 +112,13 @@ const ExpenseDetails = async ({ params }: ServerSideComponentProp) => {
               />
             </div>
             <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
-            <Balance userId={userId} groupId={groupId} expenseId={expenseId} />
+            <Balance
+              key={keyString}
+              userId={userId}
+              groupId={groupId}
+              expenseId={expenseId}
+              balance={showBalance}
+            />
           </>
         )}
       </div>
