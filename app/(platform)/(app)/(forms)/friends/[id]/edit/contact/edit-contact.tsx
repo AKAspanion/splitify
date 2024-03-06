@@ -3,6 +3,7 @@ import { Header } from "@/components/container/header";
 
 import Form from "./form";
 import { db } from "@/lib/db";
+import { NoData } from "@/components/no-data";
 
 const FriendsEditContact = async ({
   params,
@@ -17,12 +18,16 @@ const FriendsEditContact = async ({
 
   return (
     <AutoContainer header={<Header title="Update contact" backTo={to} />}>
-      <Form
-        backTo={to}
-        id={friend?.id || "null"}
-        name={friend?.name || ""}
-        mail={friend?.email || ""}
-      />
+      {friend ? (
+        <Form
+          backTo={to}
+          id={friend?.id || "null"}
+          name={friend?.name || ""}
+          mail={friend?.email || ""}
+        />
+      ) : (
+        <NoData title="Friend not found" />
+      )}
     </AutoContainer>
   );
 };

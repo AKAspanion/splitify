@@ -8,6 +8,7 @@ import { GroupCardLoading } from "../../../_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import VerifyDetails from "./verify-details";
 import { auth } from "@clerk/nextjs";
+import { NoData } from "@/components/no-data";
 
 const SharedGroups = dynamic(() => import("./shared-groups"), {
   loading: () => (
@@ -40,27 +41,31 @@ const FriendDetails = async ({
     <AutoContainer
       header={<Header title="" backTo={backTo ? backTo : `/friends`} />}
     >
-      <div className="flex flex-col gap-6">
-        <Image
-          alt="profile pic"
-          width={56}
-          height={56}
-          className="rounded-full"
-          src={friend?.profile_image_url || ""}
-        />
-        <div>
-          <div className="">
-            {getYouKeyword(userId || "null", id, friend?.name || "-")}
+      {friend ? (
+        <div className="flex flex-col gap-6">
+          <Image
+            alt="profile pic"
+            width={56}
+            height={56}
+            className="rounded-full"
+            src={friend?.profile_image_url || ""}
+          />
+          <div>
+            <div className="">
+              {getYouKeyword(userId || "null", id, friend?.name || "-")}
+            </div>
+            <div className="text-sm font-light">{friend?.email}</div>
           </div>
-          <div className="text-sm font-light">{friend?.email}</div>
+          {isYou ? null : (
+            <>
+              {!isVerified ? <VerifyDetails friend={friend} /> : null}
+              <SharedGroups id={id} />
+            </>
+          )}
         </div>
-        {isYou ? null : (
-          <>
-            {!isVerified ? <VerifyDetails friend={friend} /> : null}
-            <SharedGroups id={id} />
-          </>
-        )}
-      </div>
+      ) : (
+        <NoData title="Friend not found" />
+      )}
     </AutoContainer>
   );
 };

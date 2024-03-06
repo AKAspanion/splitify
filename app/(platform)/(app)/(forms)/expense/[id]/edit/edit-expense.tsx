@@ -4,6 +4,7 @@ import { Header } from "@/components/container/header";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { UISpinner } from "@/components/ui-spinner";
+import { NoData } from "@/components/no-data";
 
 const Form = dynamic(() => import("./form"), {
   loading: () => <UISpinner />,
@@ -27,7 +28,9 @@ const EditExpense = async ({
 
   return (
     <AutoContainer header={<Header backTo={backTo} title="Update expense" />}>
-      <Suspense>{expense ? <Form {...expense} /> : null}</Suspense>
+      <Suspense>
+        {expense ? <Form {...expense} /> : <NoData title="Expense not found" />}
+      </Suspense>
     </AutoContainer>
   );
 };

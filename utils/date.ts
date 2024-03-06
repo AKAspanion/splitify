@@ -5,7 +5,7 @@ export const relativeDate = (date: string) => {
 };
 
 export const indiaDate = (date: string | number | Date) => {
-  return new Date(date).toLocaleDateString(undefined, {
+  return new Date(date).toLocaleString(undefined, {
     timeZone: "Asia/Kolkata",
   });
 };

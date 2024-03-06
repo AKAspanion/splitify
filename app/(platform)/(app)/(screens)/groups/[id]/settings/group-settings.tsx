@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { urlEncode } from "@/utils/func";
+import { NoData } from "@/components/no-data";
 
 const GroupMembers = dynamic(() => import("./group-members"), {
   loading: () => (
@@ -55,27 +55,35 @@ const GroupSettings = async ({
           backTo={backTo ? backTo : `/groups/${id}`}
           title="Group Settings"
           actions={
-            <Link href={`/groups/${id}/edit`}>
-              <Button variant="ghost" size="icon">
-                <PencilIcon className="w-5 h-5" />
-              </Button>
-            </Link>
+            group ? (
+              <Link href={`/groups/${id}/edit`}>
+                <Button variant="ghost" size="icon">
+                  <PencilIcon className="w-5 h-5" />
+                </Button>
+              </Link>
+            ) : null
           }
         />
       }
     >
-      <GroupCard
-        group={group}
-        description={
-          <div className="pt-1 capitalize">
-            {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
-          </div>
-        }
-      />
-      <GroupMembers showAll={showAll} id={id} backTo={backTo} />
-      <hr />
-      <div className="h-6" />
-      <GroupDelete id={group?.id} />
+      {group ? (
+        <>
+          <GroupCard
+            group={group}
+            description={
+              <div className="pt-1 capitalize">
+                {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+              </div>
+            }
+          />
+          <GroupMembers showAll={showAll} id={id} backTo={backTo} />
+          <hr />
+          <div className="h-6" />
+          <GroupDelete id={group?.id} />
+        </>
+      ) : (
+        <NoData title="Group not found" />
+      )}
     </AutoContainer>
   );
 };

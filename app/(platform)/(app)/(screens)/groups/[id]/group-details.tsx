@@ -11,6 +11,7 @@ import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avat
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { DownloadReport } from "./_components/download-report";
+import { NoData } from "@/components/no-data";
 
 const GroupUsers = dynamic(() => import("./group-users"), {
   loading: () => <UserAvatarsLoading />,
@@ -48,35 +49,41 @@ const GroupDetails = async ({
           backTo="/groups"
           title={""}
           actions={
-            <>
-              <Link href={`/groups/${id}/activity`}>
-                <Button variant="ghost" size="icon">
-                  <ActivityIcon />
-                </Button>
-              </Link>
-              <DownloadReport groupId={id} />
-              <Link href={`/groups/${id}/settings`}>
-                <Button variant="ghost" size="icon">
-                  <SettingsIcon />
-                </Button>
-              </Link>
-            </>
+            group ? (
+              <>
+                <Link href={`/groups/${id}/activity`}>
+                  <Button variant="ghost" size="icon">
+                    <ActivityIcon />
+                  </Button>
+                </Link>
+                <DownloadReport groupId={id} />
+                <Link href={`/groups/${id}/settings`}>
+                  <Button variant="ghost" size="icon">
+                    <SettingsIcon />
+                  </Button>
+                </Link>
+              </>
+            ) : null
           }
         />
       }
     >
-      <div className="flex flex-col gap-6">
-        <GroupCard
-          group={group}
-          description={
-            <div className="pt-1 capitalize">
-              {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
-            </div>
-          }
-        />
-        <GroupUsers id={id} backUrl={backUrl} />
-        <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
-      </div>
+      {group ? (
+        <div className="flex flex-col gap-6">
+          <GroupCard
+            group={group}
+            description={
+              <div className="pt-1 capitalize">
+                {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+              </div>
+            }
+          />
+          <GroupUsers id={id} backUrl={backUrl} />
+          <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
+        </div>
+      ) : (
+        <NoData title="Group not found" />
+      )}
     </AutoContainer>
   );
 };

@@ -9,6 +9,7 @@ import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avat
 import { BanknoteIcon, PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { NoData } from "@/components/no-data";
 
 const Balance = dynamic(() => import("./expense-balance"), {
   loading: () => (
@@ -67,61 +68,67 @@ const ExpenseDetails = async ({
           backTo={backTo}
           title={isSettlement ? "Settlement" : expense?.description}
           actions={
-            <>
-              <ExpenseActions expense={expense} />
-              {isSettlement ? null : (
-                <Link href={editLink}>
-                  <Button variant={"ghost"} size={"icon"}>
-                    <PencilIcon className="w-5 h-5" />
-                  </Button>
-                </Link>
-              )}
-            </>
+            expense ? (
+              <>
+                <ExpenseActions expense={expense} />
+                {isSettlement ? null : (
+                  <Link href={editLink}>
+                    <Button variant={"ghost"} size={"icon"}>
+                      <PencilIcon className="w-5 h-5" />
+                    </Button>
+                  </Link>
+                )}
+              </>
+            ) : null
           }
         />
       }
     >
-      <div className="flex flex-col gap-6">
-        {isSettlement ? (
-          <>
-            <div className="flex items-center gap-6">
-              <BanknoteIcon className="w-10 h-10 text-green-500" />
-              <div>{expense?.description}</div>
-            </div>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPPEE_SYMBOL} {expense?.amount}
+      {expense ? (
+        <div className="flex flex-col gap-6">
+          {isSettlement ? (
+            <>
+              <div className="flex items-center gap-6">
+                <BanknoteIcon className="w-10 h-10 text-green-500" />
+                <div>{expense?.description}</div>
               </div>
-              <ExpenseAddedBy
+              <div className={""}>
+                <div className="font-bold text-lg">
+                  {RUPPEE_SYMBOL} {expense?.amount}
+                </div>
+                <ExpenseAddedBy
+                  userId={userId}
+                  groupId={groupId}
+                  expenseId={expenseId}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={""}>
+                <div className="font-bold text-lg">
+                  {RUPPEE_SYMBOL} {expense?.amount}
+                </div>
+                <ExpenseAddedBy
+                  userId={userId}
+                  groupId={groupId}
+                  expenseId={expenseId}
+                />
+              </div>
+              <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
+              <Balance
+                key={keyString}
                 userId={userId}
                 groupId={groupId}
                 expenseId={expenseId}
+                balance={showBalance}
               />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPPEE_SYMBOL} {expense?.amount}
-              </div>
-              <ExpenseAddedBy
-                userId={userId}
-                groupId={groupId}
-                expenseId={expenseId}
-              />
-            </div>
-            <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
-            <Balance
-              key={keyString}
-              userId={userId}
-              groupId={groupId}
-              expenseId={expenseId}
-              balance={showBalance}
-            />
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      ) : (
+        <NoData title="Expense not found" />
+      )}
     </AutoContainer>
   );
 };
