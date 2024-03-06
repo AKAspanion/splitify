@@ -1,6 +1,8 @@
 import { ListItem } from "@/components/list-item";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getYouKeyword } from "@/utils/validate";
 import { User } from "@prisma/client";
+import { AlertOctagon } from "lucide-react";
 import Image from "next/image";
 
 type UserCardProps = {
@@ -14,12 +16,22 @@ type UserCardProps = {
 export const UserCard = (props: UserCardProps) => {
   const { currUserId, disabled, user, showMail = true, actions } = props;
 
-  const name =
-    currUserId === user?.id ? "You" : user?.firstName || user?.name || "-";
+  const name = getYouKeyword(
+    currUserId || "null",
+    user?.id || "lol",
+    user?.firstName || user?.name || "-",
+  );
 
   return !user ? null : (
     <ListItem
-      title={name}
+      title={
+        <div className="flex items-center gap-2">
+          {name}
+          {!user?.fromClerk ? (
+            <AlertOctagon className="w-3 h-3 text-yellow-500" />
+          ) : null}
+        </div>
+      }
       disabled={disabled}
       actions={actions}
       subtitle={showMail ? user?.email : ""}

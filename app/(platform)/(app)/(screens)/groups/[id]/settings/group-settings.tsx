@@ -48,11 +48,6 @@ const GroupSettings = async ({
     where: { id, users: { some: { id: userId || "null" } } },
   });
 
-  const loadMore = urlEncode({
-    path: `/groups/${id}/settings`,
-    query: { back: backTo, show: "all" },
-  });
-
   return (
     <AutoContainer
       header={
@@ -77,13 +72,7 @@ const GroupSettings = async ({
           </div>
         }
       />
-      <GroupMembers take={showAll ? undefined : 4} id={id} userId={userId} />
-      {!showAll ? (
-        <Link className="text-sparkle underline text-sm" href={loadMore}>
-          Show all
-        </Link>
-      ) : null}
-      <div className="h-6" />
+      <GroupMembers showAll={showAll} id={id} backTo={backTo} />
       <hr />
       <div className="h-6" />
       <GroupDelete id={group?.id} />

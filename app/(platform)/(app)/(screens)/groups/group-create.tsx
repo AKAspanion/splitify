@@ -16,7 +16,7 @@ export default async function GroupCreate({
   const count = await db.group.count({ where });
   const noData = count === 0;
 
-  const showAll = !show && count > 5;
+  const showAll = !show && count > 6;
 
   const noDataTitle = searchText
     ? "No results found"
