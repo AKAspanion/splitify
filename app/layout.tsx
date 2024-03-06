@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import { siteConfig } from "@/config/site";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
-import Script from "next/script";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,6 +50,8 @@ export default function RootLayout({
             </Suspense>
           </Providers>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
