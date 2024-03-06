@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { Expense } from "@prisma/client";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { indiaDate } from "@/utils/date";
 
 const WhoPaid = dynamic(() => import("./who-paid"), {
   loading: () => <Skeleton className="h-4 w-[120px]" />,
@@ -32,9 +33,7 @@ export const ExpenseCard = async (props: ExpenseCardProps) => {
 
   const ExpenseIcon = isSettlement ? BanknoteIcon : CategoryExpenseIcon;
 
-  const createDate = expense?.createdAt
-    ? new Date(expense?.createdAt).toString()
-    : "";
+  const createDate = expense?.createdAt ? indiaDate(expense?.createdAt) : "";
 
   return expense ? (
     <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>

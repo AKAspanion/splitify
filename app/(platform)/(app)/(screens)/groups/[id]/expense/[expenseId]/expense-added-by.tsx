@@ -1,7 +1,6 @@
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { db } from "@/lib/db";
 import { relativeDate } from "@/utils/date";
-import { format } from "date-fns";
 
 const ExpenseAddedBy = async ({
   userId,

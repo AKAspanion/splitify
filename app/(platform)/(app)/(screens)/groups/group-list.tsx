@@ -27,7 +27,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
   const { userId } = auth();
 
   const query = {
-    take: show ? undefined : 5,
+    take: show ? undefined : 6,
     where: {
       users: { some: { id: userId || "null" } },
       title: { contains: searchText },
