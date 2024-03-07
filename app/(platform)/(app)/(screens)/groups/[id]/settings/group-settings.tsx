@@ -11,6 +11,7 @@ import { PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NoData } from "@/components/no-data";
+import GroupLeave from "./group-leave";
 
 const GroupMembers = dynamic(() => import("./group-members"), {
   loading: () => (
@@ -80,6 +81,8 @@ const GroupSettings = async ({
           <hr />
           <div className="h-6" />
           <GroupDelete id={group?.id} />
+          <div className="h-2" />
+          <GroupLeave id={group?.id} />
         </>
       ) : (
         <NoData title="Group not found" />
