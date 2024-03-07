@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
+import Adsense from "./adsense";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,6 +34,7 @@ export default function RootLayout({
         strategy="afterInteractive"
         src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
       />
+      <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
