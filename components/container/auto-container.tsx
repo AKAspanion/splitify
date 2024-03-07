@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
 
 type AutoContainerProps = {
+  id?: string;
   header?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export const AutoContainer = ({ header, children }: AutoContainerProps) => {
+export const AutoContainer = ({ id, header, children }: AutoContainerProps) => {
   return (
     <>
       {header ? (
@@ -14,6 +15,7 @@ export const AutoContainer = ({ header, children }: AutoContainerProps) => {
         </div>
       ) : null}
       <div
+        id={id}
         className={cn(
           "pb-8 px-8 h-[calc(100vh-73px)] sm:h-[calc(100vh-64px)] overflow-y-auto",
           header
