@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "in.spanion.splitify.twa",
+        "sha256_cert_fingerprints": ["CC:62:1F:79:79:89:D1:A7:79:D8:91:87:40:43:53:A8:6E:A8:73:26:F4:95:E9:48:40:9D:2D:4E:89:79:D6:99"]
+      }
+    }]

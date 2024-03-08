@@ -1,0 +1,5 @@
+## App packaging
+*.apk
+*.aab
+*.keystore
+signing-key-info.txt

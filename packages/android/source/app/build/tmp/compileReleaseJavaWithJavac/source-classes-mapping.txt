@@ -1,0 +1,8 @@
+in/spanion/splitify/twa/DelegationService.java
+ in.spanion.splitify.twa.DelegationService
+in/spanion/splitify/twa/LauncherActivity.java
+ in.spanion.splitify.twa.LauncherActivity
+in/spanion/splitify/twa/BuildConfig.java
+ in.spanion.splitify.twa.BuildConfig
+in/spanion/splitify/twa/Application.java
+ in.spanion.splitify.twa.Application

@@ -17,7 +17,7 @@ const LandingPage = () => {
     <div className="flex items-center justify-center flex-col pt-12">
       <div className={cn("flex items-center justify-center flex-col")}>
         <h1 className="uppercase text-3xl font-extralight md:text-6xl text-center text-neutral-800dark:text-neutral-200 mb-6">
-          Spliting Expenses
+          Splitting Expenses
         </h1>
         <div className="uppercase text-md md:text-4xl bg-gradient-to-r from-green-600 to-lime-600 text-white px-4 py-2 rounded-md w-fit">
           made easy
