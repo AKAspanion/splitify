@@ -22,6 +22,7 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
           select: {
             id: true,
             name: true,
+            fromClerk: true,
             firstName: true,
             profile_image_url: true,
           },

@@ -3,7 +3,6 @@
 import { DarkModeToggle } from "@/components/theme/dark-mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import OneSignal from "react-onesignal";
 import {
   ClerkLoaded,
   ClerkLoading,
@@ -20,7 +19,6 @@ const ProfilePage = () => {
   const router = useRouter();
 
   const handleSignout = () => {
-    OneSignal.logout();
     signOut(() => router.push("/"));
   };
 
