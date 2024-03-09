@@ -9,7 +9,11 @@ import {
   UserProfile,
   useClerk,
 } from "@clerk/nextjs";
-import { ArrowLeftIcon, FingerprintIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  FingerprintIcon,
+  MessageSquareHeart,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NotificationAction from "./notification-action";
@@ -60,6 +64,12 @@ const ProfilePage = () => {
               <span className="sr-only">Back</span>
             </Button>
             <div className="flex-1" />
+            <Link href="/feedback/add">
+              <Button variant="ghost" size="icon">
+                <MessageSquareHeart />
+                <span className="sr-only">Feedback</span>
+              </Button>
+            </Link>
             <DarkModeToggle />
             <Button variant="secondary" onClick={() => handleSignout()}>
               Sign out
