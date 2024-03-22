@@ -77,14 +77,32 @@
       "form_factor": "wide"
     },
     {
-      "src": "images/ss/mobile-light.png",
-      "sizes": "750x1334",
+      "src": "images/ss/feature-0.png",
+      "sizes": "1140x2280",
       "type": "image/png",
       "form_factor": "narrow"
     },
     {
-      "src": "images/ss/mobile-dark.png",
-      "sizes": "750x1334",
+      "src": "images/ss/feature-1.png",
+      "sizes": "1140x2280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "images/ss/feature-2.png",
+      "sizes": "1140x2280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "images/ss/feature-3.png",
+      "sizes": "1140x2280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "images/ss/feature-4.png",
+      "sizes": "1140x2280",
       "type": "image/png",
       "form_factor": "narrow"
     }
