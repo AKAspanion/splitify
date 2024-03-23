@@ -5,23 +5,15 @@ import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Expense } from "@prisma/client";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import { indiaDate } from "@/utils/date";
-
-const WhoPaid = dynamic(() => import("./who-paid"), {
-  loading: () => <Skeleton className="h-4 w-[120px]" />,
-});
-
-const YourShare = dynamic(() => import("./your-share"), {
-  loading: () => <Skeleton className="h-3 w-[120px]" />,
-});
+import WhoPaid from "./who-paid";
+import YourShare from "./your-share";
 
 type ExpenseCardProps = {
   expense: Expense;
 };
 
-export const ExpenseCard = async (props: ExpenseCardProps) => {
+export const ExpenseCard = (props: ExpenseCardProps) => {
   const { expense } = props;
 
   const category = (expense?.category || "General") as ExpenseCategoryType;

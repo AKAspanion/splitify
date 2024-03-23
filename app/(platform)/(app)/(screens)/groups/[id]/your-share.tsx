@@ -1,26 +1,28 @@
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+"use client";
+
 import { RUPPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum } from "@/utils/validate";
+import { useEffect, useMemo, useState } from "react";
+import { getShare } from "@/actions/get-share";
+import { User, UserPayment, UserSplit } from "@prisma/client";
+import { useUser } from "@clerk/nextjs";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const YourShare = async ({
+const YourShare = ({
   groupId,
   expenseId,
 }: {
   groupId?: string | null;
   expenseId: string;
 }) => {
-  const { userId } = auth();
-  const [users, payments, splits] = await db.$transaction([
-    db.user.findMany({
-      where: { groups: { some: { id: groupId || "null" } } },
-    }),
-    db.userPayment.findMany({ where: { expenseId } }),
-    db.userSplit.findMany({ where: { expenseId } }),
-  ]);
+  const { user } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [splits, setSplits] = useState<UserSplit[]>([]);
+  const [payments, setPayments] = useState<UserPayment[]>([]);
 
-  const getSummaryList = () => {
-    const u = users?.find((x) => x?.id === userId);
+  const summaryList = useMemo(() => {
+    const u = users?.find((x) => x?.id === user?.id);
     if (!u) {
       return "";
     }
@@ -44,9 +46,32 @@ const YourShare = async ({
         {owed}
       </div>
     );
+  }, [payments, splits, user?.id, users]);
+
+  const fetchShare = async () => {
+    if (groupId && expenseId) {
+      setLoading(true);
+      const { data } = await getShare(expenseId, groupId);
+      if (data) {
+        const { users: us, payments: ps, splits: sps } = data;
+        setUsers(() => [...(us || [])]);
+        setPayments(() => [...(ps || [])]);
+        setSplits(() => [...(sps || [])]);
+      }
+      setLoading(false);
+    }
   };
 
-  return <div className="text-[12px] truncate">{getSummaryList()}</div>;
+  useEffect(() => {
+    fetchShare();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, expenseId]);
+
+  return loading ? (
+    <Skeleton className="h-3 w-[120px]" />
+  ) : (
+    <div className="text-[12px] truncate">{summaryList}</div>
+  );
 };
 
 export default YourShare;

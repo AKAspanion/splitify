@@ -1,29 +1,51 @@
-import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
-import Link from "next/link";
+"use client";
 
-const ExpensesPaginate = async ({
+import { getExpenses } from "@/actions/get-expense";
+import { Expense } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
+
+import { useInView } from "react-intersection-observer";
+import { ExpenseCard } from "./expense-card";
+import Spinner from "@/components/ui/spinner";
+
+const ExpensesPaginate = ({
   groupId,
-  page,
-  count,
 }: {
   groupId: string;
-  page: number;
-  count: number;
+  loader: React.ReactNode;
 }) => {
-  const totalCount = await db.expense.count({ where: { groupId } });
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
 
-  const more = totalCount > count;
+  const { ref, inView } = useInView();
 
-  return more ? (
-    <div className="flex w-full items-center justify-center">
-      <Link href={`/groups/${groupId}?page=${page + 1}`}>
-        <Button type="button" variant={"secondary"}>
-          <div>Show more</div>
-        </Button>
-      </Link>
-    </div>
-  ) : null;
+  const loadMoreExpenses = useCallback(async () => {
+    setLoading(true);
+    const nextPage = page + 1;
+    const { data: nextExpenses = [] } = await getExpenses(nextPage, groupId);
+    if (nextExpenses?.length) {
+      setPage(nextPage);
+      setExpenses((prevExpenses) => [...prevExpenses, ...nextExpenses]);
+    }
+    setLoading(false);
+  }, [groupId, page]);
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreExpenses();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView]);
+
+  return (
+    <>
+      {expenses?.map((e) => <ExpenseCard expense={e} key={e.id} />)}
+      <div ref={ref} className="flex w-full items-center justify-center">
+        {loading ? <Spinner /> : null}
+      </div>
+    </>
+  );
 };
 
 export default ExpensesPaginate;

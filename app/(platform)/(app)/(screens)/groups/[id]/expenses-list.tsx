@@ -1,39 +1,23 @@
+import { getExpenses } from "@/actions/get-expense";
 import { ExpenseCard } from "./expense-card";
 import { NoData } from "@/components/no-data";
-import { ScrollTo } from "@/components/scroll-to";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { db } from "@/lib/db";
 import { UserPlusIcon } from "lucide-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import React from "react";
-
-const ExpensesPaginate = dynamic(() => import("./expenses-paginate"), {
-  loading: () => (
-    <div className="py-6 flex w-full items-center justify-center">
-      <Skeleton className="h-10 w-[108px]" />
-    </div>
-  ),
-});
-
-const PAGE_COUNT = 9;
+import ExpensesPaginate from "./expenses-paginate";
+import { auth } from "@clerk/nextjs";
 
 const ExpensesList = async ({
-  page,
   backUrl,
   groupId,
 }: {
-  page: number;
   groupId: string;
   backUrl: string;
 }) => {
-  const take = page * PAGE_COUNT;
-  const expenses = await db.expense.findMany({
-    take,
-    where: { groupId },
-    orderBy: [{ createdAt: "desc" }],
-  });
+  const { userId } = auth();
+  const { data: expenses } = await getExpenses(1, groupId);
 
   const count = expenses ? expenses?.length : 0;
 
@@ -61,17 +45,12 @@ const ExpensesList = async ({
       ) : (
         <>
           <div className="pb-8 pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {expenses?.map((e, i) => (
-              <React.Fragment key={e.id}>
-                <ExpenseCard expense={e} key={e.id} />
-                {(i + 1) % PAGE_COUNT === 0 && i !== count - 1 ? (
-                  <div className="w-0" id={`take${i + 1}`} />
-                ) : null}
-              </React.Fragment>
-            ))}
+            {expenses?.map((e) => <ExpenseCard expense={e} key={e.id} />)}
+            <ExpensesPaginate
+              groupId={groupId}
+              loader={<ExpenseListLoader />}
+            />
           </div>
-          <ExpensesPaginate groupId={groupId} page={page} count={count} />
-          <ScrollTo id={`take${take - PAGE_COUNT}`} parent={"expenseslist"} />
         </>
       )}
     </>

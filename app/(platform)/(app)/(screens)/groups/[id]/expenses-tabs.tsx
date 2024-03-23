@@ -29,15 +29,12 @@ const Totals = dynamic(() => import("./totals"), {
 const ExpensesTabs = ({
   id,
   tab,
-  page,
   backUrl,
 }: {
   id: string;
   tab: string;
-  page: number;
   backUrl: string;
 }) => {
-  const keyString = `page=${page}`;
   return (
     <>
       <Tabs defaultValue={tab} className="w-full pb-6">
@@ -53,14 +50,7 @@ const ExpensesTabs = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
-          <Suspense key={keyString} fallback={<ExpenseListLoader />}>
-            <ExpensesList
-              key={keyString}
-              page={page}
-              groupId={id}
-              backUrl={backUrl}
-            />
-          </Suspense>
+          <ExpensesList groupId={id} backUrl={backUrl} />
         </TabsContent>
         <TabsContent value={"Balances"}>
           <div className="py-6">

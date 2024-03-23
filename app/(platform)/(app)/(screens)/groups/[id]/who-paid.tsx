@@ -1,27 +1,50 @@
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
-import { whoPaidExpense } from "../../../_utils/expense";
+"use client";
 
-const WhoPaid = async ({
+import { whoPaidExpense } from "../../../_utils/expense";
+import { useEffect, useMemo, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { getWhoPaid } from "@/actions/get-who-paid";
+import { UserPaymentWithUser } from "@/types/shared";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const WhoPaid = ({
   expenseId,
   amount,
 }: {
   expenseId: string;
   amount: number;
 }) => {
-  const { userId } = auth();
-  if (!expenseId || !amount) {
-    return null;
-  }
+  const { user } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [payments, setPayments] = useState<UserPaymentWithUser[]>([]);
 
-  const payments = await db.userPayment.findMany({
-    where: { expenseId: expenseId || "null" },
-    select: { user: true },
-  });
+  const whoPaid = useMemo(
+    () => whoPaidExpense(amount, payments || [], user?.id || ""),
+    [amount, payments, user?.id],
+  );
 
-  const whoPaid = whoPaidExpense(amount, payments || [], userId || "");
+  const fetchWhoPaid = async () => {
+    if (expenseId) {
+      setLoading(true);
+      const { data } = await getWhoPaid(expenseId);
+      if (data) {
+        const { payments: ps } = data;
+        setPayments(() => [...(ps || [])]);
+      }
+      setLoading(false);
+    }
+  };
 
-  return <div>{whoPaid}</div>;
+  useEffect(() => {
+    fetchWhoPaid();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expenseId]);
+
+  return loading ? (
+    <Skeleton className="h-4 w-[120px]" />
+  ) : (
+    <div>{whoPaid}</div>
+  );
 };
 
 export default WhoPaid;

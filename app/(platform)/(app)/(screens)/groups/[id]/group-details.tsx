@@ -38,9 +38,6 @@ const GroupDetails = async ({
 }: ServerSideComponentProp) => {
   const { userId } = auth();
   const id = params["id"] || "null";
-  const pageNo = searchParams["page"] || "1";
-
-  const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
 
   const tab = searchParams["tab"] || "Expenses";
 
@@ -91,7 +88,7 @@ const GroupDetails = async ({
             }
           />
           <GroupUsers id={id} backUrl={backUrl} />
-          <ExpensesTabs page={page} id={id} backUrl={backUrl} tab={tab} />
+          <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
         </div>
       ) : (
         <NoData title="Group not found" />
