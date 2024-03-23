@@ -2,23 +2,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
 import { BalancesLoader } from "./balances-loader";
+import { Suspense } from "react";
+import { ExpenseListLoader } from "./expenses-list";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
-  loading: () => (
-    <div className="py-6">
-      <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex gap-4 items-center">
-            <Skeleton className="rounded-full w-10 h-10" />
-            <div>
-              <Skeleton className="h-4 mt-0.5 w-[90px]" />
-              <Skeleton className="h-3 mt-1 w-[120px]" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  ),
+  loading: () => <ExpenseListLoader />,
 });
 
 const Balances = dynamic(() => import("./balances"), {
@@ -41,12 +29,15 @@ const Totals = dynamic(() => import("./totals"), {
 const ExpensesTabs = ({
   id,
   tab,
+  page,
   backUrl,
 }: {
   id: string;
   tab: string;
+  page: number;
   backUrl: string;
 }) => {
+  const keyString = `page=${page}`;
   return (
     <>
       <Tabs defaultValue={tab} className="w-full pb-6">
@@ -62,7 +53,9 @@ const ExpensesTabs = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
-          <ExpensesList groupId={id} backUrl={backUrl} />
+          <Suspense key={keyString} fallback={<ExpenseListLoader />}>
+            <ExpensesList page={page} groupId={id} backUrl={backUrl} />
+          </Suspense>
         </TabsContent>
         <TabsContent value={"Balances"}>
           <div className="py-6">

@@ -5,6 +5,7 @@ import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo } from "react";
 import { evaluateTotals } from "../../../_utils/calculation";
 import { useUser } from "@clerk/nextjs";
+import { fixedNum } from "@/utils/validate";
 
 export const TotalsList = ({
   expenses,
@@ -23,14 +24,14 @@ export const TotalsList = ({
         <div className="">Total group spending</div>
         <div className="font-medium text-xl">
           {RUPPEE_SYMBOL}
-          {data?.totals}
+          {fixedNum(data?.totals)}
         </div>
       </div>
       <div>
         <div>Total you paid for</div>
         <div className="font-medium text-xl">
           {RUPPEE_SYMBOL}
-          {data?.yours}
+          {fixedNum(data?.yours)}
         </div>
       </div>
       {/* <div>

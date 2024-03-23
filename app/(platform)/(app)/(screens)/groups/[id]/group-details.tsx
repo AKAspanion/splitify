@@ -12,31 +12,42 @@ import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { DownloadReport } from "./_components/download-report";
 import { NoData } from "@/components/no-data";
+import { urlEncode } from "@/utils/func";
 
 const GroupUsers = dynamic(() => import("./group-users"), {
   loading: () => <UserAvatarsLoading />,
 });
 
 const ExpensesTabs = dynamic(() => import("./expenses-tabs"), {
-  loading: () => (
+  loading: () => <ExpensesTabsLoader />,
+});
+
+const ExpensesTabsLoader = () => {
+  return (
     <div className="grid grid-cols-3 gap-2 pb-6">
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />
       <Skeleton className="h-10" />
     </div>
-  ),
-});
+  );
+};
 
 const GroupDetails = async ({
-  id,
-  tab,
-  backUrl,
-}: {
-  id: string;
-  tab: string;
-  backUrl: string;
-}) => {
+  params,
+  searchParams,
+}: ServerSideComponentProp) => {
   const { userId } = auth();
+  const id = params["id"] || "null";
+  const pageNo = searchParams["page"] || "1";
+
+  const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
+
+  const tab = searchParams["tab"] || "Expenses";
+
+  const backUrl = urlEncode({
+    path: `/groups/${id}`,
+    query: searchParams,
+  });
 
   const group = await db.group.findUnique({
     where: { id, users: { some: { id: userId || "null" } } },
@@ -44,6 +55,7 @@ const GroupDetails = async ({
 
   return (
     <AutoContainer
+      id="expenseslist"
       header={
         <Header
           backTo="/groups"
@@ -79,7 +91,7 @@ const GroupDetails = async ({
             }
           />
           <GroupUsers id={id} backUrl={backUrl} />
-          <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
+          <ExpensesTabs page={page} id={id} backUrl={backUrl} tab={tab} />
         </div>
       ) : (
         <NoData title="Group not found" />
