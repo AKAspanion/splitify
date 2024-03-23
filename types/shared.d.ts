@@ -25,3 +25,5 @@ export type PartialExpenseWithPaymentWithSplit = Expense & {
 export type GroupWIthUsers = Group & { users: User[] };
 
 export type GroupWIthExpenses = Group & { expenses: Expense[] };
+
+export type GroupWIthExpenseWithUserWithPaymentWithSplit = Group & { expenses: ExpenseWithUserWithPaymentWithSplit[] };
