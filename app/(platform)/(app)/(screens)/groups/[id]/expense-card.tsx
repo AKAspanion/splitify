@@ -27,6 +27,8 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const createDate = expense?.createdAt ? indiaDate(expense?.createdAt) : "";
 
+  // console.log({ createDate });
+
   return expense ? (
     <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>
       <ListItem
@@ -45,7 +47,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
         actions={
           <div className="text-[10px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
-              {format(createDate, "d LLL")}
+              {/* {format(createDate, "d LLL")} */}
             </div>
             {isSettlement ? null : (
               <YourShare expenseId={expense?.id} groupId={expense?.groupId} />
