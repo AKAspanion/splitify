@@ -10,13 +10,14 @@ import Spinner from "@/components/ui/spinner";
 
 const ExpensesPaginate = ({
   groupId,
+  intialExpenses,
 }: {
   groupId: string;
-  loader: React.ReactNode;
+  intialExpenses: Expense[] | null;
 }) => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>(intialExpenses || []);
 
   const { ref, inView } = useInView();
 
@@ -39,12 +40,12 @@ const ExpensesPaginate = ({
   }, [inView]);
 
   return (
-    <>
+    <div className="pb-8 pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {expenses?.map((e) => <ExpenseCard expense={e} key={e.id} />)}
       <div ref={ref} className="flex w-full items-center justify-center">
         {loading ? <Spinner /> : null}
       </div>
-    </>
+    </div>
   );
 };
 

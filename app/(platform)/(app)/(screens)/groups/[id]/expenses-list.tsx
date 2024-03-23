@@ -7,7 +7,6 @@ import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ExpensesPaginate from "./expenses-paginate";
-import { auth } from "@clerk/nextjs";
 
 const ExpensesList = async ({
   backUrl,
@@ -16,7 +15,6 @@ const ExpensesList = async ({
   groupId: string;
   backUrl: string;
 }) => {
-  const { userId } = auth();
   const { data: expenses } = await getExpenses(1, groupId);
 
   const count = expenses ? expenses?.length : 0;
@@ -43,15 +41,7 @@ const ExpensesList = async ({
           }
         />
       ) : (
-        <>
-          <div className="pb-8 pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {expenses?.map((e) => <ExpenseCard expense={e} key={e.id} />)}
-            <ExpensesPaginate
-              groupId={groupId}
-              loader={<ExpenseListLoader />}
-            />
-          </div>
-        </>
+        <ExpensesPaginate groupId={groupId} intialExpenses={expenses} />
       )}
     </>
   );
