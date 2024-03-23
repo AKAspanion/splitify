@@ -5,7 +5,7 @@ import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Expense } from "@prisma/client";
-import { indiaDate } from "@/utils/date";
+import { formateDate, indiaDate } from "@/utils/date";
 import WhoPaid from "./who-paid";
 import YourShare from "./your-share";
 
@@ -27,8 +27,6 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const createDate = expense?.createdAt ? indiaDate(expense?.createdAt) : "";
 
-  // console.log({ createDate });
-
   return expense ? (
     <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>
       <ListItem
@@ -47,7 +45,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
         actions={
           <div className="text-[10px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
-              {/* {format(createDate, "d LLL")} */}
+              {formateDate(createDate, "d LLL")}
             </div>
             {isSettlement ? null : (
               <YourShare expenseId={expense?.id} groupId={expense?.groupId} />
