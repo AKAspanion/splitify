@@ -17,7 +17,7 @@ const ExpensesPaginate = dynamic(() => import("./expenses-paginate"), {
   ),
 });
 
-const PAGE_COUNT = 10;
+const PAGE_COUNT = 9;
 
 const ExpensesList = async ({
   page,
@@ -65,7 +65,7 @@ const ExpensesList = async ({
               <React.Fragment key={e.id}>
                 <ExpenseCard expense={e} key={e.id} />
                 {(i + 1) % PAGE_COUNT === 0 && i !== count - 1 ? (
-                  <hr id={`take${i + 1}`} />
+                  <div className="w-0" id={`take${i + 1}`} />
                 ) : null}
               </React.Fragment>
             ))}

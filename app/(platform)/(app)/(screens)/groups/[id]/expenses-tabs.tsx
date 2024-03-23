@@ -54,7 +54,12 @@ const ExpensesTabs = ({
         </TabsList>
         <TabsContent value={"Expenses"}>
           <Suspense key={keyString} fallback={<ExpenseListLoader />}>
-            <ExpensesList page={page} groupId={id} backUrl={backUrl} />
+            <ExpensesList
+              key={keyString}
+              page={page}
+              groupId={id}
+              backUrl={backUrl}
+            />
           </Suspense>
         </TabsContent>
         <TabsContent value={"Balances"}>
