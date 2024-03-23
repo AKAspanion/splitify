@@ -13,6 +13,8 @@ const ExpensesList = async ({
   backUrl: string;
 }) => {
   const expenses = await db.expense.findMany({
+    // TODO add pagination
+    take: 5,
     where: { groupId },
     orderBy: [{ createdAt: "desc" }],
   });
