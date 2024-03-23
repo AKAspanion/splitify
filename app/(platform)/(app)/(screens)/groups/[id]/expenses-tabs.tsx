@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { BalancesLoader } from "./balances-loader";
 import { Suspense } from "react";
 import { ExpenseListLoader } from "./expenses-list";
+import { Input } from "@/components/ui/input";
+import { Search } from "../../../_components/search";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
   loading: () => <ExpenseListLoader />,
@@ -30,10 +32,12 @@ const ExpensesTabs = ({
   id,
   tab,
   backUrl,
+  searchText,
 }: {
   id: string;
   tab: string;
   backUrl: string;
+  searchText?: string;
 }) => {
   return (
     <>
@@ -50,7 +54,9 @@ const ExpensesTabs = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
-          <ExpensesList groupId={id} backUrl={backUrl} />
+          <div className="h-3" />
+          <Search path={`/groups/${id}`} queryText={searchText} />
+          <ExpensesList groupId={id} backUrl={backUrl} queryText={searchText} />
         </TabsContent>
         <TabsContent value={"Balances"}>
           <div className="py-6">

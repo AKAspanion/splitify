@@ -4,8 +4,12 @@ import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
 
-const PAGE_COUNT = 8;
-export const getExpenses = async (page = 1, groupId: string) => {
+const PAGE_COUNT = 10;
+export const getExpenses = async (
+  page = 1,
+  groupId: string,
+  queryText?: string,
+) => {
   const { userId } = auth();
 
   if (!userId) {
@@ -22,7 +26,7 @@ export const getExpenses = async (page = 1, groupId: string) => {
     const expenses = await db.expense.findMany({
       skip,
       take,
-      where: { groupId },
+      where: { groupId, description: { contains: queryText } },
       orderBy: [{ createdAt: "desc" }],
     });
 

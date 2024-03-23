@@ -11,11 +11,13 @@ import ExpensesPaginate from "./expenses-paginate";
 const ExpensesList = async ({
   backUrl,
   groupId,
+  queryText,
 }: {
   groupId: string;
   backUrl: string;
+  queryText?: string;
 }) => {
-  const { data: expenses } = await getExpenses(1, groupId);
+  const { data: expenses } = await getExpenses(1, groupId, queryText);
 
   const count = expenses ? expenses?.length : 0;
 

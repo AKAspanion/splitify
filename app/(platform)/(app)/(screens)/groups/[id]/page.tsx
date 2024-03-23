@@ -2,6 +2,7 @@ import { urlEncode } from "@/utils/func";
 import dynamic from "next/dynamic";
 import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
 
 const GroupDetails = dynamic(() => import("./group-details"), {
   loading: () => <GroupDetailsLoading />,
@@ -24,7 +25,12 @@ const GroupDetailsLoading = () => {
 };
 
 const GroupDetailsPage = async (props: ServerSideComponentProp) => {
-  return <GroupDetails {...props} />;
+  const keyString = `show=${props.searchParams?.["show"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
+  return (
+    <Suspense key={keyString} fallback={<GroupDetailsLoading />}>
+      <GroupDetails {...props} />
+    </Suspense>
+  );
 };
 
 export default GroupDetailsPage;

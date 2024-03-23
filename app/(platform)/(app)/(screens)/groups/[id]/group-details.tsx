@@ -41,6 +41,8 @@ const GroupDetails = async ({
 
   const tab = searchParams["tab"] || "Expenses";
 
+  const searchText = searchParams["text"];
+
   const backUrl = urlEncode({
     path: `/groups/${id}`,
     query: searchParams,
@@ -88,7 +90,12 @@ const GroupDetails = async ({
             }
           />
           <GroupUsers id={id} backUrl={backUrl} />
-          <ExpensesTabs id={id} backUrl={backUrl} tab={tab} />
+          <ExpensesTabs
+            id={id}
+            tab={tab}
+            backUrl={backUrl}
+            searchText={searchText}
+          />
         </div>
       ) : (
         <NoData title="Group not found" />

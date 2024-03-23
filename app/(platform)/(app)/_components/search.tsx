@@ -11,10 +11,12 @@ export const Search = ({
   path,
   queryText,
   queryKey = "text",
+  placeholder = "Search...",
 }: {
   path: string;
   queryKey?: string;
   queryText?: string;
+  placeholder?: string;
 } & Partial<ServerSideComponentProp>) => {
   const router = useRouter();
   const initialRender = useRef(true);
@@ -39,8 +41,9 @@ export const Search = ({
   return (
     <div className="relative rounded-md shadow-sm">
       <Input
+        autoFocus
         value={text}
-        placeholder="Search groups..."
+        placeholder={placeholder}
         onChange={(e) => setText(e.target.value)}
       />
     </div>
