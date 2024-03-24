@@ -23,14 +23,20 @@ export const getExpenses = async (
   try {
     const skip = (page - 1) * PAGE_COUNT;
     const take = page * PAGE_COUNT;
-    const expenses = await db.expense.findMany({
-      skip,
-      take,
-      where: { groupId, description: { contains: queryText } },
-      orderBy: [{ createdAt: "desc" }],
-    });
 
-    return { data: expenses, error: null };
+    const [count, expenses] = await Promise.all([
+      db.expense.count({
+        where: { groupId, description: { contains: queryText } },
+      }),
+      db.expense.findMany({
+        skip,
+        take,
+        where: { groupId, description: { contains: queryText } },
+        orderBy: [{ createdAt: "desc" }],
+      }),
+    ]);
+
+    return { data: { count, expenses }, error: null };
   } catch (err) {
     return {
       data: null,

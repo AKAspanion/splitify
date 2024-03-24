@@ -67,12 +67,7 @@ const GroupDetails = async ({
       <div className="flex flex-col gap-6">
         <GroupClient id={id} />
         <GroupUsers id={id} backUrl={backUrl} />
-        <ExpensesTabs
-          id={id}
-          tab={tab}
-          backUrl={backUrl}
-          searchText={searchText}
-        />
+        <ExpensesTabs id={id} tab={tab} backUrl={backUrl} />
       </div>
     </AutoContainer>
   );

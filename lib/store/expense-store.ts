@@ -32,7 +32,7 @@ export const defaultInitState: ExpenseState = {
   expenses: {},
   pageLoading: false,
   page: 0,
-  count: 0,
+  count: Infinity,
   whoPaid: {},
   whoPaidLoading: {},
   yourShare: {},
@@ -59,14 +59,15 @@ export const createExpenseStore = (
         set(() => ({ pageLoading: true }));
 
         const nextPage = page + 1;
-        const { data: nextExpenses = [] } = await getExpenses(nextPage, grp);
-        if (nextExpenses?.length) {
+        const { data } = await getExpenses(nextPage, grp);
+        if (data?.expenses?.length) {
           set((state) => ({
             page: nextPage,
             pageLoading: false,
+            count: data?.count,
             expenses: {
               ...(state?.expenses || {}),
-              [grp]: [...(state?.expenses?.[grp] || []), ...nextExpenses],
+              [grp]: [...(state?.expenses?.[grp] || []), ...data?.expenses],
             },
           }));
         }

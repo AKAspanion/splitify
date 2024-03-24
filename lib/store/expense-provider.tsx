@@ -13,17 +13,15 @@ export const ExpenseStoreContext = createContext<StoreApi<ExpenseStore> | null>(
 );
 
 export interface ExpenseStoreProviderProps {
-  count: number;
   children: ReactNode;
 }
 
 export const ExpenseStoreProvider = ({
-  count,
   children,
 }: ExpenseStoreProviderProps) => {
   const storeRef = useRef<StoreApi<ExpenseStore>>();
   if (!storeRef.current) {
-    storeRef.current = createExpenseStore({ count });
+    storeRef.current = createExpenseStore();
   }
 
   return (

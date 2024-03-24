@@ -1,5 +1,4 @@
-import { getExpenses } from "@/actions/get-expenses";
-import { ExpenseCard } from "./expense-card";
+"use client";
 import { NoData } from "@/components/no-data";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,17 +6,16 @@ import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ExpensesPaginate from "./expenses-paginate";
-import { db } from "@/lib/db";
+import useExpenses from "@/hooks/use-expenses";
 
-const ExpensesList = async ({
+const ExpensesList = ({
   backUrl,
   groupId,
-  count,
 }: {
   groupId: string;
   backUrl: string;
-  count: number;
 }) => {
+  const { count } = useExpenses();
   const noExpenses = count === 0;
 
   const noDataSubtitle = "Start adding expenses and/or group members";

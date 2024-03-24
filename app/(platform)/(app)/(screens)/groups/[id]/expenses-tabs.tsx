@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 import { BalancesLoader } from "./balances-loader";
 import { ExpenseListLoader } from "./expenses-list";
 // import { Search } from "../../../_components/search";
-import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
-import { db } from "@/lib/db";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
   loading: () => (
@@ -36,19 +34,13 @@ const ExpensesTabs = async ({
   id,
   tab,
   backUrl,
-  searchText,
 }: {
   id: string;
   tab: string;
   backUrl: string;
-  searchText?: string;
 }) => {
-  const count = await db.expense.count({
-    where: { groupId: id, description: { contains: searchText } },
-  });
-
   return (
-    <ExpenseStoreProvider count={count}>
+    <>
       <Tabs defaultValue={tab} className="w-full pb-6">
         <TabsList className="w-full">
           <TabsTrigger value={"Expenses"} className="w-full">
@@ -64,7 +56,7 @@ const ExpensesTabs = async ({
         <TabsContent value={"Expenses"}>
           {/* <div className="h-3" /> */}
           {/* <Search path={`/groups/${id}`} queryText={searchText} /> */}
-          <ExpensesList groupId={id} backUrl={backUrl} count={count} />
+          <ExpensesList groupId={id} backUrl={backUrl} />
         </TabsContent>
         <TabsContent value={"Balances"}>
           <div className="py-6">
@@ -75,7 +67,7 @@ const ExpensesTabs = async ({
           <Totals id={id} />
         </TabsContent>
       </Tabs>
-    </ExpenseStoreProvider>
+    </>
   );
 };
 

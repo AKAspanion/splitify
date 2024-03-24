@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { AddExpenseFab } from "../_components/add-expense-fab";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GroupStoreProvider } from "@/lib/store/group-provider";
+import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
 
 export default function PlatformLayout({
   children,
@@ -15,7 +16,9 @@ export default function PlatformLayout({
           <Skeleton className="rounded-md h-[100px] w-[calc(100vw-48px)] m-6" />
         }
       >
-        <GroupStoreProvider>{children}</GroupStoreProvider>
+        <GroupStoreProvider>
+          <ExpenseStoreProvider>{children}</ExpenseStoreProvider>
+        </GroupStoreProvider>
       </Suspense>
       <Suspense>
         <AddExpenseFab />
