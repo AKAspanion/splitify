@@ -15,7 +15,6 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
   } = useExpenseStore((s) => s);
 
   const { ref, inView } = useInView();
-  const { ref: cardRef, inView: cardInView } = useInView();
 
   const expensesList = useMemo(() => {
     return expenses[groupId] || [];
@@ -32,28 +31,16 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
-  useEffect(() => {
-    if (cardInView) {
-      loadMoreExpenses();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardInView]);
-
   return (
     <div className="pb-8 pt-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {expensesList?.map((e, i) => (
-          <div
-            ref={
-              loading ? null : expensesList?.length - 1 === i ? cardRef : null
-            }
-            key={e.id}
-          >
+          <div key={e.id}>
             <ExpenseCard expense={e} key={e.id} />
           </div>
         ))}
       </div>
-      <div ref={ref} className="w-full">
+      <div ref={loading ? null : ref} className="w-full">
         {loading ? <ExpenseListLoader /> : null}
       </div>
     </div>

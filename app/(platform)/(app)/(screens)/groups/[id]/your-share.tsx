@@ -83,9 +83,7 @@ const YourShare = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return loading ? (
-    <Skeleton className="h-3  mt-1 w-[120px]" />
-  ) : (
+  return loading ? null : (
     <div className="text-[12px] truncate">
       <div className={summaryList?.color}>{summaryList?.text || ""}</div>
     </div>

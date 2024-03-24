@@ -1,17 +1,38 @@
-import { db } from "@/lib/db";
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
+"use client";
+import {
+  UserAvatars,
+  UserAvatarsLoading,
+} from "@/app/(platform)/(app)/_components/user-avatars";
 import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useEffect, useMemo } from "react";
+import { useGroupStore } from "@/lib/store/group-provider";
 
-const GroupUsers = async ({ id, backUrl }: { id: string; backUrl: string }) => {
-  const users = await db.user.findMany({
-    where: { groups: { some: { id: id || "null" } } },
-  });
+const GroupUsers = ({ id, backUrl }: { id: string; backUrl: string }) => {
+  const { setGroupUsers, groupUsers, groupUsersLoading } = useGroupStore(
+    (s) => s,
+  );
+  const users = useMemo(() => {
+    return groupUsers[id];
+  }, [groupUsers, id]);
+
+  const loading = useMemo(() => {
+    return groupUsersLoading[id];
+  }, [groupUsersLoading, id]);
+
+  useEffect(() => {
+    if (!users) {
+      setGroupUsers(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const noData = !users || users.length === 0;
 
-  return noData ? null : (
+  return loading || noData ? (
+    <UserAvatarsLoading />
+  ) : (
     <UserAvatars
       users={users}
       action={

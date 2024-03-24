@@ -59,11 +59,7 @@ const WhoPaid = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return loading ? (
-    <Skeleton className="h-4 mt-1 w-[120px]" />
-  ) : (
-    <div>{whoPaidValue}</div>
-  );
+  return loading ? null : <div>{whoPaidValue}</div>;
 };
 
 export default WhoPaid;

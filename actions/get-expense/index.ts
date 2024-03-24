@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
 
-const PAGE_COUNT = 10;
+const PAGE_COUNT = 20;
 export const getExpenses = async (
   page = 1,
   groupId: string,
