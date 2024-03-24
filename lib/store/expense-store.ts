@@ -1,7 +1,7 @@
 import { Expense } from "@prisma/client";
 import { createStore } from "zustand/vanilla";
 // import { persist, createJSONStorage } from "zustand/middleware";
-import { getExpenses } from "@/actions/get-expense";
+import { getExpenses } from "@/actions/get-expenses";
 
 type ShareDataObj = { text: string; color: string };
 export type ExpenseState = {

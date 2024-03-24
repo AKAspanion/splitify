@@ -4,10 +4,11 @@ import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
 
-export const getExpense = async (
-  expenseId: string,
+const PAGE_COUNT = 20;
+export const getExpenses = async (
+  page = 1,
   groupId: string,
-  user = true,
+  queryText?: string,
 ) => {
   const { userId } = auth();
 
@@ -20,16 +21,20 @@ export const getExpense = async (
   }
 
   try {
-    const expense = await db.expense.findUnique({
-      where: { id: expenseId, groupId },
-      include: { user },
+    const skip = (page - 1) * PAGE_COUNT;
+    const take = page * PAGE_COUNT;
+    const expenses = await db.expense.findMany({
+      skip,
+      take,
+      where: { groupId, description: { contains: queryText } },
+      orderBy: [{ createdAt: "desc" }],
     });
 
-    return { data: expense, error: null };
+    return { data: expenses, error: null };
   } catch (err) {
     return {
       data: null,
-      error: "Failed to get expense",
+      error: "Failed to get expenses",
       debugMessage: getErrorMessage(err).message,
     };
   }

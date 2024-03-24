@@ -1,4 +1,4 @@
-import { getExpenses } from "@/actions/get-expense";
+import { getExpenses } from "@/actions/get-expenses";
 import { ExpenseCard } from "./expense-card";
 import { NoData } from "@/components/no-data";
 import { Button } from "@/components/ui/button";

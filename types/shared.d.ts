@@ -13,6 +13,10 @@ export type ExpenseWithUserWithPaymentWithSplit =
     user: User;
   };
 
+export type ExpenseWithUser = Expense & {
+  user: User;
+};
+
 export type ExpenseWithUserPayment = Expense & {
   payments: UserPaymentWithUser[];
 };

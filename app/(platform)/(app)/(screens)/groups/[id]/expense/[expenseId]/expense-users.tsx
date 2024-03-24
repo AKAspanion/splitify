@@ -2,33 +2,28 @@ import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
+import ExpenseUsersClient from "./expense-users-client";
 
 const ExpenseUsers = async ({
-  amount,
   expenseId,
+  groupId,
+  balance,
 }: {
-  amount?: number;
   expenseId: string;
+  groupId: string;
+  balance: React.ReactNode;
 }) => {
-  const { userId } = auth();
   const payments = await db.userPayment.findMany({
     where: { expenseId },
     include: { user: true },
   });
-  const users = payments?.map((p) => p.user) || [];
 
   return (
-    <UserAvatars
-      users={users}
-      action={
-        amount ? (
-          <div className="text-sm">
-            {whoPaidExpense(amount, payments || [], userId || "")}
-          </div>
-        ) : (
-          ""
-        )
-      }
+    <ExpenseUsersClient
+      payments={payments}
+      expenseId={expenseId}
+      groupId={groupId}
+      balance={balance}
     />
   );
 };

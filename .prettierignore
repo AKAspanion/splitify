@@ -40,3 +40,6 @@ next-env.d.ts
 
 # sw
 public/sw.js
+
+# packages
+packages
