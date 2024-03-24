@@ -66,7 +66,9 @@ const YourShare = ({
       // }
 
       setYourShareLoading(expenseId, true);
-      const { data } = await getShare(expenseId, groupId);
+      const { data } = await getShare(expenseId, groupId).then(
+        (r) => r.promise,
+      );
       if (data) {
         const { users: us, payments: ps, splits: sps } = data;
 

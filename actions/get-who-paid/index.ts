@@ -5,28 +5,32 @@ import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs";
 
 export const getWhoPaid = async (expenseId: string) => {
-  const { userId } = auth();
+  async function call() {
+    const { userId } = auth();
 
-  if (!userId) {
-    return {
-      data: null,
-      error: "Unauthorized",
-      debugMessage: "No user id found",
-    };
+    if (!userId) {
+      return {
+        data: null,
+        error: "Unauthorized",
+        debugMessage: "No user id found",
+      };
+    }
+
+    try {
+      const payments = await db.userPayment.findMany({
+        where: { expenseId: expenseId || "null" },
+        include: { user: true },
+      });
+
+      return { data: { payments }, error: null };
+    } catch (err) {
+      return {
+        data: null,
+        error: "Failed to get share",
+        debugMessage: getErrorMessage(err).message,
+      };
+    }
   }
 
-  try {
-    const payments = await db.userPayment.findMany({
-      where: { expenseId: expenseId || "null" },
-      include: { user: true },
-    });
-
-    return { data: { payments }, error: null };
-  } catch (err) {
-    return {
-      data: null,
-      error: "Failed to get share",
-      debugMessage: getErrorMessage(err).message,
-    };
-  }
+  return { promise: call() };
 };

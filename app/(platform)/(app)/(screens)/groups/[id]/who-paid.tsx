@@ -41,7 +41,7 @@ const WhoPaid = ({
       //   return;
       // }
       setWhoPaidLoading(expenseId, true);
-      const { data } = await getWhoPaid(expenseId);
+      const { data } = await getWhoPaid(expenseId).then((r) => r.promise);
       if (data) {
         const { payments: ps } = data;
         setWhoPaid(expenseId, calcWhoPaid(ps));
