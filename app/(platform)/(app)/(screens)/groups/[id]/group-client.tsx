@@ -4,22 +4,10 @@ import { useEffect, useMemo } from "react";
 import { GroupCard, GroupCardLoading } from "../../../_components/group-card";
 import { useGroupStore } from "@/lib/store/group-provider";
 import { Badge } from "@/components/ui/badge";
+import useGroup from "@/hooks/use-group";
 
 const GroupClient = ({ id }: { id: string }) => {
-  const { setGroup, groups, groupLoading } = useGroupStore((s) => s);
-  const group = useMemo(() => {
-    return groups[id];
-  }, [groups, id]);
-  const loading = useMemo(() => {
-    return groupLoading[id];
-  }, [groupLoading, id]);
-
-  useEffect(() => {
-    if (!group) {
-      setGroup(id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { group, loading } = useGroup(id);
 
   return loading || !group ? (
     <GroupCardLoading />

@@ -1,24 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useInView } from "react-intersection-observer";
 import { ExpenseCard } from "./expense-card";
-import { useExpenseStore } from "@/lib/store/expense-provider";
 import { ExpenseListLoader } from "./expenses-list";
+import useExpenses from "@/hooks/use-expenses";
 
 const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
-  const { expenses, pageLoading, addExpenses } = useExpenseStore((s) => s);
+  const { expenses, loading, addExpenses } = useExpenses(groupId);
 
   const { ref, inView } = useInView();
-
-  const expensesList = useMemo(() => {
-    return expenses[groupId] || [];
-  }, [expenses, groupId]);
-
-  const loading = useMemo(() => {
-    return pageLoading[groupId] || false;
-  }, [pageLoading, groupId]);
 
   const loadMoreExpenses = useCallback(async () => {
     addExpenses(groupId);
@@ -34,7 +26,7 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
   return (
     <div className="pb-8 pt-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {expensesList?.map((e, i) => (
+        {expenses?.map((e, i) => (
           <div key={e.id}>
             <ExpenseCard expense={e} key={e.id} />
           </div>

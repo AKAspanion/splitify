@@ -6,27 +6,10 @@ import {
 import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
-import { useGroupStore } from "@/lib/store/group-provider";
+import useGroupUsers from "@/hooks/use-group-users";
 
 const GroupUsers = ({ id, backUrl }: { id: string; backUrl: string }) => {
-  const { setGroupUsers, groupUsers, groupUsersLoading } = useGroupStore(
-    (s) => s,
-  );
-  const users = useMemo(() => {
-    return groupUsers[id];
-  }, [groupUsers, id]);
-
-  const loading = useMemo(() => {
-    return groupUsersLoading[id];
-  }, [groupUsersLoading, id]);
-
-  useEffect(() => {
-    if (!users) {
-      setGroupUsers(id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { users, loading } = useGroupUsers(id);
 
   const noData = !users || users.length === 0;
 

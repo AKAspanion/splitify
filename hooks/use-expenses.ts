@@ -2,9 +2,12 @@ import { useExpenseStore } from "@/lib/store/expense-provider";
 import { useMemo } from "react";
 
 const useExpenses = (groupId: string) => {
-  const { count: countStore, expenses: expensesStore } = useExpenseStore(
-    (s) => s,
-  );
+  const {
+    addExpenses,
+    pageLoading,
+    count: countStore,
+    expenses: expensesStore,
+  } = useExpenseStore((s) => s);
 
   const expenses = useMemo(() => {
     return expensesStore[groupId] || [];
@@ -14,7 +17,11 @@ const useExpenses = (groupId: string) => {
     return countStore[groupId] || [];
   }, [countStore, groupId]);
 
-  return { count, expenses };
+  const loading = useMemo(() => {
+    return pageLoading[groupId] || false;
+  }, [pageLoading, groupId]);
+
+  return { count, loading, expenses, addExpenses };
 };
 
 export default useExpenses;
