@@ -8,17 +8,17 @@ import { useExpenseStore } from "@/lib/store/expense-provider";
 import { ExpenseListLoader } from "./expenses-list";
 
 const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
-  const {
-    expenses,
-    pageLoading: loading,
-    addExpenses,
-  } = useExpenseStore((s) => s);
+  const { expenses, pageLoading, addExpenses } = useExpenseStore((s) => s);
 
   const { ref, inView } = useInView();
 
   const expensesList = useMemo(() => {
     return expenses[groupId] || [];
   }, [expenses, groupId]);
+
+  const loading = useMemo(() => {
+    return pageLoading[groupId] || false;
+  }, [pageLoading, groupId]);
 
   const loadMoreExpenses = useCallback(async () => {
     addExpenses(groupId);

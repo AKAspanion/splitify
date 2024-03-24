@@ -61,9 +61,9 @@ const YourShare = ({
 
   const fetchShare = async () => {
     if (groupId && expenseId) {
-      if (loading) {
-        return;
-      }
+      // if (loading) {
+      //   return;
+      // }
 
       setYourShareLoading(expenseId, true);
       const { data } = await getShare(expenseId, groupId);

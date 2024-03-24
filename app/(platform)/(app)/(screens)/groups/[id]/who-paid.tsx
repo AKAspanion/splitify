@@ -1,11 +1,9 @@
 "use client";
 
 import { whoPaidExpense } from "../../../_utils/expense";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { getWhoPaid } from "@/actions/get-who-paid";
-import { UserPaymentWithUser } from "@/types/shared";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UserPayment } from "@prisma/client";
 import { useExpenseStore } from "@/lib/store/expense-provider";
 
@@ -39,9 +37,9 @@ const WhoPaid = ({
 
   const fetchWhoPaid = async () => {
     if (expenseId) {
-      if (loading) {
-        return;
-      }
+      // if (loading) {
+      //   return;
+      // }
       setWhoPaidLoading(expenseId, true);
       const { data } = await getWhoPaid(expenseId);
       if (data) {
