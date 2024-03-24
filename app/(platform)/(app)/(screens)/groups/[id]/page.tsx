@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
+import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
 
 const GroupDetails = dynamic(() => import("./group-details"), {
   loading: () => <GroupDetailsLoading />,

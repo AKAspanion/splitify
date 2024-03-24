@@ -26,4 +26,6 @@ export type GroupWIthUsers = Group & { users: User[] };
 
 export type GroupWIthExpenses = Group & { expenses: Expense[] };
 
-export type GroupWIthExpenseWithUserWithPaymentWithSplit = Group & { expenses: ExpenseWithUserWithPaymentWithSplit[] };
+export type GroupWIthExpenseWithUserWithPaymentWithSplit = Group & {
+  expenses: ExpenseWithUserWithPaymentWithSplit[];
+};

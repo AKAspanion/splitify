@@ -1,11 +1,13 @@
 "use client";
 
 import { whoPaidExpense } from "../../../_utils/expense";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { getWhoPaid } from "@/actions/get-who-paid";
 import { UserPaymentWithUser } from "@/types/shared";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserPayment } from "@prisma/client";
+import { useExpenseStore } from "@/lib/store/expense-provider";
 
 const WhoPaid = ({
   expenseId,
@@ -14,36 +16,53 @@ const WhoPaid = ({
   expenseId: string;
   amount: number;
 }) => {
-  const { user } = useUser();
-  const [loading, setLoading] = useState(false);
-  const [payments, setPayments] = useState<UserPaymentWithUser[]>([]);
+  const { whoPaid, whoPaidLoading, setWhoPaid, setWhoPaidLoading } =
+    useExpenseStore((s) => s);
 
-  const whoPaid = useMemo(
-    () => whoPaidExpense(amount, payments || [], user?.id || ""),
-    [amount, payments, user?.id],
+  const { user } = useUser();
+
+  const whoPaidValue = useMemo(
+    () => whoPaid?.[expenseId],
+    [expenseId, whoPaid],
+  );
+
+  const loading = useMemo(
+    () => whoPaidLoading?.[expenseId],
+    [expenseId, whoPaidLoading],
+  );
+
+  const calcWhoPaid = useCallback(
+    (payments: UserPayment[]) =>
+      whoPaidExpense(amount, payments || [], user?.id || ""),
+    [amount, user?.id],
   );
 
   const fetchWhoPaid = async () => {
     if (expenseId) {
-      setLoading(true);
+      if (loading) {
+        return;
+      }
+      setWhoPaidLoading(expenseId, true);
       const { data } = await getWhoPaid(expenseId);
       if (data) {
         const { payments: ps } = data;
-        setPayments(() => [...(ps || [])]);
+        setWhoPaid(expenseId, calcWhoPaid(ps));
       }
-      setLoading(false);
+      setWhoPaidLoading(expenseId, false);
     }
   };
 
   useEffect(() => {
-    fetchWhoPaid();
+    if (!whoPaidValue) {
+      fetchWhoPaid();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenseId]);
+  }, []);
 
   return loading ? (
-    <Skeleton className="h-4 w-[120px]" />
+    <Skeleton className="h-4 mt-1 w-[120px]" />
   ) : (
-    <div>{whoPaid}</div>
+    <div>{whoPaidValue}</div>
   );
 };
 

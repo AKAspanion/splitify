@@ -2,11 +2,12 @@
 
 import { RUPPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum } from "@/utils/validate";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { getShare } from "@/actions/get-share";
 import { User, UserPayment, UserSplit } from "@prisma/client";
 import { useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useExpenseStore } from "@/lib/store/expense-provider";
 
 const YourShare = ({
   groupId,
@@ -15,62 +16,79 @@ const YourShare = ({
   groupId?: string | null;
   expenseId: string;
 }) => {
+  const { yourShare, yourShareLoading, setYourShare, setYourShareLoading } =
+    useExpenseStore((s) => s);
+
   const { user } = useUser();
-  const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-  const [splits, setSplits] = useState<UserSplit[]>([]);
-  const [payments, setPayments] = useState<UserPayment[]>([]);
 
-  const summaryList = useMemo(() => {
-    const u = users?.find((x) => x?.id === user?.id);
-    if (!u) {
-      return "";
-    }
-    const paid = payments?.find((p) => p.userId === u.id)?.amount || 0;
-    const owed = splits?.find((s) => s.userId === u.id)?.amount || 0;
+  const summaryList = useMemo(
+    () => yourShare?.[expenseId],
+    [expenseId, yourShare],
+  );
 
-    if (!paid && !owed) {
-      return `You are not involved`;
-    }
+  const loading = useMemo(
+    () => yourShareLoading?.[expenseId],
+    [expenseId, yourShareLoading],
+  );
 
-    const normalizedAmount = fixedNum(paid - owed);
+  const getSummaryList = useCallback(
+    (users: User[], payments: UserPayment[], splits: UserSplit[]) => {
+      const u = users?.find((x) => x?.id === user?.id);
+      if (!u) {
+        return { text: `You are not involved`, color: "" };
+      }
+      const paid = payments?.find((p) => p.userId === u.id)?.amount || 0;
+      const owed = splits?.find((s) => s.userId === u.id)?.amount || 0;
 
-    return normalizedAmount > 0 ? (
-      <div className="text-sparkle">
-        You get back {RUPPEE_SYMBOL}
-        {Math.abs(normalizedAmount)}
-      </div>
-    ) : (
-      <div className="text-destructive">
-        You owe {RUPPEE_SYMBOL}
-        {owed}
-      </div>
-    );
-  }, [payments, splits, user?.id, users]);
+      if (!paid && !owed) {
+        return { text: `You are not involved`, color: "" };
+      }
+
+      const normalizedAmount = fixedNum(paid - owed);
+
+      return normalizedAmount > 0
+        ? {
+            text: `You get back ${RUPPEE_SYMBOL} ${Math.abs(normalizedAmount)}`,
+            color: "text-sparkle",
+          }
+        : {
+            text: `You owe ${RUPPEE_SYMBOL} ${Math.abs(owed)}`,
+            color: "text-destructive",
+          };
+    },
+    [user?.id],
+  );
 
   const fetchShare = async () => {
     if (groupId && expenseId) {
-      setLoading(true);
+      if (loading) {
+        return;
+      }
+
+      setYourShareLoading(expenseId, true);
       const { data } = await getShare(expenseId, groupId);
       if (data) {
         const { users: us, payments: ps, splits: sps } = data;
-        setUsers(() => [...(us || [])]);
-        setPayments(() => [...(ps || [])]);
-        setSplits(() => [...(sps || [])]);
+
+        setYourShare(expenseId, getSummaryList(us, ps, sps));
       }
-      setLoading(false);
+      setYourShareLoading(expenseId, false);
     }
   };
 
   useEffect(() => {
-    fetchShare();
+    if (!summaryList) {
+      fetchShare();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, expenseId]);
+  }, []);
 
   return loading ? (
-    <Skeleton className="h-3 w-[120px]" />
+    <Skeleton className="h-3  mt-1 w-[120px]" />
   ) : (
-    <div className="text-[12px] truncate">{summaryList}</div>
+    <div className="text-[12px] truncate">
+      <div className={summaryList?.color}>{summaryList?.text || ""}</div>
+    </div>
   );
 };
 

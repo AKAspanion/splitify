@@ -2,13 +2,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
 import { BalancesLoader } from "./balances-loader";
-import { Suspense } from "react";
 import { ExpenseListLoader } from "./expenses-list";
-import { Input } from "@/components/ui/input";
-import { Search } from "../../../_components/search";
+// import { Search } from "../../../_components/search";
+import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
+import { db } from "@/lib/db";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
-  loading: () => <ExpenseListLoader />,
+  loading: () => (
+    <div className="py-6">
+      <ExpenseListLoader />
+    </div>
+  ),
 });
 
 const Balances = dynamic(() => import("./balances"), {
@@ -28,7 +32,7 @@ const Totals = dynamic(() => import("./totals"), {
   ),
 });
 
-const ExpensesTabs = ({
+const ExpensesTabs = async ({
   id,
   tab,
   backUrl,
@@ -39,8 +43,12 @@ const ExpensesTabs = ({
   backUrl: string;
   searchText?: string;
 }) => {
+  const count = await db.expense.count({
+    where: { groupId: id, description: { contains: searchText } },
+  });
+
   return (
-    <>
+    <ExpenseStoreProvider count={count}>
       <Tabs defaultValue={tab} className="w-full pb-6">
         <TabsList className="w-full">
           <TabsTrigger value={"Expenses"} className="w-full">
@@ -54,9 +62,9 @@ const ExpensesTabs = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
-          <div className="h-3" />
-          <Search path={`/groups/${id}`} queryText={searchText} />
-          <ExpensesList groupId={id} backUrl={backUrl} queryText={searchText} />
+          {/* <div className="h-3" /> */}
+          {/* <Search path={`/groups/${id}`} queryText={searchText} /> */}
+          <ExpensesList groupId={id} backUrl={backUrl} count={count} />
         </TabsContent>
         <TabsContent value={"Balances"}>
           <div className="py-6">
@@ -67,7 +75,7 @@ const ExpensesTabs = ({
           <Totals id={id} />
         </TabsContent>
       </Tabs>
-    </>
+    </ExpenseStoreProvider>
   );
 };
 

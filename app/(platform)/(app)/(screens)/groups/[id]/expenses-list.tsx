@@ -7,20 +7,17 @@ import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ExpensesPaginate from "./expenses-paginate";
+import { db } from "@/lib/db";
 
 const ExpensesList = async ({
   backUrl,
   groupId,
-  queryText,
+  count,
 }: {
   groupId: string;
   backUrl: string;
-  queryText?: string;
+  count: number;
 }) => {
-  const { data: expenses } = await getExpenses(1, groupId, queryText);
-
-  const count = expenses ? expenses?.length : 0;
-
   const noExpenses = count === 0;
 
   const noDataSubtitle = "Start adding expenses and/or group members";
@@ -43,7 +40,7 @@ const ExpensesList = async ({
           }
         />
       ) : (
-        <ExpensesPaginate groupId={groupId} intialExpenses={expenses} />
+        <ExpensesPaginate groupId={groupId} />
       )}
     </>
   );
@@ -51,7 +48,7 @@ const ExpensesList = async ({
 
 export const ExpenseListLoader = () => {
   return (
-    <div className="py-6">
+    <div className="">
       <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="flex gap-4 items-center">

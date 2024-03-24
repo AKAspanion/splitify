@@ -6,6 +6,7 @@ import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 import ConfirmProvider from "./confirm/ConfirmContext";
 import { Suspense } from "react";
+import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
