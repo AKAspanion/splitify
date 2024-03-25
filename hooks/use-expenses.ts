@@ -5,6 +5,7 @@ const useExpenses = (groupId: string) => {
   const {
     addExpenses,
     pageLoading,
+    page: pageStore,
     count: countStore,
     expenses: expensesStore,
   } = useExpenseStore((s) => s);
@@ -17,11 +18,15 @@ const useExpenses = (groupId: string) => {
     return countStore[groupId] || [];
   }, [countStore, groupId]);
 
+  const page = useMemo(() => {
+    return pageStore[groupId] || 1;
+  }, [pageStore, groupId]);
+
   const loading = useMemo(() => {
     return pageLoading[groupId] || false;
   }, [pageLoading, groupId]);
 
-  return { count, loading, expenses, addExpenses };
+  return { count, page, loading, expenses, addExpenses };
 };
 
 export default useExpenses;

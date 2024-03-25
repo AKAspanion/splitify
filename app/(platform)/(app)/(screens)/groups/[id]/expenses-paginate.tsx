@@ -6,9 +6,10 @@ import { useInView } from "react-intersection-observer";
 import { ExpenseCard } from "./expense-card";
 import { ExpenseListLoader } from "./expenses-list";
 import useExpenses from "@/hooks/use-expenses";
+import { cn } from "@/lib/utils";
 
 const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
-  const { expenses, loading, addExpenses } = useExpenses(groupId);
+  const { expenses, page, loading, addExpenses } = useExpenses(groupId);
 
   const { ref, inView } = useInView();
 
@@ -25,14 +26,19 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
 
   return (
     <div className="pb-8 py-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+      <div
+        className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6")}
+      >
         {expenses?.map((e, i) => (
           <div key={e.id}>
             <ExpenseCard expense={e} key={e.id} />
           </div>
         ))}
       </div>
-      <div ref={loading ? null : ref} className="w-full">
+      <div
+        ref={loading ? null : ref}
+        className={cn("w-full", { "pt-6": page > 1 })}
+      >
         {loading ? <ExpenseListLoader /> : null}
       </div>
     </div>
