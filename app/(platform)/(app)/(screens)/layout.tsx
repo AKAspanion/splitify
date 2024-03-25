@@ -3,6 +3,7 @@ import { AddExpenseFab } from "../_components/add-expense-fab";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GroupStoreProvider } from "@/lib/store/group-provider";
 import { ExpenseStoreProvider } from "@/lib/store/expense-provider";
+import { ActivityStoreProvider } from "@/lib/store/activity-provider";
 
 export default function PlatformLayout({
   children,
@@ -17,7 +18,9 @@ export default function PlatformLayout({
         }
       >
         <GroupStoreProvider>
-          <ExpenseStoreProvider>{children}</ExpenseStoreProvider>
+          <ExpenseStoreProvider>
+            <ActivityStoreProvider>{children}</ActivityStoreProvider>
+          </ExpenseStoreProvider>
         </GroupStoreProvider>
       </Suspense>
       <Suspense>

@@ -14,7 +14,7 @@ const ActivityPage = async (props: ServerSideComponentProp) => {
       key={keyString}
       fallback={<ScreenSkeleton card={<ActivityCardLoading />} />}
     >
-      <ActivityList {...props} />
+      <ActivityList />
     </Suspense>
   );
 };

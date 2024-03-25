@@ -1,7 +1,6 @@
-import { ListItem } from "@/components/list-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { relativeDate } from "@/utils/date";
+import { relativeFormatDate } from "@/utils/date";
 import { Activity } from "@prisma/client";
 import {
   MessageSquareText,
@@ -98,7 +97,9 @@ export const ActivityCard = (props: ActivityCardProps) => {
                 {activity.message}
               </div>
               <div className="text-xs font-light">
-                <div className="capitalize">{relativeDate(activityDate)}</div>
+                <div className="capitalize">
+                  {relativeFormatDate(activityDate)}
+                </div>
               </div>
             </div>
           </div>
