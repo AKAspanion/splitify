@@ -39,8 +39,6 @@ export const createActivityStore = (
         const totalCount = tCount === undefined ? Infinity : tCount;
         const activitiesCount = get().activities?.length || 0;
 
-        console.log({ activitiesCount, totalCount });
-
         const canLoad = activitiesCount < totalCount;
         if (!canLoad) {
           return;

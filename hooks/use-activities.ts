@@ -1,4 +1,4 @@
-import { useActivityStore } from "@/store/activity-provider";
+import { useActivityStore } from "@/store/activity/provider";
 import { useMemo } from "react";
 
 const useActivities = () => {

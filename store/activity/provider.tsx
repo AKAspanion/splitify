@@ -3,10 +3,7 @@
 import { type ReactNode, createContext, useRef, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
-import {
-  type ActivityStore,
-  createActivityStore,
-} from "@/store/activity-store";
+import { type ActivityStore, createActivityStore } from "@/store/activity";
 
 export const ActivityStoreContext =
   createContext<StoreApi<ActivityStore> | null>(null);

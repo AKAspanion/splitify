@@ -3,7 +3,7 @@ import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skelet
 import dynamic from "next/dynamic";
 
 const GroupActivityList = dynamic(() => import("./group-activity"), {
-  loading: () => <ScreenSkeleton card={<ActivityCardLoading />} />,
+  loading: () => <ScreenSkeleton oneCol card={<ActivityCardLoading />} />,
 });
 
 const GroupActivityPage = async (props: ServerSideComponentProp) => {

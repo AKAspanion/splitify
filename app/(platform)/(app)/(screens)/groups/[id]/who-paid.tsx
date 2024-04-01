@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { getWhoPaid } from "@/actions/get-who-paid";
 import { UserPayment } from "@prisma/client";
-import { useExpenseStore } from "@/store/expense-provider";
+import { useExpenseStore } from "@/store/expense/provider";
 
 const WhoPaid = ({
   expenseId,

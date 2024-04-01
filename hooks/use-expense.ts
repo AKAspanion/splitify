@@ -1,6 +1,6 @@
 "use client";
 
-import { useGroupStore } from "@/store/group-provider";
+import { useGroupStore } from "@/store/group/provider";
 import { useEffect, useMemo } from "react";
 
 const useExpense = (expenseId: string, groupId: string) => {
