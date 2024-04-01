@@ -8,6 +8,7 @@ import { Expense } from "@prisma/client";
 import { formateDate, indiaDate } from "@/utils/date";
 import WhoPaid from "./who-paid";
 import YourShare from "./your-share";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ExpenseCardProps = {
   expense: Expense;
@@ -55,4 +56,16 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
       />
     </Link>
   ) : null;
+};
+
+export const ExpenseCardLoader = () => {
+  return (
+    <div className="flex gap-4 items-center">
+      <Skeleton className="rounded-full w-10 h-10" />
+      <div>
+        <Skeleton className="h-4 mt-0.5 w-[90px]" />
+        <Skeleton className="h-3 mt-1 w-[120px]" />
+      </div>
+    </div>
+  );
 };

@@ -11,6 +11,7 @@ import {
   ActivityCard,
   ActivityCardLoading,
 } from "@/app/(platform)/(app)/_components/activity-card";
+import { ACTIVITY_PAGE_COUNT } from "@/constants/numbers";
 
 const ActivityPaginate = () => {
   const { user } = useUser();
@@ -40,11 +41,11 @@ const ActivityPaginate = () => {
       </div>
       <div
         ref={loading ? null : ref}
-        className={cn("w-full", { "pt-6": page >= 1 })}
+        className={cn("w-full", { "pt-6": page > 1 })}
       >
         {loading ? (
           <div className="flex flex-col gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((g) => {
+            {Array.from(Array(ACTIVITY_PAGE_COUNT)).map((g) => {
               return (
                 <React.Fragment key={g}>
                   <ActivityCardLoading />

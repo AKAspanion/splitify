@@ -15,7 +15,7 @@ const useExpenses = (groupId: string) => {
   }, [expensesStore, groupId]);
 
   const count = useMemo(() => {
-    return countStore[groupId] || [];
+    return countStore[groupId];
   }, [countStore, groupId]);
 
   const page = useMemo(() => {

@@ -35,8 +35,11 @@ export const createActivityStore = (
       ...initState,
       addActivities: async () => {
         const page = get().page || 0;
-        const totalCount = get().count || Infinity;
+        const tCount = get().count;
+        const totalCount = tCount === undefined ? Infinity : tCount;
         const activitiesCount = get().activities?.length || 0;
+
+        console.log({ activitiesCount, totalCount });
 
         const canLoad = activitiesCount < totalCount;
         if (!canLoad) {
@@ -45,12 +48,15 @@ export const createActivityStore = (
         set(() => ({ pageLoading: true }));
 
         const nextPage = page + 1;
-        const { data } = await getActivities(nextPage);
-        if (data?.activities?.length) {
+        const { data, error } = await getActivities(nextPage);
+        if (!error) {
           set((state) => ({
             page: nextPage,
             count: data?.count,
-            activities: [...(state?.activities || []), ...data?.activities],
+            activities: [
+              ...(state?.activities || []),
+              ...(data?.activities || []),
+            ],
           }));
         }
         set(() => ({ pageLoading: false }));

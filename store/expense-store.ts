@@ -48,7 +48,8 @@ export const createExpenseStore = (
       ...initState,
       addExpenses: async (grp) => {
         const page = get().page?.[grp] || 0;
-        const totalCount = get().count?.[grp] || Infinity;
+        const tCount = get().count?.[grp];
+        const totalCount = tCount === undefined ? Infinity : tCount;
         const expensesCount = get().expenses?.[grp]?.length || 0;
 
         const canLoad = expensesCount < totalCount;
@@ -60,14 +61,17 @@ export const createExpenseStore = (
         }));
 
         const nextPage = page + 1;
-        const { data } = await getExpenses(nextPage, grp);
-        if (data?.expenses?.length) {
+        const { data, error } = await getExpenses(nextPage, grp);
+        if (!error) {
           set((state) => ({
             page: { ...(state?.page || {}), [grp]: nextPage },
             count: { ...(state?.count || {}), [grp]: data?.count },
             expenses: {
               ...(state?.expenses || {}),
-              [grp]: [...(state?.expenses?.[grp] || []), ...data?.expenses],
+              [grp]: [
+                ...(state?.expenses?.[grp] || []),
+                ...(data?.expenses || []),
+              ],
             },
           }));
         }

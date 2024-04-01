@@ -4,7 +4,7 @@ import { ActivityCardLoading } from "@/app/(platform)/(app)/_components/activity
 import { Suspense } from "react";
 
 const ActivityList = dynamic(() => import("./activity-list"), {
-  loading: () => <ScreenSkeleton card={<ActivityCardLoading />} />,
+  loading: () => <ScreenSkeleton oneCol card={<ActivityCardLoading />} />,
 });
 
 const ActivityPage = async (props: ServerSideComponentProp) => {
@@ -12,7 +12,7 @@ const ActivityPage = async (props: ServerSideComponentProp) => {
   return (
     <Suspense
       key={keyString}
-      fallback={<ScreenSkeleton card={<ActivityCardLoading />} />}
+      fallback={<ScreenSkeleton oneCol card={<ActivityCardLoading />} />}
     >
       <ActivityList />
     </Suspense>

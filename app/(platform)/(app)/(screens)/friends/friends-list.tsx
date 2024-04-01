@@ -9,6 +9,7 @@ import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FRIENDS_PAGE_COUNT } from "@/constants/numbers";
 
 const FriendsPaginate = dynamic(() => import("./friends-paginate"), {
   loading: () => (
@@ -18,8 +19,6 @@ const FriendsPaginate = dynamic(() => import("./friends-paginate"), {
   ),
 });
 
-const PAGE_COUNT = 6;
-
 const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
   const pageNo = searchParams["page"] || "1";
   const { userId } = auth();
@@ -27,7 +26,7 @@ const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
   const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
 
   const friends = await db.user.findMany({
-    take: page * PAGE_COUNT,
+    take: page * FRIENDS_PAGE_COUNT,
     where: { friends: { some: { id: userId || "null" } } },
   });
 

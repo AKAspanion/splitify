@@ -5,9 +5,11 @@ import React from "react";
 export const ScreenSkeleton = ({
   card,
   noPad = false,
+  oneCol = false,
 }: {
   card?: React.ReactNode;
   noPad?: boolean;
+  oneCol?: boolean;
 }) => {
   return (
     <div className={cn({ "px-8 py-6": !noPad })}>
@@ -18,7 +20,11 @@ export const ScreenSkeleton = ({
           <Skeleton className="w-10 h-10 rounded-md" />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        className={cn("grid grid-cols-1 gap-6", {
+          "sm:grid-cols-2 lg:grid-cols-3": !oneCol,
+        })}
+      >
         {[1, 2, 3, 4, 5, 6].map((g) => {
           return (
             <React.Fragment key={g}>

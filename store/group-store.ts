@@ -87,10 +87,10 @@ export const createGroupStore = (
           },
         }));
 
-        const { data: users } = await getGroupUsers(grp);
-        if (users?.length) {
+        const { data: users, error } = await getGroupUsers(grp);
+        if (!error) {
           set((state) => ({
-            groupUsers: { ...(state?.groupUsers || {}), [grp]: users },
+            groupUsers: { ...(state?.groupUsers || {}), [grp]: users || [] },
           }));
         }
         set((state) => ({

@@ -6,8 +6,6 @@ import {
   LucideIcon,
   NotepadText,
   PlaneTakeoff,
-  Receipt,
-  ReceiptIndianRupee,
   ReceiptText,
   Star,
   Store,

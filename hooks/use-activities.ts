@@ -15,7 +15,7 @@ const useActivities = () => {
   }, [activitiesStore]);
 
   const count = useMemo(() => {
-    return countStore || [];
+    return countStore;
   }, [countStore]);
 
   const page = useMemo(() => {

@@ -7,6 +7,7 @@ import Link from "next/link";
 import React from "react";
 import ExpensesPaginate from "./expenses-paginate";
 import useExpenses from "@/hooks/use-expenses";
+import { ExpenseCardLoader } from "./expense-card";
 
 const ExpensesList = ({
   backUrl,
@@ -37,9 +38,8 @@ const ExpensesList = ({
             </Link>
           }
         />
-      ) : (
-        <ExpensesPaginate groupId={groupId} />
-      )}
+      ) : null}
+      <ExpensesPaginate groupId={groupId} />
     </>
   );
 };
@@ -49,13 +49,7 @@ export const ExpenseListLoader = () => {
     <div className="">
       <div className="pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex gap-4 items-center">
-            <Skeleton className="rounded-full w-10 h-10" />
-            <div>
-              <Skeleton className="h-4 mt-0.5 w-[90px]" />
-              <Skeleton className="h-3 mt-1 w-[120px]" />
-            </div>
-          </div>
+          <ExpenseCardLoader key={i} />
         ))}
       </div>
     </div>
