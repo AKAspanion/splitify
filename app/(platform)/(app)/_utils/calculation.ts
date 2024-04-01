@@ -157,11 +157,12 @@ export const calcGroupSplits = (
 };
 
 export const evaluateTotals = (
-  expenses: ExpenseWithPaymentWithSplit[] | null,
+  expensesList: ExpenseWithPaymentWithSplit[] | null,
   userId?: string,
 ) => {
   let yours = 0;
   if (userId) {
+    const expenses = expensesList?.filter((e) => e?.tag !== "SETTLEMENT");
     const totals =
       expenses
         ?.map((e) =>
