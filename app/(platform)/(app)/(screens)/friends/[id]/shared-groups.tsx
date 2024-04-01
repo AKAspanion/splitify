@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
-import { GroupCard } from "../../../_components/group-card";
+import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 
 const SharedGroups = async ({ id }: { id: string }) => {
   const { userId } = auth();

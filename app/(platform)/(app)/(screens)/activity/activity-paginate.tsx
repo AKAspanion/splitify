@@ -10,7 +10,7 @@ import { useInView } from "react-intersection-observer";
 import {
   ActivityCard,
   ActivityCardLoading,
-} from "../../_components/activity-card";
+} from "@/app/(platform)/(app)/_components/activity-card";
 
 const ActivityPaginate = () => {
   const { user } = useUser();

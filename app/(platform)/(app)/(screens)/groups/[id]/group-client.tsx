@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { GroupCard, GroupCardLoading } from "../../../_components/group-card";
-import { useGroupStore } from "@/lib/store/group-provider";
+import {
+  GroupCard,
+  GroupCardLoading,
+} from "@/app/(platform)/(app)/_components/group-card";
+import { useGroupStore } from "@/store/group-provider";
 import { Badge } from "@/components/ui/badge";
 import useGroup from "@/hooks/use-group";
 

@@ -1,4 +1,4 @@
-import { useExpenseStore } from "@/lib/store/expense-provider";
+import { useExpenseStore } from "@/store/expense-provider";
 import { useMemo } from "react";
 
 const useExpenses = (groupId: string) => {

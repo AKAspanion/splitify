@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-import { ScreenSkeleton } from "../../_components/screen-skeleton";
-import { ActivityCardLoading } from "../../_components/activity-card";
+import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
+import { ActivityCardLoading } from "@/app/(platform)/(app)/_components/activity-card";
 import { Suspense } from "react";
 
 const ActivityList = dynamic(() => import("./activity-list"), {

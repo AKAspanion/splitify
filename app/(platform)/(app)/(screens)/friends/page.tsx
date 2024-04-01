@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
 
-import { ScreenSkeleton } from "../../_components/screen-skeleton";
+import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { Suspense } from "react";
-import { UserCardLoading } from "../../_components/user-card";
+import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
 
 const FriendsList = dynamic(() => import("./friends-list"), {
   loading: () => <ScreenSkeleton card={<UserCardLoading />} />,

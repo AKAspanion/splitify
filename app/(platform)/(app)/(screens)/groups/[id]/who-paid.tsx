@@ -1,11 +1,11 @@
 "use client";
 
-import { whoPaidExpense } from "../../../_utils/expense";
+import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { useCallback, useEffect, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { getWhoPaid } from "@/actions/get-who-paid";
 import { UserPayment } from "@prisma/client";
-import { useExpenseStore } from "@/lib/store/expense-provider";
+import { useExpenseStore } from "@/store/expense-provider";
 
 const WhoPaid = ({
   expenseId,

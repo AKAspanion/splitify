@@ -3,7 +3,7 @@
 import { type ReactNode, createContext, useRef, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
-import { type GroupStore, createGroupStore } from "@/lib/store/group-store";
+import { type GroupStore, createGroupStore } from "@/store/group-store";
 
 export const GroupStoreContext = createContext<StoreApi<GroupStore> | null>(
   null,

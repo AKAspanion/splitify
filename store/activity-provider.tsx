@@ -6,7 +6,7 @@ import { type StoreApi, useStore } from "zustand";
 import {
   type ActivityStore,
   createActivityStore,
-} from "@/lib/store/activity-store";
+} from "@/store/activity-store";
 
 export const ActivityStoreContext =
   createContext<StoreApi<ActivityStore> | null>(null);

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { getYouKeyword } from "@/utils/validate";
-import { GroupCardLoading } from "../../../_components/group-card";
+import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import VerifyDetails from "./verify-details";
 import { auth } from "@clerk/nextjs";

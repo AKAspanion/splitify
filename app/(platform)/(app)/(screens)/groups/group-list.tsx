@@ -7,7 +7,7 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { auth } from "@clerk/nextjs";
 import { Header } from "@/components/container/header";
 import { urlEncode } from "@/utils/func";
-import { Search } from "../../_components/search";
+import { Search } from "@/app/(platform)/(app)/_components/search";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 

@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import ExpenseFormLoading from "../../../_components/expense-form-loading";
+import ExpenseFormLoading from "@/app/(platform)/(app)/_components/expense-form-loading";
 
 const AddExpense = dynamic(() => import("./add-expense"), {
   loading: () => <ExpenseFormLoading add />,

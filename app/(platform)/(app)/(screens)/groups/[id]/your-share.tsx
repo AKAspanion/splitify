@@ -7,7 +7,7 @@ import { getShare } from "@/actions/get-share";
 import { User, UserPayment, UserSplit } from "@prisma/client";
 import { useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useExpenseStore } from "@/lib/store/expense-provider";
+import { useExpenseStore } from "@/store/expense-provider";
 
 const YourShare = ({
   groupId,

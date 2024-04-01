@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from "next/dynamic";
 import { BalancesLoader } from "./balances-loader";
 import { ExpenseListLoader } from "./expenses-list";
-// import { Search } from "../../../_components/search";
+// import { Search } from "@/app/(platform)/(app)/_components/search";
 
 const ExpensesList = dynamic(() => import("./expenses-list"), {
   loading: () => (

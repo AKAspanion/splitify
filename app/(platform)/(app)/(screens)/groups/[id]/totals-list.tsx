@@ -3,7 +3,7 @@
 import { RUPPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo } from "react";
-import { evaluateTotals } from "../../../_utils/calculation";
+import { evaluateTotals } from "@/app/(platform)/(app)/_utils/calculation";
 import { useUser } from "@clerk/nextjs";
 import { fixedNum } from "@/utils/validate";
 
