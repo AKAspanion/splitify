@@ -9,6 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "studio": "npx prisma studio",
+    "db": "docker compose up --build",
     "postinstall": "npx prisma generate && npx prisma db push",
     "postbuild": "npx prisma generate && npx prisma db push",
     "ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 3000"
@@ -16,7 +17,7 @@
   "dependencies": {
     "@clerk/nextjs": "^4.29.6",
     "@clerk/themes": "^1.7.9",
-    "@prisma/client": "^5.10.2",
+    "@prisma/client": "^5.17.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -41,11 +42,11 @@
     "iron-session": "^8.0.1",
     "lucide-react": "^0.321.0",
     "memorystore": "^1.6.7",
-    "next": "14.1.0",
+    "next": "^14.2.5",
     "next-nprogress-bar": "^2.1.2",
     "next-themes": "^0.2.1",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-intersection-observer": "^9.8.1",
     "react-onesignal": "^3.0.1",
     "sonner": "^1.4.0",
@@ -65,12 +66,13 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "14.1.0",
+    "eslint-config-next": "^14.2.5",
     "postcss": "^8",
     "prettier": "^3.2.5",
-    "prisma": "^5.10.2",
+    "prisma": "^5.17.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5",
     "webpack": "^5.90.1"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
