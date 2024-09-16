@@ -4,6 +4,7 @@ import {
   UserAvatarsLoading,
 } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import useExpense from "@/hooks/use-expense";
 import { UserPaymentWithUser } from "@/types/shared";
 import { useUser } from "@clerk/nextjs";
@@ -25,20 +26,17 @@ const ExpenseUsersClient = ({
 
   const isSettlement = expense?.tag === "SETTLEMENT";
 
+  const whoPaid = whoPaidExpense(payments || [], user?.id || "");
+
+  let whoPaidValue = whoPaid;
+
+  if (expense?.amount) {
+    whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${expense?.amount}`;
+  }
+
   return isSettlement ? null : expense ? (
     <>
-      <UserAvatars
-        users={users}
-        action={
-          expense?.amount ? (
-            <div className="text-sm">
-              {whoPaidExpense(expense?.amount, payments || [], user?.id || "")}
-            </div>
-          ) : (
-            ""
-          )
-        }
-      />
+      <UserAvatars users={users} action={<>{whoPaidValue}</>} />
       {balance}
     </>
   ) : (
