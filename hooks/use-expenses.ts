@@ -1,7 +1,7 @@
 import { GET_METHOD_CALLBACK, getCall } from "@/utils/api";
 import { Expense } from "@prisma/client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 const useExpenses = (id: string) => {
   const {
@@ -37,8 +37,16 @@ const useExpenses = (id: string) => {
     fetchNextPage();
   }, [data, fetchNextPage]);
 
+  const count = useMemo(() => {
+    let currentCount = 0;
+    data?.pages.forEach((p) => (currentCount += p.expenses.length));
+
+    return !data?.pages ? 1 : currentCount;
+  }, [data]);
+
   return {
     data,
+    count,
     isLoading,
     hasNextPage,
     isFetching,
