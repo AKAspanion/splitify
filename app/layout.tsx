@@ -9,6 +9,7 @@ import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
 import Adsense from "./adsense";
 import Analytics from "./analytics";
+
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });

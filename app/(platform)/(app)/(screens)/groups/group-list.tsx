@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { auth } from "@clerk/nextjs";
 import { Header } from "@/components/container/header";
@@ -19,6 +17,8 @@ const GroupCreate = dynamic(() => import("./group-create"), {
   ),
 });
 
+const Groups = dynamic(() => import("./groups"));
+
 const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
   const show = searchParams["show"] === "all";
   const search = searchParams["search"] === "yes";
@@ -33,11 +33,6 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
       title: { contains: searchText },
     },
   };
-
-  const groups = await db.group.findMany({
-    ...query,
-    orderBy: [{ createdAt: "desc" }],
-  });
 
   const searchUrl = urlEncode({
     path: "/groups",
@@ -92,9 +87,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {groups?.map((g) => {
-          return <GroupCard key={g.id} group={g} />;
-        })}
+        <Groups show={show} searchText={searchText} />
       </div>
       <GroupCreate where={query.where} show={show} searchText={searchText} />
       <div className="h-[72px]" />

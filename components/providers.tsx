@@ -6,10 +6,19 @@ import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 import ConfirmProvider from "./confirm/ConfirmContext";
 import { Suspense } from "react";
-import { ExpenseStoreProvider } from "@/store/expense/provider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
+
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
   return (
     <ClerkProvider
       appearance={{
@@ -25,7 +34,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         />
       </Suspense>
       <Suspense>
-        <ConfirmProvider>{children}</ConfirmProvider>
+        <QueryClientProvider client={queryClient}>
+          <ConfirmProvider>{children}</ConfirmProvider>
+        </QueryClientProvider>
       </Suspense>
     </ClerkProvider>
   );
