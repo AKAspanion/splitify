@@ -43,6 +43,7 @@ model User {
 model Expense {
   id          String        @id @default(nanoid())
   amount      Float
+  currency    String?       @default("inr")
   description String
   category    String?
   settlement  Boolean?
@@ -75,6 +76,7 @@ enum ExpenseTag {
 model UserPayment {
   id        String    @id @default(nanoid())
   amount    Float
+  currency  String?   @default("inr")
   userId    String    @map("user_id")
   expenseId String    @map("expense_id")
   createdAt DateTime  @default(now())
@@ -89,6 +91,7 @@ model UserPayment {
 model UserSplit {
   id        String    @id @default(nanoid())
   amount    Float
+  currency  String?   @default("inr")
   percent   Float?
   userId    String    @map("user_id")
   expenseId String?   @map("expense_id")
@@ -104,6 +107,7 @@ model UserSplit {
 model Group {
   id          String     @id @default(nanoid())
   title       String
+  currency    String?    @default("inr")
   description String?
   image_url   String?
   type        String?
