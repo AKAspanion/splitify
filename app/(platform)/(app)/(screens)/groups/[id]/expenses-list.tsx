@@ -16,8 +16,8 @@ const ExpensesList = ({
   groupId: string;
   backUrl: string;
 }) => {
-  const { data } = useExpenses(groupId);
-  const noExpenses = data?.count === 0;
+  const { count } = useExpenses(groupId);
+  const noExpenses = count === 0;
 
   const noDataSubtitle = "Start adding expenses and/or group members";
 
