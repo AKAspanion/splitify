@@ -210,7 +210,6 @@ export const GET_METHOD_CALLBACK = <T>(
   API_URL: string,
   options: ApiCallOptions,
 ) => {
-  console.log({ API_URL });
   return async (queryParams?: any) => {
     try {
       const response = await getCall<T>(API_URL, options);

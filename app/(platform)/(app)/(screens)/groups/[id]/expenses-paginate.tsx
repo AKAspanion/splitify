@@ -1,10 +1,7 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-
 import { useInView } from "react-intersection-observer";
 import { ExpenseCard, ExpenseCardLoader } from "./expense-card";
-import { ExpenseListLoader } from "./expenses-list";
 import useExpenses from "@/hooks/use-expenses";
 import { cn } from "@/lib/utils";
 import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";

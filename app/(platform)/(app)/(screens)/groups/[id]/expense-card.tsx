@@ -9,6 +9,7 @@ import { formateDate, indiaDate } from "@/utils/date";
 import WhoPaid from "./who-paid";
 import YourShare from "./your-share";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ExpenseDate } from "./expense-date";
 
 type ExpenseCardProps = {
   expense: Expense;
@@ -26,7 +27,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const ExpenseIcon = isSettlement ? BanknoteIcon : CategoryExpenseIcon;
 
-  const createDate = expense?.createdAt ? indiaDate(expense?.createdAt) : "";
+  const createDate = expense?.createdAt ?? "";
 
   return expense ? (
     <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>
@@ -44,9 +45,9 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
         title={expense.description}
         subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
         actions={
-          <div className="text-[10px] text-right flex flex-col gap-0.5">
+          <div className="text-[10px] min-h-[18px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
-              {formateDate(createDate, "d LLL")}
+              <ExpenseDate date={createDate} />
             </div>
             {isSettlement ? null : (
               <YourShare expenseId={expense?.id} groupId={expense?.groupId} />

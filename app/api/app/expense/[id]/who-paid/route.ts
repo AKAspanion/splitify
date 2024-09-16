@@ -1,3 +1,4 @@
+import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
@@ -20,7 +21,9 @@ export async function GET(
       include: { user: true },
     });
 
-    return NextResponse.json({ payments }, { status: 200 });
+    const whoPaid = whoPaidExpense(payments || [], userId);
+
+    return NextResponse.json(whoPaid, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Something went wrong" },
