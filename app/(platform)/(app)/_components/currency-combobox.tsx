@@ -21,7 +21,7 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 
 import { useFormStatus } from "react-dom";
-import { getCurrencies, getCurrencyCode } from "@/utils/currency";
+import { getCurrencies } from "@/utils/currency";
 
 type ComboboxProps = {
   label?: string;
