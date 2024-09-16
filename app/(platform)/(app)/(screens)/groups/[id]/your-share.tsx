@@ -20,7 +20,7 @@ const YourShare = ({
   });
 
   return isLoading ? (
-    <Skeleton className="h-3 w-20" />
+    <Skeleton className="h-3 w-28" />
   ) : (
     <div className="text-[12px] truncate">
       <div className={shareSummary?.color}>{shareSummary?.text || ""}</div>

@@ -18,10 +18,11 @@ export async function GET(
 
     const groupId = params.id;
     const page = Number(searchParams.get("page") || "1");
+    const limit = Number(searchParams.get("limit") || EXPENSE_PAGE_COUNT);
     const queryText = searchParams.get("queryText") || "";
 
-    const skip = (page - 1) * EXPENSE_PAGE_COUNT;
-    const take = page * EXPENSE_PAGE_COUNT;
+    const take = limit === 0 ? undefined : limit;
+    const skip = (page - 1) * limit ?? 0;
 
     const [count, expenses] = await Promise.all([
       db.expense.count({

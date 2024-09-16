@@ -1,41 +1,51 @@
-import { useExpenseStore } from "@/store/expense/provider";
-import { GET_METHOD_CALLBACK } from "@/utils/api";
+import { GET_METHOD_CALLBACK, getCall } from "@/utils/api";
 import { Expense } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import React, { useCallback } from "react";
 
 const useExpenses = (id: string) => {
-  const { data, isLoading } = useQuery<{ count: number; expenses: Expense[] }>({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
     queryKey: [`group-${id}-expense`],
-    queryFn: GET_METHOD_CALLBACK(`/api/app/group/${id}/expense`, {}),
-    enabled: true,
+    queryFn: async ({ pageParam }) => {
+      const response = await getCall<{
+        count: number;
+        expenses: Expense[];
+      }>(`/api/app/group/${id}/expense?page=${pageParam}`, {});
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      const maxCount = lastPage.count;
+      let currentPage = pages.length;
+      let currentCount = 0;
+      pages.forEach((p) => (currentCount += p.expenses.length));
+      const hasNext = currentCount < maxCount;
+      const nextPage = hasNext ? currentPage + 1 : undefined;
+      return nextPage;
+    },
   });
 
-  // const {
-  //   addExpenses,
-  //   pageLoading,
-  //   page: pageStore,
-  //   count: countStore,
-  //   expenses: expensesStore,
-  // } = useExpenseStore((s) => s);
+  const loadMore = useCallback(async () => {
+    fetchNextPage();
+  }, [data, fetchNextPage]);
 
-  // const expenses = useMemo(() => {
-  //   return expensesStore[groupId] || [];
-  // }, [expensesStore, groupId]);
-
-  // const count = useMemo(() => {
-  //   return countStore[groupId];
-  // }, [countStore, groupId]);
-
-  // const page = useMemo(() => {
-  //   return pageStore[groupId] || 1;
-  // }, [pageStore, groupId]);
-
-  // const loading = useMemo(() => {
-  //   return pageLoading[groupId] || false;
-  // }, [pageLoading, groupId]);
-
-  return { data, isLoading };
+  return {
+    data,
+    isLoading,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+    loadMore,
+  };
 };
 
 export default useExpenses;
