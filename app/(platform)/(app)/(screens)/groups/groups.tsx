@@ -24,7 +24,6 @@ export default function Groups({
     ),
     enabled: true,
   });
-  console.log(groups);
 
   return isLoading
     ? [1, 2, 3, 4, 5, 6].map((g) => {

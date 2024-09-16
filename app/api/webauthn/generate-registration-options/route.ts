@@ -77,7 +77,7 @@ export async function GET(_req: Request) {
   } catch (error: any) {
     console.trace(error);
     return NextResponse.json(
-      { message: error?.message || "Somethig went wrong" },
+      { message: error?.message || "Something went wrong" },
       { status: 500 },
     );
   }

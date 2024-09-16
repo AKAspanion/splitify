@@ -1,6 +1,6 @@
 "use client";
 
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import useExpense from "@/hooks/use-expense";
 import { BanknoteIcon } from "lucide-react";
 

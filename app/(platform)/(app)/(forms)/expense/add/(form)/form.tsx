@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
 import { NotificationService } from "@/lib/notification/service";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -205,7 +205,7 @@ const FormComp = ({ groups }: FormProps) => {
         <FormInput
           id="amount"
           name="amount"
-          label={`Amount(${RUPPEE_SYMBOL})`}
+          label={`Amount(${RUPEE_SYMBOL})`}
           type="number"
           step={0.01}
           placeholder={"0.00"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo } from "react";
 import { evaluateTotals } from "@/app/(platform)/(app)/_utils/calculation";
@@ -23,14 +23,14 @@ export const TotalsList = ({
       <div>
         <div className="">Total group spending</div>
         <div className="font-medium text-xl">
-          {RUPPEE_SYMBOL}
+          {RUPEE_SYMBOL}
           {fixedNum(data?.totals)}
         </div>
       </div>
       <div>
         <div>Total you paid for</div>
         <div className="font-medium text-xl">
-          {RUPPEE_SYMBOL}
+          {RUPEE_SYMBOL}
           {fixedNum(data?.yours)}
         </div>
       </div>

@@ -22,7 +22,7 @@ export async function POST(_req: Request) {
     }
   } catch (error: any) {
     return NextResponse.json(
-      { message: error?.message || "Somethig went wrong" },
+      { message: error?.message || "Something went wrong" },
       { status: 500 },
     );
   }

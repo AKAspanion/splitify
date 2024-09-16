@@ -1,4 +1,4 @@
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { UserPaymentWithUser } from "@/types/shared";
 
 export const whoPaidExpense = (
@@ -17,7 +17,7 @@ export const whoPaidExpense = (
       payments?.length > 1 ? `${payments.length} People paid` : `${name} paid`;
 
     if (amount) {
-      paid = paid + ` ${RUPPEE_SYMBOL}${amount}`;
+      paid = paid + ` ${RUPEE_SYMBOL}${amount}`;
     }
   }
 

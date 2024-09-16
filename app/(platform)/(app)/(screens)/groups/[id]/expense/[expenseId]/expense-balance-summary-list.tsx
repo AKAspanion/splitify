@@ -1,7 +1,7 @@
 "use client";
 
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
 import { User, UserPayment, UserSplit } from "@prisma/client";
@@ -36,7 +36,7 @@ const BalanceSummaryList = ({
         return `${name} ${getVerbKeyword(name)} not involved`;
       }
 
-      return `${name} paid ${RUPPEE_SYMBOL}${paid} and ${getOwsKeyword(name)} ${RUPPEE_SYMBOL}${owed}`;
+      return `${name} paid ${RUPEE_SYMBOL}${paid} and ${getOwsKeyword(name)} ${RUPEE_SYMBOL}${owed}`;
     });
 
     return (

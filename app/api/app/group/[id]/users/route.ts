@@ -1,9 +1,11 @@
-import DevicesService from "@/lib/auth/service/devices";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
-export async function GET(_req: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   try {
     const { userId } = auth();
 
@@ -11,13 +13,11 @@ export async function GET(_req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const devices = await DevicesService.getDevice(userId);
+    const users = await db.user.findMany({
+      where: { groups: { some: { id: params.id || "null" } } },
+    });
 
-    if (!devices) {
-      return NextResponse.json({ data: [] }, { status: 200 });
-    }
-
-    return NextResponse.json({ data: devices }, { status: 200 });
+    return NextResponse.json(users, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
       { message: error?.message || "Something went wrong" },

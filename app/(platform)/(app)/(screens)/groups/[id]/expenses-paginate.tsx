@@ -10,20 +10,22 @@ import { cn } from "@/lib/utils";
 import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";
 
 const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
-  const { expenses, page, loading, addExpenses } = useExpenses(groupId);
+  const { data, isLoading } = useExpenses(groupId);
 
   const { ref, inView } = useInView();
 
-  const loadMoreExpenses = useCallback(async () => {
-    addExpenses(groupId);
-  }, [addExpenses, groupId]);
+  const expenses = data?.expenses || [];
 
-  useEffect(() => {
-    if (inView && !loading) {
-      loadMoreExpenses();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+  // const loadMoreExpenses = useCallback(async () => {
+  //   addExpenses(groupId);
+  // }, [addExpenses, groupId]);
+
+  // useEffect(() => {
+  //   if (inView && !loading) {
+  //     loadMoreExpenses();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [inView]);
 
   return (
     <div className="pb-8 pt-6">
@@ -35,13 +37,13 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
             <ExpenseCard expense={e} key={e.id} />
           </div>
         ))}
-        {loading
+        {isLoading
           ? Array.from(Array(EXPENSE_PAGE_COUNT).keys()).map((i) => (
               <ExpenseCardLoader key={i} />
             ))
           : null}
       </div>
-      <div ref={loading ? null : ref} className={cn("w-full")} />
+      <div ref={isLoading ? null : ref} className={cn("w-full")} />
     </div>
   );
 };

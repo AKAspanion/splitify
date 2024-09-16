@@ -41,7 +41,7 @@ const GroupDetails = async ({
 
   return (
     <AutoContainer
-      id="expenseslist"
+      id="expenses-list"
       header={
         <Header
           backTo="/groups"

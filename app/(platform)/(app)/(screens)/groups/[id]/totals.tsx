@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { TotalsList } from "./totals-list";
 
 const Totals = async ({ id }: { id: string }) => {

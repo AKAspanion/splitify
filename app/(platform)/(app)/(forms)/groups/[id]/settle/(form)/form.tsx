@@ -2,7 +2,7 @@
 import { createSettlement } from "@/actions/create-settlement";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { useAction } from "@/hooks/use-action";
 import { NotificationService } from "@/lib/notification/service";
 import { fixedNum } from "@/utils/validate";
@@ -56,7 +56,7 @@ const FormComp = ({ amount, groupId, user1Id, user2Id }: FormProps) => {
         type="number"
         value={total}
         disabled={loading}
-        label={`Amount(${RUPPEE_SYMBOL})`}
+        label={`Amount(${RUPEE_SYMBOL})`}
         errors={fieldErrors?.amount}
         onChange={(e) => onTotalChange(e.target.value)}
       />

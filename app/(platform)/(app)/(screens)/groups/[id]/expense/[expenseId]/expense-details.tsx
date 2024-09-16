@@ -50,7 +50,7 @@ const ExpenseDetails = ({ params, searchParams }: ServerSideComponentProp) => {
             </div>
             <div className={""}>
               <div className="font-bold text-lg">
-                {RUPPEE_SYMBOL} {expense?.amount}
+                {RUPEE_SYMBOL} {expense?.amount}
               </div>
               <ExpenseAddedBy
                 userId={userId}
@@ -63,7 +63,7 @@ const ExpenseDetails = ({ params, searchParams }: ServerSideComponentProp) => {
           <>
             <div className={""}>
               <div className="font-bold text-lg">
-                {RUPPEE_SYMBOL} {expense?.amount}
+                {RUPEE_SYMBOL} {expense?.amount}
               </div>
               <ExpenseAddedBy
                 userId={userId}

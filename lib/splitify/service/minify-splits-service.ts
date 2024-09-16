@@ -1,4 +1,4 @@
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum, getOwsKeyword } from "@/utils/validate";
 
 export class MinifySplitsService {
@@ -113,7 +113,7 @@ export class MinifySplitsService {
       const user1 = this.users[b.user1Index];
       const owes = fixedNum(b.owes);
       balances.push({
-        message: `${user1} ${getOwsKeyword(user1)} ${this.users[b.user2Index]} ${RUPPEE_SYMBOL}${owes}`,
+        message: `${user1} ${getOwsKeyword(user1)} ${this.users[b.user2Index]} ${RUPEE_SYMBOL}${owes}`,
         user1Id: this.userIds[b.user1Index],
         user1Name: this.users[b.user1Index],
         user2Id: this.userIds[b.user2Index],

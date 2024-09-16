@@ -9,6 +9,8 @@ type UserAvatarsProps = { users?: User[] | null; action: React.ReactNode };
 export const UserAvatars = (props: UserAvatarsProps) => {
   const { users, action } = props;
 
+  console.log(users);
+
   return !users ? null : (
     <div className="flex h-10 relative w-full items-center">
       {users?.map((u, index) => (

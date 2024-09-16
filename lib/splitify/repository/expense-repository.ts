@@ -6,7 +6,7 @@ import { Payment } from "../model/payment/payment";
 import { Split } from "../model/split/split";
 import { User } from "../model/user/user";
 import { ExpenseService } from "../service/expense-service";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 
 export class ExpenseRepository {
   group: Group;
@@ -130,9 +130,9 @@ export class ExpenseRepository {
     const user2Name = this.getUser(user2Id)?.getUserName();
     const am = fixedNum(amount, 0);
     if (am < 0) {
-      return `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
+      return `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
     } else if (am > 0) {
-      return `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
+      return `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPEE_SYMBOL}${fixedNum(Math.abs(amount))}`;
     }
     return "";
   }
@@ -147,7 +147,7 @@ export class ExpenseRepository {
     const am = fixedNum(amount, 0);
     if (am < 0) {
       const owes = fixedNum(Math.abs(amount));
-      const message = `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPPEE_SYMBOL}${owes}`;
+      const message = `${user1Name} ${getOwsKeyword(user1Name)} ${user2Name} ${RUPEE_SYMBOL}${owes}`;
       return {
         user1Name,
         user2Name,
@@ -158,7 +158,7 @@ export class ExpenseRepository {
       };
     } else if (am > 0) {
       const owes = fixedNum(Math.abs(amount));
-      const message = `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPPEE_SYMBOL}${owes}`;
+      const message = `${user2Name} ${getOwsKeyword(user2Name)} ${user1Name} ${RUPEE_SYMBOL}${owes}`;
       return {
         message,
         user1Name: user2Name,

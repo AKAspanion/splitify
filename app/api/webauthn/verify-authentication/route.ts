@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       const _error = error as Error;
       console.trace(_error);
       return NextResponse.json(
-        { message: _error?.message || "Somethig went wrong" },
+        { message: _error?.message || "Something went wrong" },
         { status: 500 },
       );
     }
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.trace(error);
     return NextResponse.json(
-      { message: error?.message || "Somethig went wrong" },
+      { message: error?.message || "Something went wrong" },
       { status: 500 },
     );
   }

@@ -56,4 +56,4 @@ export const EXPENSE_CATEGORY_ICONS: Record<ExpenseCategoryType, LucideIcon> = {
   ["general"]: ReceiptText,
 };
 
-export const RUPPEE_SYMBOL = "₹";
+export const RUPEE_SYMBOL = "₹";

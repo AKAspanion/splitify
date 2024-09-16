@@ -6,14 +6,22 @@ import {
 import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import useGroupUsers from "@/hooks/use-group-users";
+import { User } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import { GET_METHOD_CALLBACK } from "@/utils/api";
 
 const GroupUsers = ({ id, backUrl }: { id: string; backUrl: string }) => {
-  const { users, loading } = useGroupUsers(id);
+  // const { users, loading } = useGroupUsers(id);
+
+  const { data: users, isLoading } = useQuery<User[]>({
+    queryKey: [`group-users`],
+    queryFn: GET_METHOD_CALLBACK(`/api/app/group/${id}/users`, {}),
+    enabled: true,
+  });
 
   const noData = !users || users.length === 0;
 
-  return loading || noData ? (
+  return isLoading || noData ? (
     <UserAvatarsLoading />
   ) : (
     <UserAvatars

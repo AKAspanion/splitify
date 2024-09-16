@@ -5,14 +5,19 @@ import {
   GroupCard,
   GroupCardLoading,
 } from "@/app/(platform)/(app)/_components/group-card";
-import { useGroupStore } from "@/store/group/provider";
 import { Badge } from "@/components/ui/badge";
-import useGroup from "@/hooks/use-group";
+import { useQuery } from "@tanstack/react-query";
+import { GET_METHOD_CALLBACK } from "@/utils/api";
+import { Group } from "@prisma/client";
 
 const GroupClient = ({ id }: { id: string }) => {
-  const { group, loading } = useGroup(id);
+  const { data: group, isLoading } = useQuery<Group>({
+    queryKey: [`group-${id}`],
+    queryFn: GET_METHOD_CALLBACK(`/api/app/group/${id}?`, {}),
+    enabled: true,
+  });
 
-  return loading || !group ? (
+  return isLoading || !group ? (
     <GroupCardLoading />
   ) : (
     <GroupCard

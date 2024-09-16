@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { APILogger } from "@/lib/logger";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 
 export async function POST(req: Request) {
   try {
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
             groupId,
             type: "SETTLEMENT_PLUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${exp?.description || ""} ${RUPPEE_SYMBOL}${exp?.amount || 0} in group ${group?.title || ""}`,
+            message: `${exp?.description || ""} ${RUPEE_SYMBOL}${exp?.amount || 0} in group ${group?.title || ""}`,
           },
         }),
       ];
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     }
   } catch (error: any) {
     return NextResponse.json(
-      { message: error?.message || "Somethig went wrong" },
+      { message: error?.message || "Something went wrong" },
       { status: 500 },
     );
   }

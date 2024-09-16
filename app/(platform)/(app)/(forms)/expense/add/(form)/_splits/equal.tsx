@@ -3,7 +3,7 @@ import { SplitDrawerProps } from "../split-drawer.types";
 import { convertAllValues, convertToObject, fixedNum } from "@/utils/validate";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RUPPEE_SYMBOL } from "@/constants/ui";
+import { RUPEE_SYMBOL } from "@/constants/ui";
 
 const EqualSplit = ({
   currUserId,
@@ -72,7 +72,7 @@ const EqualSplit = ({
         ) : (
           <>
             <div>
-              {RUPPEE_SYMBOL}
+              {RUPEE_SYMBOL}
               {equalShare}/person
             </div>
             <div>{checkedPeople} people</div>
