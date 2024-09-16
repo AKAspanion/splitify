@@ -1,12 +1,11 @@
 "use client";
 
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
-import { RUPEE_SYMBOL } from "@/constants/ui";
-import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
-import { User, UserPayment, UserSplit } from "@prisma/client";
+import { Expense, User, UserPayment, UserSplit } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { getInitials } from "@/utils/func";
+import { getCurrencySymbol } from "@/utils/currency";
 
 const MAX_LIST_COUNT = 2;
 
@@ -15,15 +14,18 @@ const BalanceSummaryList = ({
   payments,
   splits,
   users,
+  expense,
 }: {
   userId: string | null;
   users: User[] | null;
   payments: UserPayment[] | null;
   splits: UserSplit[] | null;
-  // expense: ExpenseWithPaymentWithSplit | null;
+  expense: Expense | null;
 }) => {
   const [show, setShow] = useState(false);
   const summaryList = useMemo(() => {
+    const symbol = getCurrencySymbol(expense?.currency);
+
     const list = users?.map((u) => {
       const paid = payments?.find((p) => p.userId === u.id)?.amount || 0;
       const owed = splits?.find((s) => s.userId === u.id)?.amount || 0;
@@ -36,13 +38,13 @@ const BalanceSummaryList = ({
         return `${name} ${getVerbKeyword(name)} not involved`;
       }
 
-      return `${name} paid ${RUPEE_SYMBOL}${paid} and ${getOwsKeyword(name)} ${RUPEE_SYMBOL}${owed}`;
+      return `${name} paid ${symbol}${paid} and ${getOwsKeyword(name)} ${symbol}${owed}`;
     });
 
     return (
       list?.sort((a) => (a.includes("not") || a.includes("₹0") ? 1 : -1)) || []
     );
-  }, [payments, splits, users, userId]);
+  }, [payments, splits, users, userId, expense?.currency]);
 
   const summary = useMemo(
     () => (!show ? summaryList?.slice(0, MAX_LIST_COUNT) : summaryList),

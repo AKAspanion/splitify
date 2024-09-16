@@ -9,13 +9,14 @@ import { Split } from "../model/split/split";
 export class ExpenseService {
   public static createExpense(
     name: string,
+    currency: string,
     expenseType: ExpenseType,
     payment: Payment,
     splits: Split[],
   ) {
     switch (expenseType) {
       case ExpenseType.EXACT: {
-        const exp = new ExactExpense(name, payment, splits);
+        const exp = new ExactExpense(name, currency, payment, splits);
         if (exp.validate()) {
           return exp;
         } else {
@@ -29,7 +30,7 @@ export class ExpenseService {
             (payment.getAmount() * percentSplit?.getPercent()) / 100.0;
           split.setAmount(splitAmount);
         }
-        const exp = new PercentExpense(name, payment, splits);
+        const exp = new PercentExpense(name, currency, payment, splits);
         if (exp.validate()) {
           return exp;
         } else {
@@ -43,7 +44,7 @@ export class ExpenseService {
         for (const split of splits) {
           split.setAmount(splitAmount);
         }
-        const exp = new EqualExpense(name, payment, splits);
+        const exp = new EqualExpense(name, currency, payment, splits);
         if (exp.validate()) {
           return exp;
         } else {

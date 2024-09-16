@@ -8,11 +8,10 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExpenseType, User } from "@prisma/client";
+import { ExpenseType } from "@prisma/client";
 import { ArrowLeftIcon } from "lucide-react";
 import { SplitDrawerProps } from "./split-drawer.types";
 import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
 import { EqualLoader } from "./_splits/equal-loader";
 import { ExactLoader } from "./_splits/exact-loader";
 import { useFormStatus } from "react-dom";

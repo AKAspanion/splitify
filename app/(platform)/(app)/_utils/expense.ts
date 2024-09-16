@@ -1,5 +1,5 @@
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import { UserPaymentWithUser } from "@/types/shared";
+import { getCurrencySymbol } from "@/utils/currency";
 import { fixedNum } from "@/utils/validate";
 import { User, UserPayment, UserSplit } from "@prisma/client";
 
@@ -26,7 +26,10 @@ export const yourShareInExpense = (
   users: User[],
   payments: UserPayment[],
   splits: UserSplit[],
+  currency?: string,
 ) => {
+  const symbol = getCurrencySymbol(currency);
+
   const u = users?.find((x) => x?.id === userId);
   if (!u) {
     return { text: `You are not involved`, color: "" };
@@ -43,11 +46,11 @@ export const yourShareInExpense = (
 
   return normalizedAmount > 0
     ? {
-        text: `You get back ${RUPEE_SYMBOL} ${Math.abs(normalizedAmount)}`,
+        text: `You get back ${symbol} ${Math.abs(normalizedAmount)}`,
         color: "text-sparkle",
       }
     : {
-        text: `You owe ${RUPEE_SYMBOL} ${Math.abs(owed)}`,
+        text: `You owe ${symbol} ${Math.abs(owed)}`,
         color: "text-destructive",
       };
 };

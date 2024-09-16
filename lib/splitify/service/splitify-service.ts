@@ -6,7 +6,6 @@ import { ExpenseRepository } from "../repository/expense-repository";
 import { EqualSplit } from "../model/split/equal-split";
 import { ExactSplit } from "../model/split/exact-split";
 import { PercentSplit } from "../model/split/percent-split";
-import { fixedNum } from "@/utils/validate";
 
 export class SplitifyService {
   expenseRepository: ExpenseRepository;
@@ -17,6 +16,7 @@ export class SplitifyService {
 
   public addExpense(
     name: string,
+    currency: string,
     expenseType: ExpenseType,
     payments: Payment[],
     splits: Split[],
@@ -29,7 +29,13 @@ export class SplitifyService {
     }
 
     if (payments.length === 1) {
-      this.expenseRepository.addExpense(name, expenseType, payments[0], splits);
+      this.expenseRepository.addExpense(
+        name,
+        currency,
+        expenseType,
+        payments[0],
+        splits,
+      );
       return;
     }
 
@@ -39,6 +45,7 @@ export class SplitifyService {
           const totalSplits = splits.length;
           this.expenseRepository.addExpense(
             name,
+            currency,
             ExpenseType.PERCENT,
             payment,
             splits.map((s) => {
@@ -52,6 +59,7 @@ export class SplitifyService {
         for (const payment of payments) {
           this.expenseRepository.addExpense(
             name,
+            currency,
             expenseType,
             payment,
             splits.map(
@@ -78,6 +86,7 @@ export class SplitifyService {
         for (const payment of payments) {
           this.expenseRepository.addExpense(
             name,
+            currency,
             ExpenseType.PERCENT,
             payment,
             splits.map((s) => {

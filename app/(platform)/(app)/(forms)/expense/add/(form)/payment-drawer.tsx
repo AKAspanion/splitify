@@ -9,10 +9,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum } from "@/utils/validate";
 import { User } from "@prisma/client";
-import { ArrowLeftIcon, CheckIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
 import { useFormStatus } from "react-dom";
@@ -22,6 +21,7 @@ type PaymentDrawerProps = {
   total?: number;
   disabled?: boolean;
   currUserId?: string;
+  symbol?: string;
   payment: Record<string, number>;
   onChange: (value: string, userId: string) => void;
 };
@@ -35,6 +35,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
     users = [],
     total = 0,
     payment = {},
+    symbol,
     onChange,
   } = props;
 
@@ -126,7 +127,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
                 currUserId={currUserId}
                 actions={
                   <div className="flex gap-3 items-center">
-                    <div className="text-md">{RUPEE_SYMBOL}</div>
+                    <div className="text-md">{symbol}</div>
                     <div className="max-w-[120px] p-1">
                       <Input
                         type="number"
@@ -142,12 +143,12 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
           </div>
           <div className="text-center text-xs font-semibold pt-6">
             <div>
-              {RUPEE_SYMBOL}
-              {used} of {RUPEE_SYMBOL}
+              {symbol}
+              {used} of {symbol}
               {total}
             </div>
             <div className={balance !== 0 ? "text-red-500" : ""}>
-              {RUPEE_SYMBOL}
+              {symbol}
               {Math.abs(balance)} {balanceText}
             </div>
           </div>

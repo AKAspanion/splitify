@@ -42,46 +42,6 @@ const ExpenseDetails = ({ params, searchParams }: ServerSideComponentProp) => {
       <div className="flex flex-col gap-6">
         <ExpenseClient groupId={groupId} expenseId={expenseId} />
         <ExpenseAddedBy groupId={groupId} expenseId={expenseId} />
-        {/* {isSettlement ? (
-          <>
-            <div className="flex items-center gap-6">
-              <BanknoteIcon className="w-10 h-10 text-green-500" />
-              <div>{expense?.description}</div>
-            </div>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPEE_SYMBOL} {expense?.amount}
-              </div>
-              <ExpenseAddedBy
-                userId={userId}
-                groupId={groupId}
-                expenseId={expenseId}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPEE_SYMBOL} {expense?.amount}
-              </div>
-              <ExpenseAddedBy
-                userId={userId}
-                groupId={groupId}
-                expenseId={expenseId}
-              />
-            </div>
-            <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
-            <Balance
-              key={keyString}
-              userId={userId}
-              groupId={groupId}
-              expenseId={expenseId}
-              balance={showBalance}
-            />
-          </>
-        )} */}
-
         <ExpenseUsers
           expenseId={expenseId}
           groupId={groupId}

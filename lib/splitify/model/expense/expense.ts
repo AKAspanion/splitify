@@ -8,12 +8,19 @@ export abstract class Expense {
   payment: Payment;
   splits: Split[];
   name: string;
+  currency: string;
 
-  constructor(name: string, payment: Payment, splits: Split[]) {
+  constructor(
+    name: string,
+    currency: string,
+    payment: Payment,
+    splits: Split[],
+  ) {
     this.name = name;
     this.id = uid();
     this.payment = payment;
     this.splits = splits;
+    this.currency = currency;
   }
 
   public getId() {
@@ -44,13 +51,13 @@ export abstract class Expense {
     this.splits = splits;
   }
 
-  // public getExpenseData() {
-  //   return this.expenseData;
-  // }
+  public getCurrency() {
+    return this.currency;
+  }
 
-  // public setExpenseData(expenseData: ExpenseData) {
-  //   this.expenseData = expenseData;
-  // }
+  public setCurrency(currency: string) {
+    this.currency = currency;
+  }
 
   public abstract validate(): boolean;
 }

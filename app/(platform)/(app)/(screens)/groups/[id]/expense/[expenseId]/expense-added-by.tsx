@@ -1,8 +1,8 @@
 "use client";
 import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import useExpense from "@/hooks/use-expense";
+import { getCurrencySymbol } from "@/utils/currency";
 import { relativeFormatDate } from "@/utils/date";
 import { useUser } from "@clerk/nextjs";
 import { useMemo } from "react";
@@ -25,10 +25,12 @@ const ExpenseAddedBy = ({
     ? new Date(expense?.createdAt).toString()
     : "";
 
+  const symbol = getCurrencySymbol(expense?.currency);
+
   return expense ? (
     <div>
       <div className="font-bold text-lg">
-        {RUPEE_SYMBOL} {expense?.amount}
+        {symbol} {expense?.amount}
       </div>
       <div className="font-thin text-sm">
         Added by {addedBy}, {relativeFormatDate(createDate)}

@@ -23,6 +23,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     splits,
     payments,
     groupId,
+    currency,
     createrId,
   } = data;
 
@@ -35,6 +36,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         type,
         groupId,
         category,
+        currency,
         createrId,
         tag: "EXPENSE",
         payments: {

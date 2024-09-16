@@ -7,7 +7,8 @@ import { User } from "@/lib/splitify/model/user/user";
 import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository";
 import { MinifySplitsService } from "@/lib/splitify/service/minify-splits-service";
 import { SplitifyService } from "@/lib/splitify/service/splitify-service";
-import { ExpenseWithPaymentWithSplit } from "@/types/shared";
+import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
+import { getCurrencySymbol } from "@/utils/currency";
 import { getInitials } from "@/utils/func";
 
 import {
@@ -27,6 +28,7 @@ const evaluateExpense = (
     case "EQUAL":
       service.addExpense(
         expense.description,
+        expense.currency || "inr",
         ExpenseType.EQUAL,
         payments?.map((p) => new Payment(p.userId, p.amount)) || [],
         splits?.map((s) => new EqualSplit(s.userId)) || [],
@@ -36,6 +38,7 @@ const evaluateExpense = (
     case "PERCENT":
       service.addExpense(
         expense.description,
+        expense.currency || "inr",
         ExpenseType.EXACT,
         payments?.map((p) => new Payment(p.userId, p.amount)) || [],
         splits?.map((s) => new ExactSplit(s.userId, s.amount)) || [],
@@ -67,7 +70,7 @@ export const calcExpenseSplits = (
           "0",
         ),
     );
-    const group = new Group("Group");
+    const group = new Group("Group", "inr");
 
     users.forEach((u) => group.addUser(u));
 
@@ -93,7 +96,11 @@ export const calcExpenseSplits = (
         ),
       );
 
-      return minifyService.getBalancesList().sort((a, b) => b?.owes - a?.owes);
+      const symbol = getCurrencySymbol(expense?.currency || "inr");
+
+      return minifyService
+        .getBalancesList(symbol)
+        .sort((a, b) => b?.owes - a?.owes);
     }
   } catch (error) {
     console.error(error);
@@ -105,6 +112,7 @@ export const calcGroupSplits = (
   currUserId: string,
   expenses: ExpenseWithPaymentWithSplit[] | null,
   dbUsers: DBUser[],
+  currency?: string | null,
   detailed = false,
 ) => {
   try {
@@ -120,7 +128,7 @@ export const calcGroupSplits = (
           "0",
         ),
     );
-    const group = new Group("Group");
+    const group = new Group("Group", currency || "inr");
 
     users.forEach((u) => group.addUser(u));
 
@@ -148,7 +156,11 @@ export const calcGroupSplits = (
       const minifyService = new MinifySplitsService(userNamesArr, userIdsArr);
       minifyService.execute(graph);
 
-      return minifyService.getBalancesList().sort((a, b) => b?.owes - a?.owes);
+      const symbol = getCurrencySymbol(currency || "inr");
+
+      return minifyService
+        .getBalancesList(symbol)
+        .sort((a, b) => b?.owes - a?.owes);
     }
   } catch (error) {
     console.error(error);

@@ -19,8 +19,8 @@ const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
     orderBy: [{ createdAt: "desc" }],
   });
 
-  const groupdId = searchParams["groupId"] || "";
-  const backTo = groupdId ? `/groups/${groupdId}` : `/groups`;
+  const groupId = searchParams["groupId"] || "";
+  const backTo = groupId ? `/groups/${groupId}` : `/groups`;
 
   return (
     <AutoContainer header={<Header backTo={backTo} title="Add an expense" />}>

@@ -29,6 +29,7 @@ export const CreateExpense = z
     groupId: z.string({ required_error: "Group is required" }),
     createrId: z.string({ required_error: "Creator id is required" }),
     category: z.string().optional(),
+    currency: z.string().optional(),
     type: expenseType,
   })
   .refine(

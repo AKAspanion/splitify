@@ -1,6 +1,5 @@
 "use client";
 
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import useExpense from "@/hooks/use-expense";
 import { BanknoteIcon } from "lucide-react";
 
@@ -11,7 +10,7 @@ const ExpenseClient = ({
   expenseId: string;
   groupId: string;
 }) => {
-  const { expense, loading } = useExpense(expenseId, groupId);
+  const { expense } = useExpense(expenseId, groupId);
 
   const isSettlement = expense?.tag === "SETTLEMENT";
 

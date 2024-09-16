@@ -43,14 +43,24 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
           </div>
         }
         title={expense.description}
-        subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
+        subtitle={
+          <WhoPaid
+            expenseId={expense?.id}
+            amount={expense?.amount}
+            currency={expense?.currency}
+          />
+        }
         actions={
           <div className="text-[10px] min-h-[18px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
               <ExpenseDate date={createDate} />
             </div>
             {isSettlement ? null : (
-              <YourShare expenseId={expense?.id} groupId={expense?.groupId} />
+              <YourShare
+                expenseId={expense?.id}
+                groupId={expense?.groupId}
+                currency={expense?.currency}
+              />
             )}
           </div>
         }

@@ -4,8 +4,13 @@ import { Split } from "../split/split";
 import { Expense } from "./expense";
 
 export class EqualExpense extends Expense {
-  constructor(name: string, payment: Payment, splits: Split[]) {
-    super(name, payment, splits);
+  constructor(
+    name: string,
+    currency: string,
+    payment: Payment,
+    splits: Split[],
+  ) {
+    super(name, currency, payment, splits);
   }
 
   public validate(): boolean {

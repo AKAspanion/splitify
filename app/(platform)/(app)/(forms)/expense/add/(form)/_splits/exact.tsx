@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 import { SplitDrawerProps } from "../split-drawer.types";
-import { convertAllValues, convertToObject, fixedNum } from "@/utils/validate";
+import { fixedNum } from "@/utils/validate";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { RUPEE_SYMBOL } from "@/constants/ui";
 
 const ExactSplit = ({
   currUserId,
   total = 0,
   users = [],
   exactSplit = {},
+  symbol,
   onExactSplitChange,
 }: SplitDrawerProps) => {
   const handleExactChange = (id: string, value: string) => {
@@ -41,7 +40,7 @@ const ExactSplit = ({
             currUserId={currUserId}
             actions={
               <div className="flex gap-3 items-center">
-                <div className="text-md">{RUPEE_SYMBOL}</div>
+                <div className="text-md">{symbol}</div>
                 <div className="max-w-[120px] p-1">
                   <Input
                     type="number"
@@ -58,12 +57,12 @@ const ExactSplit = ({
       </div>
       <div className="text-center text-xs font-semibold pt-6">
         <div>
-          {RUPEE_SYMBOL}
-          {used} of {RUPEE_SYMBOL}
+          {symbol}
+          {used} of {symbol}
           {total}
         </div>
         <div className={balance !== 0 ? "text-red-500" : ""}>
-          {RUPEE_SYMBOL}
+          {symbol}
           {Math.abs(balance)} {balanceText}
         </div>
       </div>

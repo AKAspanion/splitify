@@ -6,14 +6,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 const YourShare = ({
   groupId,
   expenseId,
+  currency = "",
 }: {
   groupId?: string | null;
   expenseId: string;
+  currency?: string | null;
 }) => {
   const { data: shareSummary, isLoading } = useQuery<any>({
     queryKey: [`group-${groupId}-your-share-${expenseId}`],
     queryFn: GET_METHOD_CALLBACK(
-      `/api/app/group/${groupId}/your-share/${expenseId}`,
+      `/api/app/group/${groupId}/your-share/${expenseId}?currency=${currency || ""}`,
       {},
     ),
     enabled: true,

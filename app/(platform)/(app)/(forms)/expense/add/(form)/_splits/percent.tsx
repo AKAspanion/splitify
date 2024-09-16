@@ -3,12 +3,12 @@ import { SplitDrawerProps } from "../split-drawer.types";
 import { fixedNum } from "@/utils/validate";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { Input } from "@/components/ui/input";
-import { RUPEE_SYMBOL } from "@/constants/ui";
 
 const ExactSplit = ({
   currUserId,
   users = [],
   percentSplit = {},
+  symbol,
   onPercentSplitChange,
 }: SplitDrawerProps) => {
   const total = 100;
@@ -40,7 +40,7 @@ const ExactSplit = ({
             currUserId={currUserId}
             actions={
               <div className="flex gap-3 items-center">
-                <div className="text-md">{RUPEE_SYMBOL}</div>
+                <div className="text-md">{symbol}</div>
                 <div className="max-w-[120px] p-1">
                   <Input
                     type="number"

@@ -28,10 +28,11 @@ export const BalancesList = ({
             user?.id,
             expenses || [],
             group?.users || [],
+            group?.currency,
             detailed,
           ) || []
         : [],
-    [detailed, expenses, group?.users, user?.id],
+    [detailed, expenses, group, user?.id],
   );
 
   const balances = useMemo(

@@ -1,7 +1,4 @@
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
-import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
 import ExpenseUsersClient from "./expense-users-client";
 
 const ExpenseUsers = async ({

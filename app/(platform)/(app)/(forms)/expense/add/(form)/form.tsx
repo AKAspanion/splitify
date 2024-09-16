@@ -17,7 +17,8 @@ import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
 import { NotificationService } from "@/lib/notification/service";
-import { RUPEE_SYMBOL } from "@/constants/ui";
+import { CurrencyCombobox } from "../../../../_components/currency-combobox";
+import { getCurrencySymbol } from "@/utils/currency";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -27,14 +28,18 @@ const FormComp = ({ groups }: FormProps) => {
   const searchParams = useSearchParams();
   const paramsGroupId = searchParams.get("groupId") || "";
 
+  const currGroup = groups?.find((g) => g.id === paramsGroupId);
+
   const [groupOpen, setGroupOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
   const [total, setTotal] = useState<number>(0);
   const [tag, setTag] = useState<string>("expense");
   const [category, setCategory] = useState<string>("general");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(paramsGroupId.toString());
+  const [currency, setCurrency] = useState(currGroup?.currency || "inr");
 
   const { loading, execute, fieldErrors } = useAction(createExpense, {
     onSuccess: ({ expense, userId }) => {
@@ -101,6 +106,7 @@ const FormComp = ({ groups }: FormProps) => {
         splits,
         groupId,
         category,
+        currency,
         createrId: user?.id,
         type: splitType,
       });
@@ -152,6 +158,7 @@ const FormComp = ({ groups }: FormProps) => {
 
   const onGroupChange = (gid: string) => {
     setGroupId(gid);
+    setCurrency(groups.find((g) => g.id === gid)?.currency || "inr");
     if (currUserId && total) {
       setPayment(() => ({ [currUserId]: total }));
       setEqualSplit(() => convertToObject(users || [], "id", true));
@@ -162,6 +169,10 @@ const FormComp = ({ groups }: FormProps) => {
     setCategory(() => c);
   };
 
+  const onCurrencyChange = (c: string) => {
+    setCurrency(() => c);
+  };
+
   const effectUsers = useMemo(() => JSON.stringify(users), [users]);
 
   useEffect(() => {
@@ -169,8 +180,20 @@ const FormComp = ({ groups }: FormProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectUsers]);
 
+  const symbol = getCurrencySymbol(currency);
+
   return (
     <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
+      <div>
+        <CurrencyCombobox
+          label="Currency"
+          disabled={loading}
+          value={currency}
+          open={currencyOpen}
+          setOpen={setCurrencyOpen}
+          setValue={onCurrencyChange}
+        />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <GroupCombobox
@@ -205,7 +228,7 @@ const FormComp = ({ groups }: FormProps) => {
         <FormInput
           id="amount"
           name="amount"
-          label={`Amount(${RUPEE_SYMBOL})`}
+          label={`Amount (${symbol}) `}
           type="number"
           step={0.01}
           placeholder={"0.00"}
@@ -216,6 +239,7 @@ const FormComp = ({ groups }: FormProps) => {
       <div>
         <div className="flex gap-2 justify-between items-center">
           <PaymentDrawer
+            symbol={symbol}
             users={users}
             total={total}
             payment={payment}
@@ -225,6 +249,7 @@ const FormComp = ({ groups }: FormProps) => {
           />
           <div className="pt-1">and</div>
           <SplitDrawer
+            symbol={symbol}
             users={users}
             total={total}
             disabled={loading}

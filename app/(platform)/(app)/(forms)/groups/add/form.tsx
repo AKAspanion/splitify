@@ -13,9 +13,13 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CurrencyCombobox } from "../../../_components/currency-combobox";
 
 const Form = () => {
   const router = useRouter();
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+
+  const [currency, setCurrency] = useState("inr");
   const [type, setType] = useState<GroupType | undefined>(undefined);
   const { execute, fieldErrors } = useAction(createGroup, {
     onSuccess: ({ group, userId }) => {
@@ -36,16 +40,27 @@ const Form = () => {
     const imageId = randomNumber(1, 20);
     let image_url = `/images/placeholder/groups/${imageId}.png`;
 
-    execute({ title, type, image_url, description });
+    execute({ title, type, currency, image_url, description });
   };
 
   const handleTypeChange = (t: GroupType) => {
     setType((s) => (s === t ? undefined : t));
   };
 
+  const onCurrencyChange = (c: string) => {
+    setCurrency(() => c);
+  };
+
   return (
     <form className="flex flex-col gap-6" action={onSubmit}>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        <CurrencyCombobox
+          label="Currency"
+          value={currency}
+          open={currencyOpen}
+          setOpen={setCurrencyOpen}
+          setValue={onCurrencyChange}
+        />
         <FormInput
           label="Group name"
           id="title"
@@ -55,7 +70,7 @@ const Form = () => {
         />
         <FormInput
           label="Description"
-          id="escription"
+          id="description"
           name="description"
           placeholder="Enter a description"
           errors={fieldErrors?.description}

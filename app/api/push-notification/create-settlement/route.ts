@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
 import { APILogger } from "@/lib/logger";
-import { RUPEE_SYMBOL } from "@/constants/ui";
+import { getCurrencySymbol } from "@/utils/currency";
 
 export async function POST(req: Request) {
   try {
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
             groupId,
             type: "SETTLEMENT_PLUS",
             users: { connect: [{ id: creatorId }] },
-            message: `${exp?.description || ""} ${RUPEE_SYMBOL}${exp?.amount || 0} in group ${group?.title || ""}`,
+            message: `${exp?.description || ""} ${getCurrencySymbol(exp?.currency)}${exp?.amount || 0} in group ${group?.title || ""}`,
           },
         }),
       ];

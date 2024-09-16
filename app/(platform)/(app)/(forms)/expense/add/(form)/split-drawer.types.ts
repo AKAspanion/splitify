@@ -5,6 +5,7 @@ export type SplitDrawerProps = {
   total?: number;
   disabled?: boolean;
   currUserId?: string;
+  symbol: string;
   equalSplit?: Record<string, boolean>;
   onEqualSplitChange?: (value: Record<string, boolean>) => void;
   exactSplit?: Record<string, number>;

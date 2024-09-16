@@ -1,8 +1,6 @@
 "use client";
-import { Switch } from "@/components/ui/switch";
 import { calcExpenseSplits } from "@/app/(platform)/(app)/_utils/calculation";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
-import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { User } from "@prisma/client";
@@ -60,9 +58,9 @@ export const BalanceList = ({
       </div>
       {noDataText ? <div className="pb-6">{noDataText}</div> : null}
       <div className="flex flex-col gap-2">
-        {balanceList?.map((s, i) => (
+        {balanceList?.map((b, i) => (
           <div className="text-sm font-medium opacity-90" key={i}>
-            {s.message}
+            {b.message}
           </div>
         ))}
       </div>

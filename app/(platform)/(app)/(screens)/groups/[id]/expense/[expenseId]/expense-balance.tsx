@@ -32,12 +32,13 @@ const Balance = async ({
   expenseId: string;
   balance: boolean;
 }) => {
-  const [users, payments, splits] = await db.$transaction([
+  const [users, payments, splits, expense] = await db.$transaction([
     db.user.findMany({
       where: { groups: { some: { id: groupId } } },
     }),
     db.userPayment.findMany({ where: { expenseId } }),
     db.userSplit.findMany({ where: { expenseId } }),
+    db.expense.findUnique({ where: { id: expenseId } }),
   ]);
 
   return (
@@ -47,6 +48,7 @@ const Balance = async ({
         payments={payments}
         splits={splits}
         users={users}
+        expense={expense}
       />
       {balance ? (
         <>

@@ -10,6 +10,7 @@ const EqualSplit = ({
   total = 0,
   users = [],
   equalSplit = {},
+  symbol,
   onEqualSplitChange,
 }: SplitDrawerProps) => {
   const handleEqualChange = (id: string, value: boolean) => {
@@ -72,7 +73,7 @@ const EqualSplit = ({
         ) : (
           <>
             <div>
-              {RUPEE_SYMBOL}
+              {symbol}
               {equalShare}/person
             </div>
             <div>{checkedPeople} people</div>

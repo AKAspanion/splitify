@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
 import {
   GroupCard,
   GroupCardLoading,
@@ -9,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
 import { Group } from "@prisma/client";
+import { useMemo } from "react";
+import { getCurrency } from "@/utils/currency";
 
 const GroupClient = ({ id }: { id: string }) => {
   const { data: group, isLoading } = useQuery<Group>({
@@ -17,17 +18,25 @@ const GroupClient = ({ id }: { id: string }) => {
     enabled: true,
   });
 
+  const currency = useMemo(
+    () => (group?.currency ? getCurrency(group.currency)?.symbol : ""),
+    [group?.currency],
+  );
+
   return isLoading || !group ? (
     <GroupCardLoading />
   ) : (
-    <GroupCard
-      group={group}
-      description={
-        <div className="pt-1 capitalize">
-          {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
-        </div>
-      }
-    />
+    <div className="flex items-center justify-between">
+      <GroupCard
+        group={group}
+        description={
+          <div className="pt-1 capitalize flex gap-4 items-center">
+            {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+          </div>
+        }
+      />
+      <div className="p-3 text-lg">{`${currency || ""}`}</div>
+    </div>
   );
 };
 

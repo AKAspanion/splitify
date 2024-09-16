@@ -9,5 +9,6 @@ export const CreateGroup = z.object({
     .min(3, { message: "Minimum 3 chars required" }),
   image_url: z.string(),
   type: z.string().optional(),
+  currency: z.string().optional(),
   description: z.string().optional(),
 });

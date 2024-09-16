@@ -11,7 +11,7 @@ export const AddExpenseFab = () => {
 
   const query = groupId ? `?groupId=${groupId}` : "";
 
-  // TODO remove when indivialu expense ready
+  // TODO remove when individual expense ready
   const hidden = false;
 
   return hidden ? null : (

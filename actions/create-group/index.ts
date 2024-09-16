@@ -15,7 +15,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { title, type, description, image_url } = data;
+  const { title, type, currency, description, image_url } = data;
 
   let group;
   try {
@@ -23,6 +23,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       data: {
         type,
         title,
+        currency,
         image_url,
         description,
         users: { connect: [{ id: userId }] },

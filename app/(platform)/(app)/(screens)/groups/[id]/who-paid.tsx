@@ -1,16 +1,18 @@
 "use client";
 
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import { useQuery } from "@tanstack/react-query";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCurrencySymbol } from "@/utils/currency";
 
 const WhoPaid = ({
   expenseId,
   amount,
+  currency = "",
 }: {
   expenseId: string;
   amount: number;
+  currency?: string | null;
 }) => {
   const { data: whoPaid, isLoading } = useQuery<string>({
     queryKey: [`group-${expenseId}-who-paid-${amount}`],
@@ -18,10 +20,12 @@ const WhoPaid = ({
     enabled: true,
   });
 
+  const symbol = getCurrencySymbol(currency || "");
+
   let whoPaidValue = whoPaid;
 
   if (amount) {
-    whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${amount}`;
+    whoPaidValue = whoPaidValue + ` ${symbol}${amount}`;
   }
 
   return isLoading ? (

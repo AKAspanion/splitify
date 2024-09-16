@@ -4,9 +4,9 @@ import {
   UserAvatarsLoading,
 } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
-import { RUPEE_SYMBOL } from "@/constants/ui";
 import useExpense from "@/hooks/use-expense";
 import { UserPaymentWithUser } from "@/types/shared";
+import { getCurrencySymbol } from "@/utils/currency";
 import { useUser } from "@clerk/nextjs";
 
 const ExpenseUsersClient = ({
@@ -29,9 +29,10 @@ const ExpenseUsersClient = ({
   const whoPaid = whoPaidExpense(payments || [], user?.id || "");
 
   let whoPaidValue = whoPaid;
+  const symbol = getCurrencySymbol(expense?.currency || "");
 
   if (expense?.amount) {
-    whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${expense?.amount}`;
+    whoPaidValue = whoPaidValue + ` ${symbol}${expense?.amount}`;
   }
 
   return isSettlement ? null : expense ? (

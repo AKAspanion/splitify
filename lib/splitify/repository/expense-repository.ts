@@ -31,6 +31,7 @@ export class ExpenseRepository {
 
   public addExpense(
     name: string,
+    currency: string,
     expenseType: ExpenseType,
     payment: Payment,
     splits: Split[],
@@ -41,6 +42,7 @@ export class ExpenseRepository {
 
     const expense = ExpenseService.createExpense(
       name,
+      currency,
       expenseType,
       payment,
       splits,
