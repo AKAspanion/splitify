@@ -15,7 +15,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { amount, user1Id, user2Id, groupId } = data;
+  const { amount, currency, user1Id, user2Id, groupId } = data;
 
   let expense;
   try {
@@ -32,6 +32,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         data: {
           amount,
           groupId,
+          currency,
           description,
           type: "EXACT",
           createrId: userId,
@@ -54,7 +55,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   revalidatePath(`/groups/${groupId || ""}`);
-  return { data: { expense, userId, user1Id, user2Id } };
+  return { data: { expense, currency, userId, user1Id, user2Id } };
 };
 
 export const createSettlement = createSafeAction(CreateSettlement, handler);

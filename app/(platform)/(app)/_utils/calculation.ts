@@ -26,7 +26,6 @@ const evaluateExpense = async (
   splits: UserSplit[],
   groupCurrency: string,
 ) => {
-  // convert expense currency to group currency
   const rate = await CurrencyExchangeService.getRate(
     expense.currency || "inr",
     groupCurrency,
@@ -184,24 +183,33 @@ export const calcGroupSplits = async (
   }
 };
 
-export const evaluateTotals = (
+export const evaluateTotals = async (
   expensesList: ExpenseWithPaymentWithSplit[] | null,
   userId?: string,
+  groupCurrency?: string | null,
 ) => {
   let yours = 0;
+  let totals = 0;
   if (userId) {
     const expenses = expensesList?.filter((e) => e?.tag !== "SETTLEMENT");
-    const totals =
-      expenses
-        ?.map((e) =>
-          e?.payments?.reduce((total, p) => {
-            if (p?.userId === userId) {
-              yours += p.amount;
-            }
-            return p.amount + total;
-          }, 0),
-        )
-        ?.reduce((t, x) => t + x, 0) || 0;
+
+    const expensePromises = expenses?.map(async (e) => {
+      const rate = await CurrencyExchangeService.getRate(
+        e.currency || "inr",
+        groupCurrency || "inr",
+      );
+      return e?.payments?.reduce((total, p) => {
+        if (p?.userId === userId) {
+          yours += rate * p.amount;
+        }
+        return rate * p.amount + total;
+      }, 0);
+    });
+
+    if (expensePromises) {
+      const result = await Promise.all([...expensePromises]);
+      totals = result.reduce((t, x) => t + x, 0) || 0;
+    }
 
     return { totals, yours };
   } else {

@@ -8,5 +8,11 @@ import { CreateSettlement } from "./schema";
 export type InputType = z.infer<typeof CreateSettlement>;
 export type ReturnType = ActionState<
   InputType,
-  { expense?: Expense; userId: string; user1Id: string; user2Id: string }
+  {
+    expense?: Expense;
+    userId: string;
+    currency: string;
+    user1Id: string;
+    user2Id: string;
+  }
 >;

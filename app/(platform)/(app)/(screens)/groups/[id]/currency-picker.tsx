@@ -7,7 +7,7 @@ import { getCurrency } from "@/utils/currency";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 
-export const BalancesCurrency = ({
+export const CurrencyPicker = ({
   group,
   currency,
   onCurrencyChange,

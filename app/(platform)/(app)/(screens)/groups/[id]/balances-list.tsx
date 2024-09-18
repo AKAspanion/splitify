@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { BalancesLoader } from "./balances-loader";
-import { BalancesCurrency } from "./balances-currency";
+import { CurrencyPicker } from "./currency-picker";
 
 export const BalancesList = ({
   group,
@@ -37,7 +37,7 @@ export const BalancesList = ({
           )) || []
         : [];
     },
-    // enabled: true,
+    enabled: true,
   });
 
   const balances = useMemo(
@@ -56,8 +56,8 @@ export const BalancesList = ({
     return text;
   }, [balanceList?.length, expenses?.length]);
 
-  const onCurrencyChange = useCallback((currency: string) => {
-    setCurrency(currency);
+  const onCurrencyChange = useCallback((c: string) => {
+    setCurrency(() => c);
   }, []);
 
   // const handleCheck = () => {
@@ -68,6 +68,13 @@ export const BalancesList = ({
     <BalancesLoader />
   ) : (
     <div>
+      <div className="mb-3">
+        <CurrencyPicker
+          group={group}
+          currency={currency}
+          onCurrencyChange={onCurrencyChange}
+        />
+      </div>
       <div className="font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
         <div
           className={cn("flex flex-col", {
@@ -79,13 +86,6 @@ export const BalancesList = ({
             noDataText
           ) : (
             <>
-              <div className="mb-3">
-                <BalancesCurrency
-                  group={group}
-                  currency={currency}
-                  onCurrencyChange={onCurrencyChange}
-                />
-              </div>
               {balances?.map((s, i) => (
                 <div
                   className="font-medium flex w-full gap-4 items-center"
@@ -95,7 +95,7 @@ export const BalancesList = ({
                     {s.message}
                   </div>
                   <Link
-                    href={`/groups/${group?.id || ""}/settle?user1Id=${s.user1Id}&user2Id=${s.user2Id}&owes=${s.owes}`}
+                    href={`/groups/${group?.id || ""}/settle?user1Id=${s.user1Id}&user2Id=${s.user2Id}&owes=${s.owes}&currency=${currency}`}
                   >
                     <Badge size="sm">Settle</Badge>
                   </Link>

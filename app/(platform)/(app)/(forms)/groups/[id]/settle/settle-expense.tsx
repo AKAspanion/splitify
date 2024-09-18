@@ -20,6 +20,7 @@ const SettleExpense = async ({
 
   const user1Id = searchParams["user1Id"] || "";
   const user2Id = searchParams["user2Id"] || "";
+  const currency = searchParams["currency"] || "";
 
   const owes = searchParams["owes"] || "";
   const amount = isNaN(owes) ? 0 : parseFloat(owes);
@@ -30,6 +31,7 @@ const SettleExpense = async ({
         <div className="flex flex-col gap-4 sm:gap-6">
           <SettleUsers user1Id={user1Id} user2Id={user2Id} />
           <Form
+            currency={currency}
             groupId={groupId}
             amount={amount}
             user1Id={user1Id}
