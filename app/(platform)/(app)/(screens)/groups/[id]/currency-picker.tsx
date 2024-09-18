@@ -33,15 +33,8 @@ export const CurrencyPicker = ({
       const all = new Set([...uniqueCurrencies, defaultCurrency]);
 
       return Array.from(all)
-        .map((c) => {
-          const v = getCurrency(c);
-          if (v) {
-            return v;
-          } else {
-            return false;
-          }
-        })
-        .filter((s) => s !== false);
+        .map((c) => getCurrency(c))
+        .filter((s) => s !== undefined);
     }
 
     const grp = getCurrency(defaultCurrency);

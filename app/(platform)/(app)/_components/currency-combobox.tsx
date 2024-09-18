@@ -28,7 +28,7 @@ type ComboboxProps = {
   value: string;
   open?: boolean;
   disabled?: boolean;
-  currencies: CurrencyType[];
+  currencies: (CurrencyType | undefined)[];
   setOpen?: (open: boolean) => void;
   setValue: (value: string) => void;
 };
@@ -45,7 +45,7 @@ export function CurrencyCombobox({
   const value = v.toUpperCase();
   const { pending } = useFormStatus();
 
-  const currency = currencies.find((c) => c.abbreviation === value);
+  const currency = currencies.find((c) => c?.abbreviation === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -77,8 +77,8 @@ export function CurrencyCombobox({
             <CommandGroup>
               {currencies.map((c) => (
                 <CommandItem
-                  key={c.abbreviation}
-                  value={c.abbreviation}
+                  key={c?.abbreviation}
+                  value={c?.abbreviation}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     setOpen && setOpen(false);
@@ -87,10 +87,10 @@ export function CurrencyCombobox({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === c.abbreviation ? "opacity-100" : "opacity-0",
+                      value === c?.abbreviation ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {c.currency} - {`${c?.symbol || ""} `}
+                  {c?.currency} - {`${c?.symbol || ""} `}
                 </CommandItem>
               ))}
             </CommandGroup>
