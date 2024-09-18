@@ -4,6 +4,7 @@ import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { User } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
 
 export const BalanceList = ({
   expense,
@@ -14,18 +15,23 @@ export const BalanceList = ({
 }) => {
   const { user } = useUser();
   const [detailed] = useState(false);
-  const balanceList = useMemo(() => {
-    return user?.id
-      ? calcExpenseSplits(
-          user?.id,
-          expense,
-          users || [],
-          expense?.payments || [],
-          expense?.splits || [],
-          detailed,
-        ) || []
-      : [];
-  }, [detailed, expense, users, user?.id]);
+
+  const { data: balanceList } = useQuery({
+    queryKey: ["expense-balance-list"],
+    queryFn: async () => {
+      return user?.id
+        ? (await calcExpenseSplits(
+            user?.id,
+            expense,
+            users || [],
+            expense?.payments || [],
+            expense?.splits || [],
+            detailed,
+          )) || []
+        : [];
+    },
+    enabled: true,
+  });
 
   const noDataText = useMemo(() => {
     let text = "";

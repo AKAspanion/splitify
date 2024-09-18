@@ -5,6 +5,7 @@ import { EqualSplit } from "@/lib/splitify/model/split/equal-split";
 import { ExactSplit } from "@/lib/splitify/model/split/exact-split";
 import { User } from "@/lib/splitify/model/user/user";
 import { ExpenseRepository } from "@/lib/splitify/repository/expense-repository";
+import { CurrencyExchangeService } from "@/lib/splitify/service/currency-exchange-service";
 import { MinifySplitsService } from "@/lib/splitify/service/minify-splits-service";
 import { SplitifyService } from "@/lib/splitify/service/splitify-service";
 import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
@@ -18,19 +19,26 @@ import {
   UserSplit,
 } from "@prisma/client";
 
-const evaluateExpense = (
+const evaluateExpense = async (
   service: SplitifyService,
   expense: DBExpense,
   payments: UserPayment[],
   splits: UserSplit[],
+  groupCurrency: string,
 ) => {
+  // convert expense currency to group currency
+  const rate = await CurrencyExchangeService.getRate(
+    expense.currency || "inr",
+    groupCurrency,
+  );
+
   switch (expense.type) {
     case "EQUAL":
       service.addExpense(
         expense.description,
         expense.currency || "inr",
         ExpenseType.EQUAL,
-        payments?.map((p) => new Payment(p.userId, p.amount)) || [],
+        payments?.map((p) => new Payment(p.userId, p.amount * rate)) || [],
         splits?.map((s) => new EqualSplit(s.userId)) || [],
       );
       break;
@@ -40,8 +48,8 @@ const evaluateExpense = (
         expense.description,
         expense.currency || "inr",
         ExpenseType.EXACT,
-        payments?.map((p) => new Payment(p.userId, p.amount)) || [],
-        splits?.map((s) => new ExactSplit(s.userId, s.amount)) || [],
+        payments?.map((p) => new Payment(p.userId, p.amount * rate)) || [],
+        splits?.map((s) => new ExactSplit(s.userId, s.amount * rate)) || [],
       );
       break;
     default:
@@ -49,7 +57,7 @@ const evaluateExpense = (
   }
 };
 
-export const calcExpenseSplits = (
+export const calcExpenseSplits = async (
   currUserId: string,
   expense: DBExpense | null,
   dbUsers: DBUser[],
@@ -59,6 +67,7 @@ export const calcExpenseSplits = (
 ) => {
   try {
     if (!expense) return [];
+    const currency = expense?.currency || "inr";
     const users = dbUsers.map(
       (u) =>
         new User(
@@ -70,7 +79,7 @@ export const calcExpenseSplits = (
           "0",
         ),
     );
-    const group = new Group("Group", "inr");
+    const group = new Group("Group", currency);
 
     users.forEach((u) => group.addUser(u));
 
@@ -79,7 +88,7 @@ export const calcExpenseSplits = (
     const expenseRepository = new ExpenseRepository(group);
     const service = new SplitifyService(expenseRepository);
 
-    evaluateExpense(service, expense, payments, splits);
+    await evaluateExpense(service, expense, payments, splits, currency);
 
     if (detailed) {
       return service.getBalancesList().sort((a, b) => b?.owes - a?.owes);
@@ -96,7 +105,7 @@ export const calcExpenseSplits = (
         ),
       );
 
-      const symbol = getCurrencySymbol(expense?.currency || "inr");
+      const symbol = getCurrencySymbol(currency);
 
       return minifyService
         .getBalancesList(symbol)
@@ -108,14 +117,15 @@ export const calcExpenseSplits = (
   }
 };
 
-export const calcGroupSplits = (
+export const calcGroupSplits = async (
   currUserId: string,
   expenses: ExpenseWithPaymentWithSplit[] | null,
   dbUsers: DBUser[],
-  currency?: string | null,
+  currency: string | null,
   detailed = false,
 ) => {
   try {
+    const groupCurrency = currency || "inr";
     if (!expenses) return [];
     const users = dbUsers.map(
       (u) =>
@@ -128,7 +138,7 @@ export const calcGroupSplits = (
           "0",
         ),
     );
-    const group = new Group("Group", currency || "inr");
+    const group = new Group("Group", groupCurrency);
 
     users.forEach((u) => group.addUser(u));
 
@@ -138,7 +148,13 @@ export const calcGroupSplits = (
     const service = new SplitifyService(expenseRepository);
 
     for (const expense of expenses) {
-      evaluateExpense(service, expense, expense?.payments, expense?.splits);
+      await evaluateExpense(
+        service,
+        expense,
+        expense?.payments,
+        expense?.splits,
+        groupCurrency,
+      );
     }
 
     if (detailed) {
@@ -156,7 +172,7 @@ export const calcGroupSplits = (
       const minifyService = new MinifySplitsService(userNamesArr, userIdsArr);
       minifyService.execute(graph);
 
-      const symbol = getCurrencySymbol(currency || "inr");
+      const symbol = getCurrencySymbol(groupCurrency);
 
       return minifyService
         .getBalancesList(symbol)

@@ -8,6 +8,8 @@ import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { BalancesLoader } from "./balances-loader";
 
 export const BalancesList = ({
   group,
@@ -21,22 +23,25 @@ export const BalancesList = ({
   const { user } = useUser();
   const [detailed] = useState(false);
 
-  const balanceList = useMemo(
-    () =>
-      user?.id
-        ? calcGroupSplits(
+  const { data: balanceList, isLoading } = useQuery({
+    queryKey: ["group-balance-list"],
+    queryFn: async () => {
+      return user?.id
+        ? (await calcGroupSplits(
             user?.id,
             expenses || [],
             group?.users || [],
-            group?.currency,
+            group?.currency || "inr",
             detailed,
-          ) || []
-        : [],
-    [detailed, expenses, group, user?.id],
-  );
+          )) || []
+        : [];
+    },
+    enabled: true,
+  });
 
   const balances = useMemo(
-    () => (onlyList ? balanceList.slice(0, 2) : balanceList),
+    () =>
+      onlyList && balanceList ? balanceList.slice(0, 2) : balanceList || [],
     [balanceList, onlyList],
   );
 
@@ -54,7 +59,9 @@ export const BalancesList = ({
   //   setDetailed((s) => !s);
   // };
 
-  return (
+  return isLoading ? (
+    <BalancesLoader />
+  ) : (
     <div>
       <div className="font-semibold text-normal flex flex-wrap-reverse justify-end gap-3 items-end">
         <div
