@@ -14,7 +14,7 @@ const GroupUsers = ({ id, backUrl }: { id: string; backUrl: string }) => {
   // const { users, loading } = useGroupUsers(id);
 
   const { data: users, isLoading } = useQuery<User[]>({
-    queryKey: [`group-users`],
+    queryKey: [`group-${id}-users`],
     queryFn: GET_METHOD_CALLBACK(`/api/app/group/${id}/users`, {}),
     enabled: true,
   });

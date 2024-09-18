@@ -18,7 +18,7 @@ import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
 import { NotificationService } from "@/lib/notification/service";
 import { CurrencyCombobox } from "../../../../_components/currency-combobox";
-import { getCurrencySymbol } from "@/utils/currency";
+import { getCurrencies, getCurrencySymbol } from "@/utils/currency";
 
 type FormProps = { groups: GroupWIthUsers[] };
 
@@ -129,6 +129,8 @@ const FormComp = ({ groups }: FormProps) => {
   const [exactSplit, setExactSplit] = useState<Record<string, number>>({});
   const [percentSplit, setPercentSplit] = useState<Record<string, number>>({});
 
+  const currencies = useMemo(() => getCurrencies(), []);
+
   const onTotalChange = (value: string) => {
     if (currUserId) {
       setTotal(() => parseFloat(value || ""));
@@ -190,6 +192,7 @@ const FormComp = ({ groups }: FormProps) => {
           disabled={loading}
           value={currency}
           open={currencyOpen}
+          currencies={currencies}
           setOpen={setCurrencyOpen}
           setValue={onCurrencyChange}
         />

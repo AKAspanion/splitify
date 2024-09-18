@@ -33,3 +33,9 @@ export type GroupWIthExpenses = Group & { expenses: Expense[] };
 export type GroupWIthExpenseWithUserWithPaymentWithSplit = Group & {
   expenses: ExpenseWithUserWithPaymentWithSplit[];
 };
+
+export type CurrencyType = {
+  symbol: string;
+  currency: string;
+  abbreviation: string;
+};

@@ -1,15 +1,14 @@
 "use client";
-import { Switch } from "@/components/ui/switch";
 import { calcGroupSplits } from "@/app/(platform)/(app)/_utils/calculation";
 import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
-import { Label } from "@/components/ui/label";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { BalancesLoader } from "./balances-loader";
+import { BalancesCurrency } from "./balances-currency";
 
 export const BalancesList = ({
   group,
@@ -23,20 +22,22 @@ export const BalancesList = ({
   const { user } = useUser();
   const [detailed] = useState(false);
 
+  const [currency, setCurrency] = useState(group?.currency || "inr");
+
   const { data: balanceList, isLoading } = useQuery({
-    queryKey: ["group-balance-list"],
+    queryKey: [`group-balance-list-${group?.id || ""}`, currency],
     queryFn: async () => {
       return user?.id
         ? (await calcGroupSplits(
             user?.id,
             expenses || [],
             group?.users || [],
-            group?.currency || "inr",
+            currency,
             detailed,
           )) || []
         : [];
     },
-    enabled: true,
+    // enabled: true,
   });
 
   const balances = useMemo(
@@ -55,6 +56,10 @@ export const BalancesList = ({
     return text;
   }, [balanceList?.length, expenses?.length]);
 
+  const onCurrencyChange = useCallback((currency: string) => {
+    setCurrency(currency);
+  }, []);
+
   // const handleCheck = () => {
   //   setDetailed((s) => !s);
   // };
@@ -70,9 +75,18 @@ export const BalancesList = ({
             "gap-2": !onlyList,
           })}
         >
-          {noDataText
-            ? noDataText
-            : balances?.map((s, i) => (
+          {noDataText ? (
+            noDataText
+          ) : (
+            <>
+              <div className="mb-3">
+                <BalancesCurrency
+                  group={group}
+                  currency={currency}
+                  onCurrencyChange={onCurrencyChange}
+                />
+              </div>
+              {balances?.map((s, i) => (
                 <div
                   className="font-medium flex w-full gap-4 items-center"
                   key={i}
@@ -87,6 +101,8 @@ export const BalancesList = ({
                   </Link>
                 </div>
               ))}
+            </>
+          )}
         </div>
         <div className="flex-1" />
         {/* {onlyList ? null : (

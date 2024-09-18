@@ -11,9 +11,10 @@ import { useAction } from "@/hooks/use-action";
 import { randomNumber } from "@/utils/func";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CurrencyCombobox } from "../../../_components/currency-combobox";
+import { getCurrencies } from "@/utils/currency";
 
 const Form = () => {
   const router = useRouter();
@@ -32,6 +33,8 @@ const Form = () => {
       toast.error(error);
     },
   });
+
+  const currencies = useMemo(() => getCurrencies(), []);
 
   const onSubmit = async (formData: FormData) => {
     const title = formData.get("title") as string;
@@ -58,6 +61,7 @@ const Form = () => {
           label="Currency"
           value={currency}
           open={currencyOpen}
+          currencies={currencies}
           setOpen={setCurrencyOpen}
           setValue={onCurrencyChange}
         />

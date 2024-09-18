@@ -21,13 +21,14 @@ import {
 import { Label } from "@radix-ui/react-dropdown-menu";
 
 import { useFormStatus } from "react-dom";
-import { getCurrencies } from "@/utils/currency";
+import { CurrencyType } from "@/types/shared";
 
 type ComboboxProps = {
   label?: string;
   value: string;
   open?: boolean;
   disabled?: boolean;
+  currencies: CurrencyType[];
   setOpen?: (open: boolean) => void;
   setValue: (value: string) => void;
 };
@@ -37,13 +38,12 @@ export function CurrencyCombobox({
   open,
   disabled,
   value: v,
+  currencies,
   setOpen,
   setValue,
 }: ComboboxProps) {
   const value = v.toUpperCase();
   const { pending } = useFormStatus();
-
-  const currencies = React.useMemo(() => getCurrencies(), []);
 
   const currency = currencies.find((c) => c.abbreviation === value);
 

@@ -17,7 +17,7 @@ export const BalanceList = ({
   const [detailed] = useState(false);
 
   const { data: balanceList } = useQuery({
-    queryKey: ["expense-balance-list"],
+    queryKey: [`expense-balance-list-${expense?.id || ""}`],
     queryFn: async () => {
       return user?.id
         ? (await calcExpenseSplits(
