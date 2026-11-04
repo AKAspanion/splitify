@@ -28,7 +28,9 @@ const checkServed = async () => {
     ["/privacy", "Privacy Policy"],
     ["/delete-account", "Delete your account"],
     ["/groups/abc", SOON],
-    ["/sign-in", SOON],
+    ["/sign-in", "Sign in"],
+    ["/sign-up", "Sign up"],
+    ["/forgot-password", "Reset your password"],
     ["/coming-soon", SOON],
   ];
   for (const [route, text] of pages) {
@@ -46,19 +48,30 @@ const checkServed = async () => {
     );
   }
   expect(
-    links.body.includes("We&#x27;re moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.") ||
-      links.body.includes("We're moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here."),
+    links.body.includes(
+      "We&#x27;re moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
+    ) ||
+      links.body.includes(
+        "We're moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
+      ),
     "/coming-soon body text is not as specified",
   );
 
   const assetlinks = await get("/.well-known/assetlinks.json");
-  expect(assetlinks.res.status === 200, "/.well-known/assetlinks.json is not 200");
   expect(
-    (assetlinks.res.headers.get("content-type") ?? "").startsWith("application/json"),
+    assetlinks.res.status === 200,
+    "/.well-known/assetlinks.json is not 200",
+  );
+  expect(
+    (assetlinks.res.headers.get("content-type") ?? "").startsWith(
+      "application/json",
+    ),
     "/.well-known/assetlinks.json is not application/json",
   );
 
-  const staticMatch = (await get("/")).body.match(/\/_next\/static\/[^"')\s]+\.js/);
+  const staticMatch = (await get("/")).body.match(
+    /\/_next\/static\/[^"')\s]+\.js/,
+  );
   expect(staticMatch, "/ references no /_next/static/ script");
   const asset = await get(staticMatch[0]);
   expect(asset.res.status === 200, `${staticMatch[0]} is not 200`);
@@ -108,12 +121,16 @@ const must = [
   "privacy/index.html",
   "delete-account/index.html",
   "coming-soon/index.html",
+  "sign-in/index.html",
+  "sign-up/index.html",
+  "forgot-password/index.html",
 ];
 for (const file of must) {
   if (!existsSync(path.join(root, "out", file))) fail(`out/${file} is missing`);
 }
-for (const dir of ["groups", "sign-in", "sign-up", "profile", "api", "logs"]) {
-  if (existsSync(path.join(root, "out", dir))) fail(`out/${dir}/ must not exist`);
+for (const dir of ["groups", "profile", "api", "logs"]) {
+  if (existsSync(path.join(root, "out", dir)))
+    fail(`out/${dir}/ must not exist`);
 }
 
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.

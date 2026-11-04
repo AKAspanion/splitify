@@ -4,6 +4,7 @@ import { AppProgressBar } from "next-nprogress-bar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import { AuthProvider } from "./auth/auth-provider";
 import ConfirmProvider from "./confirm/ConfirmContext";
 import { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -33,11 +34,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
           shallowRouting
         />
       </Suspense>
-      <Suspense>
-        <QueryClientProvider client={queryClient}>
-          <ConfirmProvider>{children}</ConfirmProvider>
-        </QueryClientProvider>
-      </Suspense>
+      <AuthProvider>
+        <Suspense>
+          <QueryClientProvider client={queryClient}>
+            <ConfirmProvider>{children}</ConfirmProvider>
+          </QueryClientProvider>
+        </Suspense>
+      </AuthProvider>
     </ClerkProvider>
   );
 }
