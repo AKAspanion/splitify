@@ -33,18 +33,17 @@ There is one deployable service, the Next.js app at the repository root (`next.c
 
 ## Jobs and queues
 
-There are no background jobs or queues. Follow-up work after a write runs as a second request from the browser:
-when a server action succeeds, the form's `onSuccess` calls a `NotificationService` method
-(`lib/notification/service/index.ts`), which posts to `/api/push-notification/...`. That route sends the OneSignal
-push **and** writes the `Activity` row. See [push-notification API](../api/push-notification.md).
+There are no background jobs or queues. Each server action writes its `Activity` row in the same transaction as its
+change, then sends its pushes after the response with `notifyAfterResponse` (`lib/notification/notify.ts`), which
+calls OneSignal through `lib/onesignal.ts`; a failed push doesn't fail the action. See
+[activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
 ## Data flow
 
 1. A signed-in person submits a form; the client calls a server action through `useAction` (`hooks/use-action.ts`).
-2. The action checks `auth()` from Clerk, writes with Prisma, calls `revalidatePath`, and returns `{ data }` or
-   `{ error, debugMessage }`.
-3. On success the client calls the matching notification route, which notifies the group's members through
-   OneSignal and records the activity.
+2. The action checks `auth()` from Clerk and the caller's group membership, writes the change and its `Activity` row
+   with Prisma in one transaction, calls `revalidatePath`, and returns `{ data }` or `{ error, debugMessage }`.
+3. After the response, the action pushes to the group's members through OneSignal.
 4. Pages re-render; balance screens recompute balances from the group's expenses, payments and splits.
 
 User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` (see
@@ -52,6 +51,7 @@ User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` 
 
 ## History
 
+- 2026-11-05: pushes and activity were sent by `/api/push-notification` routes the browser called after each action; now each action writes its activity and sends its pushes itself, because the security fixes removed those routes. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 - 2026-11-05: added the hosting build, because the public pages are served from Firebase Hosting first.
 
 ## Sources
@@ -63,5 +63,6 @@ User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` 
 - `utils/api.ts`
 - `lib/db.ts`
 - `prisma/schema.prisma`
-- `lib/notification/service/index.ts`
+- `lib/notification/notify.ts`
+- `lib/onesignal.ts`
 - `app/(platform)/(app)/_utils/calculation.ts`
