@@ -195,12 +195,25 @@ describe("anonymiseUser", () => {
     expect(tx.group.update).not.toHaveBeenCalled();
   });
 
-  it("never throws: a failure is logged and reported as not anonymised", async () => {
+  it("rejects with the same error when group deletion fails, before updating the user", async () => {
+    const tx = makeTx(asha);
+    const error = new Error("db down");
+    tx.group.deleteMany.mockRejectedValue(error);
+    await expect(anonymiseUser(asTx(tx), "user_1")).rejects.toBe(error);
+    expect(tx.user.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects with the error when the user update fails", async () => {
+    const tx = makeTx(asha);
+    const error = new Error("update failed");
+    tx.user.update.mockRejectedValue(error);
+    await expect(anonymiseUser(asTx(tx), "user_1")).rejects.toBe(error);
+  });
+
+  it("logs nothing itself when a run fails", async () => {
     const tx = makeTx(asha);
     tx.user.update.mockRejectedValue(new Error("db down"));
-    await expect(anonymiseUser(asTx(tx), "user_1")).resolves.toEqual({
-      anonymised: false,
-    });
-    expect(APILogger.error).toHaveBeenCalled();
+    await expect(anonymiseUser(asTx(tx), "user_1")).rejects.toThrow("db down");
+    expect(APILogger.error).not.toHaveBeenCalled();
   });
 });
