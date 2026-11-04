@@ -1,7 +1,10 @@
 // Note: `useUploadThing` is IMPORTED FROM YOUR CODEBASE using the `generateReactHelpers` function
 import { useDropzone } from "@uploadthing/react";
 import { useCallback, useState } from "react";
-import { generateClientDropzoneAccept } from "uploadthing/client";
+import {
+  generateClientDropzoneAccept,
+  generatePermittedFileTypes,
+} from "uploadthing/client";
 import { useUploadThing } from "./uploadthing";
 
 export function MultiUploader() {
@@ -10,7 +13,7 @@ export function MultiUploader() {
     setFiles(acceptedFiles);
   }, []);
 
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onClientUploadComplete: () => {
       console.log("uploaded successfully!");
     },
@@ -22,9 +25,7 @@ export function MultiUploader() {
     },
   });
 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
+  const { fileTypes } = generatePermittedFileTypes(routeConfig);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,

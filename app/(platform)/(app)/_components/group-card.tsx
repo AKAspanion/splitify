@@ -39,7 +39,7 @@ export const GroupCard = (props: GroupCardProps) => {
                 alt="bg image"
               />
               <div
-                className={cn("absolute drop-shadow text-white", {
+                className={cn("absolute drop-shadow-sm text-white", {
                   "top-3 left-3": !compact,
                   "top-2 left-2": compact,
                 })}
@@ -50,7 +50,7 @@ export const GroupCard = (props: GroupCardProps) => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-stretch justify-center rounded bg-gradient-to-r from-green-500/70 to-lime-500/70 p-3">
+            <div className="flex flex-col items-stretch justify-center rounded bg-linear-to-r from-green-500/70 to-lime-500/70 p-3">
               <GroupIcon className="w-10 h-10" />
             </div>
           )}

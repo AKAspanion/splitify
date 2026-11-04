@@ -12,8 +12,8 @@ export const Navbar = () => {
   const { user } = useUser();
   // const user: any = { imageUrl: "" };
   return (
-    <div className="fixed top-0 w-full h-16 px-4 border-b shadow-sm  flex items-center">
-      <div className="md:max-w-screen-2xl mx-auto flex items-center w-full">
+    <div className="fixed top-0 w-full h-16 px-4 border-b shadow-xs  flex items-center">
+      <div className="md:max-w-(--breakpoint-2xl) mx-auto flex items-center w-full">
         <Logo to={user ? "/groups" : "/"} />
         <div className="flex-1" />
         <div className="flex items-center gap-4">

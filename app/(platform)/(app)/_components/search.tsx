@@ -41,7 +41,7 @@ export const Search = ({
   }, [query]);
 
   return (
-    <div className="relative rounded-md shadow-sm">
+    <div className="relative rounded-md shadow-xs">
       <Input
         value={text}
         autoFocus={autoFocus}

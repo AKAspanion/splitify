@@ -19,7 +19,7 @@ const LandingPage = () => {
         <h1 className="uppercase text-3xl font-extralight md:text-6xl text-center text-neutral-800dark:text-neutral-200 mb-6">
           Splitting Expenses
         </h1>
-        <div className="uppercase text-md md:text-4xl bg-gradient-to-r from-green-600 to-lime-600 text-white px-4 py-2 rounded-md w-fit">
+        <div className="uppercase text-md md:text-4xl bg-linear-to-r from-green-600 to-lime-600 text-white px-4 py-2 rounded-md w-fit">
           made easy
         </div>
       </div>

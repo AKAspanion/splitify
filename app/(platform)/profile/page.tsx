@@ -27,7 +27,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="flex items-start justify-center md:max-w-screen-2xl mx-auto">
+    <div className="flex items-start justify-center md:max-w-(--breakpoint-2xl) mx-auto">
       <div className="w-full px-0 pt-6 flex flex-col items-center gap-6 overflow-x-hidden -mb-12">
         <ClerkLoading>
           <div className="w-full flex flex-col gap-6 px-8">
