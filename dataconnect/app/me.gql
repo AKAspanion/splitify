@@ -1,0 +1,33 @@
+# The signed-in person's own row. Nothing else writes a signed-up person's row: the browser runs UpsertMe after
+# every sign-in, and id, email and name come from the token, never from variables.
+mutation UpsertMe($firstName: String, $lastName: String, $imageUrl: String)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && has(auth.token.email) && auth.token.email.size() <= 254 && (!has(auth.token.name) || auth.token.name.size() <= 100) && (!has(vars.firstName) || vars.firstName == null || vars.firstName.size() <= 100) && (!has(vars.lastName) || vars.lastName == null || vars.lastName.size() <= 100) && (!has(vars.imageUrl) || vars.imageUrl == null || vars.imageUrl.size() <= 2048)"
+) {
+  user_upsert(
+    data: {
+      id_expr: "auth.uid"
+      email_expr: "auth.token.email.lowerAscii()"
+      name_expr: "has(auth.token.name) ? auth.token.name : ''"
+      signedUp: true
+      firstName: $firstName
+      lastName: $lastName
+      imageUrl: $imageUrl
+    }
+  )
+}
+
+query GetMe
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  user(key: { id_expr: "auth.uid" }) {
+    id
+    email
+    name
+    firstName
+    lastName
+    imageUrl
+    signedUp
+  }
+}

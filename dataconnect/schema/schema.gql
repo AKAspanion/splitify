@@ -28,7 +28,7 @@ enum ActivityType {
 # signedUp: false and is a contact other people added by email.
 type User @table(key: "id") {
   id: String!
-  email: String! @unique
+  email: String! @index
   name: String
   firstName: String
   lastName: String
