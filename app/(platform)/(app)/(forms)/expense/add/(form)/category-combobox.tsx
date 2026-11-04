@@ -9,6 +9,7 @@ import {
   CommandGroup,
   CommandEmpty,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -59,34 +60,36 @@ export function CategoryCombobox(props: CategoryComboboxProps) {
       </div>
       <PopoverContent className="p-0" side="bottom" align="end">
         <Command>
-          <CommandEmpty>No Category found.</CommandEmpty>
-          <CommandGroup>
-            {EXPENSE_CATEGORY_TYPES.map((c) => {
-              const category = c as ExpenseCategoryType;
+          <CommandList>
+            <CommandEmpty>No Category found.</CommandEmpty>
+            <CommandGroup>
+              {EXPENSE_CATEGORY_TYPES.map((c) => {
+                const category = c as ExpenseCategoryType;
 
-              const ExpenseIcon =
-                EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
-              return (
-                <CommandItem
-                  key={c}
-                  value={c}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setOpen && setOpen(false);
-                  }}
-                >
-                  <ExpenseIcon className={cn("mr-2 h-4 w-4")} />
-                  <div className="line-clamp-1 w-full capitalize">{c}</div>
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === c.toLowerCase() ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
+                const ExpenseIcon =
+                  EXPENSE_CATEGORY_ICONS[category] || ReceiptText;
+                return (
+                  <CommandItem
+                    key={c}
+                    value={c}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : currentValue);
+                      setOpen && setOpen(false);
+                    }}
+                  >
+                    <ExpenseIcon className={cn("mr-2 h-4 w-4")} />
+                    <div className="line-clamp-1 w-full capitalize">{c}</div>
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === c.toLowerCase() ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

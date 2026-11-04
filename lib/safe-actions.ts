@@ -22,7 +22,7 @@ export const createSafeAction =
     if (!validationResult.success) {
       return {
         fieldErrors: <FieldErrors<TI>>(
-          validationResult.error.flatten().fieldErrors
+          z.flattenError(validationResult.error).fieldErrors
         ),
       };
     }

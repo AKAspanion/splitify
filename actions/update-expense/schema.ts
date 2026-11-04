@@ -5,9 +5,14 @@ import { z } from "zod";
 export const UpdateExpense = z.object({
   description: z
     .string({
-      required_error: "Description is required",
-      invalid_type_error: "Description must be a string",
+      error: (issue) =>
+        issue.input === undefined
+          ? "Description is required"
+          : "Description must be a string",
     })
     .min(3, { message: "Minimum 3 chars required" }),
-  id: z.string({ required_error: "Expense id is required" }),
+  id: z.string({
+    error: (issue) =>
+      issue.input === undefined ? "Expense id is required" : undefined,
+  }),
 });

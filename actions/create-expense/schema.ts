@@ -21,13 +21,24 @@ export const CreateExpense = z
     ),
     description: z
       .string({
-        required_error: "Description is required",
-        invalid_type_error: "Description must be a string",
+        error: (issue) =>
+          issue.input === undefined
+            ? "Description is required"
+            : "Description must be a string",
       })
       .min(3, { message: "Minimum 3 chars required" }),
-    amount: z.number({ required_error: "Amount is required" }),
-    groupId: z.string({ required_error: "Group is required" }),
-    createrId: z.string({ required_error: "Creator id is required" }),
+    amount: z.number({
+      error: (issue) =>
+        issue.input === undefined ? "Amount is required" : undefined,
+    }),
+    groupId: z.string({
+      error: (issue) =>
+        issue.input === undefined ? "Group is required" : undefined,
+    }),
+    createrId: z.string({
+      error: (issue) =>
+        issue.input === undefined ? "Creator id is required" : undefined,
+    }),
     category: z.string().optional(),
     type: expenseType,
   })

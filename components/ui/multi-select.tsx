@@ -4,7 +4,12 @@ import * as React from "react";
 import { X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
 
 type Framework = Record<"value" | "label", string>;
@@ -124,26 +129,28 @@ export function FancyMultiSelect() {
       <div className="relative mt-2">
         {open && selectables.length > 0 ? (
           <div className="absolute w-full z-10 top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden animate-in">
-            <CommandGroup className="h-full overflow-auto">
-              {selectables.map((framework) => {
-                return (
-                  <CommandItem
-                    key={framework.value}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onSelect={(value) => {
-                      setInputValue("");
-                      setSelected((prev) => [...prev, framework]);
-                    }}
-                    className={"cursor-pointer"}
-                  >
-                    {framework.label}
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
+            <CommandList>
+              <CommandGroup className="h-full overflow-auto">
+                {selectables.map((framework) => {
+                  return (
+                    <CommandItem
+                      key={framework.value}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onSelect={(value) => {
+                        setInputValue("");
+                        setSelected((prev) => [...prev, framework]);
+                      }}
+                      className={"cursor-pointer"}
+                    >
+                      {framework.label}
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
           </div>
         ) : null}
       </div>

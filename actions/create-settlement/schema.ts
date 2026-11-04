@@ -2,10 +2,22 @@ import { z } from "zod";
 
 export const CreateSettlement = z
   .object({
-    amount: z.number({ required_error: "Amount is required" }),
-    groupId: z.string({ required_error: "Group is required" }),
-    user1Id: z.string({ required_error: "First party is required" }),
-    user2Id: z.string({ required_error: "Second party is required" }),
+    amount: z.number({
+      error: (issue) =>
+        issue.input === undefined ? "Amount is required" : undefined,
+    }),
+    groupId: z.string({
+      error: (issue) =>
+        issue.input === undefined ? "Group is required" : undefined,
+    }),
+    user1Id: z.string({
+      error: (issue) =>
+        issue.input === undefined ? "First party is required" : undefined,
+    }),
+    user2Id: z.string({
+      error: (issue) =>
+        issue.input === undefined ? "Second party is required" : undefined,
+    }),
   })
   .refine((a) => !!a.amount, {
     message: "Please enter an amount",

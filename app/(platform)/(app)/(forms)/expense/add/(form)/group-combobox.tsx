@@ -9,6 +9,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -68,34 +69,36 @@ export function GroupCombobox(props: GroupComboboxProps) {
       </div>
       <PopoverContent className="p-0" side="bottom" align="end">
         <Command>
-          <CommandEmpty>No group found.</CommandEmpty>
-          <CommandGroup>
-            {groups.map((group) => {
-              const type = group?.type as GroupType;
-              const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
-              return (
-                <CommandItem
-                  key={group.id}
-                  value={group.id}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : group.id);
-                    setOpen && setOpen(false);
-                  }}
-                >
-                  <GroupIcon className={cn("mr-2 h-4 w-4")} />
-                  <div className="line-clamp-1 w-full capitalize">
-                    {group.title}
-                  </div>
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === group.id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>No group found.</CommandEmpty>
+            <CommandGroup>
+              {groups.map((group) => {
+                const type = group?.type as GroupType;
+                const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
+                return (
+                  <CommandItem
+                    key={group.id}
+                    value={group.id}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : group.id);
+                      setOpen && setOpen(false);
+                    }}
+                  >
+                    <GroupIcon className={cn("mr-2 h-4 w-4")} />
+                    <div className="line-clamp-1 w-full capitalize">
+                      {group.title}
+                    </div>
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === group.id ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
