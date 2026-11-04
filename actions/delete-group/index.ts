@@ -6,7 +6,10 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/safe-actions";
 import { DeleteGroup } from "./schema";
-import { getErrorMessage } from "@/utils/validate";
+import { APILogger } from "@/lib/logger";
+import { getActorName } from "@/lib/notification/actor";
+import { groupDeleted } from "@/lib/notification/messages";
+import { notifyAfterResponse } from "@/lib/notification/notify";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = await auth();
@@ -16,24 +19,44 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   const { groupId } = data;
-  let group;
+  let groupName = "";
+  let msg;
   try {
-    group = await db.group.delete({ where: { id: groupId } });
+    // The membership check is part of the lookup, so a non-member sees the same answer as a missing group.
+    const existing = await db.group.findFirst({
+      where: { id: groupId, users: { some: { id: userId } } },
+      select: { title: true },
+    });
+    if (!existing) {
+      return { error: "Not found" };
+    }
+
+    const actorName = await getActorName(userId);
+    groupName = existing.title || "";
+    const message = groupDeleted(actorName, groupName);
+    msg = message;
+    await db.$transaction(async (tx) => {
+      await tx.group.delete({ where: { id: groupId } });
+      await tx.activity.create({
+        data: {
+          groupId,
+          type: message.type,
+          message: message.message,
+          users: { connect: [{ id: userId }] },
+        },
+      });
+    });
   } catch (error) {
-    return {
-      error: "Failed to delete group",
-      debugMessage: getErrorMessage(error).message,
-    };
+    await APILogger.error("Failed to delete group", {
+      cause: error instanceof Error ? error.name : "Unknown",
+    });
+    return { error: "Failed to delete group" };
   }
 
+  notifyAfterResponse([userId], msg, userId);
   revalidatePath(`/groups`);
   return {
-    data: {
-      message: "Group deleted",
-      groupName: group?.title || "",
-      groupId,
-      userId,
-    },
+    data: { message: "Group deleted", groupName, groupId, userId },
   };
 };
 

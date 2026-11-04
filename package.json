@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
     "format": "prettier --write .",
     "studio": "npx prisma studio",
     "db": "docker compose up --build",
@@ -45,7 +46,6 @@
     "iron-session": "^9.0.1",
     "lucide-react": "^1.68.0",
     "mariadb": "^3.5.4",
-    "memorystore": "^1.6.8",
     "next": "^16.4.5",
     "next-nprogress-bar": "^2.4.7",
     "next-themes": "^0.4.6",
@@ -60,7 +60,6 @@
     "uploadthing": "^7.7.4",
     "use-debounce": "^10.1.1",
     "vaul": "^1.1.2",
-    "web-push": "^3.6.7",
     "zod": "^4.6.7",
     "zustand": "^5.0.16"
   },
@@ -76,7 +75,15 @@
     "prisma": "7.10.1",
     "tailwindcss": "^4.3.4",
     "typescript": "6.0.3",
-    "webpack": "^5.112.2"
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "resolutions": {
+    "effect": "^3.22.4",
+    "tmp": "0.2.7",
+    "exceljs/**/archiver-utils/**/minimatch": "3.1.5",
+    "exceljs/**/zip-stream/**/minimatch": "3.1.5",
+    "exceljs/**/readdir-glob/minimatch": "5.1.9"
+  }
 }

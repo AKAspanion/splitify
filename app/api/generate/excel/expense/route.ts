@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { isGroupMember } from "@/lib/auth/membership";
 import { generateXLS } from "@/lib/excel";
 import { GroupWIthExpenseWithUserWithPaymentWithSplit } from "@/types/shared";
 import { auth } from "@clerk/nextjs/server";
@@ -18,6 +19,9 @@ export async function POST(req: Request) {
     const groupId = body?.groupId;
 
     if (groupId) {
+      if (!(await isGroupMember(userId, groupId))) {
+        return NextResponse.json({ message: "Not found" }, { status: 404 });
+      }
       const promises = [
         db.user.findMany({
           where: { groups: { some: { id: groupId } } },
@@ -84,8 +88,9 @@ export async function POST(req: Request) {
       );
     }
   } catch (error: any) {
+    console.error("excel expense export failed", error?.name);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

@@ -4,7 +4,6 @@ import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
-import { NotificationService } from "@/lib/notification/service";
 import { Expense } from "@/generated/prisma/browser";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -17,12 +16,6 @@ const ExpenseActions = ({ expense }: { expense: Expense | null }) => {
     onSuccess: ({ userId, groupId, expenseDesc, expenseTag }) => {
       toast.success("Expense deleted successfully");
       router.push(`/groups/${groupId}`);
-      NotificationService.deleteExpense(
-        userId,
-        expenseDesc,
-        expenseTag,
-        groupId,
-      );
     },
     onError: (error, debug) => {
       console.error(debug);

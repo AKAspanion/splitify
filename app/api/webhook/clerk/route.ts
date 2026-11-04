@@ -1,10 +1,22 @@
 import { db } from "@/lib/db";
-import { WebhookEvent } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import type { WebhookEvent } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  let payload: WebhookEvent;
   try {
-    const payload: WebhookEvent = await request.json();
+    // Checks the Svix signature against CLERK_WEBHOOK_SIGNING_SECRET before anything in the body is read.
+    payload = await verifyWebhook(request);
+  } catch (error) {
+    console.error(
+      "Clerk webhook signature check failed",
+      error instanceof Error ? error.name : "unknown",
+    );
+    return NextResponse.json({ message: "Invalid signature" }, { status: 400 });
+  }
+
+  try {
     let userIdFound = "";
     const data = payload.data as any;
     const email = data?.email_addresses?.[0];
@@ -57,10 +69,14 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: "Event received" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
+    console.error(
+      "Clerk webhook handling failed",
+      error instanceof Error ? error.name : "unknown",
+    );
     return NextResponse.json(
-      { message: error?.message || "Failed to parse event" },
-      { status: 400 },
+      { message: "Something went wrong" },
+      { status: 500 },
     );
   }
 }

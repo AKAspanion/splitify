@@ -25,7 +25,9 @@ A creator-only rule needs the group's creator stored, and `Group` has no field f
 
 ## Status
 
-Open
+Answered: any member of a group may change the group, its members and its expenses; a contact only by someone who
+has them as a friend, and a Clerk user by nobody else. See
+[group member permissions](../decisions/group-member-permissions.md).
 
 ## Sources
 

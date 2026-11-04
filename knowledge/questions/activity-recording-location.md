@@ -22,7 +22,8 @@ why it was done this way.
 
 ## Status
 
-Open
+Answered: yes; each server action writes its activity entry in the same transaction as its change, and sends
+its pushes on the server. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
 ## Sources
 

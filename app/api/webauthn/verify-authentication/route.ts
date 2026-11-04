@@ -7,8 +7,7 @@ import type {
 } from "@simplewebauthn/server";
 import { auth } from "@clerk/nextjs/server";
 import DevicesService from "@/lib/auth/service/devices";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
+import { getChallengeSession } from "@/lib/auth/session";
 
 const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 const expectedOrigin =
@@ -21,16 +20,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body: AuthenticationResponseJSON = await req.json();
-
-    const session = await getIronSession<{ currentChallenge?: string }>(
-      await cookies(),
-      {
-        password: "supersecretamazingpassword123456",
-        cookieName: "challenge",
-      },
-    );
+    const session = await getChallengeSession();
     const expectedChallenge = session.currentChallenge;
+
+    if (!expectedChallenge) {
+      return NextResponse.json(
+        { message: "No authentication in progress" },
+        { status: 400 },
+      );
+    }
+
+    const body: AuthenticationResponseJSON = await req.json();
 
     const devices = await DevicesService.getDevice(userId);
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     try {
       const opts: VerifyAuthenticationResponseOpts = {
         response: body,
-        expectedChallenge: `${expectedChallenge}`,
+        expectedChallenge,
         expectedOrigin,
         expectedRPID: rpID,
         credential: dbAuthenticator,
@@ -56,10 +56,9 @@ export async function POST(req: Request) {
       };
       verification = await verifyAuthenticationResponse(opts);
     } catch (error) {
-      const _error = error as Error;
-      console.trace(_error);
+      console.trace(error);
       return NextResponse.json(
-        { message: _error?.message || "Something went wrong" },
+        { message: "Something went wrong" },
         { status: 500 },
       );
     }
@@ -67,18 +66,22 @@ export async function POST(req: Request) {
     const { verified, authenticationInfo } = verification;
 
     if (verified) {
-      // Update the authenticator's counter in the DB to the newest count in the authentication
-      dbAuthenticator.counter = authenticationInfo.newCounter;
+      // Save the newest counter, so a cloned authenticator that replays an older one is caught next time
+      await DevicesService.updateCounter(
+        userId,
+        dbAuthenticator.id,
+        authenticationInfo.newCounter,
+      );
     }
 
     session.currentChallenge = undefined;
     await session.save();
 
     return NextResponse.json({ data: { verified } }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.trace(error);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

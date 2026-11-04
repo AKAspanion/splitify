@@ -8,9 +8,7 @@ import type {
 } from "@simplewebauthn/server";
 import { auth } from "@clerk/nextjs/server";
 import DevicesService from "@/lib/auth/service/devices";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { db } from "@/lib/db";
+import { getChallengeSession } from "@/lib/auth/session";
 
 const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 const expectedOrigin =
@@ -23,32 +21,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body: RegistrationResponseJSON = await req.json();
-
-    const session = await getIronSession<{ currentChallenge?: string }>(
-      await cookies(),
-      {
-        password: "supersecretamazingpassword123456",
-        cookieName: "challenge",
-      },
-    );
+    const session = await getChallengeSession();
     const expectedChallenge = session.currentChallenge;
+
+    if (!expectedChallenge) {
+      return NextResponse.json(
+        { message: "No registration in progress" },
+        { status: 400 },
+      );
+    }
+
+    const body: RegistrationResponseJSON = await req.json();
 
     let verification: VerifiedRegistrationResponse;
     try {
       const opts: VerifyRegistrationResponseOpts = {
         response: body,
-        expectedChallenge: `${expectedChallenge}`,
+        expectedChallenge,
         expectedOrigin,
         expectedRPID: rpID,
         requireUserVerification: false,
       };
       verification = await verifyRegistrationResponse(opts);
     } catch (error) {
-      const _error = error as Error;
       console.trace(error);
       return NextResponse.json(
-        { message: _error?.message || "Something went wrong" },
+        { message: "Registration could not be verified" },
         { status: 400 },
       );
     }
@@ -73,7 +71,7 @@ export async function POST(req: Request) {
           counter: credential.counter,
           transports: body.response.transports,
         };
-        DevicesService.pushDevice(userId, newDevice);
+        await DevicesService.pushDevice(userId, newDevice);
       }
     }
 
@@ -81,10 +79,10 @@ export async function POST(req: Request) {
     await session.save();
 
     return NextResponse.json({ data: { verified } }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.trace(error);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

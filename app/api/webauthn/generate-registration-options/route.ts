@@ -1,7 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
+import { getChallengeSession } from "@/lib/auth/session";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
 import { isoUint8Array } from "@simplewebauthn/server/helpers";
@@ -64,21 +63,15 @@ export async function GET(_req: Request) {
      * The server needs to temporarily remember this value for verification, so don't lose it until
      * after you verify an authenticator response.
      */
-    const session = await getIronSession<{ currentChallenge?: string }>(
-      await cookies(),
-      {
-        password: "supersecretamazingpassword123456",
-        cookieName: "challenge",
-      },
-    );
+    const session = await getChallengeSession();
     session.currentChallenge = data?.challenge;
     await session.save();
 
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.trace(error);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { useAction } from "@/hooks/use-action";
 import { toast } from "sonner";
-import { NotificationService } from "@/lib/notification/service";
 import { updateExpense } from "@/actions/update-expense";
 
 type FormProps = { id: string; description: string };
@@ -20,7 +19,6 @@ const FormComp = ({ id, description }: FormProps) => {
       router.push(
         `/groups/${expense?.groupId || ""}/expense/${expense?.id || ""}`,
       );
-      NotificationService.updateExpense(userId, expense);
     },
     onError: (error, debug) => {
       console.error(debug);

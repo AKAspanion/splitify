@@ -98,6 +98,28 @@ const pushDevice = async (userId: string, credential: WebAuthnCredential) => {
   }
 };
 
+/** Saves a credential's newest signature counter, leaving every other stored device as it is. */
+const updateCounter = async (
+  userId: string,
+  credentialId: string,
+  newCounter: number,
+): Promise<void> => {
+  const deviceBlob = await db.authnDevice.findUnique({ where: { userId } });
+  if (!deviceBlob) return;
+
+  const devices = parseDevices(new TextDecoder().decode(deviceBlob.data));
+  const updated = devices.map((device) =>
+    isoBase64URL.fromBuffer(device.credentialID) === credentialId
+      ? { ...device, counter: newCounter }
+      : device,
+  );
+
+  await db.authnDevice.update({
+    where: { id: deviceBlob.id },
+    data: { data: new TextEncoder().encode(JSON.stringify(updated)) },
+  });
+};
+
 const removeDevices = async (userId: string) => {
   try {
     await db.authnDevice.deleteMany({ where: { userId } });
@@ -115,6 +137,11 @@ const getAuthnDevice = async (userId: string) => {
   }
 };
 
-const DevicesService = { getDevice, pushDevice, removeDevices };
+const DevicesService = {
+  getDevice,
+  pushDevice,
+  updateCounter,
+  removeDevices,
+};
 
 export default DevicesService;

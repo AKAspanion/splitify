@@ -18,7 +18,7 @@ generated:
   which applies the schema straight to the database `DATABASE_URL` names, production included, with no migrations.
 - **Activity depends on a second request.** Activity rows are written by the push-notification routes the browser
   calls after an action succeeds; if that call fails or the tab closes, the change has no activity entry
-  ([question](../questions/activity-recording-location.md)).
+  (decided: [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md)).
 - **Reads are written twice.** The `actions/get-*` functions and the `/api/app` routes run the same queries
   (e.g. `actions/get-expenses/index.ts` and `app/api/app/group/[id]/expense/route.ts`).
 - **Test code ships with the app:** `app/(platform)/(app)/test.tsx` (hard-coded user ids and a test notification) and

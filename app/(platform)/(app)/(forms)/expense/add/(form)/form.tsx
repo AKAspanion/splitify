@@ -16,7 +16,6 @@ import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { GroupWIthUsers } from "@/types/shared";
-import { NotificationService } from "@/lib/notification/service";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 
 type FormProps = { groups: GroupWIthUsers[] };
@@ -40,7 +39,6 @@ const FormComp = ({ groups }: FormProps) => {
     onSuccess: ({ expense, userId }) => {
       toast.success("Expense created successfully");
       router.push(`/groups/${expense?.groupId || ""}`);
-      NotificationService.createExpense(userId, expense);
     },
     onError: (error, debug) => {
       console.error(debug);

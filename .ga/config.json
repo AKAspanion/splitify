@@ -14,7 +14,7 @@
         "lint": "yarn lint",
         "lint-fix": null,
         "format-check": "yarn prettier --check .",
-        "test": null,
+        "test": "yarn test",
         "e2e": null
       }
     }

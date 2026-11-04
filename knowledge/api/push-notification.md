@@ -50,7 +50,7 @@ result is logged with `APILogger.info` ([logging](../operations/logging.md)).
 - The actor is the `userId` in the request body, not the session's user, and the group is not checked against the
   caller: see [open push relay](../findings/push-notification-open-relay.md).
 - Activity is written here, so an activity entry exists only if the browser made this second call after the
-  action succeeded: see [where activity is recorded](../questions/activity-recording-location.md).
+  action succeeded. The decision to remove these routes is [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
 ## Sources
 

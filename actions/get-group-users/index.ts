@@ -1,5 +1,6 @@
 "use server";
 
+import { isGroupMember } from "@/lib/auth/membership";
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs/server";
@@ -16,6 +17,10 @@ export const getGroupUsers = async (id: string) => {
   }
 
   try {
+    if (!(await isGroupMember(userId, id))) {
+      return { data: null, error: "Not found", debugMessage: "Not a member" };
+    }
+
     const users = await db.user.findMany({
       where: { groups: { some: { id: id || "null" } } },
     });

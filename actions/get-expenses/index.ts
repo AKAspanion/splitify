@@ -1,6 +1,7 @@
 "use server";
 
 import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";
+import { isGroupMember } from "@/lib/auth/membership";
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs/server";
@@ -21,6 +22,10 @@ export const getExpenses = async (
   }
 
   try {
+    if (!(await isGroupMember(userId, groupId))) {
+      return { data: null, error: "Not found", debugMessage: "Not a member" };
+    }
+
     const skip = (page - 1) * EXPENSE_PAGE_COUNT;
     const take = page * EXPENSE_PAGE_COUNT;
 

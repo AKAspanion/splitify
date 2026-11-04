@@ -33,7 +33,9 @@ What the code allows today, handler by handler:
 - **Any push to anyone:** `POST /api/push-notification` ([open push relay](../findings/push-notification-open-relay.md)).
 - **All logs:** `/logs` ([admin logs unprotected](../findings/admin-logs-unprotected.md)).
 
-Who *should* be able to do what is [an open question](../questions/group-permissions.md).
+Who *should* be able to do what is decided in [group member permissions](../decisions/group-member-permissions.md):
+any member of a group, for that group and its expenses. `/logs` is to be removed
+([decision](../decisions/remove-admin-logs-page.md)).
 
 ## Sources
 
