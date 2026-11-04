@@ -67,10 +67,10 @@ building `main` until the app moves.
   `yarn build:hosting`, then deploy hosting with `FirebaseExtended/action-hosting-deploy` pinned to the SHA
   flash-cards uses (`500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0`), `channelId: live`,
   `firebaseToolsVersion: 15.34.2`, the `FIREBASE_SERVICE_ACCOUNT` secret and the `FIREBASE_PROJECT_ID` variable.
-- The build reads `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (the root layout's `ClerkProvider` needs it to build),
-  `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`, `NEXT_PUBLIC_ONE_SIGNAL_APP_ID` and `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID` from
-  repository Variables; all four are public by design. The configuration check fails naming
-  `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` when it's missing; the other three are optional.
+- The build uses no Clerk at all: the developer no longer has a Clerk account, so in the hosting build
+  `@clerk/nextjs` resolves to a stub (`lib/clerk-hosting.tsx`) that reports no signed-in user and needs no key. It
+  reads `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`, `NEXT_PUBLIC_ONE_SIGNAL_APP_ID` and `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID`
+  from repository Variables, all optional and public by design.
 - Vercel Analytics stays out of the hosting build: `app/analytics.tsx` renders nothing when
   `NEXT_BUILD_TARGET` is `hosting`, since `/_vercel/insights` doesn't exist on Firebase Hosting.
 - `github-deploy@` needs Firebase Hosting Admin, which it already has.
