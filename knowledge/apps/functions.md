@@ -11,7 +11,8 @@ generated:
 # Cloud Functions
 
 Node 24 functions in `functions/`, built with their own `typescript` and `tsconfig.json` (test files excluded),
-deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.ts` exports both.
+deployed by hand with `yarn deploy:functions` from a project owner's machine, not by the deploy workflow
+([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). `functions/src/index.ts` exports both.
 
 ## Functions
 
@@ -22,6 +23,10 @@ deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.
   `budget-alerts` in `asia-south1`, running as `billing-kill-switch@` with `maxInstances: 1`. It unlinks billing once
   actual spend reaches the budget ([decision](../decisions/budget-kill-switch.md)). Its tests cover
   `parseNotification`, `enforceBudget` and the trigger options; the handler body itself has no direct test.
+
+## History
+
+- 2026-11-05: the deploy workflow deployed the functions; now a project owner deploys them by hand. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).
 
 ## Sources
 

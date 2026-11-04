@@ -2,10 +2,11 @@
 type: Decision
 title: Check pull requests and deploy from GitHub Actions with a service account
 description: GitHub Actions checks every pull request and deploys on push to main, modelled on the flash-cards project; Cloud Functions deploy automatically, the SQL Connect schema only when started by hand, signed in with a service-account key.
-status: draft
+status: superseded
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T17:23:08Z
+superseded_by: decisions/ci-cd-functions-deployed-by-hand
 ---
 
 # Check pull requests and deploy from GitHub Actions with a service account
