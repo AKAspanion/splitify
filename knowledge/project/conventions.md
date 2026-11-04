@@ -47,7 +47,9 @@ generated:
 
 ## Tests
 
-There are no tests in this repository; see [how should changes be tested?](../questions/testing-approach.md).
+- Unit tests are Vitest (`vitest.config.mts`), in a `*.test.ts` file beside the file they cover
+  (`actions/create-expense/index.test.ts`), run by `yarn test`.
+- Changes are to be tested end to end through the main flows: [decision](../decisions/e2e-main-flows.md).
 
 ## Lint and format
 
@@ -66,15 +68,18 @@ There are no tests in this repository; see [how should changes be tested?](../qu
 
 - The package manager is yarn (`packageManager` in `package.json`).
 - Type-check, lint and format-check commands are in the policy: `checks.commands.typecheck`,
-  `checks.commands.lint`, `checks.commands.format-check`. There are no test or e2e commands
-  (`checks.commands.test`, `checks.commands.e2e`).
+  `checks.commands.lint`, `checks.commands.format-check`. Tests run with `yarn test`
+  (`checks.commands.test`); there is no e2e command yet (`checks.commands.e2e`).
 
 ## History
 
+- 2026-11-04: said the repository had no tests; now Vitest unit tests sit beside the code and end-to-end tests of the main flows are decided, because tests were added and the testing question was answered. See [e2e of the main flows](../decisions/e2e-main-flows.md).
 - 2026-11-04: lint was `next lint` with `.eslintrc.json`; now `eslint .` with `eslint.config.mjs`, because Next 16 removed `next lint`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
 
+- `vitest.config.mts`
+- `actions/create-expense/index.test.ts`
 - `utils/page.ts`
 - `types/common.d.ts`
 - `lib/db.ts`

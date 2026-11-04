@@ -20,7 +20,7 @@ expense and adding it again, which loses its history.
 
 ## Status
 
-Open
+Answered: only the description is editable. See [expense edit description only](../decisions/expense-edit-description-only.md).
 
 ## Sources
 

@@ -13,8 +13,8 @@ generated:
 ## Fields
 
 - `Expense.amount` is the total, a `Float`. `Expense.currency` defaults to `inr`, as do the currency fields of
-  `UserPayment`, `UserSplit` and `Group`; nothing in the app sets another (see
-  [currency](../questions/currency.md)).
+  `UserPayment`, `UserSplit` and `Group`; nothing in the app sets another
+  ([multi-currency](../decisions/multi-currency.md) decides how others will work).
 - `Expense.type` is an `ExpenseType`: `EQUAL`, `EXACT` or `PERCENT`, the way it was split
   ([split types](../domain/split-types.md)).
 - `Expense.tag` is an `ExpenseTag`: `EXPENSE` for an ordinary expense, `SETTLEMENT` for a payment between two people

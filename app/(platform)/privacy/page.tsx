@@ -1,86 +1,122 @@
 import { Header } from "@/components/container/header";
 
+const CONTACT = "panditankit1995@gmail.com";
+
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <section className="space-y-2">
+    <h2 className="text-lg font-semibold">{title}</h2>
+    {children}
+  </section>
+);
+
 const PrivacyPage = () => {
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="p-6 w-full">
         <Header backTo="/" title="Privacy Policy" />
       </div>
-      <pre className="w-[calc(100vw)] h-[calc(100vh-88px)] overflow-auto">
-        {`
-      Privacy Policy for Splitify App
+      <article className="w-full max-w-2xl space-y-6 px-6 pb-12 text-sm leading-relaxed">
+        <p className="text-muted-foreground">Effective date: 4 November 2026</p>
 
-      Effective Date: 01/03/2014
-      
-      This Privacy Policy describes how Splitify ("we," "us," or "our") collects, uses, 
-      and shares information when you use our mobile application available on the Google Play Store (the "App").
-      By downloading, installing, or using the App, you agree to the terms of this Privacy Policy.
-      
-      1. Information We Collect:
-      
-         a. Personal Information:
-            - When you create an account, we may collect personal information such as your name, email address, and profile picture.
-            - When you invite friends to join Splitify, we may collect their email addresses for invitation purposes.
-      
-         b. Transaction Information:
-            - We collect information related to your transactions, including details about expenses, participants, and payment methods.
-      
-         c. Device Information:
-            - We may collect information about the device you use to access the App, including device type, operating system, 
-              and unique device identifiers.
-      
-         d. Log Data:
-            - We automatically collect log data when you use the App, including IP address, browser type, and pages visited.
-      
-      2. How We Use Your Information:
-      
-         a. Provide and Improve the App:
-            - We use your information to provide and improve the App's functionality, features, and user experience.
-      
-         b. Communication:
-            - We may use your email address to send you updates, newsletters, and important announcements related to the App.
-      
-         c. Customer Support:
-            - We use the information you provide to respond to your inquiries, troubleshoot issues, and address concerns.
-      
-         d. Research and Analytics:
-            - We may use aggregated and anonymized data for research, analytics, and to improve our services.
-      
-      3. Sharing of Information:
-      
-         a. Third-Party Services:
-            - We may share your information with third-party service providers to assist us in providing and maintaining the App.
-      
-         b. Legal Compliance:
-            - We may disclose your information if required by law or in response to a valid legal request.
-      
-      4. Security:
-      
-         - We implement security measures to protect your information from unauthorized access, alteration, disclosure, or destruction.
-      
-      5. Your Choices:
-      
-         a. Account Information:
-            - You can update or delete your account information at any time through the App settings.
-      
-         b. Communication Preferences:
-            - You can manage your communication preferences by adjusting your notification settings in the App.
-      
-      6. Children's Privacy:
-      
-         - The App is not intended for use by individuals under the age of 13. We do not knowingly collect personal information from children.
-      
-      7. Changes to this Privacy Policy:
-      
-         - We may update this Privacy Policy to reflect changes in our practices or for legal reasons. 
-           We will notify you of any significant changes.
-      
-      8. Contact Us:
-      
-         - If you have any questions or concerns about this Privacy Policy, please contact us at panditankit1995@gmail.com.
-      
-      By using the Splitify App, you agree to the terms outlined in this Privacy Policy.`}
-      </pre>
+        <Section title="Who we are">
+          <p>
+            Splitify helps people split shared expenses in groups. It is
+            available on the web at splitify.spanion.in and as Android and iOS
+            apps. This policy covers all three.
+          </p>
+        </Section>
+
+        <Section title="What we collect">
+          <ul className="list-disc space-y-1 pl-5">
+            <li>Your name, email address and profile picture, from sign-up.</li>
+            <li>
+              The groups, expenses, payments, splits and settlements you enter.
+            </li>
+            <li>The names and email addresses of contacts you add.</li>
+            <li>Feedback you send us.</li>
+            <li>
+              A passkey&apos;s public key, when you turn on biometric lock.
+            </li>
+            <li>A push subscription id, when you allow notifications.</li>
+            <li>Page views and performance measurements.</li>
+          </ul>
+        </Section>
+
+        <Section title="Why we use it">
+          <p>
+            We use it to run the app, to send the notifications you allow, and
+            to understand how the app is used and how well it performs. We do
+            not sell your data.
+          </p>
+        </Section>
+
+        <Section title="Who handles it for us">
+          <ul className="list-disc space-y-1 pl-5">
+            <li>Clerk handles accounts and sign-in.</li>
+            <li>
+              Vercel provides hosting, analytics and performance measurement.
+            </li>
+            <li>OneSignal sends push notifications.</li>
+            <li>UploadThing stores image uploads.</li>
+            <li>Google AdSense may show ads and use cookies to do so.</li>
+          </ul>
+        </Section>
+
+        <Section title="What other members can see">
+          <p>
+            What you enter in a group is visible to the members of that group.
+          </p>
+        </Section>
+
+        <Section title="How long we keep it">
+          <p>
+            We keep your data while your account exists. When you delete your
+            account, it is anonymised: your name, email address, profile
+            picture, passkeys and feedback are removed, and the expenses you
+            shared with other people stay in their groups under the name
+            &quot;Deleted user&quot;. A group that only you belonged to is
+            deleted.
+          </p>
+        </Section>
+
+        <Section title="Deleting your account">
+          <p>
+            You can delete your account in the app, under Profile, then Delete
+            account, or as described at{" "}
+            <a className="underline" href="/delete-account">
+              /delete-account
+            </a>
+            .
+          </p>
+        </Section>
+
+        <Section title="Children">
+          <p>
+            Splitify is not intended for anyone under 13. We do not knowingly
+            collect personal information from children.
+          </p>
+        </Section>
+
+        <Section title="Contact">
+          <p>
+            Questions about this policy? Email{" "}
+            <a className="underline" href={`mailto:${CONTACT}`}>
+              {CONTACT}
+            </a>
+            .
+          </p>
+        </Section>
+
+        <Section title="Changes to this policy">
+          <p>If we change this policy, we change the effective date above.</p>
+        </Section>
+      </article>
     </div>
   );
 };

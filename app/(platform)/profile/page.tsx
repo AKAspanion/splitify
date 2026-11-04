@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import DeleteAccountAction from "./delete-account-action";
 import NotificationAction from "./notification-action";
 
 const ProfilePage = () => {
@@ -77,7 +78,7 @@ const ProfilePage = () => {
           </div>
 
           <div className="w-full">
-            <div className="w-full px-8 md:px-12 flex gap-6 justify-end items-center">
+            <div className="w-full px-8 md:px-12 flex flex-wrap gap-4 md:gap-6 justify-end items-center">
               <Link href="/webauthn/register">
                 <Button>
                   <FingerprintIcon />
@@ -85,6 +86,7 @@ const ProfilePage = () => {
                 </Button>
               </Link>
               <NotificationAction />
+              <DeleteAccountAction />
             </div>
           </div>
           <div className="w-full">
