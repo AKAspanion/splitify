@@ -1,6 +1,6 @@
 name: Deploy
 
-# Every push to main runs the full CI suite, then deploys the Cloud Functions.
+# Every push to main runs the full CI suite, then deploys the public pages to Firebase Hosting and the Cloud Functions.
 # The SQL Connect schema deploys only when started by hand with "deploy_dataconnect" ticked.
 on:
   push:
@@ -52,10 +52,27 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-          cache-dependency-path: functions/yarn.lock
-      # The functions predeploy builds functions/, so only its dependencies are needed.
+          cache-dependency-path: |
+            yarn.lock
+            functions/yarn.lock
+      # --ignore-scripts: postinstall runs `prisma db push`, which a deploy must not do.
+      # The hosting build needs the root dependencies; the functions predeploy builds functions/.
+      - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn install --frozen-lockfile --ignore-scripts
         working-directory: functions
+      - name: Build public pages
+        env:
+          NEXT_PUBLIC_GOOGLE_ADSENSE_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ADSENSE_ID }}
+          NEXT_PUBLIC_ONE_SIGNAL_APP_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_APP_ID }}
+          NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID }}
+        run: yarn build:hosting
+      - name: Deploy hosting
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live
+          firebaseToolsVersion: 15.34.2
       - name: Write service account key
         env:
           SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

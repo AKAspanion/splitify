@@ -39,6 +39,15 @@ jobs:
       - run: yarn test
       - name: SQL Connect rules tests
         run: yarn test:rules
+      - name: Hosting build
+        # The public pages export to out/ and are served by the Hosting emulator.
+        env:
+          NEXT_PUBLIC_GOOGLE_ADSENSE_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ADSENSE_ID }}
+          NEXT_PUBLIC_ONE_SIGNAL_APP_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_APP_ID }}
+          NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID }}
+        run: |
+          yarn build:hosting
+          yarn check:hosting
       - name: Audit shipped dependencies
         run: |
           # yarn 1 exits with a bitmask of every severity found (high 8, critical 16),

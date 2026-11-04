@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:hosting": "NEXT_BUILD_TARGET=hosting next build",
+    "check:hosting": "node scripts/check-hosting-build.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
