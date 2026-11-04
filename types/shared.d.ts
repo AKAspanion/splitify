@@ -1,4 +1,10 @@
-import { Expense, Group, User, UserPayment, UserSplit } from "@/generated/prisma/browser";
+import {
+  Expense,
+  Group,
+  User,
+  UserPayment,
+  UserSplit,
+} from "@/generated/prisma/browser";
 
 export type UserPaymentWithUser = UserPayment & { user: User };
 export type UserSplitWithUser = UserSplit & { user: User };
