@@ -31,6 +31,8 @@ switch, with Google and email-and-password sign-in.
   `auth.token.email_verified` is true: Google accounts are verified, and an email-and-password account after it
   confirms Firebase's verification email. Without that, anyone could sign up with someone else's contact email and
   take over that contact's history.
+- An email-and-password account that hasn't verified its email can use the app. A banner asks it to verify, with a
+  button to send the email again, until it does; its contact merge waits for the verification.
 
 ## Consequences
 
@@ -38,6 +40,10 @@ switch, with Google and email-and-password sign-in.
 - Google blocks its sign-in inside the iOS WebView wrapper ([iOS app](../apps/ios.md)); email and password work
   there.
 - The signed-in user is known offline, so queued writes go out signed in after a reload.
+
+## History
+
+- 2026-11-05: what an unverified email-and-password account could do was unset; now it can use the app with a banner asking it to verify, because the developer chose that over blocking it.
 
 ## Sources
 
