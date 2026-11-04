@@ -2,7 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+
 **Status:** complete
+
 **Goal:** Let people sign up, sign in and out with Firebase Auth on the hosted site, give 2b a data layer to build on, and send push notifications through FCM in place of OneSignal.
 
 **Architecture:** An auth provider in the root providers holds the Firebase user; the sign-in screens are hosting-build pages. `lib/data/` holds query keys, error text, search escaping and the `expense` connector wrappers. Devices register FCM tokens in a new `PushToken` table; a trigger function per activity-recording mutation reads the activity with the admin SDK and sends the push.
