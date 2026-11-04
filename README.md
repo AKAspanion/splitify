@@ -39,19 +39,21 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 | Workflow | When | What |
 | --- | --- | --- |
-| `ci.yml` | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests and audits |
-| `deploy.yml` | Push to `main` | Runs CI, then deploys the Cloud Functions in `functions/`. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
+| `ci.yml` | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator |
+| `deploy.yml` | Push to `main` | Runs CI, then deploys the public pages to Firebase Hosting and the Cloud Functions in `functions/`. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
 | `codeql.yml` | PRs, pushes, weekly | CodeQL security analysis of the code and the workflows |
 | `dependabot.yml` | Weekly | Grouped dependency and GitHub Actions updates |
 
 Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI always runs as
-`npx --yes firebase-tools@15.34.2`. The web app itself is not deployed by these workflows.
+`npx --yes firebase-tools@15.34.2`. The signed-in web app itself is not deployed by these workflows; only the public pages (`yarn build:hosting`, written to `out/`) are, and a public page that stops exporting fails the CI build.
 
 `deploy.yml` reads these repository settings (Settings > Secrets and variables > Actions) and fails with a message
 naming what is missing, before anything installs:
 
 - **Secret** `FIREBASE_SERVICE_ACCOUNT`: JSON key of `github-deploy@splitify-416321.iam.gserviceaccount.com`.
 - **Variable** `FIREBASE_PROJECT_ID`: `splitify-416321`.
+- **Variables** `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`, `NEXT_PUBLIC_ONE_SIGNAL_APP_ID` and
+  `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID` (all optional): public values the hosting build reads when set.
 - **Variable** `APP_URL` (optional): the address shown on deploys; defaults to `https://splitify.spanion.in`.
 
 ### One-time setup
@@ -71,7 +73,7 @@ Run these once, signed in as the project owner.
 2. **Create the deploy account:** IAM & Admin > Service accounts > create `github-deploy` and give it these roles:
    Cloud Functions Admin, Cloud Run Admin, Service Account User, Artifact Registry Administrator, Cloud Build
    Editor, Eventarc Admin, Pub/Sub Editor, Firebase Data Connect Admin (`roles/firebasedataconnect.admin`),
-   Cloud SQL Admin, Service Usage Consumer and Firebase Viewer.
+   Cloud SQL Admin, Service Usage Consumer, Firebase Viewer and Firebase Hosting Admin (for the hosting deploy).
 
    Where the list came from: it is the list the CI/CD spec set, checked against Firebase's and Google Cloud's
    documentation. Those documents state only some of it: Cloud Functions Admin plus Service Account User to
@@ -85,10 +87,15 @@ Run these once, signed in as the project owner.
 
 3. **Add the key to GitHub:** create a JSON key for `github-deploy`, save its contents as the secret
    `FIREBASE_SERVICE_ACCOUNT`, then delete the downloaded file. Add the variable `FIREBASE_PROJECT_ID` and,
-   if wanted, `APP_URL`.
+   if wanted, `APP_URL` and the optional Variables above.
 4. **First SQL Connect deploy, by hand:** run `yarn deploy:dataconnect` from a machine signed in with `firebase login`.
    It creates the free-trial Cloud SQL instance `splitify-fdc`, which takes several minutes. After that, the
    **deploy_dataconnect** option of `deploy.yml` deploys schema changes.
+5. **Custom domain:** Firebase console > Hosting > **Add custom domain** > `splitify.spanion.in`. Add the DNS
+   records it shows at the `spanion.in` DNS provider, replacing any old `splitify` record. The certificate can take
+   a few hours to issue.
+6. **Authorized domain:** Firebase console > Authentication > Settings > **Authorized domains** > add
+   `splitify.spanion.in`.
 
 ### Budget kill switch
 
