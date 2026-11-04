@@ -31,10 +31,12 @@ generated:
   that throws shows nothing to the person.
 - **Errors leak details:** route handlers return `error.message` in `500` responses, and the global error page shows
   it (`app/global-error.tsx`).
+- **Four moderate advisories remain** (`uuid` and `minimatch` under `exceljs`), and `@grpc/grpc-js` is pinned to `^1.13.6` through `resolutions` in `package.json` because firebase 13.2.0's `@firebase/firestore` still depends on `~1.9.0`, which carries a high advisory; the app doesn't use Firestore. Drop the pin when firebase moves its dependency. CI fails only on high or critical ([CI and deploy](../operations/ci-cd.md)).
 
 ## History
 
 - 2026-11-04: dropped "activity depends on a second request" and the unused create-friend push route, and the test page's path, because those routes and `test.tsx` are deleted ([decision](../decisions/activity-and-notifications-in-actions.md)).
+- 2026-11-04: added the pinned grpc and remaining moderate advisories, because the CI audit run found them.
 
 ## Sources
 
