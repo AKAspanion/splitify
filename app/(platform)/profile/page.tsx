@@ -90,7 +90,9 @@ const ProfilePage = () => {
           <div className="w-full">
             <hr />
             <div className="w-full pt-6 h-[calc(100vh-153px)] overflow-y-auto overflow-x-hidden">
+              {/* Clerk 4 routed this by hash; Clerk 7 defaults to path routing, which needs a catch-all route. */}
               <UserProfile
+                routing="hash"
                 appearance={{
                   elements: {
                     rootBox: {

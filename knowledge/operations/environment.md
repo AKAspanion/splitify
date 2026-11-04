@@ -14,7 +14,10 @@ generated:
 
 The full list is `.env.sample`; copy it to `.env` and fill it in. The groups:
 
-- **Clerk:** `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` and the four `NEXT_PUBLIC_CLERK_*_URL` keys.
+- **Clerk:** `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL`,
+  `NEXT_PUBLIC_CLERK_SIGN_UP_URL`, and where to land after them, `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL` and
+  `NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL`. Clerk 7 no longer reads `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` or
+  `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`.
 - **Database:** `DATABASE_URL`, a MySQL URL.
 - **WebAuthn:** `AUTHN_RP_ID` and `AUTHN_EXPECTED_ORIGIN`, which must match the host the app is served from.
 - **OneSignal:** `NEXT_PUBLIC_ONE_SIGNAL_APP_ID`, `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID`, `ONE_SIGNAL_REST_API_KEY`.
@@ -39,6 +42,7 @@ The full list is `.env.sample`; copy it to `.env` and fill it in. The groups:
 
 ## History
 
+- 2026-11-04: Clerk's after-sign-in keys were `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` and `_AFTER_SIGN_UP_URL`; now the `_FALLBACK_REDIRECT_URL` pair, because Clerk 7 dropped the old names. See [upgrade](../decisions/upgrade-all-dependencies.md).
 - 2026-11-04: `DATABASE_URL` was read in `prisma/schema.prisma` and UploadThing used `UPLOADTHING_SECRET` and `UPLOADTHING_APP_ID`; now `prisma.config.ts` and `lib/db.ts` read it, and UploadThing uses `UPLOADTHING_TOKEN`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources

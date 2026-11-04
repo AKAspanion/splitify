@@ -1,9 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+// authMiddleware let the sign-in and sign-up pages through by itself; clerkMiddleware needs them listed.
 const isPublicRoute = createRouteMatcher([
   "/",
   "/privacy",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
   "/api/webhook/clerk",
   "/api/uploadthing",
   "/api/test(.*)",

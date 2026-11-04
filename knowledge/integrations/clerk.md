@@ -14,7 +14,11 @@ generated:
 
 - Sessions and route protection: `clerkMiddleware` in `proxy.ts`, `auth()` in every action and route, and
   `ClerkProvider` in `components/providers.tsx` (dark theme from `@clerk/themes` when the site is dark).
-- Sign-in and sign-up pages under `app/(platform)/(clerk)/`.
+- Sign-in and sign-up pages under `app/(platform)/(clerk)/`, public in `proxy.ts` ([auth](../security/auth.md)).
+- The profile page embeds `<UserProfile routing="hash" />` (`app/(platform)/profile/page.tsx`): `/profile` isn't a
+  catch-all route, and Clerk 7's default path routing would need one. Clerk 4 routed it by hash anyway.
+- Sign-in by email needs "Email verification code" turned on for sign-in in the Clerk instance's email settings;
+  without it, an account with no password can only sign in with Google.
 - User records: Clerk calls `POST /api/webhook/clerk` on `user.created` and `user.updated`, which writes the `User`
   row ([contact identity](../domain/contact-identity.md)). `GET /api/webhook/clerk` only answers a greeting.
 - Profile images are served from Clerk's image hosts, allowed in `images.remotePatterns` in `next.config.mjs`.
@@ -36,6 +40,7 @@ dashboard; `scripts.ngrok` in `package.json` exposes a local server for it.
 
 ## Sources
 
+- `app/(platform)/profile/page.tsx`
 - `proxy.ts`
 - `components/providers.tsx`
 - `app/api/webhook/clerk/route.ts`

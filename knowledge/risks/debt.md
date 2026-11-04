@@ -25,6 +25,10 @@ generated:
   the `app/(platform)/(app)/webauthn/test/` page; `/api/test(.*)` is a public route in `proxy.ts` though no such
   route exists.
 - **The service worker is commented out** (`app/sw.ts`).
+- **React warnings in the expense form and activity list.** `PaymentDrawer` puts a `Button` inside vaul's
+  `DrawerTrigger` without `asChild`, a button inside a button (`app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.tsx`),
+  and `ActivityPaginate` renders a list without unique `key`s
+  (`app/(platform)/(app)/(screens)/activity/activity-paginate.tsx`).
 - **Unused pieces:** the `/api/uploadthing` route and `components/uploadthing/`, `POST /api/push-notification/create-friend`,
   `Expense.settlement` and `User.uid`.
 - **`useAction` swallows thrown errors.** Its `catch` only clears `loading` (`hooks/use-action.ts`), so an action
@@ -34,6 +38,8 @@ generated:
 
 ## Sources
 
+- `app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.tsx`
+- `app/(platform)/(app)/(screens)/activity/activity-paginate.tsx`
 - `package.json`
 - `proxy.ts`
 - `hooks/use-action.ts`
