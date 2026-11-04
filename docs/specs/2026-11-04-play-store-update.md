@@ -30,8 +30,8 @@ only the build files change.
 - `build.gradle`: Android Gradle Plugin `8.13.0`; repositories `google()` and `mavenCentral()` (`jcenter()` is shut
   down).
 - `app/build.gradle`:
-  - `namespace 'in.spanion.splitify.twa'`, `compileSdk 36`, `targetSdk 36`, `minSdk 21` (`androidbrowserhelper`
-    needs 21);
+  - `namespace 'in.spanion.splitify.twa'`, `compileSdk 36`, `targetSdk 36`, `minSdk 24` (`androidbrowserhelper`
+    `2.7.4` declares 24, and the manifest merger refuses less; Android 5.0 to 6.x devices get no update);
   - `versionCode 10`, `versionName "1.1.0"`. Play's live version code isn't known here; `10` is above anything
     PWABuilder sets. If Play rejects it as too low, raise it;
   - `buildFeatures { resValues true }`, since the build relies on `resValue`;
