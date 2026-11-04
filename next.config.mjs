@@ -29,8 +29,7 @@ const hostingConfig = {
   trailingSlash: true,
   images: { ...nextConfig.images, unoptimized: true },
   pageExtensions: ["hosting.tsx"],
-  // @clerk/nextjs's ClerkProvider imports a server action, which a static export rejects, so the hosting build
-  // swaps in the client-only Clerk SDK it is built on.
+  // The hosting build has no Clerk (no account, no key), so "@clerk/nextjs" points at a signed-out stub.
   turbopack: { resolveAlias: { "@clerk/nextjs": "./lib/clerk-hosting.tsx" } },
 };
 
