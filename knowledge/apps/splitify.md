@@ -58,7 +58,6 @@ the client. Versions are in `package.json`.
 - `/groups/:id/settings`: `app/(platform)/(app)/(screens)/groups/[id]/settings/page.tsx`
 - `/groups/:id/settle`: `app/(platform)/(app)/(forms)/groups/[id]/settle/page.tsx`
 - `/groups/add`: `app/(platform)/(app)/(forms)/groups/add/page.tsx`
-- `/logs`: `app/(admin)/logs/page.tsx`
 - `/privacy`: `app/(platform)/privacy/page.tsx`
 - `/profile`: `app/(platform)/profile/page.tsx`
 - `/sign-in/*`: `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx`
