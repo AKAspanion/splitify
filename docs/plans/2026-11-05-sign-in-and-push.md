@@ -2,6 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** complete
 **Goal:** Let people sign up, sign in and out with Firebase Auth on the hosted site, give 2b a data layer to build on, and send push notifications through FCM in place of OneSignal.
 
 **Architecture:** An auth provider in the root providers holds the Firebase user; the sign-in screens are hosting-build pages. `lib/data/` holds query keys, error text, search escaping and the `expense` connector wrappers. Devices register FCM tokens in a new `PushToken` table; a trigger function per activity-recording mutation reads the activity with the admin SDK and sends the push.
@@ -80,21 +81,21 @@ type PushToken @table(key: "token") { token: String! user: User! platform: Strin
 - Given Alice is a member of group "Goa trip", when she runs `DeleteGroup`, then it returns the title "Goa trip" with the member ids, and the group is gone (the existing `groups.test.ts` cases still pass).
 - Given the change, then `grep` finds no `react-onesignal` in `package.json`, `yarn install --frozen-lockfile --ignore-scripts` passes, and both workflows pass `npx --yes @action-validator/cli` by absolute path.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/push-tokens.test.ts` and `dataconnect/app/groups.test.ts`, with the operations declared so they fail on behaviour
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/push-tokens.test.ts` and `dataconnect/app/groups.test.ts`, with the operations declared so they fail on behaviour
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `push-tokens.test.ts` and the `DeleteGroup` title case
 
-- [ ] **Step 3: Write the schema, operations, dependency and configuration changes** to the Interfaces, until they pass
+- [x] **Step 3: Write the schema, operations, dependency and configuration changes** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add dataconnect/schema/schema.gql dataconnect/app/push-tokens.gql dataconnect/app/push-tokens.test.ts dataconnect/admin/push.gql dataconnect/app/groups.gql dataconnect/app/groups.test.ts package.json yarn.lock .env.sample .github/workflows/ci.yml .github/workflows/deploy.yml
@@ -168,21 +169,21 @@ export function authErrorMessage(error: unknown): string;
 - Given `yarn build:hosting && yarn check:hosting`, then `out/sign-in/`, `out/sign-up/` and `out/forgot-password/` exist and answer 200, and the check no longer expects `sign-in/` to be absent.
 - Given each screen in the hosting build, then it is checked in the browser in light and dark at 390 pixels, with each error state shown.
 
-- [ ] **Step 1: Write the failing tests** for `safeNextPath` and `authErrorMessage` in `lib/auth/next-path.test.ts` and `lib/auth/auth-errors.test.ts`, and the hosting check's new pages in `scripts/check-hosting-build.mjs`
+- [x] **Step 1: Write the failing tests** for `safeNextPath` and `authErrorMessage` in `lib/auth/next-path.test.ts` and `lib/auth/auth-errors.test.ts`, and the hosting check's new pages in `scripts/check-hosting-build.mjs`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `next-path.test.ts` and `auth-errors.test.ts`
 
-- [ ] **Step 3: Write the provider, hook, guard, screens and landing changes** to the Interfaces, until they pass
+- [x] **Step 3: Write the provider, hook, guard, screens and landing changes** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS, then check each screen in the browser as the last Acceptance case says
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add components/auth/auth-provider.tsx hooks/use-auth.ts components/auth/require-auth.tsx lib/auth/next-path.ts lib/auth/next-path.test.ts lib/auth/auth-errors.ts lib/auth/auth-errors.test.ts components/providers.tsx "app/(platform)/(auth)/sign-in/page.hosting.tsx" "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/page.hosting.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx" "app/(platform)/(auth)/forgot-password/page.hosting.tsx" "app/(platform)/(auth)/forgot-password/forgot-password-form.tsx" "app/(landing)/page.tsx" "app/(landing)/_components/navbar.tsx" scripts/check-hosting-build.mjs
@@ -235,21 +236,21 @@ This device's registered token is kept in `localStorage` under `splitify.pushTok
 - Given `app/launch.tsx` with someone signed in, then it starts `listenForIosToken()` and, only when `Notification.permission` is `"granted"`, calls `registerWebPush()`; it never prompts; it no longer imports `react-onesignal`.
 - Given `public/`, then the two OneSignal worker files are gone and `firebase-messaging-sw.js` exists; `yarn build:hosting && yarn check:hosting` still pass.
 
-- [ ] **Step 1: Write the failing tests** for each `lib/push/register.ts` case in `lib/push/register.test.ts`, with fake `PushDeps`
+- [x] **Step 1: Write the failing tests** for each `lib/push/register.ts` case in `lib/push/register.test.ts`, with fake `PushDeps`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `register.test.ts`
 
-- [ ] **Step 3: Write the registration module, the service worker, and the launch and sign-out changes** to the Interfaces, until they pass
+- [x] **Step 3: Write the registration module, the service worker, and the launch and sign-out changes** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/push/register.ts lib/push/register.test.ts public/firebase-messaging-sw.js public/OneSignalSDK.sw.js public/OneSignalSDKWorker.js app/launch.tsx lib/firebase/auth.ts
@@ -309,21 +310,21 @@ Links: a group's activity `/groups/<groupId>`, an expense's `/groups/<groupId>/e
 - Given `pushForDeletedGroup("Goa trip", [Alice, Bob], Alice, …)`, then Bob's tokens get `GROUP_MINUS` text naming "Goa trip", Alice's get nothing.
 - Given `functions/src/index.ts`, then the three triggers are exported beside `mergeContactOnSignUp` and `billingKillSwitch`, each in `asia-south1` with the connectors and operations above (read from their endpoint options), and `yarn --cwd functions build` exits 0.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/activity-text.test.ts` and `functions/src/push-activity.test.ts`, with a fake `Messaging` and the emulator harness
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/activity-text.test.ts` and `functions/src/push-activity.test.ts`, with a fake `Messaging` and the emulator harness
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `activity-text.test.ts` and `push-activity.test.ts`
 
-- [ ] **Step 3: Write the text builder, the push logic and the triggers** to the Interfaces, until they pass
+- [x] **Step 3: Write the text builder, the push logic and the triggers** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/activity-text.ts functions/src/activity-text.test.ts functions/src/push-activity.ts functions/src/push-activity.test.ts functions/src/index.ts
@@ -381,21 +382,21 @@ export function createSettlement(vars: CreateSettlementVars): Promise<{ id: stri
 - Given `queryKeys.ListMyGroups({ search: "goa", limit: 6 })`, then it returns `["ListMyGroups", { search: "goa", limit: 6 }]`, and there is one entry for each query operation in `dataconnect/app/*.gql`.
 - Given `createExpense` against the emulators with Alice signed in and a group she shares with Bob, then the expense is written and `{ id }` returned; with Carol in a split it rejects, and `toUserMessage` of the rejection is "Only members of this group can be added to an expense". The same for `createSettlement`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `lib/data/errors.test.ts`, `lib/data/search.test.ts` and `lib/data/expense-writes.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `lib/data/errors.test.ts`, `lib/data/search.test.ts` and `lib/data/expense-writes.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `errors.test.ts` and `search.test.ts` (`expense-writes.test.ts` runs under `yarn test:rules`)
 
-- [ ] **Step 3: Write the data layer modules** to the Interfaces, until they pass
+- [x] **Step 3: Write the data layer modules** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/data/client.ts lib/data/errors.ts lib/data/errors.test.ts lib/data/search.ts lib/data/search.test.ts lib/data/expense-writes.ts lib/data/expense-writes.test.ts
