@@ -71,7 +71,7 @@ export const postCallMultipartForm = async <T, B = FormData>(
   path: string,
   formData: B,
   options: ApiCallOptions,
-): Promise<T> =>
+): Promise<AxiosResponse<T>> =>
   getMockFlag(options.mock)
     ? mockCall(options.mockKey)
     : axios.post(path, formData, {

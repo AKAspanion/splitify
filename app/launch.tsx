@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import OneSignal from "react-onesignal";
+import OneSignal, { type IInitObject } from "react-onesignal";
 
 export const Launch = () => {
   const { user } = useUser();
@@ -19,7 +19,10 @@ export const Launch = () => {
       OneSignal.init({
         appId,
         safari_web_id,
-        notifyButton: { enable: process.env.NODE_ENV === "development" },
+        // react-onesignal types every bell option as required; OneSignal defaults the rest.
+        notifyButton: {
+          enable: process.env.NODE_ENV === "development",
+        } as IInitObject["notifyButton"],
         allowLocalhostAsSecureOrigin: true,
       })
         .then(() => {
