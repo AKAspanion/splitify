@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** complete
+
 **Goal:** Build the landing page, `/privacy` and `/delete-account` as a static client-rendered export and deploy it to Firebase Hosting from CI, with a "coming back soon" page for every other route.
 
 **Architecture:** A `NEXT_BUILD_TARGET=hosting` build switches `next.config.mjs` to `output: "export"` and to the page extension `hosting.tsx`, so only `*.hosting.tsx` entries, which re-export the real pages and layouts, are built. Firebase Hosting serves `out/`, rewriting every path it has no file for to the coming-soon page. CI builds it on every pull request, and `deploy.yml` deploys it on push to `main`.
@@ -92,21 +94,21 @@ None: the policy's `run.checkpoints` is `none`, and the spec asks for none. The 
 - Given `NEXT_BUILD_TARGET` is `hosting`, then `app/analytics.tsx` renders nothing; otherwise it behaves as before.
 - Given `NEXT_BUILD_TARGET` is unset, then `next.config.mjs` returns the same config as before (no `output`, no `pageExtensions`), `yarn tsc --noEmit` passes, and no existing `page.tsx` or `layout.tsx` changed.
 
-- [ ] **Step 1: Write the failing check** `scripts/check-hosting-build.mjs` for each Acceptance case
+- [x] **Step 1: Write the failing check** `scripts/check-hosting-build.mjs` for each Acceptance case
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `yarn check:hosting`
 Expected: FAIL, naming the missing `out/index.html`
 
-- [ ] **Step 3: Write the hosting build, the entries, the coming-soon page and the Hosting config** to the Interfaces, until the check passes
+- [x] **Step 3: Write the hosting build, the entries, the coming-soon page and the Hosting config** to the Interfaces, until the check passes
 
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `yarn build:hosting && yarn check:hosting`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add next.config.mjs package.json app/analytics.tsx app/layout.hosting.tsx "app/(landing)/layout.hosting.tsx" "app/(landing)/page.hosting.tsx" "app/(platform)/layout.hosting.tsx" "app/(platform)/privacy/page.hosting.tsx" "app/(platform)/delete-account/page.hosting.tsx" app/coming-soon/page.hosting.tsx firebase.json scripts/check-hosting-build.mjs
@@ -155,21 +157,21 @@ Pinned action: `FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659
 - Given `README.md`, then the "One-time setup" lists the four Variables and which is required, the custom domain steps (Hosting → Add custom domain → `splitify.spanion.in`, the DNS records at the `spanion.in` provider replacing any old `splitify` record, the certificate taking a few hours), and adding `splitify.spanion.in` to Firebase Authentication's Authorized domains.
 - Given both workflows, when `npx --yes @action-validator/cli` checks each by absolute path, then it reports no error, and every `uses:` is pinned to a SHA.
 
-- [ ] **Step 1: Write the checks** for each Acceptance case: the validator by absolute path, and `grep` checks for the step names, the Variables, the fallback key only in `ci.yml`, and the action's SHA
+- [x] **Step 1: Write the checks** for each Acceptance case: the validator by absolute path, and `grep` checks for the step names, the Variables, the fallback key only in `ci.yml`, and the action's SHA
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `grep -n "build:hosting" .github/workflows/ci.yml .github/workflows/deploy.yml`
 Expected: FAIL, no match
 
-- [ ] **Step 3: Write the workflow steps and the README sections** to the Interfaces, until the checks pass
+- [x] **Step 3: Write the workflow steps and the README sections** to the Interfaces, until the checks pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npx --yes @action-validator/cli "$PWD/.github/workflows/deploy.yml"`
 Expected: PASS, and the same for `ci.yml`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .github/workflows/ci.yml .github/workflows/deploy.yml README.md
