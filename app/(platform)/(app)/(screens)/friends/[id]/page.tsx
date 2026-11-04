@@ -1,16 +1,9 @@
-import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import { resolvePageProps } from "@/utils/page";
+"use client";
 
-const FriendDetails = dynamic(() => import("./friend-details"));
+import FriendDetails from "./friend-details";
 
-const FriendDetailsPage = async (pageProps: ServerSidePageProp) => {
-  const props = await resolvePageProps(pageProps);
-  return (
-    <Suspense>
-      <FriendDetails {...props} />
-    </Suspense>
-  );
+const FriendDetailsPage = () => {
+  return <FriendDetails />;
 };
 
 export default FriendDetailsPage;

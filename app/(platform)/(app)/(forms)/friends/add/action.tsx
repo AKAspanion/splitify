@@ -1,8 +1,8 @@
-import { createFriend } from "@/actions/create-friend";
+"use client";
+
 import { Button } from "@/components/ui/button";
-import Spinner from "@/components/ui/spinner";
-import { useAction } from "@/hooks/use-action";
-import { UserPlus } from "lucide-react";
+import { toUserMessage } from "@/lib/data/errors";
+import { useAddFriend } from "@/lib/data/people";
 import { toast } from "sonner";
 
 export const Action = ({
@@ -14,33 +14,32 @@ export const Action = ({
   groupId?: string;
   isFriend?: boolean;
 }) => {
-  const { execute, loading } = useAction(createFriend, {
-    onSuccess: ({ message, userId, friendId }) => {
-      toast.success(message);
-    },
-    onError: (error, debug) => {
-      console.error(error, debug);
-      toast.error(error);
-    },
-  });
+  const { mutate, isPending } = useAddFriend();
 
-  const onRequest = async () => {
+  const onRequest = () => {
     if (isFriend) return;
 
-    await execute({ friendId: id, groupId });
+    mutate(
+      { friendId: id, groupId },
+      {
+        onSuccess: () => toast.success("Friend added"),
+        onError: (error) => toast.error(toUserMessage(error)),
+      },
+    );
   };
 
   return (
     <div>
       <Button
-        disabled={isFriend || loading}
+        disabled={isFriend || isPending}
         type="button"
-        variant={"ghost"}
-        size={"icon"}
+        variant={isFriend ? "ghost" : "outline"}
+        size={"sm"}
+        loading={isPending}
         onClick={onRequest}
         className={isFriend ? "text-green-500" : ""}
       >
-        {loading ? <Spinner size="sm" /> : <UserPlus />}
+        {isFriend ? "Added" : "Add"}
       </Button>
     </div>
   );

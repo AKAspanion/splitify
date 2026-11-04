@@ -1,12 +1,18 @@
 "use client";
 
 import { FormInput } from "@/components/form/form-input";
-import { FormSubmit } from "@/components/form/form-submit";
-import { useAction } from "@/hooks/use-action";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
-import { createContact } from "@/actions/create-contact";
-import { urlEncode } from "@/utils/func";
+import { toUserMessage } from "@/lib/data/errors";
+import {
+  normaliseEmail,
+  peopleHref,
+  useCreateContact,
+  validateContact,
+  type ContactFieldErrors,
+} from "@/lib/data/people";
 
 const Form = ({
   groupId,
@@ -18,57 +24,69 @@ const Form = ({
   mail?: string;
 }) => {
   const router = useRouter();
-  const { execute, fieldErrors } = useAction(createContact, {
-    onSuccess: ({ user }) => {
-      const to = urlEncode({
-        path: "/friends/add",
-        query: {
-          groupId: groupId || "",
-          back: backTo || "",
-          email: user.email,
-        },
-      });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(mail || "");
+  const [errors, setErrors] = useState<ContactFieldErrors>({});
+  const { mutate, isPending } = useCreateContact();
 
-      router.push(to);
-      toast.success("Contact added successfully");
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const check = validateContact({ name, email });
+    if (!check.ok) {
+      setErrors(check.errors);
+      return;
+    }
+    setErrors({});
 
-  const onSubmit = async (formData: FormData) => {
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-
-    execute({ name, email });
+    mutate(check.value, {
+      onSuccess: () => {
+        router.push(
+          peopleHref("/friends/add", {
+            groupId,
+            back: backTo,
+            email: normaliseEmail(check.value.email),
+          }),
+        );
+        toast.success("Contact added successfully");
+      },
+      // What was typed stays in the fields.
+      onError: (error) => toast.error(toUserMessage(error)),
+    });
   };
 
   return (
-    <form className="flex flex-col gap-6" action={onSubmit}>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <FormInput
           label="Name"
           id="name"
           name="name"
           placeholder="Enter name"
-          errors={fieldErrors?.name}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={isPending}
+          errors={errors.name ? [errors.name] : undefined}
         />
         <FormInput
           label="Email"
           id="email"
           name="email"
-          defaultValue={mail}
           placeholder="Enter an email"
-          errors={fieldErrors?.email}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isPending}
+          errors={errors.email ? [errors.email] : undefined}
         />
       </div>
       <div className="text-sm">
         Contact added here is synced up after your friend signs up with the same
         email id. Make sure you are using the correct email id.
       </div>
-      <FormSubmit>Add</FormSubmit>
+      <div className="flex justify-end items-center">
+        <Button type="submit" loading={isPending} disabled={isPending}>
+          Add
+        </Button>
+      </div>
     </form>
   );
 };
