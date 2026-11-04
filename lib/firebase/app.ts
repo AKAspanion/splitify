@@ -16,7 +16,7 @@ import {
 const AUTH_EMULATOR = "http://127.0.0.1:9099";
 const DATA_CONNECT_EMULATOR = { host: "127.0.0.1", port: 9399 };
 
-const useEmulators = () =>
+const shouldUseEmulators = () =>
   process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true";
 
 let auth: Auth | undefined;
@@ -44,7 +44,7 @@ export function getFirebaseAuth(): Auth {
         ? inMemoryPersistence
         : indexedDBLocalPersistence,
   });
-  if (useEmulators())
+  if (shouldUseEmulators())
     connectAuthEmulator(created, AUTH_EMULATOR, { disableWarnings: true });
   auth = created;
   return created;
@@ -53,7 +53,7 @@ export function getFirebaseAuth(): Auth {
 export function getDataConnectClient(): DataConnect {
   if (dataConnect) return dataConnect;
   const client = getDataConnect(getFirebaseApp(), connectorConfig);
-  if (useEmulators())
+  if (shouldUseEmulators())
     connectDataConnectEmulator(
       client,
       DATA_CONNECT_EMULATOR.host,

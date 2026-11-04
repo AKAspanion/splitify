@@ -63,7 +63,7 @@ async function seedExpense(e: SeedExpense) {
 }
 
 const query = async (dc: DataConnect, name: string, vars: object) =>
-  (await executeQuery(queryRef(dc, name, vars as never))).data as never as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  (await executeQuery(queryRef(dc, name, vars as never))).data as never as any;
 const mutate = (dc: DataConnect, name: string, vars: object) =>
   executeMutation(mutationRef(dc, name, vars as never));
 
