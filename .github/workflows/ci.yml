@@ -30,6 +30,8 @@ jobs:
           java-version: '21'
       # --ignore-scripts: postinstall runs `prisma db push`, which CI must not do.
       - run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Install Cloud Functions dependencies
+        run: yarn --cwd functions install --frozen-lockfile
       - run: npx prisma generate
       - run: yarn dataconnect:generate
       - run: yarn lint
@@ -48,8 +50,6 @@ jobs:
             exit 1
           fi
           exit 0
-      - name: Install Cloud Functions dependencies
-        run: yarn --cwd functions install --frozen-lockfile
       - name: Build Cloud Functions
         run: yarn --cwd functions build
       - name: Audit Cloud Functions dependencies
