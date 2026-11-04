@@ -14,16 +14,7 @@ generated:
 
 <!-- GA-GENERATED:routes app/api/push-notification -->
 
-- `POST /api/push-notification`: `app/api/push-notification/route.ts`
-- `POST /api/push-notification/create-expense`: `app/api/push-notification/create-expense/route.ts`
-- `POST /api/push-notification/create-friend`: `app/api/push-notification/create-friend/route.ts`
-- `POST /api/push-notification/create-group`: `app/api/push-notification/create-group/route.ts`
-- `POST /api/push-notification/create-settlement`: `app/api/push-notification/create-settlement/route.ts`
-- `POST /api/push-notification/delete-expense`: `app/api/push-notification/delete-expense/route.ts`
-- `POST /api/push-notification/delete-group`: `app/api/push-notification/delete-group/route.ts`
-- `POST /api/push-notification/update-expense`: `app/api/push-notification/update-expense/route.ts`
-- `POST /api/push-notification/update-group`: `app/api/push-notification/update-group/route.ts`
-- `POST /api/push-notification/update-group-member`: `app/api/push-notification/update-group-member/route.ts`
+_None in `app/api/push-notification`._
 
 <!-- GA-GENERATED:END -->
 
