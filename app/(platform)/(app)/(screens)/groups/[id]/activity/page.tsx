@@ -1,15 +1,7 @@
-import { ActivityCardLoading } from "@/app/(platform)/(app)/_components/activity-card";
-import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
-import dynamic from "next/dynamic";
-import { resolvePageProps } from "@/utils/page";
+"use client";
 
-const GroupActivityList = dynamic(() => import("./group-activity"), {
-  loading: () => <ScreenSkeleton oneCol card={<ActivityCardLoading />} />,
-});
+import GroupActivity from "./group-activity";
 
-const GroupActivityPage = async (pageProps: ServerSidePageProp) => {
-  const props = await resolvePageProps(pageProps);
-  return <GroupActivityList {...props} />;
-};
+const GroupActivityPage = () => <GroupActivity />;
 
 export default GroupActivityPage;

@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "activity/index.html",
+    "activity/_/index.html",
+    "groups/_/activity/index.html",
+    "feedback/add/index.html",
+    "profile/index.html"
+  ],
+  "requests": [
+    { "path": "/activity/", "expectText": "Your activity" },
+    { "path": "/activity/abc/", "expectText": "Activity details" },
+    { "path": "/groups/abc/activity/", "expectText": "Group activity" },
+    { "path": "/feedback/add/", "expectText": "Send a feedback" },
+    { "path": "/profile/", "expectText": "Your profile" }
+  ]
+}
