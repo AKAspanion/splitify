@@ -1,3 +1,22 @@
 {
-  "consent": null
+  "consent": null,
+  "workflow": {
+    "git": {
+      "message": "free",
+      "ticket": "none",
+      "base": "main",
+      "branch": "feat/<topic>",
+      "squash": false
+    },
+    "checks": {
+      "commands": {
+        "typecheck": "yarn tsc --noEmit",
+        "lint": "yarn lint",
+        "lint-fix": null,
+        "format-check": "yarn prettier --check .",
+        "test": null,
+        "e2e": null
+      }
+    }
+  }
 }

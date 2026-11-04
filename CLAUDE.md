@@ -1,5 +1,5 @@
 <!-- GA-WORKFLOW:START -->
-<!-- ga:rules 7da070b6fa1a -->
+<!-- ga:rules 6170e9afb3c3 -->
 
 ## How work flows here
 
@@ -10,7 +10,7 @@ Use these skills without being asked; the developer shouldn't have to name them.
 - **While building:** `ga:debug` when something fails and the cause isn't obvious.
 - **Where a plan run stands:** `ga.mjs run status` reads each run's ledger: tasks done out of the plan's total, the task in hand and its fix round, the checkpoints, rulings and provisional rulings so far. Run it when the developer asks how far the work has got, rather than piecing it together.
 - **Before saying it's done:** `ga:verify-work`. `ga:review-code` when the developer asks for a review.
-- **Commands:** typecheck `yarn tsc --noEmit`, lint `yarn lint`. This repository has no format-check, test or e2e command. Run these as written. An app's `AGENTS.md` may list its own under Commands.
+- **Commands:** typecheck `yarn tsc --noEmit`, lint `yarn lint`, format-check `yarn prettier --check .`. This repository has no test or e2e command. Run these as written. An app's `AGENTS.md` may list its own under Commands.
 - **Anything the client hands over** (documents, an API collection, a design or a Figma link, their code): `ga:learn` files it, asks the one question it needs and runs the skill that learns it. For what's already in place, use those directly: `ga:learn-docs` for `intake/`, and `ga:learn-codebase` for an existing codebase with little knowledge, or the client's code copied into this project, keeping their structure and updating the knowledge base that's there. Drafts are reviewed by a person: suggest `/ga:review-knowledge`.
 - **Estimating a new build for a proposal:** suggest `/ga:estimate`, which the developer starts. It grills out every gap in the client's documents and prototype, freezes the workflows, and writes the GeekyAnts estimate, plus the client's own format when they gave one. Never estimate from a template of your own.
 - **Knowledge:** `ga:ask` before searching the code, `ga:remember` for every feature, decision or changed requirement, and `ga:check-knowledge` at the end. The knowledge section below has the rules.
@@ -43,7 +43,7 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - A task runs no checks: only the tests it writes, each alone, by name, to watch it fail and then pass. Every check runs once, at the end.
 - Before the work is done, run smoke (`ga.mjs run smoke --since <the branch's base>`: the apps and the routes the branch adds start and answer, and no app's latest compile failed), typecheck (`yarn tsc --noEmit`) and lint (`yarn lint`). Run those for what the branch changed: `ga.mjs run checks --since <the branch's base> --only typecheck,lint` gives each command, narrowed to the packages it changed and those that depend on them. Then `ga:verify-work`: read the output, don't assume it.
 - Commit at the end of each step: each spec, each approved design, each task. In a plan run the implementer commits its task, and the task is complete then. Stage the step's files by name, never `git add -A`, with the knowledge that describes them in the same commit.
-- Commit messages are Conventional Commits: `type(scope): summary`.
+- Commit messages are plain sentences.
 - Build on a branch named `feat/<topic>`.
 - Branch from, and merge back into, `main`. Until ga's own setup is on `main` (`git cat-file -e main:.ga/config.json` fails), branch from the branch that holds it, and say so: a branch cut from `main` then has no `knowledge/` and no `.ga/`.
 - Ask before pushing.
@@ -101,6 +101,33 @@ Never configurable, whatever the project sets:
 
 ## Knowledge map
 
-_No concepts yet. Add the first one under `knowledge/`._
+_Generated from `knowledge/`. Do not edit by hand._
+
+_58 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+
+- [api/](knowledge/api/) — 5 concepts
+- [data/](knowledge/data/) — 3 concepts
+- [decisions/](knowledge/decisions/) — 1 concept
+- [design-system/](knowledge/design-system/) — 2 concepts
+- [domain/](knowledge/domain/) — 4 concepts
+- [features/](knowledge/features/) — 10 concepts
+- [findings/](knowledge/findings/) — 9 concepts
+- [integrations/](knowledge/integrations/) — 5 concepts
+- [operations/](knowledge/operations/) — 3 concepts
+- [questions/](knowledge/questions/) — 6 concepts
+- [risks/](knowledge/risks/) — 1 concept
+- [security/](knowledge/security/) — 3 concepts
+
+### apps
+
+- [Android app](knowledge/apps/android.md) _(Application)_ — A Trusted Web Activity, in.spanion.splitify.twa, that opens the deployed web app at /groups.
+- [iOS app](knowledge/apps/ios.md) _(Application)_ — A Swift WebView wrapper that opens the deployed web app, with Firebase push messaging.
+- [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 14 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
+
+### project
+
+- [Architecture](knowledge/project/architecture.md) _(Architecture)_ — One Next.js App Router app: server actions write, route handlers read and notify, Prisma stores data in MySQL, Clerk signs people in.
+- [Conventions](knowledge/project/conventions.md) _(Conventions)_ — How code is written in Splitify: where files go, how they are named, how errors travel, and which tools check style.
+- [Splitify](knowledge/project/overview.md) _(Project Overview)_ — An app for splitting shared expenses in groups: one Next.js web app, wrapped as Android and iOS apps.
 
 <!-- OKF-KNOWLEDGE-MAP:END -->
