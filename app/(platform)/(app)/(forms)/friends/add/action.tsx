@@ -2,7 +2,6 @@ import { createFriend } from "@/actions/create-friend";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
-import { NotificationService } from "@/lib/notification/service";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,7 +17,6 @@ export const Action = ({
   const { execute, loading } = useAction(createFriend, {
     onSuccess: ({ message, userId, friendId }) => {
       toast.success(message);
-      NotificationService.createFriend(userId, friendId, groupId || "");
     },
     onError: (error, debug) => {
       console.error(error, debug);

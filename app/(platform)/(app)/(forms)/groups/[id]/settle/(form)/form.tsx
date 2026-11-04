@@ -4,7 +4,6 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 import { useAction } from "@/hooks/use-action";
-import { NotificationService } from "@/lib/notification/service";
 import { fixedNum } from "@/utils/validate";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -24,9 +23,6 @@ const FormComp = ({ amount, groupId, user1Id, user2Id }: FormProps) => {
     onSuccess: ({ expense, userId }) => {
       toast.success("Settlement created successfully");
       router.push(`/groups/${expense?.groupId || ""}`);
-      if (expense) {
-        NotificationService.createSettlement(userId, expense);
-      }
     },
     onError: (error, debug) => {
       console.error(debug);

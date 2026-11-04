@@ -5,7 +5,6 @@ import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Badge } from "@/components/ui/badge";
-import { NotificationService } from "@/lib/notification/service";
 import { GROUP_CATEGORY_ICONS, GROUP_TYPES, GroupType } from "@/constants/ui";
 import { useAction } from "@/hooks/use-action";
 import { randomNumber } from "@/utils/func";
@@ -21,7 +20,6 @@ const Form = () => {
     onSuccess: ({ group, userId }) => {
       router.push(`/groups/${group.id}`);
       toast.success("Group created successfully");
-      NotificationService.createGroup(userId, group.id);
     },
     onError: (error, debug) => {
       console.error(debug);

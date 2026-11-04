@@ -4,7 +4,6 @@ import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
-import { NotificationService } from "@/lib/notification/service";
 import { PlusCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +19,6 @@ export const Action = ({
   const { execute, loading } = useAction(updateGroupMember, {
     onSuccess: ({ groupId, userId, friendId }) => {
       toast.success("Group member added successfully");
-      NotificationService.updateGroupMember(userId, friendId, groupId);
     },
     onError: (error, debug) => {
       console.error(error, debug);
