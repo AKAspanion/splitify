@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:hosting": "NEXT_BUILD_TARGET=hosting next build",
+    "check:hosting": "node scripts/check-hosting-build.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
@@ -21,6 +23,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.24",
+    "@clerk/react": "^6.18.5",
     "@clerk/themes": "^2.4.57",
     "@prisma/adapter-mariadb": "7.10.1",
     "@prisma/client": "7.10.1",
