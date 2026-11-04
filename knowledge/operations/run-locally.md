@@ -40,7 +40,8 @@ generated:
 ## Building the public pages
 
 `yarn build:hosting` writes the static public pages to `out/` and needs no database, Clerk key or `.env`
-([the hosting build](../apps/splitify.md)). `yarn check:hosting` (`scripts/check-hosting-build.mjs`) then serves
+([the hosting build](../apps/splitify.md)). It does need the generated Prisma client and SQL Connect SDK, and the
+`functions/` dependencies, because `next build` typechecks the whole project. `yarn check:hosting` (`scripts/check-hosting-build.mjs`) then serves
 `out/` on the Hosting emulator (port in `firebase.json`, project `demo-splitify`) and checks which pages and headers it
 answers with.
 

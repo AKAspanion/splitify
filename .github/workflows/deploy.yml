@@ -68,6 +68,10 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn install --frozen-lockfile --ignore-scripts
         working-directory: functions
+      # --ignore-scripts skips postinstall's code generation, and `next build` typechecks the whole project, which
+      # imports the Prisma client and the SQL Connect SDK. Generate them as ci.yml does; neither needs a database.
+      - run: npx prisma generate
+      - run: yarn dataconnect:generate
       - name: Build public pages
         env:
           NEXT_PUBLIC_GOOGLE_ADSENSE_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ADSENSE_ID }}

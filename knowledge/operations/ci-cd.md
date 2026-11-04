@@ -23,7 +23,7 @@ The reasons are in [the decision](../decisions/ci-cd-github-actions.md); the one
   workflows themselves.
 - `.github/dependabot.yml`: weekly grouped minor and patch updates for the root, `functions/` and GitHub Actions;
   major bumps of TypeScript, `@types/node` and Prisma are ignored.
-- `.github/workflows/deploy.yml`: on push to `main`, runs CI, then builds the public pages and deploys them to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`), then deploys the Cloud Functions. It installs the root dependencies with `--ignore-scripts` for the build, so `postinstall` never touches a database. Started by hand with
+- `.github/workflows/deploy.yml`: on push to `main`, runs CI, then builds the public pages and deploys them to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`), then deploys the Cloud Functions. It installs the root dependencies with `--ignore-scripts` for the build, so `postinstall` never touches a database, and then runs `npx prisma generate` and `yarn dataconnect:generate` itself, as `ci.yml` does: `next build` typechecks the whole project, not only the public pages, and much of it imports the generated Prisma client and SQL Connect SDK. Started by hand with
   `deploy_dataconnect` ticked, it also deploys the SQL Connect schema and connectors. It runs one at a time
   (`concurrency: deploy-production`, never cancelled), checks its settings first and fails naming the missing ones, and
   removes the service-account key file in a step that always runs.
@@ -45,6 +45,7 @@ Moderate advisories never fail CI; Dependabot still reports them.
 ## History
 
 - 2026-11-05: the hosting build read no Firebase config; now it reads the five `NEXT_PUBLIC_FIREBASE_*` Variables, because the hosted sign-in and push need them.
+- 2026-11-05: the deploy job built the public pages without generating the Prisma client and SQL Connect SDK, so its hosting build failed to typecheck; now it generates both first, as CI does.
 - 2026-11-05: CI and deploy covered only the checks and the functions; now they also build, check and deploy the hosting target, because the public pages go to Firebase Hosting.
 
 ## Sources
