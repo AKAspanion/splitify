@@ -17,6 +17,17 @@ mutation CreateContact($id: String!, $email: String!, $name: String!)
   expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.id.startsWith('spuser_') && vars.email.size() <= 254 && vars.name.size() <= 100"
 )
 @transaction {
+  # The database may not enforce a unique email (a contact and the new signed-up user briefly share one), so check here.
+  query @redact {
+    taken: users(where: { email: { eq: $email } })
+      @check(
+        expr: "this.size() == 0"
+        message: "That email is already in use"
+        optional: true
+      ) {
+      id
+    }
+  }
   user_insert(data: { id: $id, email: $email, name: $name, signedUp: false })
   friendship_insertMany(
     data: [
