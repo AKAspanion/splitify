@@ -17,12 +17,13 @@ The reasons are in [the decision](../decisions/ci-cd-github-actions.md); the one
 
 - `.github/workflows/ci.yml`: on every pull request, and callable by `deploy.yml` (`workflow_call`). One job installs
   with `--ignore-scripts` (so `postinstall` never runs `prisma db push` in CI), then runs lint, type check, unit tests,
-  the SQL Connect rule tests, the root and `functions/` audits, and the functions build. Node comes from `.nvmrc`.
+  the SQL Connect rule tests, the root and `functions/` audits, the functions build, and the hosting build
+  (`yarn build:hosting`, then `yarn check:hosting` on the Hosting emulator), so a public page that stops exporting fails the pull request. Node comes from `.nvmrc`.
 - `.github/workflows/codeql.yml`: CodeQL on pull requests, on pushes to `main` and weekly, for the code and for the
   workflows themselves.
 - `.github/dependabot.yml`: weekly grouped minor and patch updates for the root, `functions/` and GitHub Actions;
   major bumps of TypeScript, `@types/node` and Prisma are ignored.
-- `.github/workflows/deploy.yml`: on push to `main`, runs CI and then deploys the Cloud Functions. Started by hand with
+- `.github/workflows/deploy.yml`: on push to `main`, runs CI, then builds the public pages and deploys them to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`), then deploys the Cloud Functions. It installs the root dependencies with `--ignore-scripts` for the build, so `postinstall` never touches a database. Started by hand with
   `deploy_dataconnect` ticked, it also deploys the SQL Connect schema and connectors. It runs one at a time
   (`concurrency: deploy-production`, never cancelled), checks its settings first and fails naming the missing ones, and
   removes the service-account key file in a step that always runs.
@@ -37,7 +38,12 @@ Moderate advisories never fail CI; Dependabot still reports them.
 
 - Secret `FIREBASE_SERVICE_ACCOUNT`: the JSON key of the `github-deploy@` service account.
 - Variable `FIREBASE_PROJECT_ID`: the Google Cloud project.
+- Optional variables `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`, `NEXT_PUBLIC_ONE_SIGNAL_APP_ID` and `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID`: public values the hosting build reads when set. It needs no Clerk key ([hosting build](../apps/splitify.md)).
 - Optional variable APP_URL: shown on the `production` environment; defaults to `https://splitify.spanion.in`.
+
+## History
+
+- 2026-11-05: CI and deploy covered only the checks and the functions; now they also build, check and deploy the hosting target, because the public pages go to Firebase Hosting.
 
 ## Sources
 

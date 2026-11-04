@@ -37,8 +37,16 @@ generated:
 - `functions/` builds with `yarn --cwd functions build`, using its own `typescript` and `tsconfig.json` (node16 resolution, test files excluded; the rules Vitest config runs those tests).
 - `yarn dataconnect:generate` writes the SDKs to `dataconnect/generated/` ([SQL Connect schema](../data/sql-connect.md)).
 
+## Building the public pages
+
+`yarn build:hosting` writes the static public pages to `out/` and needs no database, Clerk key or `.env`
+([the hosting build](../apps/splitify.md)). `yarn check:hosting` (`scripts/check-hosting-build.mjs`) then serves
+`out/` on the Hosting emulator (port in `firebase.json`, project `demo-splitify`) and checks which pages and headers it
+answers with.
+
 ## History
 
+- 2026-11-05: added the hosting build and its check, because the public pages are served from Firebase Hosting.
 - 2026-11-04: added the rule tests and SDK generation, because the SQL Connect schema and its rules were built.
 - 2026-11-04: Node 24 from `.nvmrc`, the CLI pinned through `npx` and the functions build added, because CI and deploy need the same versions ([CI and deploy](ci-cd.md)).
 
@@ -51,4 +59,7 @@ generated:
 - `.nvmrc`
 - `functions/tsconfig.json`
 - `.env.sample`
+- `scripts/check-hosting-build.mjs`
+- `next.config.mjs`
+- `firebase.json`
 - `app/api/health-check/route.ts`

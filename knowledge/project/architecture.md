@@ -17,6 +17,8 @@ There is one deployable service, the Next.js app at the repository root (`next.c
 - **Pages** live in `app/`, in route groups: `app/(landing)` (public home page), `app/(platform)` (the signed-in
   app, plus the Clerk sign-in pages and `/privacy`) and `app/(admin)` (the logs page). See
   [the web app](../apps/splitify.md).
+- **The hosting build** (`NEXT_BUILD_TARGET=hosting` in `next.config.mjs`) exports only the public pages as a static
+  site for Firebase Hosting; see [the web app](../apps/splitify.md#the-hosting-build).
 - **Writes** go through server actions in `actions/<verb-noun>/`, each wrapped by `createSafeAction` in
   `lib/safe-actions.ts`, which validates the input with its zod schema first. See
   [server actions](../api/server-actions.md).
@@ -47,6 +49,10 @@ push **and** writes the `Activity` row. See [push-notification API](../api/push-
 
 User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` (see
 [Clerk](../integrations/clerk.md)), or as offline contacts by `createContact`.
+
+## History
+
+- 2026-11-05: added the hosting build, because the public pages are served from Firebase Hosting first.
 
 ## Sources
 
