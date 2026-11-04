@@ -78,7 +78,7 @@ const ProfilePage = () => {
           </div>
 
           <div className="w-full">
-            <div className="w-full px-8 md:px-12 flex gap-6 justify-end items-center">
+            <div className="w-full px-8 md:px-12 flex flex-wrap gap-4 md:gap-6 justify-end items-center">
               <Link href="/webauthn/register">
                 <Button>
                   <FingerprintIcon />
