@@ -32,6 +32,22 @@ the client. Versions are in `package.json`.
 - `app/manifest.webmanifest`: the PWA manifest.
 - The dev server's port is Next's default; `scripts.dev` in `package.json` passes none.
 
+## The hosting build
+
+`NEXT_BUILD_TARGET=hosting` (`yarn build:hosting`) makes `next.config.mjs` build a static export of only the public
+pages, for Firebase Hosting ([decision](../decisions/public-pages-on-firebase-hosting-first.md)): `output: "export"`,
+`trailingSlash`, unoptimised images, and `pageExtensions: ["hosting.tsx"]`, so only `*.hosting.tsx` files are routes
+and no route handler, server action, `proxy.ts` or `page.tsx` is part of it. The entries re-export the landing,
+`/privacy` and `/delete-account` pages and their layouts, so those pages are not copied; `app/coming-soon/page.hosting.tsx`
+is the page Hosting serves for every other route.
+
+- Clerk is stubbed in this build: `@clerk/nextjs` resolves to `lib/clerk-hosting.tsx` (a signed-out stand-in), because
+  the Clerk account is gone and Clerk's Next package imports a server action that a static export refuses
+  ([Clerk](../integrations/clerk.md)). The landing page therefore always shows its signed-out view on Hosting.
+- `app/analytics.tsx` renders nothing in this build, since `/_vercel/insights` doesn't exist on Hosting.
+- Known and harmless: on `/privacy` and `/delete-account` the biometric lock fetches `/api/webauthn/devices`, which
+  Hosting answers with the coming-soon page; the failed parse is caught silently.
+
 ## Screens and routes
 
 <!-- GA-GENERATED:screens app -->
@@ -80,11 +96,16 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 
 ## History
 
+- 2026-11-05: added the hosting build target and its Clerk stub, because the public pages go to Firebase Hosting before the app moves. See [decision](../decisions/public-pages-on-firebase-hosting-first.md).
 - 2026-11-04: was Next.js 14 with Clerk's `authMiddleware` in `middleware.ts`; now Next.js 16 with `clerkMiddleware` in `proxy.ts`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
 
 - `package.json`
+- `next.config.mjs`
+- `lib/clerk-hosting.tsx`
+- `app/coming-soon/page.hosting.tsx`
+- `app/(landing)/page.hosting.tsx`
 - `app/layout.tsx`
 - `app/launch.tsx`
 - `app/adsense.tsx`
