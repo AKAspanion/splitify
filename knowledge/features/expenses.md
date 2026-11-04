@@ -28,10 +28,10 @@ drawer). The expense screen then shows who paid, the caller's share, and each me
 ## Rules
 
 - How amounts are split and checked is in [split types](../domain/split-types.md).
-- Editing changes only the description; see [expense edit scope](../questions/expense-edit-scope.md).
+- Editing changes only the description, by decision: [expense edit description only](../decisions/expense-edit-description-only.md).
 - `createExpense` takes the creator (`createrId`) from the form, not from the session; and any signed-in user can
   edit or delete any expense by its id: [missing authorization on writes](../findings/missing-authorization-on-writes.md).
-- Amounts are shown with `RUPEE_SYMBOL` (`constants/ui.ts`); see [currency](../questions/currency.md).
+- Amounts are shown with `RUPEE_SYMBOL` (`constants/ui.ts`); other currencies are decided in [multi-currency](../decisions/multi-currency.md).
 
 ## Sources
 
