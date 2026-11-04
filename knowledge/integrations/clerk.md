@@ -10,6 +10,13 @@ generated:
 
 # Clerk
 
+The Clerk account no longer exists, and Clerk is to be removed from the app when
+[Firebase Auth replaces it](../decisions/firebase-auth.md) (planned in spec 2). The code below describes what the
+running app still contains, not a working service.
+
+The static hosting build doesn't use Clerk at all: there `@clerk/nextjs` resolves to the signed-out stub
+`lib/clerk-hosting.tsx`, so that build needs no Clerk key ([the hosting build](../apps/splitify.md)).
+
 ## What it is used for
 
 - Sessions and route protection: `clerkMiddleware` in `proxy.ts`, `auth()` in every action and route, and
@@ -36,6 +43,7 @@ dashboard; `scripts.ngrok` in `package.json` exposes a local server for it.
 
 ## History
 
+- 2026-11-05: the account is gone and the hosting build stubs Clerk, because the public pages go to Firebase Hosting first and Clerk leaves with spec 2.
 - 2026-11-04: route protection was `authMiddleware` in `middleware.ts`; now `clerkMiddleware` in `proxy.ts`, because Clerk 7 removed `authMiddleware`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
@@ -47,3 +55,4 @@ dashboard; `scripts.ngrok` in `package.json` exposes a local server for it.
 - `next.config.mjs`
 - `.env.sample`
 - `package.json`
+- `lib/clerk-hosting.tsx`
