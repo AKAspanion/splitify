@@ -1,0 +1,55 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { queryKeys } from "./client";
+import { escapeSearch } from "./search";
+
+describe("escapeSearch", () => {
+  const nasty = "a.b*(c)?[d]{e}|f^g$h\\i+";
+
+  it("backslash-escapes every regular-expression character", () => {
+    const escaped = escapeSearch(nasty);
+    expect(escaped).toBe(
+      "a\\.b\\*\\(c\\)\\?\\[d\\]\\{e\\}\\|f\\^g\\$h\\\\i\\+",
+    );
+  });
+
+  it("matches only the literal text as a regular expression", () => {
+    const re = new RegExp(`^${escapeSearch(nasty)}$`);
+    expect(re.test(nasty)).toBe(true);
+    expect(re.test("aXb")).toBe(false);
+    expect(new RegExp(escapeSearch(".*")).test("anything")).toBe(false);
+  });
+
+  it("cuts a 150-character input to 100 characters before escaping", () => {
+    expect(escapeSearch("a".repeat(150))).toBe("a".repeat(100));
+    // 100 dots cut first, then escaped: 200 characters, not 300.
+    expect(escapeSearch(".".repeat(150))).toHaveLength(200);
+  });
+
+  it("leaves plain text alone", () => {
+    expect(escapeSearch("taxi")).toBe("taxi");
+  });
+});
+
+describe("queryKeys", () => {
+  it("is the operation name and its variables", () => {
+    expect(queryKeys.ListMyGroups({ search: "goa", limit: 6 })).toEqual([
+      "ListMyGroups",
+      { search: "goa", limit: 6 },
+    ]);
+  });
+
+  it("has one entry for each query operation in dataconnect/app", () => {
+    const dir = join(process.cwd(), "dataconnect/app");
+    const names = readdirSync(dir)
+      .filter((file) => file.endsWith(".gql"))
+      .flatMap((file) =>
+        [
+          ...readFileSync(join(dir, file), "utf8").matchAll(/^query (\w+)/gm),
+        ].map((m) => m[1]),
+      );
+    expect(names.length).toBeGreaterThan(0);
+    expect(Object.keys(queryKeys).sort()).toEqual([...names].sort());
+  });
+});
