@@ -20,7 +20,7 @@ Someone who paid 50 of a 300 expense and owes 100 sees "You owe ₹ 100", while 
 
 ## Status
 
-Open
+Answered: it shows the same net amount everywhere, owed minus paid. See [your share shows the net amount](../decisions/your-share-shows-net-amount.md).
 
 ## Sources
 

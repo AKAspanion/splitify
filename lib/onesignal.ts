@@ -13,6 +13,21 @@ const postCall = <T>(path: string, body: T) => {
   });
 };
 
+export async function deleteOneSignalUser(
+  externalId: string,
+): Promise<{ ok: boolean }> {
+  try {
+    const res = await fetch(
+      `https://api.onesignal.com/apps/${app_id}/users/by/external_id/${encodeURIComponent(externalId)}`,
+      { method: "DELETE", headers: { Authorization } },
+    );
+    // A user OneSignal doesn't know (404) is already gone.
+    return { ok: (res.status >= 200 && res.status < 300) || res.status === 404 };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export const sendNotification = async ({
   content,
   heading,

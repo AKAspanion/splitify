@@ -21,7 +21,7 @@ change how balances are added up.
 
 ## Status
 
-Open
+Answered: currencies per group and per expense, converted at the rate of the group's creation date. See [multi-currency](../decisions/multi-currency.md).
 
 ## Sources
 

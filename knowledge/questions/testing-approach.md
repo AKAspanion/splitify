@@ -22,7 +22,7 @@ start.
 
 ## Status
 
-Open
+Answered: end-to-end tests of the main flows. See [e2e of the main flows](../decisions/e2e-main-flows.md).
 
 ## Sources
 

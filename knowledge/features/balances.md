@@ -31,8 +31,8 @@ generated:
 - How each expense contributes is in [split types](../domain/split-types.md); how the debts are reduced to the fewest
   payments is in [debt simplification](../domain/debt-simplification.md).
 - Totals leave out settlements ([settlements](../domain/settlements.md)).
-- The caller's line on one expense says "You owe" the whole split amount, not paid minus owed: see
-  [your-share owe amount](../questions/your-share-owe-amount.md).
+- The caller's line on one expense says "You owe" the whole split amount, not paid minus owed; it is decided that it
+  shows the net amount, as the balances do: [your share shows the net amount](../decisions/your-share-shows-net-amount.md).
 
 ## Sources
 

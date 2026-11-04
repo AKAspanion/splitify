@@ -3,3 +3,5 @@
 *.aab
 *.keystore
 signing-key-info.txt
+build/
+.gradle/

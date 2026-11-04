@@ -51,13 +51,14 @@ def twaManifest = [
 ]
 
 android {
-    compileSdkVersion 33
+    namespace 'in.spanion.splitify.twa'
+    compileSdk 36
     defaultConfig {
         applicationId "in.spanion.splitify.twa"
-        minSdkVersion 19
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0.0.0"
+        minSdk 24
+        targetSdk 36
+        versionCode 10
+        versionName "1.1.0"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -151,10 +152,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    lintOptions {
+    buildFeatures {
+        resValues true
+    }
+    lint {
         checkReleaseBuilds false
     }
 }
@@ -203,6 +207,6 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     
-        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'
     
 }
