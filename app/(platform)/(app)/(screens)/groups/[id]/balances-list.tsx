@@ -1,37 +1,33 @@
 "use client";
-import { Switch } from "@/components/ui/switch";
 import { calcGroupSplits } from "@/app/(platform)/(app)/_utils/calculation";
-import { ExpenseWithPaymentWithSplit, GroupWIthUsers } from "@/types/shared";
-import { Label } from "@/components/ui/label";
+import type { User } from "@/generated/prisma/browser";
+import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export const BalancesList = ({
-  group,
+  groupId,
+  users,
   expenses,
   onlyList = false,
 }: {
   onlyList?: boolean;
-  group: GroupWIthUsers | null;
+  groupId: string;
+  users: User[];
   expenses: ExpenseWithPaymentWithSplit[] | null;
 }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [detailed] = useState(false);
+
+  const uid = user?.uid;
 
   const balanceList = useMemo(
     () =>
-      user?.id
-        ? calcGroupSplits(
-            user?.id,
-            expenses || [],
-            group?.users || [],
-            detailed,
-          ) || []
-        : [],
-    [detailed, expenses, group?.users, user?.id],
+      uid ? calcGroupSplits(uid, expenses || [], users, detailed) || [] : [],
+    [detailed, expenses, users, uid],
   );
 
   const balances = useMemo(
@@ -48,10 +44,6 @@ export const BalancesList = ({
     }
     return text;
   }, [balanceList?.length, expenses?.length]);
-
-  // const handleCheck = () => {
-  //   setDetailed((s) => !s);
-  // };
 
   return (
     <div>
@@ -73,7 +65,7 @@ export const BalancesList = ({
                     {s.message}
                   </div>
                   <Link
-                    href={`/groups/${group?.id || ""}/settle?user1Id=${s.user1Id}&user2Id=${s.user2Id}&owes=${s.owes}`}
+                    href={`/groups/${groupId}/settle?user1Id=${s.user1Id}&user2Id=${s.user2Id}&owes=${s.owes}`}
                   >
                     <Badge size="sm">Settle</Badge>
                   </Link>
@@ -81,20 +73,6 @@ export const BalancesList = ({
               ))}
         </div>
         <div className="flex-1" />
-        {/* {onlyList ? null : (
-          <div>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="airplane-mode" className="text-sm">
-                Detailed
-              </Label>
-              <Switch
-                checked={detailed}
-                onCheckedChange={handleCheck}
-                id="airplane-mode"
-              />
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "groups/index.html",
+    "groups/_/index.html",
+    "groups/_/edit/index.html",
+    "groups/_/settings/index.html",
+    "groups/_/add-member/index.html",
+    "groups/_/expense/index.html",
+    "groups/add/index.html",
+    "dashboard/index.html"
+  ],
+  "requests": [
+    { "path": "/groups/", "expectText": "Groups" },
+    { "path": "/groups/abc/", "expectText": "Group" },
+    { "path": "/groups/abc/settings/", "expectText": "Group settings" },
+    { "path": "/dashboard/", "expectText": "Dashboard" }
+  ]
+}

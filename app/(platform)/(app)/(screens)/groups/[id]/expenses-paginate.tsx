@@ -2,27 +2,25 @@
 
 import { useInView } from "react-intersection-observer";
 import { ExpenseCard, ExpenseCardLoader } from "./expense-card";
-import useExpenses from "@/hooks/use-expenses";
+import { EXPENSES_PAGE_SIZE, useGroupExpenses } from "@/lib/data/groups";
 import { cn } from "@/lib/utils";
-import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";
 import React, { useEffect } from "react";
 
 const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
-  const { data, isLoading, isFetching, isFetchingNextPage, loadMore } =
-    useExpenses(groupId);
+  const { data, isFetching, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useGroupExpenses(groupId, "");
 
   const { ref, inView } = useInView();
 
   const pages = data?.pages || [];
 
-  const loading = isLoading || isFetching || isFetchingNextPage;
+  const loading = isFetching || isFetchingNextPage;
 
   useEffect(() => {
-    if (inView && !loading) {
-      loadMore();
+    if (inView && !loading && hasNextPage) {
+      fetchNextPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+  }, [inView, loading, hasNextPage, fetchNextPage]);
 
   return (
     <div className="pb-8 pt-6">
@@ -31,15 +29,15 @@ const ExpensesPaginate = ({ groupId }: { groupId: string }) => {
       >
         {pages.map(({ expenses }, i) => (
           <React.Fragment key={i}>
-            {expenses?.map((e, i) => (
+            {expenses.map((e) => (
               <div key={e.id}>
-                <ExpenseCard expense={e} key={e.id} />
+                <ExpenseCard expense={e} groupId={groupId} />
               </div>
             ))}
           </React.Fragment>
         ))}
-        {loading
-          ? Array.from(Array(EXPENSE_PAGE_COUNT).keys()).map((i) => (
+        {isFetchingNextPage
+          ? Array.from(Array(EXPENSES_PAGE_SIZE).keys()).map((i) => (
               <ExpenseCardLoader key={i} />
             ))
           : null}

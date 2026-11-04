@@ -1,38 +1,34 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs/server";
 import { Header } from "@/components/container/header";
 import { urlEncode } from "@/utils/func";
 import { Search } from "@/app/(platform)/(app)/_components/search";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useMyGroups } from "@/lib/data/groups";
+import GroupCreate from "./group-create";
+import Groups from "./groups";
 
-const GroupCreate = dynamic(() => import("./group-create"), {
-  loading: () => (
-    <div className="w-full flex justify-center py-6">
-      <Skeleton className="w-[100px] h-10" />
-    </div>
-  ),
-});
+// The most groups one read brings back; a person with more sees the newest of them.
+const GROUPS_LIMIT = 200;
+// Groups listed until "Show all".
+const GROUPS_PREVIEW = 6;
 
-const Groups = dynamic(() => import("./groups"));
-
-const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
+const GroupList = () => {
+  const params = useSearchParams();
+  const searchParams = Object.fromEntries(params.entries());
   const show = searchParams["show"] === "all";
   const search = searchParams["search"] === "yes";
-  const searchText = searchParams["text"];
+  const searchText = searchParams["text"] ?? "";
 
-  const { userId } = await auth();
-
-  const query = {
-    take: show ? undefined : 6,
-    where: {
-      users: { some: { id: userId || "null" } },
-      title: { contains: searchText },
-    },
-  };
+  const { data, isLoading, error, refetch } = useMyGroups(
+    searchText,
+    GROUPS_LIMIT,
+  );
+  const groups = show ? data : data?.slice(0, GROUPS_PREVIEW);
 
   const searchUrl = urlEncode({
     path: "/groups",
@@ -63,6 +59,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
                       className="text-red-500"
                       variant="ghost"
                       size="icon"
+                      aria-label="Close search"
                     >
                       <XIcon />
                     </Button>
@@ -70,14 +67,14 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
                 </>
               ) : (
                 <Link href={searchUrl}>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" aria-label="Search">
                     <SearchIcon />
                   </Button>
                 </Link>
               )}
 
               <Link href="/groups/add">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Create a group">
                   <UserRoundPlusIcon />
                 </Button>
               </Link>
@@ -87,9 +84,20 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Groups show={show} searchText={searchText} />
+        <Groups
+          groups={groups}
+          isLoading={isLoading}
+          error={error}
+          onRetry={() => refetch()}
+        />
       </div>
-      <GroupCreate where={query.where} show={show} searchText={searchText} />
+      {isLoading || error ? null : (
+        <GroupCreate
+          count={data?.length ?? 0}
+          show={show}
+          searchText={searchText}
+        />
+      )}
       <div className="h-[72px]" />
     </AutoContainer>
   );

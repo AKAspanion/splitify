@@ -1,13 +1,13 @@
 "use client";
 import { NoData } from "@/components/no-data";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ExpensesPaginate from "./expenses-paginate";
-import useExpenses from "@/hooks/use-expenses";
+import { useGroupExpenses } from "@/lib/data/groups";
 import { ExpenseCardLoader } from "./expense-card";
+import { LoadError } from "./_components/group-states";
 
 const ExpensesList = ({
   backUrl,
@@ -16,8 +16,18 @@ const ExpensesList = ({
   groupId: string;
   backUrl: string;
 }) => {
-  const { count } = useExpenses(groupId);
-  const noExpenses = count === 0;
+  const { data, isLoading, error, refetch } = useGroupExpenses(groupId, "");
+
+  if (isLoading)
+    return (
+      <div className="py-6">
+        <ExpenseListLoader />
+      </div>
+    );
+
+  if (error) return <LoadError error={error} onRetry={() => refetch()} />;
+
+  const noExpenses = (data?.pages[0]?.total ?? 0) === 0;
 
   const noDataSubtitle = "Start adding expenses and/or group members";
 

@@ -1,49 +1,35 @@
-import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
+"use client";
+
+import {
+  UserCard,
+  UserCardLoading,
+} from "@/app/(platform)/(app)/_components/user-card";
+import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { AutoContainer } from "@/components/container/auto-container";
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { CheckIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Action } from "./action";
 import { Header } from "@/components/container/header";
 import { ListItem } from "@/components/list-item";
+import { useRouteIds } from "@/hooks/use-route-ids";
+import {
+  toUserModel,
+  useFriendsToAdd,
+  useGroup,
+  useGroupMembers,
+} from "@/lib/data/groups";
 import { urlEncode } from "@/utils/func";
+import { GroupNotFound, LoadError } from "../_components/group-states";
 
-const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
-  const id = params["id"] || "null";
+const AddMember = () => {
+  const { groupId: id } = useRouteIds();
+  const searchParams = Object.fromEntries(useSearchParams().entries());
   const backTo = searchParams["back"];
-  const { userId } = await auth();
 
-  const [user, group] = await db.$transaction([
-    db.user.findUnique({
-      where: { id: userId || "null" },
-      select: {
-        friends: {
-          select: {
-            id: true,
-            name: true,
-            fromClerk: true,
-            firstName: true,
-            profile_image_url: true,
-          },
-        },
-      },
-    }),
-    db.group.findUnique({
-      where: { id, users: { some: { id: userId || "null" } } },
-      include: { users: { select: { id: true } } },
-    }),
-  ]);
-
-  const friendsNotInGroup = user?.friends?.filter(
-    (o) => !group?.users?.some(({ id }) => o.id === id),
-  );
-
-  const friendsInGroup = user?.friends?.filter((o) =>
-    group?.users?.some(({ id }) => o.id === id),
-  );
-
-  const noFriendsInGroup = !friendsInGroup || friendsInGroup?.length == 0;
+  const group = useGroup(id);
+  const members = useGroupMembers(id);
+  const friends = useFriendsToAdd();
 
   const backUrl = urlEncode({
     path: `/groups/${id}/add-member`,
@@ -52,42 +38,76 @@ const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
 
   const addFriendUrl = urlEncode({
     path: `/friends/add`,
-    query: { groupId: id, back: backUrl },
+    query: { groupId: id ?? "", back: backUrl },
   });
 
   const backToUrl = urlEncode({
     path: backTo ? backTo : `/groups/${id}/settings`,
   });
 
+  const header = <Header backTo={backToUrl} title="Add members to group" />;
+
+  if (id === null)
+    return (
+      <AutoContainer header={header}>
+        <GroupNotFound />
+      </AutoContainer>
+    );
+
+  if (group.isLoading || members.isLoading || friends.isLoading)
+    return <ScreenSkeleton card={<UserCardLoading />} />;
+
+  const error = group.error ?? members.error ?? friends.error;
+  if (error)
+    return (
+      <AutoContainer header={header}>
+        <LoadError
+          error={error}
+          onRetry={() => {
+            group.refetch();
+            members.refetch();
+            friends.refetch();
+          }}
+        />
+      </AutoContainer>
+    );
+
+  if (!group.data)
+    return (
+      <AutoContainer header={header}>
+        <GroupNotFound />
+      </AutoContainer>
+    );
+
+  const memberIds = new Set((members.data ?? []).map((m) => m.id));
+  const friendsNotInGroup = (friends.data ?? []).filter(
+    (f) => !memberIds.has(f.id),
+  );
+  const friendsInGroup = (friends.data ?? []).filter((f) =>
+    memberIds.has(f.id),
+  );
+
   return (
-    <AutoContainer
-      header={<Header backTo={backToUrl} title="Add members to group" />}
-    >
+    <AutoContainer header={header}>
       <div className="pb-6 flex flex-col gap-6">
         <Link href={addFriendUrl}>
           <ListItem title="Add a friend" icon={<UserPlusIcon />} />
         </Link>
-        {friendsNotInGroup?.map((d) => (
+        {friendsNotInGroup.map((d) => (
           <UserCard
-            user={d}
+            user={toUserModel(d)}
             key={d.id}
-            actions={
-              <Action
-                groupId={id || group?.id}
-                memberClerkId={d.id}
-                isInGroup={!!group?.users?.find((u) => u.id === d.id)}
-              />
-            }
+            actions={<Action groupId={id} memberId={d.id} />}
           />
         ))}
         <div>
-          {noFriendsInGroup ? null : (
+          {friendsInGroup.length === 0 ? null : (
             <div className="pb-3 font-semibold text-normal">Added in group</div>
           )}
           <div className="flex flex-col gap-6">
-            {friendsInGroup?.map((d) => (
+            {friendsInGroup.map((d) => (
               <UserCard
-                user={d}
+                user={toUserModel(d)}
                 key={d.id}
                 disabled
                 actions={
