@@ -1,10 +1,37 @@
 import { db } from "@/lib/db";
-import type { AuthenticatorDevice } from "@simplewebauthn/types";
+import type { WebAuthnCredential } from "@simplewebauthn/server";
+import { isoBase64URL } from "@simplewebauthn/server/helpers";
 
-const parseDevices = (obj: string): AuthenticatorDevice[] => {
+/**
+ * How a device is stored in `AuthnDevice.data`: the shape SimpleWebAuthn 9 called `AuthenticatorDevice`, with each
+ * byte array serialised as an index-keyed object. It is kept as is, so passkeys registered before the upgrade still
+ * work, and converted to SimpleWebAuthn's `WebAuthnCredential` on the way in and out.
+ */
+type StoredDevice = {
+  credentialPublicKey: Uint8Array<ArrayBuffer>;
+  credentialID: Uint8Array<ArrayBuffer>;
+  counter: number;
+  transports?: WebAuthnCredential["transports"];
+};
+
+const toCredential = (device: StoredDevice): WebAuthnCredential => ({
+  id: isoBase64URL.fromBuffer(device.credentialID),
+  publicKey: device.credentialPublicKey,
+  counter: device.counter,
+  transports: device.transports,
+});
+
+const toStoredDevice = (credential: WebAuthnCredential): StoredDevice => ({
+  credentialPublicKey: credential.publicKey,
+  credentialID: isoBase64URL.toBuffer(credential.id),
+  counter: credential.counter,
+  transports: credential.transports,
+});
+
+const parseDevices = (obj: string): StoredDevice[] => {
   try {
     if (!obj) return [];
-    const parsed: AuthenticatorDevice[] = JSON.parse(obj);
+    const parsed: StoredDevice[] = JSON.parse(obj);
 
     return parsed?.map((parsedobj) => {
       const unit8Values = Object.entries(parsedobj.credentialPublicKey).map(
@@ -20,7 +47,7 @@ const parseDevices = (obj: string): AuthenticatorDevice[] => {
         credentialID,
         counter: parsedobj.counter,
         transports: parsedobj.transports,
-      } as AuthenticatorDevice;
+      } as StoredDevice;
     });
   } catch (error) {
     console.trace(error);
@@ -29,18 +56,19 @@ const parseDevices = (obj: string): AuthenticatorDevice[] => {
   }
 };
 
-const getDevice = async (userId: string): Promise<AuthenticatorDevice[]> => {
+const getDevice = async (userId: string): Promise<WebAuthnCredential[]> => {
   try {
     const deviceBlob = await db.authnDevice.findUnique({ where: { userId } });
     const devices = parseDevices(new TextDecoder().decode(deviceBlob?.data));
-    return devices || [];
+    return (devices || []).map(toCredential);
   } catch (error) {
     console.trace(error);
     return [];
   }
 };
 
-const pushDevice = async (userId: string, device: AuthenticatorDevice) => {
+const pushDevice = async (userId: string, credential: WebAuthnCredential) => {
+  const device = toStoredDevice(credential);
   try {
     const deviceBlob = await getAuthnDevice(userId);
     let devices = parseDevices(new TextDecoder().decode(deviceBlob?.data));

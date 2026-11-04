@@ -47,7 +47,7 @@ export const Authn = () => {
 
       // hideAuthForm();
 
-      attResp = await startRegistration(data);
+      attResp = await startRegistration({ optionsJSON: data });
       printDebug(
         setReqDebug,
         "Registration Response",
@@ -110,7 +110,7 @@ export const Authn = () => {
 
       // hideAuthForm();
 
-      asseResp = await startAuthentication(data);
+      asseResp = await startAuthentication({ optionsJSON: data });
       printDebug(
         setAuthDebug,
         "Authentication Response",
@@ -156,7 +156,7 @@ export const Authn = () => {
       .then((resp) => resp.json())
       .then(({ data }) => {
         console.log("Authentication Options (Autofill)", data);
-        startAuthentication(data)
+        startAuthentication({ optionsJSON: data })
           .then(async (asseResp) => {
             // We can assume the DOM has loaded by now because it had to for the user to be able
             // to interact with an input to choose a credential from the autofill

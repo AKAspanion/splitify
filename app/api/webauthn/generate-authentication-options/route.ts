@@ -8,7 +8,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const rpID = process.env.AUTHN_RP_ID;
+const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
 export async function GET(_req: Request) {
   try {
     const { userId } = await auth();
@@ -22,8 +22,7 @@ export async function GET(_req: Request) {
     const opts: GenerateAuthenticationOptionsOpts = {
       timeout: 60000,
       allowCredentials: devices.map((dev) => ({
-        id: dev.credentialID,
-        type: "public-key",
+        id: dev.id,
         transports: dev.transports,
       })),
       /**

@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
 import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import type {
+  RegistrationResponseJSON,
   VerifiedRegistrationResponse,
   VerifyRegistrationResponseOpts,
+  WebAuthnCredential,
 } from "@simplewebauthn/server";
-import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
-import type {
-  AuthenticatorDevice,
-  RegistrationResponseJSON,
-} from "@simplewebauthn/types";
-import { NextApiRequest } from "next";
 import { auth } from "@clerk/nextjs/server";
 import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
@@ -60,21 +56,21 @@ export async function POST(req: Request) {
     const { verified, registrationInfo } = verification;
 
     if (verified && registrationInfo) {
-      const { credentialPublicKey, credentialID, counter } = registrationInfo;
+      const { credential } = registrationInfo;
 
       const devices = await DevicesService.getDevice(userId);
-      const existingDevice = devices.find((device) =>
-        isoUint8Array.areEqual(device.credentialID, credentialID),
+      const existingDevice = devices.find(
+        (device) => device.id === credential.id,
       );
 
       if (!existingDevice) {
         /**
          * Add the returned device to the user's list of devices
          */
-        const newDevice: AuthenticatorDevice = {
-          credentialPublicKey,
-          credentialID,
-          counter,
+        const newDevice: WebAuthnCredential = {
+          id: credential.id,
+          publicKey: credential.publicKey,
+          counter: credential.counter,
           transports: body.response.transports,
         };
         DevicesService.pushDevice(userId, newDevice);

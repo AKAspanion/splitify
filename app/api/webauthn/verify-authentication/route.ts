@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import type {
+  AuthenticationResponseJSON,
   VerifiedAuthenticationResponse,
   VerifyAuthenticationResponseOpts,
 } from "@simplewebauthn/server";
-import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
-import type { AuthenticationResponseJSON } from "@simplewebauthn/types";
 import { auth } from "@clerk/nextjs/server";
 import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
@@ -35,15 +34,8 @@ export async function POST(req: Request) {
 
     const devices = await DevicesService.getDevice(userId);
 
-    let dbAuthenticator;
-    const bodyCredIDBuffer = isoBase64URL.toBuffer(body.rawId);
     // "Query the DB" here for an authenticator matching `credentialID`
-    for (const dev of devices) {
-      if (isoUint8Array.areEqual(dev.credentialID, bodyCredIDBuffer)) {
-        dbAuthenticator = dev;
-        break;
-      }
-    }
+    const dbAuthenticator = devices.find((dev) => dev.id === body.rawId);
 
     if (!dbAuthenticator) {
       return NextResponse.json(
@@ -59,7 +51,7 @@ export async function POST(req: Request) {
         expectedChallenge: `${expectedChallenge}`,
         expectedOrigin,
         expectedRPID: rpID,
-        authenticator: dbAuthenticator,
+        credential: dbAuthenticator,
         requireUserVerification: false,
       };
       verification = await verifyAuthenticationResponse(opts);

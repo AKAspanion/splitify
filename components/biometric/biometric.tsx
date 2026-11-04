@@ -52,7 +52,7 @@ export const Biometric = () => {
     try {
       const { data } = await resp.json();
 
-      asseResp = await startAuthentication(data);
+      asseResp = await startAuthentication({ optionsJSON: data });
     } catch (e) {
       setLoading(false);
       const error = e as Error;

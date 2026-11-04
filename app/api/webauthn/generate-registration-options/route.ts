@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
+import { isoUint8Array } from "@simplewebauthn/server/helpers";
 import DevicesService from "@/lib/auth/service/devices";
 
 const rpID = process.env.AUTHN_RP_ID || "localhost";
@@ -27,7 +28,8 @@ export async function GET(_req: Request) {
     const opts: GenerateRegistrationOptionsOpts = {
       rpName: "Splitify WebAuthn",
       rpID,
-      userID: userId,
+      // SimpleWebAuthn 9 sent the Clerk id's UTF-8 bytes as the user handle; keep sending the same bytes.
+      userID: isoUint8Array.fromUTF8String(userId),
       userName: name,
       timeout: 60000,
       attestationType: "none",
@@ -38,8 +40,7 @@ export async function GET(_req: Request) {
        * on it.
        */
       excludeCredentials: devices?.map((dev) => ({
-        id: dev.credentialID,
-        type: "public-key",
+        id: dev.id,
         transports: dev.transports,
       })),
       authenticatorSelection: {

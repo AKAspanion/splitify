@@ -24,7 +24,7 @@ const AuthnActions = () => {
       try {
         const { data } = await resp.json();
 
-        attResp = await startRegistration(data);
+        attResp = await startRegistration({ optionsJSON: data });
       } catch (e) {
         setRegisterLoading(false);
         const error = e as Error;
@@ -72,7 +72,7 @@ const AuthnActions = () => {
       try {
         const { data } = await resp.json();
 
-        asseResp = await startAuthentication(data);
+        asseResp = await startAuthentication({ optionsJSON: data });
       } catch (e) {
         setVerifyLoading(false);
         const error = e as Error;
