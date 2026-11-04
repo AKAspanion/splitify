@@ -34,16 +34,24 @@ generated:
   the route files: [hard-coded session password](../findings/hardcoded-session-password.md).
 - The [biometric lock](../features/biometric-lock.md) is browser-side only: the server never asks whether it passed.
 
-## Firebase Auth (browser side, built; not yet what the app uses)
+## Firebase Auth (on the hosted site; the server app still uses Clerk)
 
-[Firebase Auth](../decisions/firebase-auth.md) will replace Clerk, with Google and email and password
+[Firebase Auth](../decisions/firebase-auth.md) replaces Clerk, with Google and email and password
 (`lib/firebase/auth.ts`, client setup in `lib/firebase/app.ts`). `UpsertMe` (`dataconnect/app/me.gql`) writes a
 person's `User` row, taking id, email and name from the signed token, never from the request. The merge of a contact
-into a new account is gated on a verified email ([contact identity](../domain/contact-identity.md)). Planned for the
-running app in spec 2: today `proxy.ts` and Clerk still guard every route.
+into a new account is gated on a verified email ([contact identity](../domain/contact-identity.md)).
+
+- The browser's auth state is `AuthProvider` (`components/auth/auth-provider.tsx`) read through `useAuth`
+  (`hooks/use-auth.ts`), with a status of loading, signed in or signed out.
+- `RequireAuth` (`components/auth/require-auth.tsx`) shows a spinner while loading and sends a signed-out person to
+  `/sign-in/?next=<path>`. It is type-checked only: no hosted page uses it yet.
+- The redirect target is checked by `safeNextPath`, and the screens are described in [sign in](../features/sign-in.md).
+- Signing out also removes this device's push token ([notifications](../features/notifications.md)).
+- Until the signed-in routes move to the hosting build, `proxy.ts` and Clerk still guard every route of the server app.
 
 ## History
 
+- 2026-11-05: the Firebase Auth section said built but unused; now says the hosted sign-in screens, the auth state and the guard use it, because spec 2a added them.
 - 2026-11-04: described the Firebase Auth pieces now built, because they exist in the code although no screen uses them yet.
 - 2026-11-04: was `authMiddleware` in `middleware.ts`, with `/api/webhook/clerk` and `/api/health-check` also in `ignoredRoutes`; now `clerkMiddleware` in `proxy.ts`, with those two simply public, because Clerk 7 removed `authMiddleware` and Next 16 renamed middleware to proxy. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
@@ -59,3 +67,7 @@ running app in spec 2: today `proxy.ts` and Clerk still guard every route.
 - `lib/firebase/auth.ts`
 - `lib/firebase/app.ts`
 - `dataconnect/app/me.gql`
+- `components/auth/auth-provider.tsx`
+- `components/auth/require-auth.tsx`
+- `hooks/use-auth.ts`
+- `lib/auth/next-path.ts`

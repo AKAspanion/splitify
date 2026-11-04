@@ -39,10 +39,12 @@ Moderate advisories never fail CI; Dependabot still reports them.
 - Secret `FIREBASE_SERVICE_ACCOUNT`: the JSON key of the `github-deploy@` service account.
 - Variable `FIREBASE_PROJECT_ID`: the Google Cloud project.
 - Optional variables `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`, `NEXT_PUBLIC_ONE_SIGNAL_APP_ID` and `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID`: public values the hosting build reads when set. It needs no Clerk key ([hosting build](../apps/splitify.md)).
+- Variables `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID` and `NEXT_PUBLIC_FIREBASE_VAPID_KEY`: the web config the hosting build bakes in; CI falls back to demo values when they are unset (see `ci.yml`, `deploy.yml`).
 - Optional variable APP_URL: shown on the `production` environment; defaults to `https://splitify.spanion.in`.
 
 ## History
 
+- 2026-11-05: the hosting build read no Firebase config; now it reads the five `NEXT_PUBLIC_FIREBASE_*` Variables, because the hosted sign-in and push need them.
 - 2026-11-05: CI and deploy covered only the checks and the functions; now they also build, check and deploy the hosting target, because the public pages go to Firebase Hosting.
 
 ## Sources

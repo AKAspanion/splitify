@@ -17,7 +17,8 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
 
 - Enable the Google Cloud APIs, create the `github-deploy@` service account with its roles, put its key in the
   `FIREBASE_SERVICE_ACCOUNT` secret and set `FIREBASE_PROJECT_ID`.
-- Add Firebase Hosting Admin to `github-deploy@` for the hosting deploy, connect the custom domain `splitify.spanion.in` in the Firebase console (DNS records at the domain's provider, replacing any old record; the certificate can take hours), and add it to Authentication's Authorized domains ([decision](../decisions/public-pages-on-firebase-hosting-first.md)). The optional Variables for the hosting build are listed in the README.
+- Add Firebase Hosting Admin to `github-deploy@` for the hosting deploy, connect the custom domain `splitify.spanion.in` in the Firebase console (DNS records at the domain's provider, replacing any old record; the certificate can take hours), and add it to Authentication's Authorized domains ([decision](../decisions/public-pages-on-firebase-hosting-first.md)). The optional Variables for the hosting build are listed in the README, and the five `NEXT_PUBLIC_FIREBASE_*` Variables (API key, auth domain, project id, app id and the push VAPID key) are set in the repository: the build and CI read them, falling back to demo values in CI. `.env.sample` still lacks `NEXT_PUBLIC_FIREBASE_VAPID_KEY`, which the developer adds.
+- Run the SQL Connect deploy by hand again (`deploy_dataconnect` ticked) after any schema change: the `PushToken` table is new and nothing deploys it otherwise.
 - Run the first SQL Connect deploy by hand from a machine signed in with `firebase login`, because only the
   interactive CLI offers the free-trial Cloud SQL instance ([decision](../decisions/ci-cd-github-actions.md)).
 - Set up the budget kill switch: its `billing-kill-switch@` account, the Cloud Run Invoker grant for the trigger, and
@@ -33,6 +34,7 @@ missing permission (the log names it) or show that some roles are spare.
 
 ## History
 
+- 2026-11-05: added the five Firebase web Variables and the manual SQL Connect deploy the `PushToken` table needs, because sign-in and push read them.
 - 2026-11-05: the setup covered functions and SQL Connect only; now it also covers the hosting deploy role, the custom domain and the Authorized domain, because the public pages go to Firebase Hosting.
 
 ## Sources

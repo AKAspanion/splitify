@@ -10,11 +10,14 @@ generated:
 
 # OneSignal
 
+Being replaced by [Firebase Cloud Messaging](../decisions/firebase-cloud-messaging.md). The browser no longer uses
+it: `react-onesignal`, its service workers and the login in the launch component are gone, and devices register FCM tokens
+([notifications](../features/notifications.md)). What is left is the server side, until the server actions that call
+it move to Cloud Functions (spec 2c, planned).
+
 ## What it is used for
 
-- In the browser, `app/launch.tsx` initialises `react-onesignal`, prompts for push, and calls `OneSignal.login` with
-  the Clerk user id; `app/layout.tsx` loads OneSignal's web SDK script; the service workers are
-  `public/OneSignalSDKWorker.js` and `public/OneSignalSDK.sw.js`.
+- `app/layout.tsx` still loads OneSignal's web SDK script.
 - On the server, `sendNotification` in `lib/onesignal.ts` posts to OneSignal's `/notifications` endpoint, targeting
   users by `include_aliases.external_id` on the `push` channel, with a `web_url` and `app_url` built from
   `NEXT_PUBLIC_HOST_URL`. It is called by the [push-notification API](../api/push-notification.md).
@@ -31,11 +34,11 @@ generated:
   write; each result is logged with `APILogger.info`.
 - A person who never allowed push, or never opened the web app signed in, gets nothing.
 
+## History
+
+- 2026-11-05: the browser registered with OneSignal under the user id; now it does not, because devices register FCM tokens instead. See [the decision](../decisions/firebase-cloud-messaging.md).
+
 ## Sources
 
 - `lib/onesignal.ts`
-- `app/launch.tsx`
 - `app/layout.tsx`
-- `public/OneSignalSDKWorker.js`
-- `public/OneSignalSDK.sw.js`
-- `app/api/push-notification/create-expense/route.ts`

@@ -21,11 +21,11 @@ the client. Versions are in `package.json`.
 
 ## Entry points
 
-- `app/layout.tsx`: the root layout. It loads the OneSignal web SDK script, Google AdSense
+- `app/layout.tsx`: the root layout. It loads the OneSignal web SDK script (the server actions still send through OneSignal), Google AdSense
   (`app/adsense.tsx`), Vercel analytics (`app/analytics.tsx`), the theme provider and `components/providers.tsx`
   (Clerk, react-query, the confirm dialog, the progress bar).
-- `app/launch.tsx`: runs on every page for a signed-in person; it starts OneSignal and logs the person in to it by
-  their user id.
+- `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the device for push
+  ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups`.
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
 - `proxy.ts`: Clerk's `clerkMiddleware`; see [auth](../security/auth.md).
@@ -43,7 +43,9 @@ is the page Hosting serves for every other route.
 
 - Clerk is stubbed in this build: `@clerk/nextjs` resolves to `lib/clerk-hosting.tsx` (a signed-out stand-in), because
   the Clerk account is gone and Clerk's Next package imports a server action that a static export refuses
-  ([Clerk](../integrations/clerk.md)). The landing page therefore always shows its signed-out view on Hosting.
+  ([Clerk](../integrations/clerk.md)). The rest of the app still uses Clerk.
+- The landing page and navbar are the exception: they read the Firebase Auth state (`useAuth`) and show the signed-in or
+  signed-out view, and the sign-in, sign-up and forgot-password screens are hosted routes ([sign in](../features/sign-in.md)).
 - `app/analytics.tsx` renders nothing in this build, since `/_vercel/insights` doesn't exist on Hosting.
 - Known and harmless: on `/privacy` and `/delete-account` the biometric lock fetches `/api/webauthn/devices`, which
   Hosting answers with the coming-soon page; the failed parse is caught silently.
@@ -96,6 +98,7 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 
 ## History
 
+- 2026-11-05: the hosting build's landing page always showed the signed-out view; now it follows Firebase Auth and has the sign-in screens, because spec 2a moved sign-in to Firebase. See [decision](../decisions/firebase-auth.md).
 - 2026-11-05: added the hosting build target and its Clerk stub, because the public pages go to Firebase Hosting before the app moves. See [decision](../decisions/public-pages-on-firebase-hosting-first.md).
 - 2026-11-04: was Next.js 14 with Clerk's `authMiddleware` in `middleware.ts`; now Next.js 16 with `clerkMiddleware` in `proxy.ts`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
@@ -108,6 +111,8 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 - `app/(landing)/page.hosting.tsx`
 - `app/layout.tsx`
 - `app/launch.tsx`
+- `app/(landing)/_components/navbar.tsx`
+- `components/auth/auth-provider.tsx`
 - `app/adsense.tsx`
 - `app/analytics.tsx`
 - `components/providers.tsx`

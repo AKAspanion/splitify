@@ -35,7 +35,7 @@ There is one deployable service, the Next.js app at the repository root (`next.c
 
 There are no background jobs or queues. Each server action writes its `Activity` row in the same transaction as its
 change, then sends its pushes after the response with `notifyAfterResponse` (`lib/notification/notify.ts`), which
-calls OneSignal through `lib/onesignal.ts`; a failed push doesn't fail the action. See
+calls OneSignal through `lib/onesignal.ts`; a failed push doesn't fail the action. Once the app moves to Firebase, Cloud Functions send these pushes through FCM instead ([notifications](../features/notifications.md)). See
 [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
 ## Data flow

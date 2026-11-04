@@ -31,7 +31,7 @@ generated:
 ## Testing the SQL Connect rules
 
 - `yarn test:rules` (`scripts.test:rules`) starts the Auth and SQL Connect emulators on the demo project
-  `demo-splitify` and runs the rule tests with `vitest.rules.config.mts`; plain `yarn test` skips them. The
+  `demo-splitify` and runs the rule tests with `vitest.rules.config.mts` (the `dataconnect/` and `functions/src` tests, `lib/firebase/` and `lib/data/**/*.rules.test.ts`); plain `yarn test` skips them. The
   emulator's Postgres falls back to another port when its default is taken.
 - The Firebase CLI runs pinned through `npx --yes firebase-tools@15.34.2` in the scripts, so no global install is needed.
 - `functions/` builds with `yarn --cwd functions build`, using its own `typescript` and `tsconfig.json` (node16 resolution, test files excluded; the rules Vitest config runs those tests).
@@ -46,6 +46,7 @@ answers with.
 
 ## History
 
+- 2026-11-05: the rules config skipped `lib/data/`; now it includes the `*.rules.test.ts` files there, because the expense writes' emulator test lives beside the code.
 - 2026-11-05: added the hosting build and its check, because the public pages are served from Firebase Hosting.
 - 2026-11-04: added the rule tests and SDK generation, because the SQL Connect schema and its rules were built.
 - 2026-11-04: Node 24 from `.nvmrc`, the CLI pinned through `npx` and the functions build added, because CI and deploy need the same versions ([CI and deploy](ci-cd.md)).
