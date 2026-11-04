@@ -31,3 +31,13 @@ export const getInitials = (fullName: string) => {
 
   return formattedInitials.trim();
 };
+
+/** One or two capital letters for an avatar: the first letters of the first two words of a name or email. */
+export const getAvatarLetters = (nameOrEmail: string) =>
+  nameOrEmail
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase();

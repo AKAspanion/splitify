@@ -115,6 +115,7 @@ query GetGroupLedger($groupId: UUID!)
     amount
     description
     tag
+    type
     createdAt
     payments: userPayments_on_expense {
       user {

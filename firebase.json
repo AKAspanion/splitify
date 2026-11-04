@@ -7,16 +7,8 @@
       "source": "functions",
       "codebase": "default",
       "runtime": "nodejs24",
-      "predeploy": [
-        "yarn --cwd \"$RESOURCE_DIR\" build"
-      ],
-      "ignore": [
-        "node_modules",
-        ".git",
-        "src",
-        "firebase-debug.log",
-        "*.local"
-      ]
+      "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"],
+      "ignore": ["node_modules", ".git", "src", "firebase-debug.log", "*.local"]
     }
   ],
   "emulators": {
@@ -41,6 +33,54 @@
     "cleanUrls": true,
     "trailingSlash": true,
     "rewrites": [
+      {
+        "source": "/groups/*/expense/*",
+        "destination": "/groups/_/expense/_/index.html"
+      },
+      {
+        "source": "/groups/*/expense",
+        "destination": "/groups/_/expense/index.html"
+      },
+      {
+        "source": "/groups/*/edit",
+        "destination": "/groups/_/edit/index.html"
+      },
+      {
+        "source": "/groups/*/settle",
+        "destination": "/groups/_/settle/index.html"
+      },
+      {
+        "source": "/groups/*/settings",
+        "destination": "/groups/_/settings/index.html"
+      },
+      {
+        "source": "/groups/*/add-member",
+        "destination": "/groups/_/add-member/index.html"
+      },
+      {
+        "source": "/groups/*/activity",
+        "destination": "/groups/_/activity/index.html"
+      },
+      {
+        "source": "/groups/*",
+        "destination": "/groups/_/index.html"
+      },
+      {
+        "source": "/expense/*/edit",
+        "destination": "/expense/_/edit/index.html"
+      },
+      {
+        "source": "/friends/*/edit/contact",
+        "destination": "/friends/_/edit/contact/index.html"
+      },
+      {
+        "source": "/friends/*",
+        "destination": "/friends/_/index.html"
+      },
+      {
+        "source": "/activity/*",
+        "destination": "/activity/_/index.html"
+      },
       {
         "source": "**",
         "destination": "/coming-soon/index.html"

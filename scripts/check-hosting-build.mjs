@@ -1,18 +1,36 @@
 // Checks the hosting build in out/: which pages exist, then what the Firebase Hosting emulator serves from it.
 // Run after `yarn build:hosting`. Exits non-zero on the first failure, with a line naming it.
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = 5050;
-const SOON = "Splitify is coming back soon";
 
-const fail = (message) => {
+// Every scripts/hosting-pages/*.json is `{ pages: string[], requests: { path, expectText }[] }`: the files
+// `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file.
+const manifestDir = path.join(root, "scripts", "hosting-pages");
+const readManifests = () =>
+  readdirSync(manifestDir)
+    .filter((name) => name.endsWith(".json"))
+    .sort()
+    .map((name) => {
+      const manifest = JSON.parse(
+        readFileSync(path.join(manifestDir, name), "utf8"),
+      );
+      if (!Array.isArray(manifest.pages) || !Array.isArray(manifest.requests)) {
+        fail(
+          `scripts/hosting-pages/${name} needs "pages" and "requests" lists`,
+        );
+      }
+      return { name, ...manifest };
+    });
+
+function fail(message) {
   console.error(`FAIL: ${message}`);
   process.exit(1);
-};
+}
 
 // Phase 2, run inside the emulator.
 const checkServed = async () => {
@@ -23,20 +41,18 @@ const checkServed = async () => {
   };
   const expect = (cond, message) => cond || fail(message);
 
-  const pages = [
-    ["/", "Splitting Expenses"],
-    ["/privacy", "Privacy Policy"],
-    ["/delete-account", "Delete your account"],
-    ["/groups/abc", SOON],
-    ["/sign-in", "Sign in"],
-    ["/sign-up", "Sign up"],
-    ["/forgot-password", "Reset your password"],
-    ["/coming-soon", SOON],
-  ];
-  for (const [route, text] of pages) {
-    const { res, body } = await get(route);
-    expect(res.status === 200, `${route} answered ${res.status}, not 200`);
-    expect(body.includes(text), `${route} does not contain "${text}"`);
+  for (const { name, requests } of readManifests()) {
+    for (const { path: route, expectText } of requests) {
+      const { res, body } = await get(route);
+      expect(
+        res.status === 200,
+        `${name}: ${route} answered ${res.status}, not 200`,
+      );
+      expect(
+        body.includes(expectText),
+        `${name}: ${route} does not contain "${expectText}"`,
+      );
+    }
   }
 
   const links = await get("/coming-soon");
@@ -86,7 +102,7 @@ const checkServed = async () => {
   };
   const everyResponse = [
     ["/", await get("/")],
-    ["/groups/abc", await get("/groups/abc")],
+    ["/coming-soon", await get("/coming-soon")],
     [staticMatch[0], asset],
   ];
   for (const [route, { res }] of everyResponse) {
@@ -116,19 +132,14 @@ if (process.argv[2] === "--served") {
 }
 
 // Phase 1: what out/ holds.
-const must = [
-  "index.html",
-  "privacy/index.html",
-  "delete-account/index.html",
-  "coming-soon/index.html",
-  "sign-in/index.html",
-  "sign-up/index.html",
-  "forgot-password/index.html",
-];
-for (const file of must) {
-  if (!existsSync(path.join(root, "out", file))) fail(`out/${file} is missing`);
+for (const { name, pages } of readManifests()) {
+  for (const file of pages) {
+    if (!existsSync(path.join(root, "out", file)))
+      fail(`${name}: out/${file} is missing`);
+  }
 }
-for (const dir of ["groups", "profile", "api", "logs"]) {
+// Not built yet: the API, the admin logs and the WebAuthn pages (2c) stay on the coming-soon page.
+for (const dir of ["api", "logs", "webauthn"]) {
   if (existsSync(path.join(root, "out", dir)))
     fail(`out/${dir}/ must not exist`);
 }

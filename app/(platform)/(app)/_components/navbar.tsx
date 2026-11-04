@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
+import { getAvatarLetters } from "@/utils/func";
 
 export const Navbar = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const pathname = usePathname();
   return (
     <div className="fixed hidden sm:flex z-10 bg-background top-0 w-full h-16 border-b shadow-xs items-center">
@@ -44,13 +44,12 @@ export const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <Link className="hidden sm:block" href="/profile">
-              <Image
-                className="rounded-full"
-                src={user?.imageUrl}
-                alt="Profile logo"
-                height={36}
-                width={36}
-              />
+              <span
+                aria-label="Profile"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground"
+              >
+                {getAvatarLetters(user.name || user.email)}
+              </span>
             </Link>
           ) : null}
         </div>

@@ -77,3 +77,19 @@ export function onUserChanged(
     ),
   );
 }
+
+/** Sends the verification email to the signed-in person. Throws when nobody is signed in. */
+export async function sendVerificationEmail(): Promise<void> {
+  const user = getFirebaseAuth().currentUser;
+  if (!user) throw new Error("Not signed in");
+  await sendEmailVerification(user);
+}
+
+/** Reloads the signed-in person and refreshes their token, so a verification done elsewhere shows. True once verified. */
+export async function reloadEmailVerified(): Promise<boolean> {
+  const user = getFirebaseAuth().currentUser;
+  if (!user) return false;
+  await user.reload();
+  if (user.emailVerified) await user.getIdToken(true);
+  return user.emailVerified;
+}
