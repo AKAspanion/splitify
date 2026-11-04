@@ -1,5 +1,6 @@
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { db } from "@/lib/db";
+import { groupIdOfExpense, isGroupMember } from "@/lib/auth/membership";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -17,6 +18,11 @@ export async function GET(
 
     const expenseId = params.id;
 
+    const groupId = await groupIdOfExpense(expenseId);
+    if (!groupId || !(await isGroupMember(userId, groupId))) {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
+
     const payments = await db.userPayment.findMany({
       where: { expenseId: expenseId || "null" },
       include: { user: true },
@@ -26,8 +32,9 @@ export async function GET(
 
     return NextResponse.json(whoPaid, { status: 200 });
   } catch (error: any) {
+    console.error("Who paid read failed", error?.name);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

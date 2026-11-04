@@ -1,5 +1,6 @@
 "use server";
 
+import { groupIdOfExpense, isGroupMember } from "@/lib/auth/membership";
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
 import { auth } from "@clerk/nextjs/server";
@@ -17,6 +18,11 @@ export const getWhoPaid = async (expenseId: string) => {
     }
 
     try {
+      const groupId = await groupIdOfExpense(expenseId);
+      if (!groupId || !(await isGroupMember(userId, groupId))) {
+        return { data: null, error: "Not found", debugMessage: "Not a member" };
+      }
+
       const payments = await db.userPayment.findMany({
         where: { expenseId: expenseId || "null" },
         include: { user: true },

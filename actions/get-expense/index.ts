@@ -20,10 +20,18 @@ export const getExpense = async (
   }
 
   try {
-    const expense = await db.expense.findUnique({
-      where: { id: expenseId, groupId },
+    const expense = await db.expense.findFirst({
+      where: {
+        id: expenseId,
+        groupId,
+        group: { users: { some: { id: userId } } },
+      },
       include: { user },
     });
+
+    if (!expense) {
+      return { data: null, error: "Not found", debugMessage: "Not a member" };
+    }
 
     return { data: expense, error: null };
   } catch (err) {

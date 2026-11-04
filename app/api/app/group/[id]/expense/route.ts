@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { isGroupMember } from "@/lib/auth/membership";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";
@@ -13,6 +14,10 @@ export async function GET(
 
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await isGroupMember(userId, params.id))) {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -39,8 +44,9 @@ export async function GET(
 
     return NextResponse.json({ count, expenses }, { status: 200 });
   } catch (error: any) {
+    console.error("Group expenses read failed", error?.name);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }
