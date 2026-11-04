@@ -1,0 +1,101 @@
+# The activity feed and the caller's feedback. The feed shows activity in groups the caller is a member of, and
+# activity where the caller is the actor or the subject.
+
+query ListMyActivity($limit: Int!, $offset: Int!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  activities(
+    where: {
+      _or: [
+        {
+          group: {
+            groupMembers_on_group: {
+              exist: { userId: { eq_expr: "auth.uid" } }
+            }
+          }
+        }
+        { actorId: { eq_expr: "auth.uid" } }
+        { subjectId: { eq_expr: "auth.uid" } }
+      ]
+    }
+    orderBy: [{ createdAt: DESC }]
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    type
+    title
+    amount
+    expenseId
+    groupId
+    createdAt
+    actor {
+      id
+      name
+    }
+    subject {
+      id
+      name
+    }
+  }
+}
+
+query GetActivity($id: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  activity(
+    first: {
+      where: {
+        _and: [
+          { id: { eq: $id } }
+          {
+            _or: [
+              {
+                group: {
+                  groupMembers_on_group: {
+                    exist: { userId: { eq_expr: "auth.uid" } }
+                  }
+                }
+              }
+              { actorId: { eq_expr: "auth.uid" } }
+              { subjectId: { eq_expr: "auth.uid" } }
+            ]
+          }
+        ]
+      }
+    }
+  ) {
+    id
+    type
+    title
+    amount
+    expenseId
+    groupId
+    createdAt
+    actor {
+      id
+      name
+    }
+    subject {
+      id
+      name
+    }
+  }
+}
+
+# The caller's one feedback row: the second call replaces the first.
+mutation UpsertMyFeedback($title: String!, $description: String)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+) {
+  feedback_upsert(
+    data: {
+      userId_expr: "auth.uid"
+      title: $title
+      description: $description
+      updatedAt_expr: "request.time"
+    }
+  )
+}
