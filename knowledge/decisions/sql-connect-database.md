@@ -24,8 +24,10 @@ The developer already has a GCP project for it, `splitify-416321`.
 - The database is Firebase SQL Connect, backed by Cloud SQL for PostgreSQL, in project `splitify-416321`. Prisma,
   MySQL and the MariaDB driver adapter are removed.
 - Clerk stays the only way people sign in. SQL Connect's `@auth` rules read a Firebase Auth token, so the browser
-  exchanges its Clerk session for a Firebase custom token (Clerk's Firebase integration) and signs in to Firebase
-  with it. The Firebase `auth.uid` is the Clerk user id. People never see Firebase Auth.
+  sends its Clerk session token to a Cloud Function, which verifies it with `@clerk/backend` and returns a Firebase
+  custom token for the Clerk user id (`admin.auth().createCustomToken`); the browser signs in to Firebase with it.
+  Clerk's own Firebase integration is deprecated and can't be enabled for new apps, so the exchange is ours. The
+  Firebase `auth.uid` is the Clerk user id. People never see Firebase Auth.
 - The access rules in [group member permissions](group-member-permissions.md) are enforced by SQL Connect's
   `@auth` and `@check` rules on every query and mutation, not by app code.
 - The rows in the old MySQL database are copied into SQL Connect once, by a migration script, from a connection the
@@ -38,6 +40,10 @@ The developer already has a GCP project for it, `splitify-416321`.
 - SQL Connect's own query cache lives only in memory on the web, so offline reading needs a cache of the app's own
   ([offline scope](offline-first-scope.md)).
 - Work that must not come from the browser (pushes, the Clerk webhook) runs in Cloud Functions with the admin SDK.
+
+## History
+
+- 2026-11-04: the Clerk session was exchanged through Clerk's Firebase integration; now a Cloud Function of ours mints the custom token, because Clerk has deprecated that integration and new apps can't enable it.
 
 ## Sources
 
