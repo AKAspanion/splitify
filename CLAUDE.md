@@ -1,5 +1,5 @@
 <!-- GA-WORKFLOW:START -->
-<!-- ga:rules cf36365f5bdf -->
+<!-- ga:rules c8c2240a8599 -->
 
 ## How work flows here
 
@@ -37,6 +37,7 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - Stop only at the stops the developer names for a run, which are always honoured.
 - When the approved design, the spec and the knowledge base disagree, stop and ask. Never settle it alone.
 - When the plan turns out to be wrong, decide, record the ruling in the ledger, and carry on; stop only if every way forward is a guess.
+- Plan runs here are unattended: the stops the rules above name don't stop the run, and nothing is asked. It governs the plan run only: the screen list, the design, the spec and the plan still wait for the developer's approval before it. A checkpoint becomes a summary written to the ledger and posted as one line; a stop for a conflict, a plan defect or a finding at the fix-round cap becomes a ruling recorded as `Provisional: <ruling> — <why> — <what the developer must confirm>`, for the developer to sign off; then the run goes on. A stop the developer names still stops it, and so does anything destructive, irreversible, outward-facing (a push or a merge request, except the push and the merge request the finish makes as `git.push` and `git.merge-request` `at-finish` say, which the developer has already agreed to; a push to a shared branch, never) or a security-sensitive action (the checkpoint after a security task becomes its summary like any other). To run a plan without keeping a session open, launch it with `ga.mjs run start <plan>`: it runs headless and survives closing the terminal.
 - Before a plan's first task, start the project's dev servers with `ga.mjs run dev`: it returns at once, and every task built in place or merged back reloads in the running apps. Give the developer their addresses with the dashboard's link. Leave them running at the finish, say so, and say that `ga.mjs run dev --stop` ends them; the end's e2e run reuses them.
 - A task is security-sensitive when the plan tags it `security`: `ga:write-plan` tags every task touching auth, sessions, secrets, encryption, permissions, personal data, uploads, outbound URL fetches, allowlists or rate limits.
 - Nothing is reviewed unasked here: no task review, re-review, security review or final review, and so no fix rounds. A task is done when its code is in, and a test-first task when its own test passes. When the developer asks ("review it", "review the branch"), review the branch since its base with `ga:review-code`, as a background agent, and post its findings when it's done. `ga.mjs workflow set review.when both` (or `run.pace thorough`) reviews every task and the branch again.
@@ -46,8 +47,8 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - Commit messages are plain sentences.
 - Build on a branch named `feat/<topic>`.
 - Branch from, and merge back into, `main`. Until ga's own setup is on `main` (`git cat-file -e main:.ga/config.json` fails), branch from the branch that holds it, and say so: a branch cut from `main` then has no `knowledge/` and no `.ga/`.
-- Ask before pushing.
-- Ask before opening a merge request.
+- Push the branch when the work is finished.
+- Open a merge request when the work is finished.
 - Keep the branch's commits as they are when it's finished; don't squash.
 - No task edits the knowledge base: each task's report lists the concepts it changed. Once the merge request is open, `ga:finish-branch` starts one background agent that writes them, runs the knowledge gates and the run's record in its own worktree of the branch, and pushes them there (its after-finish.md). Nothing waits for it, and the developer can start the next thing.
 - The after-finish job runs `knowledge stale` over the branch and rereads and fixes each concept it lists, or records it as still true.
