@@ -1,11 +1,10 @@
 import DevicesService from "@/lib/auth/service/devices";
+import { getChallengeSession } from "@/lib/auth/session";
 import { auth } from "@clerk/nextjs/server";
 import {
   GenerateAuthenticationOptionsOpts,
   generateAuthenticationOptions,
 } from "@simplewebauthn/server";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const rpID = process.env.AUTHN_RP_ID || "splitify.spanion.in";
@@ -36,20 +35,15 @@ export async function GET(_req: Request) {
 
     const data = await generateAuthenticationOptions(opts);
 
-    const session = await getIronSession<{ currentChallenge?: string }>(
-      await cookies(),
-      {
-        password: "supersecretamazingpassword123456",
-        cookieName: "challenge",
-      },
-    );
+    const session = await getChallengeSession();
     session.currentChallenge = data?.challenge;
     await session.save();
 
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("generate-authentication-options failed", error);
     return NextResponse.json(
-      { message: error?.message || "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }
