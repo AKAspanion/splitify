@@ -33,6 +33,16 @@ drawer). The expense screen then shows who paid, the caller's share, and each me
   edit or delete any expense by its id: [missing authorization on writes](../findings/missing-authorization-on-writes.md).
 - Amounts are shown with `RUPEE_SYMBOL` (`constants/ui.ts`); other currencies are decided in [multi-currency](../decisions/multi-currency.md).
 
+## Under SQL Connect
+
+Reading, editing and deleting an expense is limited to members of its group, written in the operations in
+`dataconnect/app/expenses.gql`; creating one is in the `expense` connector
+([schema and connectors](../data/sql-connect.md)). Planned for the running app in spec 2.
+
+## History
+
+- 2026-11-04: added the SQL Connect limits, because the expense operations were built.
+
 ## Sources
 
 - `app/(platform)/(app)/(forms)/expense/add/page.tsx`
@@ -47,3 +57,4 @@ drawer). The expense screen then shows who paid, the caller's share, and each me
 - `actions/update-expense/index.ts`
 - `actions/delete-expense/index.ts`
 - `constants/ui.ts`
+- `dataconnect/app/expenses.gql`

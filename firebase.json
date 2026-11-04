@@ -1,0 +1,20 @@
+{
+  "dataconnect": {
+    "source": "dataconnect"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs24",
+      "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"],
+      "ignore": ["node_modules", ".git", "src", "firebase-debug.log", "*.local"]
+    }
+  ],
+  "emulators": {
+    "auth": { "port": 9099 },
+    "dataconnect": { "port": 9399 },
+    "functions": { "port": 5001 },
+    "ui": { "enabled": false }
+  }
+}

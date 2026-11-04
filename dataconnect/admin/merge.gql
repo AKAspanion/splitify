@@ -1,0 +1,82 @@
+# Used only by the mergeContactOnSignUp function, as the admin. A contact is a User row with signedUp: false, made
+# when somebody was added by email before signing up.
+
+query FindContactByEmail($email: String!, $notId: String!)
+@auth(level: NO_ACCESS) {
+  users(
+    where: {
+      email: { eq: $email }
+      signedUp: { eq: false }
+      id: { ne: $notId }
+    }
+    limit: 1
+  ) {
+    id
+    email
+    name
+  }
+}
+
+# Moves every row that points at the contact to the new user and deletes the contact. Where the new user already
+# has the same membership or friendship, the contact's copy is deleted instead of moved.
+mutation MergeContactIntoUser($contactId: String!, $userId: String!)
+@auth(level: NO_ACCESS)
+@transaction {
+  groupMember_deleteMany(
+    where: {
+      userId: { eq: $contactId }
+      group: { groupMembers_on_group: { exist: { userId: { eq: $userId } } } }
+    }
+  )
+  groupMember_updateMany(
+    where: { userId: { eq: $contactId } }
+    data: { userId: $userId }
+  )
+  friendshipdeleteMany0: friendship_deleteMany(
+    where: { userId: { eq: $contactId }, friendId: { eq: $userId } }
+  )
+  friendshipdeleteMany1: friendship_deleteMany(
+    where: { userId: { eq: $userId }, friendId: { eq: $contactId } }
+  )
+  friendshipdeleteMany2: friendship_deleteMany(
+    where: {
+      userId: { eq: $contactId }
+      friend: { friendships_on_friend: { exist: { userId: { eq: $userId } } } }
+    }
+  )
+  friendshipdeleteMany3: friendship_deleteMany(
+    where: {
+      friendId: { eq: $contactId }
+      user: { friendships_on_user: { exist: { friendId: { eq: $userId } } } }
+    }
+  )
+  friendshipupdateMany4: friendship_updateMany(
+    where: { userId: { eq: $contactId } }
+    data: { userId: $userId }
+  )
+  friendshipupdateMany5: friendship_updateMany(
+    where: { friendId: { eq: $contactId } }
+    data: { friendId: $userId }
+  )
+  expense_updateMany(
+    where: { creatorId: { eq: $contactId } }
+    data: { creatorId: $userId }
+  )
+  userPayment_updateMany(
+    where: { userId: { eq: $contactId } }
+    data: { userId: $userId }
+  )
+  userSplit_updateMany(
+    where: { userId: { eq: $contactId } }
+    data: { userId: $userId }
+  )
+  activityupdateMany6: activity_updateMany(
+    where: { actorId: { eq: $contactId } }
+    data: { actorId: $userId }
+  )
+  activityupdateMany7: activity_updateMany(
+    where: { subjectId: { eq: $contactId } }
+    data: { subjectId: $userId }
+  )
+  user_delete(key: { id: $contactId })
+}

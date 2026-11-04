@@ -1,7 +1,7 @@
 ---
 type: Decision
 title: Continue the Splitify codebase in place
-description: This repository's own Next.js and Prisma code is built on where it is, keeping its structure; it is not rewritten or migrated.
+description: This repository's own Next.js code is built on where it is, keeping its structure; it is not rewritten. Its data layer moves from Prisma to SQL Connect.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -28,6 +28,10 @@ neither read-only reference material nor the source for a replacement build.
 - The repository is adopted (`origin: adopted` in `.ga/project.json`), so ga's `build`, `update` and `plan`
   commands don't restructure it; modules are added with `/ga:add-module`.
 - No migration plan is written for it.
+
+## History
+
+- 2026-11-04: was the Next.js and Prisma code continued in place; now the Next.js code is continued and Prisma over MySQL is replaced by SQL Connect, because the app moves to the browser on Firebase. See [SQL Connect](sql-connect-database.md).
 
 ## Sources
 

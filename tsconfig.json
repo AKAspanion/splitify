@@ -18,7 +18,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@dataconnect/app": ["./dataconnect/generated/app"],
+      "@dataconnect/admin": ["./dataconnect/generated/admin"]
     },
     "target": "ES2017"
   },
@@ -29,5 +31,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "functions/node_modules", "functions/lib"]
 }

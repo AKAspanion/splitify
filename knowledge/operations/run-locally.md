@@ -12,7 +12,7 @@ generated:
 
 ## Prerequisites
 
-- Node and yarn 1 (`packageManager` in `package.json`).
+- Node 24 (`.nvmrc`) and yarn 1 (`packageManager` in `package.json`).
 - Docker, for the MySQL container in `docker-compose.yml` (its host port and database name are set there).
 - Clerk, OneSignal and UploadThing projects for their keys ([environment](environment.md)).
 
@@ -28,9 +28,27 @@ generated:
 6. `yarn studio` opens Prisma Studio on the database.
 7. `GET /api/health-check` answers `{ message: "Server is up" }` without a session.
 
+## Testing the SQL Connect rules
+
+- `yarn test:rules` (`scripts.test:rules`) starts the Auth and SQL Connect emulators on the demo project
+  `demo-splitify` and runs the rule tests with `vitest.rules.config.mts`; plain `yarn test` skips them. The
+  emulator's Postgres falls back to another port when its default is taken.
+- The Firebase CLI runs pinned through `npx --yes firebase-tools@15.34.2` in the scripts, so no global install is needed.
+- `functions/` builds with `yarn --cwd functions build`, using its own `typescript` and `tsconfig.json` (node16 resolution, test files excluded; the rules Vitest config runs those tests).
+- `yarn dataconnect:generate` writes the SDKs to `dataconnect/generated/` ([SQL Connect schema](../data/sql-connect.md)).
+
+## History
+
+- 2026-11-04: added the rule tests and SDK generation, because the SQL Connect schema and its rules were built.
+- 2026-11-04: Node 24 from `.nvmrc`, the CLI pinned through `npx` and the functions build added, because CI and deploy need the same versions ([CI and deploy](ci-cd.md)).
+
 ## Sources
 
 - `package.json`
+- `vitest.rules.config.mts`
+- `dataconnect/test-utils/emulator.ts`
 - `docker-compose.yml`
+- `.nvmrc`
+- `functions/tsconfig.json`
 - `.env.sample`
 - `app/api/health-check/route.ts`

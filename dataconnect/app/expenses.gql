@@ -1,0 +1,214 @@
+# Reads, edits and deletes of an expense. Each is limited to members of the expense's group; an expense the caller
+# may not see answers as a missing one: null from a query, "Not found" from a mutation. The group of an edit or a
+# delete comes from the expense, never from the variables.
+
+query GetExpense($id: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  expense(
+    first: {
+      where: {
+        id: { eq: $id }
+        group: {
+          groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+        }
+      }
+    }
+  ) {
+    id
+    amount
+    currency
+    description
+    category
+    type
+    tag
+    groupId
+    createdAt
+    updatedAt
+    creator {
+      id
+      name
+      email
+    }
+    payments: userPayments_on_expense {
+      user {
+        id
+        name
+        email
+      }
+      amount
+    }
+    splits: userSplits_on_expense {
+      user {
+        id
+        name
+        email
+      }
+      amount
+      percent
+    }
+  }
+}
+
+query ListGroupExpenses(
+  $groupId: UUID!
+  $limit: Int!
+  $offset: Int!
+  $search: String
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  expenses(
+    where: {
+      groupId: { eq: $groupId }
+      description: { pattern: { regex: $search, ignoreCase: true } }
+      group: {
+        groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+      }
+    }
+    orderBy: [{ createdAt: DESC }]
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    amount
+    currency
+    description
+    category
+    type
+    tag
+    createdAt
+    creator {
+      id
+      name
+    }
+  }
+  total: expenses(
+    where: {
+      groupId: { eq: $groupId }
+      description: { pattern: { regex: $search, ignoreCase: true } }
+      group: {
+        groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+      }
+    }
+  ) {
+    count: _count
+  }
+}
+
+query GetGroupLedger($groupId: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  expenses(
+    where: {
+      groupId: { eq: $groupId }
+      group: {
+        groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+      }
+    }
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    amount
+    description
+    tag
+    createdAt
+    payments: userPayments_on_expense {
+      user {
+        id
+      }
+      amount
+    }
+    splits: userSplits_on_expense {
+      user {
+        id
+      }
+      amount
+      percent
+    }
+  }
+}
+
+# Changes the description only and records EXPENSE_UPDATE.
+mutation UpdateExpense($id: UUID!, $description: String!, $activityId: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.description.size() <= 500"
+)
+@transaction {
+  query @redact {
+    expense(
+      first: {
+        where: {
+          id: { eq: $id }
+          group: {
+            groupMembers_on_group: {
+              exist: { userId: { eq_expr: "auth.uid" } }
+            }
+          }
+        }
+      }
+    ) @check(expr: "this != null", message: "Not found") {
+      groupId
+      amount
+    }
+  }
+  expense_update(
+    key: { id: $id }
+    data: { description: $description, updatedAt_expr: "request.time" }
+  )
+  activity_insert(
+    data: {
+      id: $activityId
+      type: EXPENSE_UPDATE
+      actorId_expr: "auth.uid"
+      groupId_expr: "response.query.expense.groupId"
+      expenseId: $id
+      amount_expr: "response.query.expense.amount"
+      title: $description
+    }
+  )
+}
+
+# Records EXPENSE_MINUS with the expense's description and amount, then deletes the expense with its payments and
+# splits. The activity row stays: it does not reference the expense.
+mutation DeleteExpense($id: UUID!, $activityId: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+)
+@transaction {
+  query @redact {
+    expense(
+      first: {
+        where: {
+          id: { eq: $id }
+          group: {
+            groupMembers_on_group: {
+              exist: { userId: { eq_expr: "auth.uid" } }
+            }
+          }
+        }
+      }
+    ) @check(expr: "this != null", message: "Not found") {
+      groupId
+      amount
+      description
+    }
+  }
+  activity_insert(
+    data: {
+      id: $activityId
+      type: EXPENSE_MINUS
+      actorId_expr: "auth.uid"
+      groupId_expr: "response.query.expense.groupId"
+      expenseId: $id
+      amount_expr: "response.query.expense.amount"
+      title_expr: "response.query.expense.description"
+    }
+  )
+  userPayment_deleteMany(where: { expenseId: { eq: $id } })
+  userSplit_deleteMany(where: { expenseId: { eq: $id } })
+  expense_delete(key: { id: $id })
+}

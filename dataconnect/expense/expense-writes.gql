@@ -1,0 +1,120 @@
+# Writes that create an expense or a settlement. Every UUID is made by the caller and passed in; an insert with an
+# existing key fails and the transaction changes nothing. creator and actor are always auth.uid.
+
+mutation CreateExpense(
+  $id: UUID!
+  $groupId: UUID!
+  $amount: Float!
+  $description: String!
+  $category: String
+  $type: ExpenseType!
+  $payments: [UserPayment_Data!]!
+  $splits: [UserSplit_Data!]!
+  $activityId: UUID!
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.amount > 0 && vars.amount <= 10000000 && vars.description.size() <= 500 && vars.payments.size() <= 50 && vars.splits.size() <= 50 && vars.payments.all(p, p.expenseId == vars.id && p.amount >= 0 && p.amount <= 10000000) && vars.splits.all(s, s.expenseId == vars.id && s.amount >= 0 && s.amount <= 10000000)"
+)
+@transaction {
+  query @redact {
+    caller: groupMember(key: { groupId: $groupId, userId_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Not found") {
+      userId
+    }
+    members: groupMembers(where: { groupId: { eq: $groupId } })
+      @check(
+        expr: "vars.payments.all(p, this.exists(m, m.userId == p.userId)) && vars.splits.all(s, this.exists(m, m.userId == s.userId))"
+        message: "Only members of this group can be added to an expense"
+      ) {
+      userId
+    }
+  }
+  expense_insert(
+    data: {
+      id: $id
+      groupId: $groupId
+      amount: $amount
+      description: $description
+      category: $category
+      type: $type
+      tag: EXPENSE
+      creatorId_expr: "auth.uid"
+    }
+  )
+  activity_insert(
+    data: {
+      id: $activityId
+      type: EXPENSE_PLUS
+      actorId_expr: "auth.uid"
+      groupId: $groupId
+      expenseId: $id
+      amount: $amount
+      title: $description
+    }
+  )
+  userPayment_insertMany(data: $payments)
+  userSplit_insertMany(data: $splits)
+}
+
+mutation CreateSettlement(
+  $id: UUID!
+  $groupId: UUID!
+  $amount: Float!
+  $fromUserId: String!
+  $toUserId: String!
+  $paymentId: UUID!
+  $splitId: UUID!
+  $activityId: UUID!
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.amount > 0 && vars.amount <= 10000000"
+)
+@transaction {
+  query @redact {
+    caller: groupMember(key: { groupId: $groupId, userId_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Not found") {
+      userId
+    }
+    members: groupMembers(where: { groupId: { eq: $groupId } })
+      @check(
+        expr: "this.exists(m, m.userId == vars.fromUserId) && this.exists(m, m.userId == vars.toUserId)"
+        message: "Only members of this group can be added to an expense"
+      ) {
+      userId
+    }
+  }
+  expense_insert(
+    data: {
+      id: $id
+      groupId: $groupId
+      amount: $amount
+      description: "Settlement"
+      type: EXACT
+      tag: SETTLEMENT
+      creatorId_expr: "auth.uid"
+    }
+  )
+  activity_insert(
+    data: {
+      id: $activityId
+      type: SETTLEMENT_PLUS
+      actorId_expr: "auth.uid"
+      groupId: $groupId
+      subjectId: $toUserId
+      expenseId: $id
+      amount: $amount
+      title: "Settlement"
+    }
+  )
+  userPayment_insert(
+    data: {
+      id: $paymentId
+      expenseId: $id
+      userId: $fromUserId
+      amount: $amount
+    }
+  )
+  userSplit_insert(
+    data: { id: $splitId, expenseId: $id, userId: $toUserId, amount: $amount }
+  )
+}

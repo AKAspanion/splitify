@@ -1,0 +1,9 @@
+query GetDevices($userId: String!) @auth(level: NO_ACCESS) {
+  authnDevice(key: { userId: $userId }) {
+    devices
+  }
+}
+
+mutation SaveDevices($userId: String!, $devices: Any!) @auth(level: NO_ACCESS) {
+  authnDevice_upsert(data: { userId: $userId, devices: $devices })
+}

@@ -33,8 +33,11 @@ had to trust a member list from the browser when a group is deleted, since the g
 - The activity feed has an entry for every change that commits, whatever the browser does afterwards.
 - Nothing a browser sends can name the actor, the recipients or the text of a push.
 
+## History
+
+- 2026-11-04: Sources named `lib/notification/service/index.ts` and `app/api/push-notification/route.ts`, the removed route and its client; now `lib/notification/notify.ts`, because the code those described is gone.
+
 ## Sources
 
 - `lib/onesignal.ts`
-- `lib/notification/service/index.ts`
-- `app/api/push-notification/route.ts`
+- `lib/notification/notify.ts`

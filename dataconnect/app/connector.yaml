@@ -1,0 +1,5 @@
+connectorId: "app"
+generate:
+  javascriptSdk:
+    outputDir: "../generated/app"
+    package: "@dataconnect/app"

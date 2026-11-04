@@ -1,0 +1,78 @@
+name: Deploy
+
+# Every push to main runs the full CI suite, then deploys the Cloud Functions.
+# The SQL Connect schema deploys only when started by hand with "deploy_dataconnect" ticked.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_dataconnect:
+        description: Also deploy the SQL Connect schema and connectors
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to Firebase
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      # Set the APP_URL variable to change the address shown on deploys.
+      url: ${{ vars.APP_URL || 'https://splitify.spanion.in' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check deploy configuration
+        env:
+          HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: |
+          missing=""
+          [ -n "$FIREBASE_PROJECT_ID" ] || missing="$missing FIREBASE_PROJECT_ID"
+          [ "$HAS_SERVICE_ACCOUNT" = "true" ] || missing="$missing FIREBASE_SERVICE_ACCOUNT(secret)"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository settings:$missing. See README > Deploy."
+            exit 1
+          fi
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: functions/yarn.lock
+      # The functions predeploy builds functions/, so only its dependencies are needed.
+      - run: yarn install --frozen-lockfile --ignore-scripts
+        working-directory: functions
+      - name: Write service account key
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          umask 077
+          printf '%s' "$SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/sa.json"
+      - name: Deploy functions
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: npx --yes firebase-tools@15.34.2 deploy --only functions --project "$PROJECT_ID" --non-interactive --force
+      - name: Deploy SQL Connect
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_dataconnect }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: npx --yes firebase-tools@15.34.2 deploy --only dataconnect --project "$PROJECT_ID" --non-interactive
+      - name: Remove service account key
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/sa.json"

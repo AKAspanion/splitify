@@ -103,24 +103,25 @@ Never configurable, whatever the project sets:
 
 _Generated from `knowledge/`. Do not edit by hand._
 
-_70 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+_82 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
 
 - [api/](knowledge/api/) — 5 concepts
-- [data/](knowledge/data/) — 3 concepts
-- [decisions/](knowledge/decisions/) — 12 concepts
+- [data/](knowledge/data/) — 4 concepts
+- [decisions/](knowledge/decisions/) — 19 concepts
 - [design-system/](knowledge/design-system/) — 2 concepts
 - [domain/](knowledge/domain/) — 4 concepts
 - [features/](knowledge/features/) — 10 concepts
 - [findings/](knowledge/findings/) — 10 concepts
 - [integrations/](knowledge/integrations/) — 5 concepts
-- [operations/](knowledge/operations/) — 3 concepts
-- [questions/](knowledge/questions/) — 6 concepts
+- [operations/](knowledge/operations/) — 5 concepts
+- [questions/](knowledge/questions/) — 7 concepts
 - [risks/](knowledge/risks/) — 1 concept
 - [security/](knowledge/security/) — 3 concepts
 
 ### apps
 
 - [Android app](knowledge/apps/android.md) _(Application)_ — A Trusted Web Activity, in.spanion.splitify.twa, that opens the deployed web app at /groups.
+- [Cloud Functions](knowledge/apps/functions.md) _(Application)_ — The Firebase Cloud Functions in functions/: the contact merge after sign-up and the budget kill switch.
 - [iOS app](knowledge/apps/ios.md) _(Application)_ — A Swift WebView wrapper that opens the deployed web app, with Firebase push messaging.
 - [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 16 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
 

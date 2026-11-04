@@ -1,0 +1,77 @@
+import { upsertMe } from "@dataconnect/app";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  updateProfile,
+  type User,
+} from "firebase/auth";
+import { getDataConnectClient, getFirebaseAuth } from "./app";
+
+/** Writes the person's own row from their token. Every sign-in function runs it once the Firebase user is set. */
+async function upsertCurrentUser(): Promise<void> {
+  await upsertMe(getDataConnectClient());
+}
+
+export async function signInWithGoogle(): Promise<void> {
+  await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+  await upsertCurrentUser();
+}
+
+export async function signInWithEmail(
+  email: string,
+  password: string,
+): Promise<void> {
+  await signInWithEmailAndPassword(getFirebaseAuth(), email.trim(), password);
+  await upsertCurrentUser();
+}
+
+/** Creates the account, sends the verification email and runs `UpsertMe` with the name on the token. */
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  name: string,
+): Promise<void> {
+  const credential = await createUserWithEmailAndPassword(
+    getFirebaseAuth(),
+    email.trim(),
+    password,
+  );
+  await updateProfile(credential.user, { displayName: name.trim() });
+  await sendEmailVerification(credential.user);
+  // The new name reaches the token only when it is refreshed.
+  await credential.user.getIdToken(true);
+  await upsertCurrentUser();
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  await sendPasswordResetEmail(getFirebaseAuth(), email.trim());
+}
+
+/** Signs out this browser only. */
+export async function signOut(): Promise<void> {
+  await firebaseSignOut(getFirebaseAuth());
+}
+
+export function onUserChanged(
+  cb: (
+    user: { uid: string; email: string; emailVerified: boolean } | null,
+  ) => void,
+): () => void {
+  return onAuthStateChanged(getFirebaseAuth(), (user: User | null) =>
+    cb(
+      user
+        ? {
+            uid: user.uid,
+            email: user.email ?? "",
+            emailVerified: user.emailVerified,
+          }
+        : null,
+    ),
+  );
+}
