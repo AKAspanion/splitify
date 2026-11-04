@@ -6,6 +6,11 @@ import { onMessagePublished } from "firebase-functions/v2/pubsub";
 import { enforceBudget, parseNotification } from "./kill-switch";
 
 export { mergeContactOnSignUp } from "./merge-contact";
+export {
+  sendActivityPushApp,
+  sendActivityPushExpense,
+  sendGroupDeletedPush,
+} from "./push-activity";
 
 let billing: CloudBillingClient | undefined;
 
