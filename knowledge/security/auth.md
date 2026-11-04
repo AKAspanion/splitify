@@ -16,7 +16,7 @@ generated:
   `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`. Clerk's keys and redirect URLs are the `CLERK_*` keys in
   `.env.sample` ([environment](../operations/environment.md)).
 - `proxy.ts` (what Next 16 calls middleware) runs Clerk's `clerkMiddleware` on every page and API route. Its public
-  routes (`isPublicRoute`, reachable signed out) are `/`, `/privacy`, `/sign-in(.*)`, `/sign-up(.*)`,
+  routes (`isPublicRoute`, reachable signed out) are `/`, `/privacy`, `/delete-account`, `/sign-in(.*)`, `/sign-up(.*)`,
   `/api/webhook/clerk`, `/api/uploadthing`, `/api/test(.*)` and `/api/health-check(.*)`. The sign-in and sign-up pages
   must be listed: `authMiddleware` let them through by itself, `clerkMiddleware` doesn't, and without them `/sign-in`
   redirects to itself.

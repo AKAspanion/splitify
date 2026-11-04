@@ -19,6 +19,10 @@ generated:
   users by `include_aliases.external_id` on the `push` channel, with a `web_url` and `app_url` built from
   `NEXT_PUBLIC_HOST_URL`. It is called by the [push-notification API](../api/push-notification.md).
 
+- `deleteOneSignalUser` in `lib/onesignal.ts` deletes a deleted account's OneSignal user by external id (the Clerk user
+  id). It never throws and treats `404` as already gone; [account deletion](../features/account-deletion.md) calls it
+  after the transaction commits.
+
 ## Configuration
 
 `NEXT_PUBLIC_ONE_SIGNAL_APP_ID`, `NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID` and `ONE_SIGNAL_REST_API_KEY`
@@ -26,10 +30,14 @@ generated:
 
 ## Failure modes
 
-- `sendNotification` never throws: a network error comes back as `{ errors: [message] }`.
+- `sendNotification` and `deleteOneSignalUser` never throw: a network error comes back as `{ errors: [message] }`.
 - The notification routes use `Promise.allSettled`, so one failed push doesn't stop the others or the activity
   write; each result is logged with `APILogger.info`.
 - A person who never allowed push, or never opened the web app signed in, gets nothing.
+
+## History
+
+- 2026-11-04: had no user deletion; now `deleteOneSignalUser`, because Play requires deleting the data tied to a deleted account. See [the decision](../decisions/anonymise-deleted-accounts.md).
 
 ## Sources
 

@@ -23,6 +23,11 @@ The row keeps its `spuser_` id after the merge, while the person's Clerk session
 action looks the caller up by that session id: see
 [contact sign-up keeps the contact's id](../findings/contact-signup-keeps-contact-id.md).
 
+## Deleting a merged contact
+
+The Clerk session id finds no row for a merged contact, so [account deletion](../features/account-deletion.md) looks
+the row up by the Clerk account's primary email.
+
 ## Where it is enforced
 
 - `app/api/webhook/clerk/route.ts`
@@ -31,5 +36,6 @@ action looks the caller up by that session id: see
 ## Sources
 
 - `app/api/webhook/clerk/route.ts`
+- `actions/delete-account/index.ts`
 - `actions/create-contact/index.ts`
 - `app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx`

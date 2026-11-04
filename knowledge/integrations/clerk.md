@@ -20,7 +20,9 @@ generated:
 - Sign-in by email needs "Email verification code" turned on for sign-in in the Clerk instance's email settings;
   without it, an account with no password can only sign in with Google.
 - User records: Clerk calls `POST /api/webhook/clerk` on `user.created` and `user.updated`, which writes the `User`
-  row ([contact identity](../domain/contact-identity.md)). `GET /api/webhook/clerk` only answers a greeting.
+  row ([contact identity](../domain/contact-identity.md)), and on `user.deleted`, which anonymises the row whose id is
+  `data.id` ([account deletion](../features/account-deletion.md)). The deleted event is handled after the signature
+  check and before the email lookup, since it carries only an id. `GET /api/webhook/clerk` only answers a greeting.
 - Profile images are served from Clerk's image hosts, allowed in `images.remotePatterns` in `next.config.mjs`.
 
 ## Configuration
@@ -30,12 +32,14 @@ dashboard; `scripts.ngrok` in `package.json` exposes a local server for it.
 
 ## Failure modes
 
-- The webhook returns `400` with the error message when it can't process an event.
-- The webhook doesn't verify signatures: [Clerk webhook isn't verified](../findings/clerk-webhook-unverified.md).
+- The webhook returns `400` when the signature check fails and `500` when handling the event fails, including a failed
+  anonymisation, so Clerk retries it.
+- The webhook verifies signatures with `verifyWebhook`: [Clerk webhook wasn't verified](../findings/clerk-webhook-unverified.md).
 - A missed webhook leaves a signed-in person with no `User` row, and their writes fail.
 
 ## History
 
+- 2026-11-04: the webhook handled `user.created` and `user.updated`; now also `user.deleted`, because Play requires account deletion. See [the decision](../decisions/anonymise-deleted-accounts.md).
 - 2026-11-04: route protection was `authMiddleware` in `middleware.ts`; now `clerkMiddleware` in `proxy.ts`, because Clerk 7 removed `authMiddleware`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources

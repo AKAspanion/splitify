@@ -1,13 +1,13 @@
 ---
 type: Finding
-title: Clerk webhook isn't verified
-description: POST /api/webhook/clerk trusts any request body, so anyone can create users or overwrite a user's email, name and images.
+title: "Fixed: Clerk webhook wasn't verified"
+description: POST /api/webhook/clerk trusted any request body, so anyone could create users or overwrite a user's email, name and images; it now checks Clerk's signature.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
 ---
 
-# Clerk webhook isn't verified
+# Fixed: Clerk webhook wasn't verified
 
 ## Finding
 
@@ -23,7 +23,7 @@ The webhook route is public (a public route in `proxy.ts`) and reads the body as
 
 ## Status
 
-Open.
+Fixed: the route calls `verifyWebhook` and answers `400` on a bad signature.
 
 ## Sources
 

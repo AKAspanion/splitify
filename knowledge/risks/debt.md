@@ -12,8 +12,6 @@ generated:
 
 ## Items
 
-- **Android build output is committed** under `packages/android/source/app/build/` and `packages/android/source/.gradle/`
-  (over 200 generated files). They belong in `.gitignore`.
 - **The schema is pushed on install and build.** `postinstall` and `postbuild` in `package.json` run `prisma db push`,
   which applies the schema straight to the database `DATABASE_URL` names, production included, with no migrations.
 - **Activity depends on a second request.** Activity rows are written by the push-notification routes the browser

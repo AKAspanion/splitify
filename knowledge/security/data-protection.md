@@ -20,6 +20,12 @@ generated:
   notification routes pass OneSignal's results ([logging](../operations/logging.md)).
 - **Feedback** text in `Feedback`.
 
+## Deletion
+
+A person deletes their account from the profile page or through Clerk. Their row is anonymised and their shared
+expenses stay, as [the decision](../decisions/anonymise-deleted-accounts.md) sets; what is removed is in
+[account deletion](../features/account-deletion.md). The privacy policy says so ([privacy policy](../features/privacy-policy.md)).
+
 ## Protections
 
 - Data is reachable only with a Clerk session ([auth](auth.md)), but not limited to the caller's own groups:
@@ -28,6 +34,10 @@ generated:
   are in the code: [the hard-coded session password](../findings/hardcoded-session-password.md) and
   [the committed Firebase config](../findings/committed-firebase-config.md).
 - `.claude/settings.json` stops Claude reading `.env` files.
+
+## History
+
+- 2026-11-04: no deletion was described; now deletion anonymises the row and keeps shared expenses, because Play requires account deletion. See [the decision](../decisions/anonymise-deleted-accounts.md).
 
 ## Sources
 
