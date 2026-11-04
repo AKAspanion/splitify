@@ -48,7 +48,7 @@ The database starts empty, so ids need not match old data.
 
 | Table | Key | Fields | Notes |
 |---|---|---|---|
-| `User` | `id: String` | `email` (unique, lower-case), `name`, `firstName`, `lastName`, `imageUrl`, `signedUp: Boolean`, `createdAt`, `updatedAt` | For a signed-up person `id` is the Firebase `auth.uid`. For a contact, `id` is `spuser_` plus a random id, and `signedUp` is false. `fromClerk` becomes `signedUp`; `uid` and `profile_image_url` are dropped (nothing reads them). |
+| `User` | `id: String` | `email` (indexed and lower-case, but not unique: a contact and the person who signs up with that email share it until the merge runs, so `CreateContact` checks for a taken email itself), `name`, `firstName`, `lastName`, `imageUrl`, `signedUp: Boolean`, `createdAt`, `updatedAt` | For a signed-up person `id` is the Firebase `auth.uid`. For a contact, `id` is `spuser_` plus a random id, and `signedUp` is false. `fromClerk` becomes `signedUp`; `uid` and `profile_image_url` are dropped (nothing reads them). |
 | `Group` | `id: UUID` | `title`, `description`, `imageUrl`, `type`, `currency` (default `inr`), `mute`, timestamps | |
 | `GroupMember` | (`group`, `user`) | `createdAt` | Replaces Prisma's implicit `User`–`Group` many-to-many. Cascades when the group is deleted. |
 | `Friendship` | (`user`, `friend`) | `createdAt` | One row each way, as `createFriend` does today. |
