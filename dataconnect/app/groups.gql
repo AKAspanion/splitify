@@ -1,0 +1,193 @@
+# Groups and their members. Every write needs the caller's membership; a group the caller isn't in answers as a
+# missing one.
+
+mutation CreateGroup(
+  $id: UUID!
+  $title: String!
+  $description: String
+  $type: String
+  $activityId: UUID!
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+)
+@transaction {
+  group_insert(
+    data: { id: $id, title: $title, description: $description, type: $type }
+  )
+  groupMember_insert(data: { groupId: $id, userId_expr: "auth.uid" })
+  activity_insert(
+    data: {
+      id: $activityId
+      type: GROUP_PLUS
+      actorId_expr: "auth.uid"
+      groupId: $id
+      title: $title
+    }
+  )
+}
+
+mutation UpdateGroup(
+  $id: UUID!
+  $title: String!
+  $description: String
+  $type: String
+  $activityId: UUID!
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+)
+@transaction {
+  query @redact {
+    caller: groupMember(key: { groupId: $id, userId_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Not found") {
+      userId
+    }
+  }
+  group_update(
+    key: { id: $id }
+    data: {
+      title: $title
+      description: $description
+      type: $type
+      updatedAt_expr: "request.time"
+    }
+  )
+  activity_insert(
+    data: {
+      id: $activityId
+      type: GROUP_UPDATE
+      actorId_expr: "auth.uid"
+      groupId: $id
+      title: $title
+    }
+  )
+}
+
+# Returns the member ids it read before deleting. The group's activity goes with it, since Activity.group is
+# optional and deleting the group would only null it.
+mutation DeleteGroup($id: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+)
+@transaction {
+  query {
+    caller: groupMember(key: { groupId: $id, userId_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Not found") {
+      userId
+    }
+    memberIds: groupMembers(where: { groupId: { eq: $id } }) {
+      userId
+    }
+  }
+  activity_deleteMany(where: { groupId: { eq: $id } })
+  userSplit_deleteMany(where: { expense: { groupId: { eq: $id } } })
+  userPayment_deleteMany(where: { expense: { groupId: { eq: $id } } })
+  expense_deleteMany(where: { groupId: { eq: $id } })
+  groupMember_deleteMany(where: { groupId: { eq: $id } })
+  group_delete(key: { id: $id })
+}
+
+mutation AddGroupMember($groupId: UUID!, $userId: String!, $activityId: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+)
+@transaction {
+  query @redact {
+    caller: groupMember(key: { groupId: $groupId, userId_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Not found") {
+      userId
+    }
+    friendship(key: { userId_expr: "auth.uid", friendId: $userId })
+      @check(
+        expr: "this != null"
+        message: "You can only add your friends to a group"
+      ) {
+      friendId
+    }
+    group(key: { id: $groupId }) {
+      title
+    }
+  }
+  groupMember_insert(data: { groupId: $groupId, userId: $userId })
+  activity_insert(
+    data: {
+      id: $activityId
+      type: MEMBER_PLUS
+      actorId_expr: "auth.uid"
+      groupId: $groupId
+      subjectId: $userId
+      title_expr: "response.query.group.title"
+    }
+  )
+}
+
+# search is matched as a case-insensitive POSIX regular expression, since SQL Connect has no case-insensitive
+# substring filter: the caller escapes regex characters in what the person typed.
+query ListMyGroups($search: String, $limit: Int)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.search) || vars.search == null || vars.search.size() <= 100)"
+) {
+  groups(
+    where: {
+      groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+      title: { pattern: { regex: $search, ignoreCase: true } }
+    }
+    orderBy: { createdAt: DESC }
+    limit: $limit
+  ) {
+    id
+    title
+    description
+    imageUrl
+    type
+    currency
+    mute
+    createdAt
+  }
+}
+
+# The group when the caller is a member, else an empty list: a key lookup can't be filtered by membership.
+query GetGroup($id: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  groups(
+    where: {
+      id: { eq: $id }
+      groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+    }
+    limit: 1
+  ) {
+    id
+    title
+    description
+    imageUrl
+    type
+    currency
+    mute
+    createdAt
+  }
+}
+
+query ListGroupMembers($groupId: UUID!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  groupMembers(
+    where: {
+      groupId: { eq: $groupId }
+      group: {
+        groupMembers_on_group: { exist: { userId: { eq_expr: "auth.uid" } } }
+      }
+    }
+  ) {
+    user {
+      id
+      name
+      email
+      imageUrl
+      signedUp
+    }
+  }
+}

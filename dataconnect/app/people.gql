@@ -1,0 +1,154 @@
+# Users, contacts and friends. The caller is always auth.uid, never a variable. A record the caller may not see
+# answers as a missing one: null from a query, "Not found" from a mutation.
+
+query SearchUserByEmail($email: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.email.size() <= 254"
+) {
+  users(where: { email: { eq: $email } }, limit: 1) {
+    id
+    name
+    imageUrl
+  }
+}
+
+mutation CreateContact($id: String!, $email: String!, $name: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.id.startsWith('spuser_') && vars.email.size() <= 254 && vars.name.size() <= 100"
+)
+@transaction {
+  user_insert(data: { id: $id, email: $email, name: $name, signedUp: false })
+  friendship_insertMany(
+    data: [
+      { userId_expr: "auth.uid", friendId: $id }
+      { userId: $id, friendId_expr: "auth.uid" }
+    ]
+  )
+}
+
+mutation UpdateContact($id: String!, $email: String!, $name: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.email.size() <= 254 && vars.name.size() <= 100"
+)
+@transaction {
+  query @redact {
+    friendship(key: { userId_expr: "auth.uid", friendId: $id })
+      @check(expr: "this != null", message: "Not found") {
+      friendId
+    }
+    user(key: { id: $id })
+      @check(expr: "this != null && !this.signedUp", message: "Not found") {
+      signedUp
+    }
+  }
+  user_update(
+    key: { id: $id }
+    data: { email: $email, name: $name, updatedAt_expr: "request.time" }
+  )
+}
+
+query ListFriends($limit: Int)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  friendships(
+    where: { userId: { eq_expr: "auth.uid" } }
+    orderBy: { createdAt: DESC }
+    limit: $limit
+  ) {
+    friend {
+      id
+      name
+      email
+      imageUrl
+      signedUp
+    }
+  }
+}
+
+# Both Friendship rows and, with a groupId, the friend's membership (which needs the caller's). The activity is
+# MEMBER_PLUS with a group and USER without. SQL Connect can't branch on a nullable variable, so the caller also
+# passes withGroup, which must say whether groupId is set.
+mutation AddFriend(
+  $friendId: String!
+  $groupId: UUID = null
+  $withGroup: Boolean!
+  $activityId: UUID!
+)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.withGroup == (has(vars.groupId) && vars.groupId != null)"
+)
+@transaction {
+  query @redact {
+    caller: groupMembers(
+      where: {
+        groupId: {
+          eq_expr: "vars.groupId != null ? vars.groupId : '00000000-0000-0000-0000-000000000000'"
+        }
+        userId: { eq_expr: "auth.uid" }
+      }
+    ) @check(expr: "!vars.withGroup || this.size() > 0", message: "Not found") {
+      userId
+    }
+    friend: user(key: { id: $friendId })
+      @check(expr: "this != null", message: "Not found") {
+      name
+    }
+    groups(
+      where: {
+        id: {
+          eq_expr: "vars.groupId != null ? vars.groupId : '00000000-0000-0000-0000-000000000000'"
+        }
+      }
+      limit: 1
+    ) {
+      title
+    }
+  }
+  friendships: friendship_upsertMany(
+    data: [
+      { userId_expr: "auth.uid", friendId: $friendId }
+      { userId: $friendId, friendId_expr: "auth.uid" }
+    ]
+  )
+  member: groupMember_upsert(
+    data: {
+      groupId_expr: "vars.groupId != null ? vars.groupId : '00000000-0000-0000-0000-000000000000'"
+      userId: $friendId
+    }
+  ) @include(if: $withGroup)
+  addedToGroup: activity_insert(
+    data: {
+      id: $activityId
+      type: MEMBER_PLUS
+      actorId_expr: "auth.uid"
+      groupId_expr: "vars.groupId != null ? vars.groupId : '00000000-0000-0000-0000-000000000000'"
+      subjectId: $friendId
+      title_expr: "response.query.groups[0].title"
+    }
+  ) @include(if: $withGroup)
+  addedAsFriend: activity_insert(
+    data: {
+      id: $activityId
+      type: USER
+      actorId_expr: "auth.uid"
+      subjectId: $friendId
+      title_expr: "response.query.friend.name != null ? response.query.friend.name : ''"
+    }
+  ) @skip(if: $withGroup)
+}
+
+query GetFriend($id: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+) {
+  friendship(key: { userId_expr: "auth.uid", friendId: $id }) {
+    friend {
+      id
+      name
+      email
+      imageUrl
+      signedUp
+    }
+  }
+}
