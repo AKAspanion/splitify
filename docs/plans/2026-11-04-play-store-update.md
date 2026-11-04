@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** complete
+
 **Goal:** Make the Android app `in.spanion.splitify.twa` updatable on Google Play: target API 36, both signing keys in the asset links, a privacy policy and a public deletion page Play can read, and account deletion that anonymises the person.
 
 **Architecture:** One shared function, `anonymiseUser`, holds the whole anonymisation rule and runs inside a Prisma interactive transaction. Two entry points call it: a `deleteAccount` server action behind a button on the profile page, and the Clerk webhook's `user.deleted` event. The privacy and deletion pages are static server pages, public in `proxy.ts`. The Android project is upgraded in place by editing its Gradle files and manifest.
@@ -105,35 +107,35 @@ shared expenses.
 - Given `fetch` rejects, then `deleteOneSignalUser` resolves `{ ok: false }` and doesn't throw.
 - Given an external id `a/b`, then the URL ends with `external_id/a%2Fb`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `lib/account/anonymise.test.ts` (with a hand-made
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `lib/account/anonymise.test.ts` (with a hand-made
   mock `tx`) and `lib/onesignal.test.ts` (with `fetch` stubbed by `vi.stubGlobal`). Create both functions first with
   their real signatures and bodies that do nothing, so the tests fail on behaviour.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test lib/account/anonymise.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Run the OneSignal tests to verify they fail**
+- [x] **Step 3: Run the OneSignal tests to verify they fail**
 
 Run: `yarn test lib/onesignal.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 4: Write the minimal implementation** to the Interfaces, until they pass. The group lookup reads each of
+- [x] **Step 4: Write the minimal implementation** to the Interfaces, until they pass. The group lookup reads each of
   the person's groups with its member count (`_count.users`); the activity rewrite is a single `tx.$executeRaw` using
   `Prisma.join` for the group ids.
 
-- [ ] **Step 5: Run the anonymiser tests to verify they pass**
+- [x] **Step 5: Run the anonymiser tests to verify they pass**
 
 Run: `yarn test lib/account/anonymise.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: Run the OneSignal tests to verify they pass**
+- [x] **Step 6: Run the OneSignal tests to verify they pass**
 
 Run: `yarn test lib/onesignal.test.ts`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add lib/account/anonymise.ts lib/account/anonymise.test.ts lib/onesignal.ts lib/onesignal.test.ts
@@ -210,24 +212,24 @@ the Clerk account's email.
   `user_1` is anonymised and deleted.
 - Given the transaction call, then its options include `timeout: 15000`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case in `actions/delete-account/index.test.ts`, mocking
+- [x] **Step 1: Write the failing tests** for each Acceptance case in `actions/delete-account/index.test.ts`, mocking
   `@clerk/nextjs/server` (`auth`, `currentUser`, `clerkClient`), `@/lib/db`, `@/lib/account/anonymise`,
   `@/lib/onesignal` and `@/lib/logger` the way `actions/create-expense/index.test.ts` does. Create the action files
   first with a handler that returns `{ error: "Unauthorized" }`, so the tests fail on behaviour.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test actions/delete-account/index.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Write the minimal action implementation** to the Interfaces, until the tests pass.
+- [x] **Step 3: Write the minimal action implementation** to the Interfaces, until the tests pass.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test actions/delete-account/index.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Build the button.** `delete-account-action.tsx` is a `"use client"` component: a `Button` with
+- [x] **Step 5: Build the button.** `delete-account-action.tsx` is a `"use client"` component: a `Button` with
   `variant="destructive"` and the text `Delete account`, opening a `Dialog` titled `Delete your account?` whose
   description reads `Your name, email, picture, passkey, friends and feedback are removed. Expenses you share with
   others stay in their groups under "Deleted user". This can't be undone.`, with `Cancel` (closes) and
@@ -235,7 +237,7 @@ Expected: PASS
   `signOut` and routes to `/`; on error it shows the error with a `sonner` toast and keeps the dialog open. Place it
   in `page.tsx` in the row with Biometrics and notifications.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add actions/delete-account/index.ts actions/delete-account/schema.ts actions/delete-account/types.ts actions/delete-account/index.test.ts "app/(platform)/profile/delete-account-action.tsx" "app/(platform)/profile/page.tsx"
@@ -277,23 +279,23 @@ git commit -m "Let a person delete their account from the profile page: the acti
 - Given `anonymiseUser` rejects, then it answers `500` with `{ message: "Something went wrong" }`.
 - Given a verified `user.updated` event, then the existing upsert path runs as before and `anonymiseUser` isn't called.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case in `app/api/webhook/clerk/route.test.ts`, mocking
+- [x] **Step 1: Write the failing tests** for each Acceptance case in `app/api/webhook/clerk/route.test.ts`, mocking
   `@clerk/nextjs/webhooks`, `@/lib/db` and `@/lib/account/anonymise`.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test app/api/webhook/clerk/route.test.ts`
 Expected: FAIL on the `user.deleted` assertions
 
-- [ ] **Step 3: Write the minimal implementation**: a `user.deleted` branch right after the signature check, before
+- [x] **Step 3: Write the minimal implementation**: a `user.deleted` branch right after the signature check, before
   the email lookup, until the tests pass.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test app/api/webhook/clerk/route.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/api/webhook/clerk/route.ts app/api/webhook/clerk/route.test.ts
@@ -349,29 +351,29 @@ and the public `/delete-account` page explains deletion for people outside the a
   removed and what other members keep, and that someone who can't sign in can email `panditankit1995@gmail.com` from
   the account's email address.
 
-- [ ] **Step 1: Write the failing tests** in `proxy.test.ts` for the `isPublicRoute` cases and the asset links file
+- [x] **Step 1: Write the failing tests** in `proxy.test.ts` for the `isPublicRoute` cases and the asset links file
   (read with `fs`, parsed, compared). Export `isPublicRoute` first, so the tests fail on behaviour.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test proxy.test.ts`
 Expected: FAIL on `/delete-account` and the fingerprints
 
-- [ ] **Step 3: Add `/delete-account` to the public routes and both fingerprints to the asset links**, until the tests
+- [x] **Step 3: Add `/delete-account` to the public routes and both fingerprints to the asset links**, until the tests
   pass.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test proxy.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Rewrite the privacy page** as server-rendered headings and paragraphs following spec §3 bullet by
+- [x] **Step 5: Rewrite the privacy page** as server-rendered headings and paragraphs following spec §3 bullet by
   bullet, with the existing `Header` (`backTo="/"`, title `Privacy Policy`).
 
-- [ ] **Step 6: Write the deletion page** at `app/(platform)/delete-account/page.tsx`, laid out like the privacy page,
+- [x] **Step 6: Write the deletion page** at `app/(platform)/delete-account/page.tsx`, laid out like the privacy page,
   with the title `Delete your account`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add "app/(platform)/privacy/page.tsx" "app/(platform)/delete-account/page.tsx" proxy.ts proxy.test.ts public/.well-known/assetlinks.json
@@ -437,31 +439,31 @@ by hand.
   `packages/android/source/.gradle/`.
 - Given `app/build.gradle`, then the `twaManifest` block is byte-for-byte as before the task.
 
-- [ ] **Step 1: Check the build fails today**
+- [x] **Step 1: Check the build fails today**
 
 Run: `cd packages/android/source && ANDROID_HOME="$HOME/Library/Android/sdk" ./gradlew bundleRelease`
 Expected: FAIL (Gradle 6.5 can't run on JDK 21)
 
-- [ ] **Step 2: Point the wrapper at Gradle 8.13** by editing `distributionUrl` in `gradle-wrapper.properties` (the old
+- [x] **Step 2: Point the wrapper at Gradle 8.13** by editing `distributionUrl` in `gradle-wrapper.properties` (the old
   Gradle can't run the `wrapper` task on JDK 21), then refresh the wrapper's jar and scripts:
 
 Run: `cd packages/android/source && ANDROID_HOME="$HOME/Library/Android/sdk" ./gradlew wrapper --gradle-version 8.13`
 Expected: BUILD SUCCESSFUL
 
-- [ ] **Step 3: Upgrade the build files and manifest** to the Interfaces and Spec lines above, and add `build/` and
+- [x] **Step 3: Upgrade the build files and manifest** to the Interfaces and Spec lines above, and add `build/` and
   `.gradle/` to `packages/android/.gitignore`.
 
-- [ ] **Step 4: Build the bundle**
+- [x] **Step 4: Build the bundle**
 
 Run: `cd packages/android/source && ANDROID_HOME="$HOME/Library/Android/sdk" ./gradlew bundleRelease`
 Expected: BUILD SUCCESSFUL, with `app/build/outputs/bundle/release/app-release.aab` written
 
-- [ ] **Step 5: Check the merged manifest and the working tree** against the Acceptance cases
+- [x] **Step 5: Check the merged manifest and the working tree** against the Acceptance cases
 
 Run: `grep -rl 'targetSdkVersion="36"' packages/android/source/app/build/intermediates --include=AndroidManifest.xml`
 Expected: at least one release manifest listed; the same files contain `versionCode="10"` and no `AD_ID`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/android/source/gradle/wrapper/gradle-wrapper.properties packages/android/source/gradle/wrapper/gradle-wrapper.jar packages/android/source/gradlew packages/android/source/gradlew.bat packages/android/source/build.gradle packages/android/source/app/build.gradle packages/android/source/app/src/main/AndroidManifest.xml packages/android/.gitignore
