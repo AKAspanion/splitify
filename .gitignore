@@ -45,3 +45,6 @@ public/sw.js
 mysql-db
 # prisma client, written by prisma generate
 /generated/prisma
+
+# firebase config for the iOS app, downloaded from the Firebase console; see GoogleService-Info.sample.plist
+packages/ios/src/Splitify/GoogleService-Info.plist
