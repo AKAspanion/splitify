@@ -6,7 +6,7 @@ import Link from "next/link";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { ListItem } from "@/components/list-item";
 import { urlEncode } from "@/utils/func";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const GroupMembers = async ({
   id,
@@ -17,7 +17,7 @@ const GroupMembers = async ({
   backTo: string;
   showAll?: boolean;
 }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
   const take = showAll ? undefined : 4;
   const users = await db.user.findMany({
     take,

@@ -1,4 +1,4 @@
-import { auth, clerkClient } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
@@ -10,13 +10,13 @@ const rpID = process.env.AUTHN_RP_ID || "localhost";
 
 export async function GET(_req: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await clerkClient.users.getUser(userId);
+    const user = await (await clerkClient()).users.getUser(userId);
 
     const devices = await DevicesService.getDevice(userId);
 
@@ -64,7 +64,7 @@ export async function GET(_req: Request) {
      * after you verify an authenticator response.
      */
     const session = await getIronSession<{ currentChallenge?: string }>(
-      cookies(),
+      await cookies(),
       {
         password: "supersecretamazingpassword123456",
         cookieName: "challenge",

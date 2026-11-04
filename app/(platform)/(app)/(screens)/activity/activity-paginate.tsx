@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import useActivities from "@/hooks/use-activities";
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
-import { auth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import React, { useCallback, useEffect } from "react";
 import { useInView } from "react-intersection-observer";

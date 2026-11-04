@@ -3,8 +3,10 @@ import { Header } from "@/components/container/header";
 
 import Form from "./form";
 import { urlEncode } from "@/utils/func";
+import { resolvePageProps } from "@/utils/page";
 
-const FriendsAddContactPage = ({ searchParams }: ServerSideComponentProp) => {
+const FriendsAddContactPage = async (pageProps: ServerSidePageProp) => {
+  const { searchParams } = await resolvePageProps(pageProps);
   const backTo = searchParams["back"];
   const groupId = searchParams["groupId"];
   const mail = searchParams["email"];

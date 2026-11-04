@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
+import { resolvePageProps } from "@/utils/page";
 
 const ExpenseDetails = dynamic(() => import("./expense-details"), {
   loading: () => (
@@ -17,7 +18,8 @@ const ExpenseDetails = dynamic(() => import("./expense-details"), {
   ),
 });
 
-const ExpenseDetailsPage = async (props: ServerSideComponentProp) => {
+const ExpenseDetailsPage = async (pageProps: ServerSidePageProp) => {
+  const props = await resolvePageProps(pageProps);
   const keyString = `balance=${props?.searchParams?.["balance"]}`;
   return (
     <Suspense key={keyString}>

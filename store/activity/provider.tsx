@@ -15,7 +15,7 @@ export interface ActivityStoreProviderProps {
 export const ActivityStoreProvider = ({
   children,
 }: ActivityStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<ActivityStore>>();
+  const storeRef = useRef<StoreApi<ActivityStore>>(undefined);
   if (!storeRef.current) {
     storeRef.current = createActivityStore();
   }

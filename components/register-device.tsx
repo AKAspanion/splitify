@@ -1,5 +1,5 @@
 "use client";
-import { auth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 import axios from "axios";

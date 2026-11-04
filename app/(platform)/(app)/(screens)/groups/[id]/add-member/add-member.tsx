@@ -1,7 +1,7 @@
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import { AutoContainer } from "@/components/container/auto-container";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { CheckIcon, UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { Action } from "./action";
@@ -12,7 +12,7 @@ import { urlEncode } from "@/utils/func";
 const AddMember = async ({ params, searchParams }: ServerSideComponentProp) => {
   const id = params["id"] || "null";
   const backTo = searchParams["back"];
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const [user, group] = await db.$transaction([
     db.user.findUnique({

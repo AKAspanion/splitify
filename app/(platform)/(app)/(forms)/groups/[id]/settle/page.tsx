@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInputLoading } from "@/components/form/form-input-loading";
+import { resolvePageProps } from "@/utils/page";
 
 const SettleExpense = dynamic(() => import("./settle-expense"), {
   loading: () => (
@@ -30,7 +31,8 @@ const SettleExpense = dynamic(() => import("./settle-expense"), {
   ),
 });
 
-const ExpenseFormPage = async (props: ServerSideComponentProp) => {
+const ExpenseFormPage = async (pageProps: ServerSidePageProp) => {
+  const props = await resolvePageProps(pageProps);
   return <SettleExpense {...props} />;
 };
 

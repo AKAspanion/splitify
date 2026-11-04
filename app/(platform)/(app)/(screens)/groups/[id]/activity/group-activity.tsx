@@ -3,10 +3,10 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const GroupSettingsPage = async ({ params }: ServerSideComponentProp) => {
-  const { userId } = auth();
+  const { userId } = await auth();
   const groupId = params["id"] || "";
 
   const backTo = `/groups/${groupId || ""}`;

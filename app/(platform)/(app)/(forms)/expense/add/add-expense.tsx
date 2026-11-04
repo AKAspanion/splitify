@@ -1,5 +1,5 @@
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
 import { Suspense } from "react";
@@ -11,7 +11,7 @@ const Form = dynamic(() => import("./(form)/form"), {
 });
 
 const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const groups = await db.group.findMany({
     where: { users: { some: { id: userId || "null" } } },

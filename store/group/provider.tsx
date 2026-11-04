@@ -14,7 +14,7 @@ export interface GroupStoreProviderProps {
 }
 
 export const GroupStoreProvider = ({ children }: GroupStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<GroupStore>>();
+  const storeRef = useRef<StoreApi<GroupStore>>(undefined);
   if (!storeRef.current) {
     storeRef.current = createGroupStore({});
   }

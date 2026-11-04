@@ -1,5 +1,5 @@
 import DevicesService from "@/lib/auth/service/devices";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import {
   GenerateAuthenticationOptionsOpts,
   generateAuthenticationOptions,
@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 const rpID = process.env.AUTHN_RP_ID;
 export async function GET(_req: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -38,7 +38,7 @@ export async function GET(_req: Request) {
     const data = await generateAuthenticationOptions(opts);
 
     const session = await getIronSession<{ currentChallenge?: string }>(
-      cookies(),
+      await cookies(),
       {
         password: "supersecretamazingpassword123456",
         cookieName: "challenge",

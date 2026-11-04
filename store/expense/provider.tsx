@@ -16,7 +16,7 @@ export interface ExpenseStoreProviderProps {
 export const ExpenseStoreProvider = ({
   children,
 }: ExpenseStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<ExpenseStore>>();
+  const storeRef = useRef<StoreApi<ExpenseStore>>(undefined);
   if (!storeRef.current) {
     storeRef.current = createExpenseStore();
   }

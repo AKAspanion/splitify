@@ -1,7 +1,7 @@
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
@@ -21,7 +21,7 @@ const FriendsPaginate = dynamic(() => import("./friends-paginate"), {
 
 const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
   const pageNo = searchParams["page"] || "1";
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
 

@@ -1,5 +1,5 @@
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
@@ -26,8 +26,11 @@ const ExpenseUsers = dynamic(() => import("./expense-users"), {
   loading: () => <UserAvatarsLoading lg />,
 });
 
-const ExpenseDetails = ({ params, searchParams }: ServerSideComponentProp) => {
-  const { userId } = auth();
+const ExpenseDetails = async ({
+  params,
+  searchParams,
+}: ServerSideComponentProp) => {
+  const { userId } = await auth();
   const groupId = params["id"] || "null";
   const expenseId = params["expenseId"] || "null";
 

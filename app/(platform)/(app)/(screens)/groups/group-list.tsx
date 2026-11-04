@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { Header } from "@/components/container/header";
 import { urlEncode } from "@/utils/func";
 import { Search } from "@/app/(platform)/(app)/_components/search";
@@ -24,7 +24,7 @@ const GroupList = async ({ searchParams }: ServerSideComponentProp) => {
   const search = searchParams["search"] === "yes";
   const searchText = searchParams["text"];
 
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const query = {
     take: show ? undefined : 6,

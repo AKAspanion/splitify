@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Fingerprint } from "lucide-react";
 
 const AuthnDevices = async () => {
-  const { userId } = auth();
+  const { userId } = await auth();
   const devicesCount = await db.authnDevice.count({
     where: { userId: userId || "null" },
   });

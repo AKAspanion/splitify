@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
 import { Header } from "@/components/container/header";
@@ -42,7 +42,7 @@ const GroupSettings = async ({
 
   const showAll = searchParams["show"] === "all";
 
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const group = await db.group.findUnique({
     where: { id, users: { some: { id: userId || "null" } } },

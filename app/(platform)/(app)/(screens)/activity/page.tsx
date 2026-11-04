@@ -2,12 +2,14 @@ import dynamic from "next/dynamic";
 import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { ActivityCardLoading } from "@/app/(platform)/(app)/_components/activity-card";
 import { Suspense } from "react";
+import { resolvePageProps } from "@/utils/page";
 
 const ActivityList = dynamic(() => import("./activity-list"), {
   loading: () => <ScreenSkeleton oneCol card={<ActivityCardLoading />} />,
 });
 
-const ActivityPage = async (props: ServerSideComponentProp) => {
+const ActivityPage = async (pageProps: ServerSidePageProp) => {
+  const props = await resolvePageProps(pageProps);
   const keyString = `page=${props.searchParams?.["page"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
   return (
     <Suspense

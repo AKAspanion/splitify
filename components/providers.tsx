@@ -22,7 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: resolvedTheme === "dark" ? dark : undefined,
+        theme: resolvedTheme === "dark" ? dark : undefined,
       }}
     >
       <Suspense>

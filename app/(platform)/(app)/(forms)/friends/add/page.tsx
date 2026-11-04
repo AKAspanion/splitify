@@ -1,8 +1,10 @@
 import { AutoContainer } from "@/components/container/auto-container";
 
 import Search from "./search";
+import { resolvePageProps } from "@/utils/page";
 
-const FriendsAddPage = ({ searchParams }: ServerSideComponentProp) => {
+const FriendsAddPage = async (pageProps: ServerSidePageProp) => {
+  const { searchParams } = await resolvePageProps(pageProps);
   const backTo = searchParams["back"];
   const groupId = searchParams["groupId"];
   const mail = searchParams["email"];

@@ -3,10 +3,10 @@
 import { ACTIVITY_PAGE_COUNT } from "@/constants/numbers";
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export const getActivities = async (page = 1, queryText?: string) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return {

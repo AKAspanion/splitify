@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 const FriendsPaginate = async ({
@@ -10,7 +10,7 @@ const FriendsPaginate = async ({
   page: number;
   count: number;
 }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const totalCount = await db.user.count({
     where: { friends: { some: { id: userId || "null" } } },

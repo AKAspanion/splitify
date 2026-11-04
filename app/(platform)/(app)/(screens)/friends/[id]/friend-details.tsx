@@ -7,7 +7,7 @@ import { getYouKeyword } from "@/utils/validate";
 import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import VerifyDetails from "./verify-details";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { NoData } from "@/components/no-data";
 
 const SharedGroups = dynamic(() => import("./shared-groups"), {
@@ -27,7 +27,7 @@ const FriendDetails = async ({
   params,
   searchParams,
 }: ServerSideComponentProp) => {
-  const { userId } = auth();
+  const { userId } = await auth();
   const id = params["id"] || "null";
   const friend = await db.user.findUnique({ where: { id } });
 

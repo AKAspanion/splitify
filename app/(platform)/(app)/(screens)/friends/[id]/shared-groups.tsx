@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
 
 const SharedGroups = async ({ id }: { id: string }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
   const groups = await db.group.findMany({
     where: {
       AND: [
@@ -20,7 +20,9 @@ const SharedGroups = async ({ id }: { id: string }) => {
     <div>
       <div className="font-semibold text-normal pb-3">Shared groups</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {groups?.map((g) => <GroupCard group={g} key={g.id} compact />)}
+        {groups?.map((g) => (
+          <GroupCard group={g} key={g.id} compact />
+        ))}
       </div>
     </div>
   );

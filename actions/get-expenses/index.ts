@@ -3,14 +3,14 @@
 import { EXPENSE_PAGE_COUNT } from "@/constants/numbers";
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export const getExpenses = async (
   page = 1,
   groupId: string,
   queryText?: string,
 ) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return {

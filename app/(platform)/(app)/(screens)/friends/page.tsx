@@ -3,12 +3,14 @@ import dynamic from "next/dynamic";
 import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { Suspense } from "react";
 import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
+import { resolvePageProps } from "@/utils/page";
 
 const FriendsList = dynamic(() => import("./friends-list"), {
   loading: () => <ScreenSkeleton card={<UserCardLoading />} />,
 });
 
-const FriendsPage = async (props: ServerSideComponentProp) => {
+const FriendsPage = async (pageProps: ServerSidePageProp) => {
+  const props = await resolvePageProps(pageProps);
   const keyString = `page=${props.searchParams?.["page"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
   return (
     <Suspense

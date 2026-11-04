@@ -6,7 +6,7 @@ import type {
 } from "@simplewebauthn/server";
 import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
 import type { AuthenticationResponseJSON } from "@simplewebauthn/types";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import DevicesService from "@/lib/auth/service/devices";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -16,7 +16,7 @@ const expectedOrigin =
   process.env.AUTHN_EXPECTED_ORIGIN || "https://splitify.spanion.in";
 export async function POST(req: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const body: AuthenticationResponseJSON = await req.json();
 
     const session = await getIronSession<{ currentChallenge?: string }>(
-      cookies(),
+      await cookies(),
       {
         password: "supersecretamazingpassword123456",
         cookieName: "challenge",

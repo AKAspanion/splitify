@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { BalancesList } from "./balances-list";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const Balances = async ({
   id,
@@ -9,7 +9,7 @@ const Balances = async ({
   id: string;
   onlyList?: boolean;
 }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const [expenses, group] = await db.$transaction([
     db.expense.findMany({

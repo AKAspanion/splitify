@@ -2,11 +2,11 @@
 
 import { db } from "@/lib/db";
 import { getErrorMessage } from "@/utils/validate";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export const getShare = async (expenseId: string, groupId: string) => {
   async function call() {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return {

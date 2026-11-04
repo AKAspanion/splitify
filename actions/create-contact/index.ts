@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { InputType, ReturnType } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
@@ -10,7 +10,7 @@ import { getErrorMessage } from "@/utils/validate";
 import { uid } from "uid";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return { error: "Unauthorized" };

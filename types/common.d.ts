@@ -12,6 +12,12 @@ type ServerSideComponentProp = {
   searchParams?: SearchParams;
 };
 
+/** What Next passes a page or layout: since Next 15, params and searchParams are promises. */
+type ServerSidePageProp = {
+  params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
+};
+
 type FormatedBalanceResult = {
   message: string;
   user1Id: string;
