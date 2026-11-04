@@ -40,6 +40,7 @@ the client. Versions are in `package.json`.
 - `/activity`: `app/(platform)/(app)/(screens)/activity/page.tsx`
 - `/activity/:id`: `app/(platform)/(app)/(screens)/activity/[id]/page.tsx`
 - `/dashboard`: `app/(platform)/(app)/(screens)/dashboard/page.tsx`
+- `/delete-account`: `app/(platform)/delete-account/page.tsx`
 - `/expense/:id/edit`: `app/(platform)/(app)/(forms)/expense/[id]/edit/page.tsx`
 - `/expense/add`: `app/(platform)/(app)/(forms)/expense/add/page.tsx`
 - `/feedback/add`: `app/(platform)/(app)/(forms)/feedback/add/page.tsx`
