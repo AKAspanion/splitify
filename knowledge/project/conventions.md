@@ -49,6 +49,7 @@ generated:
 
 - Unit tests are Vitest (`vitest.config.mts`), in a `*.test.ts` file beside the file they cover
   (`actions/create-expense/index.test.ts`), run by `yarn test`.
+- SQL Connect rule tests sit beside their `.gql` file under `dataconnect/` and run on the emulators with `yarn test:rules`, not in `yarn test` ([run locally](../operations/run-locally.md)).
 - Changes are to be tested end to end through the main flows: [decision](../decisions/e2e-main-flows.md).
 
 ## Lint and format
@@ -73,12 +74,14 @@ generated:
 
 ## History
 
+- 2026-11-04: added the SQL Connect rule tests and `yarn test:rules`, because the schema's rules are tested apart from `yarn test`.
 - 2026-11-04: said the repository had no tests; now Vitest unit tests sit beside the code and end-to-end tests of the main flows are decided, because tests were added and the testing question was answered. See [e2e of the main flows](../decisions/e2e-main-flows.md).
 - 2026-11-04: lint was `next lint` with `.eslintrc.json`; now `eslint .` with `eslint.config.mjs`, because Next 16 removed `next lint`. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
 
 - `vitest.config.mts`
+- `vitest.rules.config.mts`
 - `actions/create-expense/index.test.ts`
 - `utils/page.ts`
 - `types/common.d.ts`

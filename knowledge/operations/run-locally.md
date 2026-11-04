@@ -28,9 +28,22 @@ generated:
 6. `yarn studio` opens Prisma Studio on the database.
 7. `GET /api/health-check` answers `{ message: "Server is up" }` without a session.
 
+## Testing the SQL Connect rules
+
+- `yarn test:rules` (`scripts.test:rules`) starts the Auth and SQL Connect emulators on the demo project
+  `demo-splitify` and runs the rule tests with `vitest.rules.config.mts`; plain `yarn test` skips them. The
+  emulator's Postgres falls back to another port when its default is taken.
+- `yarn dataconnect:generate` writes the SDKs to `dataconnect/generated/` ([SQL Connect schema](../data/sql-connect.md)).
+
+## History
+
+- 2026-11-04: added the rule tests and SDK generation, because the SQL Connect schema and its rules were built.
+
 ## Sources
 
 - `package.json`
+- `vitest.rules.config.mts`
+- `dataconnect/test-utils/emulator.ts`
 - `docker-compose.yml`
 - `.env.sample`
 - `app/api/health-check/route.ts`

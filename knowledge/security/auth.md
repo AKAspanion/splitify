@@ -34,8 +34,17 @@ generated:
   the route files: [hard-coded session password](../findings/hardcoded-session-password.md).
 - The [biometric lock](../features/biometric-lock.md) is browser-side only: the server never asks whether it passed.
 
+## Firebase Auth (browser side, built; not yet what the app uses)
+
+[Firebase Auth](../decisions/firebase-auth.md) will replace Clerk, with Google and email and password
+(`lib/firebase/auth.ts`, client setup in `lib/firebase/app.ts`). `UpsertMe` (`dataconnect/app/me.gql`) writes a
+person's `User` row, taking id, email and name from the signed token, never from the request. The merge of a contact
+into a new account is gated on a verified email ([contact identity](../domain/contact-identity.md)). Planned for the
+running app in spec 2: today `proxy.ts` and Clerk still guard every route.
+
 ## History
 
+- 2026-11-04: described the Firebase Auth pieces now built, because they exist in the code although no screen uses them yet.
 - 2026-11-04: was `authMiddleware` in `middleware.ts`, with `/api/webhook/clerk` and `/api/health-check` also in `ignoredRoutes`; now `clerkMiddleware` in `proxy.ts`, with those two simply public, because Clerk 7 removed `authMiddleware` and Next 16 renamed middleware to proxy. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
@@ -47,3 +56,6 @@ generated:
 - `app/api/webauthn/verify-authentication/route.ts`
 - `components/biometric/biometric.tsx`
 - `.env.sample`
+- `lib/firebase/auth.ts`
+- `lib/firebase/app.ts`
+- `dataconnect/app/me.gql`

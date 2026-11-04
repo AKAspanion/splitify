@@ -28,10 +28,9 @@ Remove the page and the `app/(admin)` route group. The app has no admin role. Lo
 
 ## History
 
+- 2026-11-04: Sources named `app/(admin)/layout.tsx`, `app/(admin)/logs/page.tsx` and `app/(admin)/logs/logs-list.tsx`, the page this decision removed; now none, because those files are deleted.
 - 2026-11-04: logs were read from the `Log` table; now in Cloud Logging, because the table is dropped. See [Cloud Logging](cloud-logging.md).
 
 ## Sources
 
-- `app/(admin)/layout.tsx`
-- `app/(admin)/logs/page.tsx`
-- `app/(admin)/logs/logs-list.tsx`
+- `proxy.ts`

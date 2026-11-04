@@ -2,7 +2,7 @@
 
 <!-- GA-GENERATED:index -->
 
-- [Should people be able to sign out everywhere, or delete their account?](account-flows.md) - With Firebase Auth as the sign-in, neither "sign out of all devices" nor "delete my account" exists; each needs a decision before it can be built.
+- [Should people be able to sign out of all their devices?](account-flows.md) - With Firebase Auth as the sign-in, "sign out of all devices" doesn't exist; it needs a decision before it can be built. Deleting an account is answered by anonymise-deleted-accounts.
 - [Why is activity recorded in the notification routes?](activity-recording-location.md) - Activity rows are written by /api/push-notification routes the browser calls after each action, not by the actions. Is that intended?
 - [Is more than one currency planned?](currency.md) - Every currency field defaults to inr and amounts are always shown with the rupee symbol. Should groups or expenses have their own currency?
 - [Should editing an expense change more than its description?](expense-edit-scope.md) - updateExpense only changes the description; amounts, payers and splits can't be edited, only deleted and re-added.

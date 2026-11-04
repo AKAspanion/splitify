@@ -28,6 +28,16 @@ Shows, newest first, every `Activity` in a group the caller belongs to, or that 
   [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md). The types are `ActivityType` in the
   [data model](../data/model.md).
 
+## Under SQL Connect
+
+The feed returns each activity's type, actor, subject, title and amount, from which its text is built, through the operations in
+`dataconnect/app/activity.gql`; deleting an expense records `EXPENSE_MINUS` first, and that activity survives the
+delete ([schema and connectors](../data/sql-connect.md)). Planned for the running app in spec 2.
+
+## History
+
+- 2026-11-04: added the SQL Connect shape, because the activity operations were built.
+
 ## Sources
 
 - `app/(platform)/(app)/(screens)/activity/page.tsx`
@@ -38,3 +48,4 @@ Shows, newest first, every `Activity` in a group the caller belongs to, or that 
 - `actions/get-activities/index.ts`
 - `hooks/use-activities.ts`
 - `constants/numbers.ts`
+- `dataconnect/app/activity.gql`

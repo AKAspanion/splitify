@@ -19,7 +19,13 @@ generated:
   ([contact identity](../domain/contact-identity.md)).
 - `User.uid` is a separate `nanoid()` value; nothing in the app reads it.
 - `User.image_url` and `User.profile_image_url` come from Clerk; contacts get the placeholder
-  `/images/placeholder/avatar.jpeg`.
+  `public/images/placeholder/avatar.jpeg`.
+
+## Under SQL Connect
+
+A contact is a `User` with `signedUp: false` and an `spuser_` id; a signed-up person's id is their Firebase uid
+([schema](sql-connect.md)). `email` is indexed but not unique, so `CreateContact` itself refuses an email another row
+already has. Planned for the running app in spec 2.
 
 ## Rules
 
@@ -27,9 +33,15 @@ generated:
   (`app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx` and `verify-details.tsx`).
 - Friendship is symmetric: `createFriend` connects both users ([model](model.md)).
 
+## History
+
+- 2026-11-04: added the SQL Connect shape, because its schema was built.
+
 ## Sources
 
 - `prisma/schema.prisma`
+- `dataconnect/schema/schema.gql`
+- `dataconnect/app/people.gql`
 - `actions/create-contact/index.ts`
 - `actions/create-friend/index.ts`
 - `app/api/webhook/clerk/route.ts`
