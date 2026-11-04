@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    name: Lint, types, unit + rules tests, audits, functions build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      # --ignore-scripts: postinstall runs `prisma db push`, which CI must not do.
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npx prisma generate
+      - run: yarn dataconnect:generate
+      - run: yarn lint
+      - run: yarn tsc --noEmit
+      - run: yarn test
+      - name: SQL Connect rules tests
+        run: yarn test:rules
+      - name: Audit shipped dependencies
+        run: yarn audit --groups dependencies --level high
+      - name: Install Cloud Functions dependencies
+        run: yarn --cwd functions install --frozen-lockfile
+      - name: Build Cloud Functions
+        run: yarn --cwd functions build
+      - name: Audit Cloud Functions dependencies
+        run: yarn --cwd functions audit --groups dependencies --level high
