@@ -10,6 +10,8 @@
 
 **Spec:** [docs/specs/2026-11-04-sql-connect-foundation.md](../specs/2026-11-04-sql-connect-foundation.md)
 
+**Status:** complete
+
 ## Global Constraints
 
 - Project `splitify-416321`; SQL Connect service id `splitify`, location `asia-south1`; Cloud SQL instance `splitify-fdc`, database `fdcdb`; Cloud Functions region `asia-south1`.
@@ -146,21 +148,21 @@ Dependencies: `firebase` (root dependency); `firebase-admin` and `firebase-funct
 - Given Alice is signed in, when she calls `GetDevices` or `SaveDevices` on connector `admin`, then each is refused; through `seed` (admin), `SaveDevices` then `GetDevices` returns the same JSON.
 - Given the ruling: if the "every payer and splitter is a member" check can't be written as a `@check` in one mutation, the step-3 implementer records the ruling in the run's ledger, makes `CreateExpense` and `CreateSettlement` callable functions in `functions/src/expense-writes.ts` that check membership with the admin SDK and run `NO_ACCESS` mutations, and keeps every case above passing against the callables.
 
-- [ ] **Step 1: Write the harness and the failing tests** for each Acceptance case, in `dataconnect/app/expense-writes.test.ts` and `dataconnect/admin/devices.test.ts`, with the schema, connector files and operation names in place so the tests fail on behaviour
+- [x] **Step 1: Write the harness and the failing tests** for each Acceptance case, in `dataconnect/app/expense-writes.test.ts` and `dataconnect/admin/devices.test.ts`, with the schema, connector files and operation names in place so the tests fail on behaviour
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions, not on a missing module or an emulator that didn't start
 
-- [ ] **Step 3: Write the minimal operations and configuration** to the Interfaces, until they pass
+- [x] **Step 3: Write the minimal operations and configuration** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add firebase.json .firebaserc dataconnect/dataconnect.yaml dataconnect/schema/schema.gql dataconnect/app/connector.yaml dataconnect/app/expense-writes.gql dataconnect/app/expense-writes.test.ts dataconnect/admin/connector.yaml dataconnect/admin/devices.gql dataconnect/admin/devices.test.ts dataconnect/test-utils/emulator.ts vitest.rules.config.mts functions/package.json functions/tsconfig.json functions/src/index.ts functions/yarn.lock package.json yarn.lock tsconfig.json vitest.config.mts eslint.config.mjs .gitignore
@@ -229,21 +231,21 @@ git commit -m "Add the SQL Connect schema, the expense and settlement writes wit
 - Given Alice is not a member of G, when she runs `AddFriend` with Bob and `groupId: G`, then it fails with `"Not found"` and no friendship is written; without `groupId` it writes both rows and a `USER` activity with subject Bob.
 - Given nobody is signed in, when any of these operations runs, then it is refused.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/people.test.ts` and `dataconnect/app/groups.test.ts`, with the operations declared so the tests fail on behaviour
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/people.test.ts` and `dataconnect/app/groups.test.ts`, with the operations declared so the tests fail on behaviour
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `people.test.ts` and `groups.test.ts`
 
-- [ ] **Step 3: Write the minimal operations** to the Interfaces, until they pass
+- [x] **Step 3: Write the minimal operations** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add dataconnect/app/people.gql dataconnect/app/people.test.ts dataconnect/app/groups.gql dataconnect/app/groups.test.ts
@@ -298,21 +300,21 @@ git commit -m "Add the user, contact, friend, group and member operations, each 
 - Given Alice runs `UpsertMyFeedback("Love it")` twice with different descriptions, then one feedback row exists for Alice with the second description; a title of 101 characters fails.
 - Given nobody is signed in, when any of these operations runs, then it is refused.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/expenses.test.ts` and `dataconnect/app/activity.test.ts`, with the operations declared so the tests fail on behaviour
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/expenses.test.ts` and `dataconnect/app/activity.test.ts`, with the operations declared so the tests fail on behaviour
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `expenses.test.ts` and `activity.test.ts`
 
-- [ ] **Step 3: Write the minimal operations** to the Interfaces, until they pass
+- [x] **Step 3: Write the minimal operations** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add dataconnect/app/expenses.gql dataconnect/app/expenses.test.ts dataconnect/app/activity.gql dataconnect/app/activity.test.ts
@@ -398,21 +400,21 @@ New env keys, in `.env.sample` with dev defaults: `NEXT_PUBLIC_FIREBASE_API_KEY=
 - Given Alice is signed in, when she calls `FindContactByEmail` or `MergeContactIntoUser`, then each is refused.
 - Given `mergeContactOnSignUp`'s trigger options, then it filters on connector `app` and operation `UpsertMe` in region `asia-south1`, and it runs only `admin` operations.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/me.test.ts`, `functions/src/merge-contact.test.ts` and `lib/firebase/auth.test.ts`, with the operations and exports declared so the tests fail on behaviour
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `dataconnect/app/me.test.ts`, `functions/src/merge-contact.test.ts` and `lib/firebase/auth.test.ts`, with the operations and exports declared so the tests fail on behaviour
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `me.test.ts`, `merge-contact.test.ts` and `auth.test.ts`
 
-- [ ] **Step 3: Write the minimal code** to the Interfaces, until they pass
+- [x] **Step 3: Write the minimal code** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add dataconnect/app/me.gql dataconnect/app/me.test.ts dataconnect/admin/merge.gql functions/src/merge-contact.ts functions/src/merge-contact.test.ts functions/src/index.ts lib/firebase/app.ts lib/firebase/auth.ts lib/firebase/auth.test.ts .env.sample
