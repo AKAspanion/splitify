@@ -30,7 +30,11 @@ on Cloud Run, which is slow from cold. The developer chose the static build.
 - Pages load from Firebase's CDN as files, and the service worker can cache them for offline use.
 - Routes with an id in the path (`/groups/:id` and the like) are served by one prebuilt page per route that reads
   the id in the browser.
-- The Android and iOS wrappers open the new Firebase Hosting address.
+- `splitify.spanion.in` points at Firebase Hosting, as [keep the splitify.spanion.in domain](keep-splitify-spanion-domain.md) decides, so the Android and iOS wrappers, the asset links and the passkeys don't change.
+
+## History
+
+- 2026-11-04: was: the wrappers open a new Firebase Hosting address; now: splitify.spanion.in is served by Firebase Hosting, because the developer kept the domain. See [keep the domain](keep-splitify-spanion-domain.md).
 
 ## Sources
 
