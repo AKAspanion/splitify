@@ -89,6 +89,7 @@
   "resolutions": {
     "effect": "^3.22.4",
     "tmp": "0.2.7",
+    "@grpc/grpc-js": "^1.13.6",
     "exceljs/**/archiver-utils/**/minimatch": "3.1.5",
     "exceljs/**/zip-stream/**/minimatch": "3.1.5",
     "exceljs/**/readdir-glob/minimatch": "5.1.9"
