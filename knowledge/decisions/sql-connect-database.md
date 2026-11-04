@@ -1,7 +1,7 @@
 ---
 type: Decision
 title: Store data in Firebase SQL Connect, signed in through Clerk
-description: Prisma over MySQL is replaced by Firebase SQL Connect (Cloud SQL for PostgreSQL) in GCP project splitify-416321; Clerk stays the sign-in and is bridged to Firebase Auth, and the old MySQL data is migrated.
+description: Prisma over MySQL is replaced by Firebase SQL Connect (Cloud SQL for PostgreSQL) in GCP project splitify-416321, starting with an empty database; Clerk stays the sign-in and is bridged to Firebase Auth.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -30,8 +30,8 @@ The developer already has a GCP project for it, `splitify-416321`.
   Firebase `auth.uid` is the Clerk user id. People never see Firebase Auth.
 - The access rules in [group member permissions](group-member-permissions.md) are enforced by SQL Connect's
   `@auth` and `@check` rules on every query and mutation, not by app code.
-- The rows in the old MySQL database are copied into SQL Connect once, by a migration script, from a connection the
-  developer provides.
+- SQL Connect starts with an empty database. Nothing is migrated: the old MySQL database was deleted by its host for
+  inactivity.
 
 ## Consequences
 
@@ -43,6 +43,7 @@ The developer already has a GCP project for it, `splitify-416321`.
 
 ## History
 
+- 2026-11-04: the old MySQL rows were to be migrated; now SQL Connect starts empty, because the old database was deleted for inactivity.
 - 2026-11-04: the Clerk session was exchanged through Clerk's Firebase integration; now a Cloud Function of ours mints the custom token, because Clerk has deprecated that integration and new apps can't enable it.
 
 ## Sources
