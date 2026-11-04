@@ -103,7 +103,7 @@ payments and 50 splits per expense. Whether the splits add up to the amount stay
 existing zod schemas: a member who bypasses it can only write a wrong expense into a group whose expenses they may
 already edit.
 
-Connector `admin` (all `NO_ACCESS`): `MergeContactIntoUser`, `GetDevices`, `SaveDevices`.
+Connector `admin` (all `NO_ACCESS`): `FindContactByEmail`, `MergeContactIntoUser`, `GetDevices`, `SaveDevices`.
 
 ## Firebase Auth
 
@@ -136,7 +136,7 @@ Failures log the cause class to Cloud Logging, without the email, and the event 
 
 ## Testing
 
-- `yarn test:rules` runs `firebase emulators:exec --only auth,dataconnect,functions "vitest run dataconnect"`.
+- `yarn test:rules` runs `firebase emulators:exec --only auth,dataconnect,functions --project demo-splitify` around `vitest run --config vitest.rules.config.mts`, which covers `dataconnect/`, `functions/` and `lib/firebase/`.
 - Tests sign in real emulator users (Alice, Bob, Carol) with the web SDK and call the generated operations, so
   each rule is exercised as the browser would.
 - For every row of the access-rules table: a member succeeds, a non-member gets "Not found" or `null`, and the
