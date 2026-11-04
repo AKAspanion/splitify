@@ -13,5 +13,6 @@
 - [Delete the /logs admin page instead of adding an admin role](remove-admin-logs-page.md) - The /logs page, which showed every Log row to any signed-in user, is removed; the app keeps no admin role and logs are read from the database directly.
 - [Keep the iOS Firebase config out of git](untrack-ios-firebase-config.md) - packages/ios/src/Splitify/GoogleService-Info.plist is untracked and gitignored; a sample with placeholder values is committed beside it, and each developer drops in the real file from the Firebase console.
 - [Upgrade every dependency to its latest version at once](upgrade-all-dependencies.md) - All packages, including the framework majors (Next, React, Clerk, Prisma, Tailwind, ESLint), move to their latest release on one branch; a package not yet compatible with the rest stays on its newest compatible release.
+- [A person's share of an expense shows the same net amount everywhere](your-share-shows-net-amount.md) - The "You owe" line on an expense shows owed minus paid, the same net figure as "You get back" and the group's balances, not the whole split amount.
 
 <!-- GA-GENERATED:END -->
