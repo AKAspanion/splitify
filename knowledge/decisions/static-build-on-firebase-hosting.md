@@ -20,9 +20,9 @@ on Cloud Run, which is slow from cold. The developer chose the static build.
 ## Decision
 
 - The app is a static Next.js build (`output: "export"`) served from Firebase Hosting. There is no server
-  rendering, no server actions and no `proxy.ts`; pages render in the browser and check the Clerk session there.
+  rendering, no server actions and no `proxy.ts`; pages render in the browser and check the Firebase Auth user there.
 - What needs a server becomes a Cloud Function, served by a Hosting rewrite under `/api/` on the same domain: the
-  Clerk webhook, push notifications, the report downloads, UploadThing and the WebAuthn routes.
+  push notifications, the report downloads, UploadThing and the WebAuthn routes.
 - Hosting moves off Vercel, so Vercel Analytics and Speed Insights go with it.
 
 ## Consequences

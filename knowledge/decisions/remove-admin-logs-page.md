@@ -1,7 +1,7 @@
 ---
 type: Decision
 title: Delete the /logs admin page instead of adding an admin role
-description: The /logs page, which showed every Log row to any signed-in user, is removed; the app keeps no admin role and logs are read from the database directly.
+description: The /logs page, which showed every Log row to any signed-in user, is removed; the app keeps no admin role, and logs are read in Cloud Logging.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -18,13 +18,17 @@ ids in an env key, an admin role in Clerk metadata, or removing the page.
 
 ## Decision
 
-Remove the page and the `app/(admin)` route group. The app has no admin role. Logging itself is unchanged
-([logging](../operations/logging.md)); whoever needs the `Log` table reads it from the database.
+Remove the page and the `app/(admin)` route group. The app has no admin role. Logs are read in Cloud Logging
+([Cloud Logging](cloud-logging.md)).
 
 ## Consequences
 
 - No admin identity to manage or leak.
 - Adding an admin screen later means choosing how admins are identified first.
+
+## History
+
+- 2026-11-04: logs were read from the `Log` table; now in Cloud Logging, because the table is dropped. See [Cloud Logging](cloud-logging.md).
 
 ## Sources
 
