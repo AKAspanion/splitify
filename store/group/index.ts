@@ -2,7 +2,7 @@ import { getExpense } from "@/actions/get-expense";
 import { getGroup } from "@/actions/get-group";
 import { getGroupUsers } from "@/actions/get-group-users";
 import { ExpenseWithUser } from "@/types/shared";
-import { Group, User } from "@prisma/client";
+import { Group, User } from "@/generated/prisma/browser";
 import { createStore } from "zustand/vanilla";
 // import { persist, createJSONStorage } from "zustand/middleware";
 

@@ -39,7 +39,9 @@ const LogsList = async () => {
                   <TableCell className="font-medium">{log.type}</TableCell>
                   <TableCell>{log.utcTime}</TableCell>
                   <TableCell>{log.message}</TableCell>
-                  <TableCell>{(log?.body || "").toString("utf8")}</TableCell>
+                  <TableCell>
+                    {new TextDecoder().decode(log?.body ?? undefined)}
+                  </TableCell>
                   <TableCell>{String(log.createdAt)}</TableCell>
                 </TableRow>
               ))}

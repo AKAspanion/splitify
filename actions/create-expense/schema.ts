@@ -1,5 +1,5 @@
 import { fixedNum } from "@/utils/validate";
-import { ExpenseType } from "@prisma/client";
+import { ExpenseType } from "@/generated/prisma/browser";
 import { z } from "zod";
 
 const expenseType = z.enum([

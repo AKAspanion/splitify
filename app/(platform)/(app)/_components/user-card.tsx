@@ -1,7 +1,7 @@
 import { ListItem } from "@/components/list-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getYouKeyword } from "@/utils/validate";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 import { AlertOctagon } from "lucide-react";
 import Image from "next/image";
 

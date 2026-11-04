@@ -1,7 +1,7 @@
 import { RUPEE_SYMBOL } from "@/constants/ui";
 import { UserPaymentWithUser } from "@/types/shared";
 import { fixedNum } from "@/utils/validate";
-import { User, UserPayment, UserSplit } from "@prisma/client";
+import { User, UserPayment, UserSplit } from "@/generated/prisma/browser";
 
 export const whoPaidExpense = (
   payments?: Partial<UserPaymentWithUser>[],

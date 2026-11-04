@@ -1,4 +1,4 @@
-import { ExpenseType, User } from "@prisma/client";
+import { ExpenseType, User } from "@/generated/prisma/browser";
 
 export type SplitDrawerProps = {
   users?: User[];

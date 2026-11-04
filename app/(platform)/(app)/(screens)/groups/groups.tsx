@@ -6,7 +6,7 @@ import {
 } from "@/app/(platform)/(app)/_components/group-card";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
-import { Group } from "@prisma/client";
+import { Group } from "@/generated/prisma/browser";
 import React from "react";
 
 export default function Groups({

@@ -6,7 +6,7 @@ import {
 import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 import { useQuery } from "@tanstack/react-query";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
 

@@ -15,7 +15,7 @@ import {
   Expense as DBExpense,
   UserPayment,
   UserSplit,
-} from "@prisma/client";
+} from "@/generated/prisma/browser";
 
 const evaluateExpense = (
   service: SplitifyService,

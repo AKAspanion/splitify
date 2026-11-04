@@ -4,7 +4,7 @@ import Link from "next/link";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 import { formateDate, indiaDate } from "@/utils/date";
 import WhoPaid from "./who-paid";
 import YourShare from "./your-share";

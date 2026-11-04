@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { sendNotification } from "@/lib/onesignal";
-import { Group, User } from "@prisma/client";
+import { Group, User } from "@/generated/prisma/browser";
 import { db } from "@/lib/db";
 import { APILogger } from "@/lib/logger";
 

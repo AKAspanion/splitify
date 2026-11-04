@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 
 import { ActionState } from "@/lib/safe-actions";
 import { CreateContact } from "./schema";

@@ -11,7 +11,7 @@ import { PaymentDrawer } from "./payment-drawer";
 import { SplitDrawer } from "./split-drawer";
 import { useUser } from "@clerk/nextjs";
 import { FormErrors } from "@/components/form/form-errors";
-import { ExpenseType } from "@prisma/client";
+import { ExpenseType } from "@/generated/prisma/browser";
 import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";

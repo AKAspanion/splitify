@@ -1,4 +1,4 @@
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 
 const ContentType = "application/json";
 

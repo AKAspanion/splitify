@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 import Link from "next/link";
 
 const VerifyDetails = async ({ friend }: { friend: User | null }) => {

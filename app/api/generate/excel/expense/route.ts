@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { generateXLS } from "@/lib/excel";
 import { GroupWIthExpenseWithUserWithPaymentWithSplit } from "@/types/shared";
 import { auth } from "@clerk/nextjs/server";
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

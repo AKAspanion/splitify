@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { useAction } from "@/hooks/use-action";
 import { NotificationService } from "@/lib/notification/service";
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

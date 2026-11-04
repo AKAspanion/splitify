@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@/generated/prisma/browser";
 import { db } from "@/lib/db";
 import { BalanceList } from "./expense-balance-list";
 

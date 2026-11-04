@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 
 import { ActionState } from "@/lib/safe-actions";
 import { DeleteGroup } from "./schema";

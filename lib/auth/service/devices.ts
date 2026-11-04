@@ -32,7 +32,7 @@ const parseDevices = (obj: string): AuthenticatorDevice[] => {
 const getDevice = async (userId: string): Promise<AuthenticatorDevice[]> => {
   try {
     const deviceBlob = await db.authnDevice.findUnique({ where: { userId } });
-    const devices = parseDevices((deviceBlob?.data || "").toString("utf8"));
+    const devices = parseDevices(new TextDecoder().decode(deviceBlob?.data));
     return devices || [];
   } catch (error) {
     console.trace(error);
@@ -43,7 +43,7 @@ const getDevice = async (userId: string): Promise<AuthenticatorDevice[]> => {
 const pushDevice = async (userId: string, device: AuthenticatorDevice) => {
   try {
     const deviceBlob = await getAuthnDevice(userId);
-    let devices = parseDevices((deviceBlob?.data || "").toString("utf8"));
+    let devices = parseDevices(new TextDecoder().decode(deviceBlob?.data));
     if (devices && Array.isArray(devices)) {
       devices.push(device);
     } else {
@@ -54,12 +54,12 @@ const pushDevice = async (userId: string, device: AuthenticatorDevice) => {
     if (deviceBlob?.id) {
       await db.authnDevice.update({
         where: { id: deviceBlob.id },
-        data: { data: Buffer.from(stringifiedDevices, "utf8") },
+        data: { data: new TextEncoder().encode(stringifiedDevices) },
       });
     } else {
       await db.authnDevice.create({
         data: {
-          data: Buffer.from(stringifiedDevices, "utf8"),
+          data: new TextEncoder().encode(stringifiedDevices),
           user: { connect: { id: userId } },
         },
       });

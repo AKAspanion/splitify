@@ -1,4 +1,4 @@
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 import { createStore } from "zustand/vanilla";
 // import { persist, createJSONStorage } from "zustand/middleware";
 import { getExpenses } from "@/actions/get-expenses";

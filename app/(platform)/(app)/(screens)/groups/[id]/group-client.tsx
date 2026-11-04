@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { GET_METHOD_CALLBACK } from "@/utils/api";
-import { Group } from "@prisma/client";
+import { Group } from "@/generated/prisma/browser";
 
 const GroupClient = ({ id }: { id: string }) => {
   const { data: group, isLoading } = useQuery<Group>({

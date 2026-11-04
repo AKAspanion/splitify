@@ -1,5 +1,5 @@
 import { GET_METHOD_CALLBACK, getCall } from "@/utils/api";
-import { Expense } from "@prisma/client";
+import { Expense } from "@/generated/prisma/browser";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useMemo } from "react";
 

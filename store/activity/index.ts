@@ -1,4 +1,4 @@
-import { Activity } from "@prisma/client";
+import { Activity } from "@/generated/prisma/browser";
 import { createStore } from "zustand/vanilla";
 // import { persist, createJSONStorage } from "zustand/middleware";
 import { getActivities } from "@/actions/get-activities";

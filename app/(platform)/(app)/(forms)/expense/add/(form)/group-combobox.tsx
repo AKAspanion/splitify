@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Group } from "@prisma/client";
+import { Group } from "@/generated/prisma/browser";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { GroupWIthUsers } from "@/types/shared";
 import { useFormStatus } from "react-dom";

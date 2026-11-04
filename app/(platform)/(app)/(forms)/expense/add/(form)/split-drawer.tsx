@@ -8,7 +8,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExpenseType, User } from "@prisma/client";
+import { ExpenseType, User } from "@/generated/prisma/browser";
 import { ArrowLeftIcon } from "lucide-react";
 import { SplitDrawerProps } from "./split-drawer.types";
 import dynamic from "next/dynamic";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Group } from "@prisma/client";
+import { Group } from "@/generated/prisma/browser";
 
 import { ActionState } from "@/lib/safe-actions";
 import { CreateGroup } from "./schema";

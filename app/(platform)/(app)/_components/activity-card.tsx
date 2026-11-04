@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { relativeFormatDate } from "@/utils/date";
-import { Activity } from "@prisma/client";
+import { Activity } from "@/generated/prisma/browser";
 import {
   MessageSquareText,
   FileMinus2,
