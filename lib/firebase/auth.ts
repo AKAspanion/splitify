@@ -11,6 +11,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
+import { unregisterThisDevice } from "../push/register";
 import { getDataConnectClient, getFirebaseAuth } from "./app";
 
 /** Writes the person's own row from their token. Every sign-in function runs it once the Firebase user is set. */
@@ -53,8 +54,9 @@ export async function sendPasswordReset(email: string): Promise<void> {
   await sendPasswordResetEmail(getFirebaseAuth(), email.trim());
 }
 
-/** Signs out this browser only. */
+/** Signs out this browser only, after removing this device's push token while the sign-in still authorises it. */
 export async function signOut(): Promise<void> {
+  await unregisterThisDevice();
   await firebaseSignOut(getFirebaseAuth());
 }
 

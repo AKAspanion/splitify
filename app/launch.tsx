@@ -1,56 +1,37 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { onUserChanged } from "@/lib/firebase/auth";
+import { listenForIosToken, registerWebPush } from "@/lib/push/register";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import OneSignal, { type IInitObject } from "react-onesignal";
 
 export const Launch = () => {
-  const { user } = useUser();
+  const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const [, setInitialized] = useState(false);
   const isHome = pathname === "" || pathname === "/";
 
+  useEffect(() => onUserChanged((user) => setUid(user?.uid ?? null)), []);
+
+  // Someone signed in: take the iOS wrapper's token, and re-register this browser's when it already has permission.
+  // The permission prompt itself is never raised here.
   useEffect(() => {
-    const appId = process.env.NEXT_PUBLIC_ONE_SIGNAL_APP_ID;
-    const safari_web_id = process.env.NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID;
-    if (user?.id && appId) {
-      OneSignal.init({
-        appId,
-        safari_web_id,
-        // react-onesignal types every bell option as required; OneSignal defaults the rest.
-        notifyButton: {
-          enable: process.env.NODE_ENV === "development",
-        } as IInitObject["notifyButton"],
-        allowLocalhostAsSecureOrigin: true,
-      })
-        .then(() => {
-          console.log("Initialization done");
-          setInitialized(true);
-          return OneSignal.Slidedown.promptPush();
-          // do other stuff
-        })
-        .then(() => {
-          console.log("Setting up user");
-          OneSignal.login(user?.id);
-          if (user?.primaryEmailAddress?.emailAddress) {
-            OneSignal.User.addEmail(user?.primaryEmailAddress?.emailAddress);
-          }
-        })
-        .catch((e) => {
-          console.log("Error in onesignal init", e);
-        });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    if (!uid) return;
+    const stopListening = listenForIosToken();
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    )
+      void registerWebPush();
+    return stopListening;
+  }, [uid]);
 
   useEffect(() => {
-    if (user?.id && isHome) {
+    if (uid && isHome) {
       router.push("/groups");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [uid]);
 
   return null;
 };
