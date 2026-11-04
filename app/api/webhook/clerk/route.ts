@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { anonymiseUser } from "@/lib/account/anonymise";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -17,6 +18,15 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    if (payload?.type === "user.deleted") {
+      // A deleted event carries only the id, so it skips the email lookup below.
+      const deletedId = payload.data?.id;
+      if (deletedId) {
+        await db.$transaction((tx) => anonymiseUser(tx, deletedId));
+      }
+      return NextResponse.json({ message: "Event received" }, { status: 200 });
+    }
+
     let userIdFound = "";
     const data = payload.data as any;
     const email = data?.email_addresses?.[0];
