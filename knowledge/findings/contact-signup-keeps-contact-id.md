@@ -13,7 +13,7 @@ generated:
 
 For an email that already belongs to a contact, `POST /api/webhook/clerk` writes the Clerk user onto the contact's
 row and keeps its `spuser_` id (`id: userIdFound || data.id`). Every action and route then looks the caller up by
-`auth().userId`, which is Clerk's id, so nothing matches that row: the person's groups, friends and expenses as a
+`(await auth()).userId`, which is Clerk's id, so nothing matches that row: the person's groups, friends and expenses as a
 contact don't appear for them, and actions such as `createFriend` fail on `db.user.update({ where: { id: userId } })`.
 Clerk's id isn't stored anywhere on the row.
 
@@ -22,7 +22,7 @@ This follows from reading the code; it hasn't been reproduced.
 ## Evidence
 
 - `app/api/webhook/clerk/route.ts`: `userIdFound` from the email lookup wins over `data.id`.
-- `actions/create-friend/index.ts`, and the others, use `auth().userId` as `User.id`.
+- `actions/create-friend/index.ts`, and the others, use `(await auth()).userId` as `User.id`.
 
 ## Status
 

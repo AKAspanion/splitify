@@ -12,7 +12,7 @@ generated:
 
 ## Roles
 
-- **Signed out:** the landing page, `/privacy`, and the public routes in `middleware.ts` ([auth](auth.md)).
+- **Signed out:** the landing page, `/privacy`, and the public routes in `proxy.ts` ([auth](auth.md)).
 - **Signed in:** everything else. The schema has no role field, and group membership (`Group.users`) carries no role,
   so the group's creator is not recorded as its owner ([data model](../data/model.md)).
 - The `app/(admin)` route group, which holds `/logs`, has no check beyond the Clerk session.
@@ -37,7 +37,7 @@ Who *should* be able to do what is [an open question](../questions/group-permiss
 
 ## Sources
 
-- `middleware.ts`
+- `proxy.ts`
 - `prisma/schema.prisma`
 - `app/(admin)/layout.tsx`
 - `app/(admin)/logs/page.tsx`

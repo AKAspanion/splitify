@@ -12,7 +12,7 @@ generated:
 
 ## Fields
 
-- `User.id` is the primary key. For a Clerk sign-up it is Clerk's user id, so it equals `auth().userId`. For an
+- `User.id` is the primary key. For a Clerk sign-up it is Clerk's user id, so it equals `(await auth()).userId`. For an
   offline contact, `createContact` sets it to `spuser_` plus a random id (`actions/create-contact/index.ts`).
 - `User.fromClerk` is `true` for rows written by Clerk's webhook and `false` for contacts.
 - `User.email` is `@unique`: it is how a contact is matched when that person signs up

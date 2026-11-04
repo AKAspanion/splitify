@@ -28,6 +28,12 @@ generated:
 - Route handlers are `app/api/<area>/.../route.ts`. Global request/response types are ambient in `types/*.d.ts`
   (e.g. `types/api.d.ts`).
 - Imports use the `@/` alias for the repository root (`tsconfig.json`).
+- Prisma model types and enums come from `@/generated/prisma/browser`, everywhere; only `lib/db.ts` imports
+  `@/generated/prisma/client`. The `client` entrypoint is server-only, and files without `"use client"` (stores,
+  hooks, `_utils`) are still bundled into client components.
+- A `page.tsx` takes `ServerSidePageProp` (Next passes `params` and `searchParams` as promises) and resolves them
+  once with `resolvePageProps` from `utils/page.ts`; the components under it take the resolved
+  `ServerSideComponentProp` (`types/common.d.ts`).
 
 ## Error handling
 
@@ -45,7 +51,8 @@ There are no tests in this repository; see [how should changes be tested?](../qu
 
 ## Lint and format
 
-- ESLint, configured in `./.eslintrc.json` (Next's core-web-vitals rules), run by `next lint`.
+- ESLint, configured in `./eslint.config.mjs` (Next's core-web-vitals rules, with two React Compiler rules set to
+  warn: [finding](../findings/react-compiler-lint-warnings.md)), run by `eslint .` (Next 16 removed `next lint`).
 - Prettier, configured in `./.prettierrc`, ignoring what `./.prettierignore` lists.
 
 ## Git
@@ -62,9 +69,16 @@ There are no tests in this repository; see [how should changes be tested?](../qu
   `checks.commands.lint`, `checks.commands.format-check`. There are no test or e2e commands
   (`checks.commands.test`, `checks.commands.e2e`).
 
+## History
+
+- 2026-11-04: lint was `next lint` with `.eslintrc.json`; now `eslint .` with `eslint.config.mjs`, because Next 16 removed `next lint`. See [upgrade](../decisions/upgrade-all-dependencies.md).
+
 ## Sources
 
-- `./.eslintrc.json`
+- `utils/page.ts`
+- `types/common.d.ts`
+- `lib/db.ts`
+- `./eslint.config.mjs`
 - `./.prettierrc`
 - `./.prettierignore`
 - `tsconfig.json`

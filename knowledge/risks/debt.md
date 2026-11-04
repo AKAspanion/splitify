@@ -22,7 +22,7 @@ generated:
 - **Reads are written twice.** The `actions/get-*` functions and the `/api/app` routes run the same queries
   (e.g. `actions/get-expenses/index.ts` and `app/api/app/group/[id]/expense/route.ts`).
 - **Test code ships with the app:** `app/(platform)/(app)/test.tsx` (hard-coded user ids and a test notification) and
-  the `app/(platform)/(app)/webauthn/test/` page; `/api/test(.*)` is a public route in `middleware.ts` though no such
+  the `app/(platform)/(app)/webauthn/test/` page; `/api/test(.*)` is a public route in `proxy.ts` though no such
   route exists.
 - **The service worker is commented out** (`app/sw.ts`).
 - **Unused pieces:** the `/api/uploadthing` route and `components/uploadthing/`, `POST /api/push-notification/create-friend`,
@@ -35,7 +35,7 @@ generated:
 ## Sources
 
 - `package.json`
-- `middleware.ts`
+- `proxy.ts`
 - `hooks/use-action.ts`
 - `app/sw.ts`
 - `app/global-error.tsx`

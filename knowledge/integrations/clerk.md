@@ -12,7 +12,7 @@ generated:
 
 ## What it is used for
 
-- Sessions and route protection: `authMiddleware` in `middleware.ts`, `auth()` in every action and route, and
+- Sessions and route protection: `clerkMiddleware` in `proxy.ts`, `auth()` in every action and route, and
   `ClerkProvider` in `components/providers.tsx` (dark theme from `@clerk/themes` when the site is dark).
 - Sign-in and sign-up pages under `app/(platform)/(clerk)/`.
 - User records: Clerk calls `POST /api/webhook/clerk` on `user.created` and `user.updated`, which writes the `User`
@@ -30,9 +30,13 @@ dashboard; `scripts.ngrok` in `package.json` exposes a local server for it.
 - The webhook doesn't verify signatures: [Clerk webhook isn't verified](../findings/clerk-webhook-unverified.md).
 - A missed webhook leaves a signed-in person with no `User` row, and their writes fail.
 
+## History
+
+- 2026-11-04: route protection was `authMiddleware` in `middleware.ts`; now `clerkMiddleware` in `proxy.ts`, because Clerk 7 removed `authMiddleware`. See [upgrade](../decisions/upgrade-all-dependencies.md).
+
 ## Sources
 
-- `middleware.ts`
+- `proxy.ts`
 - `components/providers.tsx`
 - `app/api/webhook/clerk/route.ts`
 - `next.config.mjs`

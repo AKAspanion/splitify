@@ -11,7 +11,7 @@ generated:
 
 ## Finding
 
-The webhook route is public (`publicRoutes` and `ignoredRoutes` in `middleware.ts`) and reads the body as a
+The webhook route is public (a public route in `proxy.ts`) and reads the body as a
 `WebhookEvent` without checking Clerk's signature (the `svix-*` headers). Any request shaped like a `user.created` or
 `user.updated` event is written to `User`.
 
@@ -28,4 +28,4 @@ Open.
 ## Sources
 
 - `app/api/webhook/clerk/route.ts`
-- `middleware.ts`
+- `proxy.ts`

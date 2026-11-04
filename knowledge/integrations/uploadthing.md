@@ -13,18 +13,22 @@ generated:
 ## What it is used for
 
 `app/api/uploadthing/core.ts` defines one file route, `imageUploader`: images up to `4MB`, signed-in users only
-(its middleware throws `Unauthorized` without `auth().userId`). `app/api/uploadthing/route.ts` serves it, and
+(its middleware throws `Unauthorized` without `(await auth()).userId`). `app/api/uploadthing/route.ts` serves it, and
 `components/uploadthing/` holds the button, uploader and `useUploadThing` helpers. No page imports
 `components/uploadthing/` (group images are placeholders: see [groups](../features/groups.md)).
 
 ## Configuration
 
-`UPLOADTHING_SECRET` and `UPLOADTHING_APP_ID` ([environment](../operations/environment.md)). `/api/uploadthing` is a
-public route in `middleware.ts`; the file route checks the session itself.
+`UPLOADTHING_TOKEN` ([environment](../operations/environment.md)). `/api/uploadthing` is a
+public route in `proxy.ts`; the file route checks the session itself.
 
 ## Failure modes
 
 An upload by someone signed out fails in the file route's middleware with `UploadThingError("Unauthorized")`.
+
+## History
+
+- 2026-11-04: its keys were `UPLOADTHING_SECRET` and `UPLOADTHING_APP_ID`; now `UPLOADTHING_TOKEN`, because uploadthing 7 replaced them. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
 
@@ -33,4 +37,4 @@ An upload by someone signed out fails in the file route's middleware with `Uploa
 - `components/uploadthing/uploadthing.ts`
 - `components/uploadthing/button.tsx`
 - `components/uploadthing/uploader.tsx`
-- `middleware.ts`
+- `proxy.ts`

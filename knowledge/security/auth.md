@@ -15,10 +15,12 @@ generated:
 - Through Clerk's hosted components on `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx` and
   `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`. Clerk's keys and redirect URLs are the `CLERK_*` keys in
   `.env.sample` ([environment](../operations/environment.md)).
-- `middleware.ts` runs Clerk's `authMiddleware` on every page and API route. Its `publicRoutes` (reachable signed
-  out) are `/`, `/privacy`, `/api/webhook/clerk`, `/api/uploadthing`, `/api/test(.*)` and `/api/health-check(.*)`;
-  `/api/webhook/clerk` and `/api/health-check` are also in `ignoredRoutes`, so the middleware doesn't run on them.
-- Behind the middleware, every route handler and server action checks `auth().userId` itself and returns
+- `proxy.ts` (what Next 16 calls middleware) runs Clerk's `clerkMiddleware` on every page and API route. Its public
+  routes (`isPublicRoute`, reachable signed out) are `/`, `/privacy`, `/api/webhook/clerk`, `/api/uploadthing`,
+  `/api/test(.*)` and `/api/health-check(.*)`.
+- Signed out, a page redirects to sign-in (`auth.protect()`), and an API route answers `401` with
+  `{ message: "Unauthorized" }`. The `401` is kept on purpose: `auth.protect()` alone answers API calls `404`.
+- Behind the proxy, every route handler and server action checks `(await auth()).userId` itself and returns
   `Unauthorized` without one. That is the only check: there is no membership or ownership check (see
   [roles](roles.md)).
 - A person's Clerk user id is their `User.id` ([users](../data/user.md)).
@@ -30,9 +32,13 @@ generated:
   the route files: [hard-coded session password](../findings/hardcoded-session-password.md).
 - The [biometric lock](../features/biometric-lock.md) is browser-side only: the server never asks whether it passed.
 
+## History
+
+- 2026-11-04: was `authMiddleware` in `middleware.ts`, with `/api/webhook/clerk` and `/api/health-check` also in `ignoredRoutes`; now `clerkMiddleware` in `proxy.ts`, with those two simply public, because Clerk 7 removed `authMiddleware` and Next 16 renamed middleware to proxy. See [upgrade](../decisions/upgrade-all-dependencies.md).
+
 ## Sources
 
-- `middleware.ts`
+- `proxy.ts`
 - `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx`
 - `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`
 - `app/api/webauthn/generate-registration-options/route.ts`

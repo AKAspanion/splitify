@@ -1,7 +1,7 @@
 ---
 type: Application
 title: Splitify web app
-description: The Next.js 14 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
+description: The Next.js 16 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -28,7 +28,7 @@ the client. Versions are in `package.json`.
   their user id.
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
-- `middleware.ts`: Clerk's `authMiddleware`; see [auth](../security/auth.md).
+- `proxy.ts`: Clerk's `clerkMiddleware`; see [auth](../security/auth.md).
 - `app/manifest.webmanifest`: the PWA manifest.
 - The dev server's port is Next's default; `scripts.dev` in `package.json` passes none.
 
@@ -78,6 +78,10 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 [UploadThing](../integrations/uploadthing.md), [Vercel analytics](../integrations/vercel-analytics.md),
 [Google AdSense](../integrations/google-adsense.md), and MySQL ([run locally](../operations/run-locally.md)).
 
+## History
+
+- 2026-11-04: was Next.js 14 with Clerk's `authMiddleware` in `middleware.ts`; now Next.js 16 with `clerkMiddleware` in `proxy.ts`. See [upgrade](../decisions/upgrade-all-dependencies.md).
+
 ## Sources
 
 - `package.json`
@@ -89,4 +93,4 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 - `app/(platform)/layout.tsx`
 - `app/(platform)/(app)/layout.tsx`
 - `app/manifest.webmanifest`
-- `middleware.ts`
+- `proxy.ts`

@@ -28,4 +28,4 @@ Open.
 - `app/(admin)/layout.tsx`
 - `app/(admin)/logs/page.tsx`
 - `app/(admin)/logs/logs-list.tsx`
-- `middleware.ts`
+- `proxy.ts`

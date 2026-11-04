@@ -27,7 +27,7 @@ There is one deployable service, the Next.js app at the repository root (`next.c
   `app/(platform)/(app)/_utils/calculation.ts`. Nothing about balances is stored. See
   [split types](../domain/split-types.md) and [debt simplification](../domain/debt-simplification.md).
 - **Data** is Prisma over MySQL (`prisma/schema.prisma`, client in `lib/db.ts`). See [data model](../data/model.md).
-- **Auth** is Clerk, enforced by `middleware.ts`. See [auth](../security/auth.md).
+- **Auth** is Clerk, enforced by `proxy.ts`. See [auth](../security/auth.md).
 
 ## Jobs and queues
 
@@ -51,7 +51,7 @@ User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` 
 ## Sources
 
 - `next.config.mjs`
-- `middleware.ts`
+- `proxy.ts`
 - `lib/safe-actions.ts`
 - `hooks/use-action.ts`
 - `utils/api.ts`

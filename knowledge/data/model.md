@@ -45,9 +45,17 @@ generated:
   (`onDelete: Cascade` in the schema).
 - The datasource uses `relationMode = "prisma"`, so Prisma, not MySQL, enforces the relations, and each foreign key
   has an `@@index`.
+- The client is generated into `generated/prisma` (git ignores it; `postinstall` runs `prisma generate`) and
+  connects through the MariaDB driver adapter in `lib/db.ts`, which Prisma 7 requires for MySQL.
+- `Bytes` columns (`AuthnDevice.data`, `Log.body`) come back as `Uint8Array`, not `Buffer`. Both hold UTF-8 text,
+  written with `TextEncoder` and read with `TextDecoder`; `Uint8Array.toString()` would give the byte values instead.
 
 ## Sources
 
 - `prisma/schema.prisma`
+- `prisma.config.ts`
+- `lib/db.ts`
+- `lib/auth/service/devices.ts`
+- `lib/logger.ts`
 - `constants/ui.ts`
 - `actions/create-friend/index.ts`
