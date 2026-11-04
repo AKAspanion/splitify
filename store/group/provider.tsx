@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { type ReactNode, createContext, useState, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
 import { type GroupStore, createGroupStore } from "@/store/group";
@@ -14,13 +14,10 @@ export interface GroupStoreProviderProps {
 }
 
 export const GroupStoreProvider = ({ children }: GroupStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<GroupStore>>(undefined);
-  if (!storeRef.current) {
-    storeRef.current = createGroupStore({});
-  }
+  const [store] = useState(() => createGroupStore({}));
 
   return (
-    <GroupStoreContext.Provider value={storeRef.current}>
+    <GroupStoreContext.Provider value={store}>
       {children}
     </GroupStoreContext.Provider>
   );

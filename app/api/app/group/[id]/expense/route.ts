@@ -23,7 +23,7 @@ export async function GET(
     const queryText = searchParams.get("queryText") || "";
 
     const take = limit === 0 ? undefined : limit;
-    const skip = (page - 1) * limit ?? 0;
+    const skip = (page - 1) * limit;
 
     const [count, expenses] = await Promise.all([
       db.expense.count({

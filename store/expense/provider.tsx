@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { type ReactNode, createContext, useState, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
 import { type ExpenseStore, createExpenseStore } from "@/store/expense";
@@ -16,13 +16,10 @@ export interface ExpenseStoreProviderProps {
 export const ExpenseStoreProvider = ({
   children,
 }: ExpenseStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<ExpenseStore>>(undefined);
-  if (!storeRef.current) {
-    storeRef.current = createExpenseStore();
-  }
+  const [store] = useState(() => createExpenseStore());
 
   return (
-    <ExpenseStoreContext.Provider value={storeRef.current}>
+    <ExpenseStoreContext.Provider value={store}>
       {children}
     </ExpenseStoreContext.Provider>
   );

@@ -41,9 +41,7 @@ export async function POST(req: Request) {
           text += headers?.map(({ key }) => e[key] || "").join(",") + "\n";
         });
 
-        const textBuffer = Buffer.from(text);
-
-        return new NextResponse(textBuffer, {
+        return new NextResponse(text, {
           status: 200,
           headers: new Headers({
             "content-disposition": `attachment;filename=${group.title}.txt`,

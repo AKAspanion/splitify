@@ -10,6 +10,7 @@
 - [Writes don't check who may change what](missing-authorization-on-writes.md) - Any signed-in person can update or delete any group or expense, add anyone to any group, rename any user, and record expenses as someone else.
 - [Group reads don't check membership](missing-group-membership-checks-on-reads.md) - Several read routes and actions only check for a session, so any signed-in person can read any group's expenses, members, shares and reports by id.
 - [Push-notification routes are an open relay](push-notification-open-relay.md) - Any signed-in person can push any text to any user, and forge activity entries in any group under another person's name.
+- [React Compiler lint rules flag four components](react-compiler-lint-warnings.md) - eslint-plugin-react-hooks 7 flags a synchronous setState inside an effect in three components and an impure call during render in scroll-to; the rules are set to warn until the code is changed.
 - [WebAuthn counter isn't saved](webauthn-counter-not-saved.md) - After a successful check the authenticator's new signature counter is set on an in-memory copy and never written back, so cloned authenticators aren't detected.
 
 <!-- GA-GENERATED:END -->

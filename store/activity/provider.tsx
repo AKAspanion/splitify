@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { type ReactNode, createContext, useState, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
 import { type ActivityStore, createActivityStore } from "@/store/activity";
@@ -15,13 +15,10 @@ export interface ActivityStoreProviderProps {
 export const ActivityStoreProvider = ({
   children,
 }: ActivityStoreProviderProps) => {
-  const storeRef = useRef<StoreApi<ActivityStore>>(undefined);
-  if (!storeRef.current) {
-    storeRef.current = createActivityStore();
-  }
+  const [store] = useState(() => createActivityStore());
 
   return (
-    <ActivityStoreContext.Provider value={storeRef.current}>
+    <ActivityStoreContext.Provider value={store}>
       {children}
     </ActivityStoreContext.Provider>
   );
