@@ -24,8 +24,8 @@ Shows, newest first, every `Activity` in a group the caller belongs to, or that 
 
 ## Rules
 
-- Activity rows are written by the [push-notification API](../api/push-notification.md), not by the actions; see
-  [where activity is recorded](../questions/activity-recording-location.md). The types are `ActivityType` in the
+- Activity rows are written by the [push-notification API](../api/push-notification.md), not by the actions; the decision to move them into the actions is
+  [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md). The types are `ActivityType` in the
   [data model](../data/model.md).
 
 ## Sources

@@ -34,8 +34,8 @@ plus its activity, its members and settings.
 - Group images are placeholders the create form picks: `/images/placeholder/groups/<n>.png`
   (`app/(platform)/(app)/(forms)/groups/add/form.tsx`).
 - Any signed-in user can edit or delete any group, or add a member to it, by its id:
-  [missing authorization on writes](../findings/missing-authorization-on-writes.md). Who should be allowed is
-  [an open question](../questions/group-permissions.md).
+  [missing authorization on writes](../findings/missing-authorization-on-writes.md). The rule is any member of the
+  group ([group member permissions](../decisions/group-member-permissions.md)).
 - Deleting a group deletes its expenses and activity ([data model](../data/model.md)).
 - Each change notifies through the [push-notification API](../api/push-notification.md).
 
