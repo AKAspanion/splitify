@@ -19,6 +19,8 @@ const eslintConfig = [
       "public/sw.js",
       "packages/**",
       "generated/**",
+      "dataconnect/generated/**",
+      "functions/lib/**",
     ],
   },
 ];

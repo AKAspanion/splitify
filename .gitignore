@@ -48,3 +48,10 @@ mysql-db
 
 # firebase config for the iOS app, downloaded from the Firebase console; see GoogleService-Info.sample.plist
 packages/ios/src/Splitify/GoogleService-Info.plist
+
+# SQL Connect: generated SDKs, emulator logs and the functions build
+/dataconnect/generated
+/functions/lib
+/functions/node_modules
+*-debug.log
+.dataconnect

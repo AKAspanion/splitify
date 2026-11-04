@@ -1,0 +1,11 @@
+query GetMyProfile @auth(level: USER) {
+  user(key: { id_expr: "auth.uid" }) {
+    id
+    email
+    name
+    firstName
+    lastName
+    imageUrl
+    signedUp
+  }
+}

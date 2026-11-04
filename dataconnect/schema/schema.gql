@@ -1,0 +1,119 @@
+enum ExpenseType {
+  EQUAL
+  EXACT
+  PERCENT
+}
+
+enum ExpenseTag {
+  EXPENSE
+  SETTLEMENT
+}
+
+enum ActivityType {
+  SETTLEMENT_MINUS
+  SETTLEMENT_PLUS
+  EXPENSE_MINUS
+  EXPENSE_PLUS
+  EXPENSE_UPDATE
+  MEMBER_MINUS
+  MEMBER_PLUS
+  GROUP_MINUS
+  GROUP_PLUS
+  GROUP_UPDATE
+  SYSTEM
+  USER
+}
+
+# The signed-in person's own row has id = their Firebase uid. A row for someone who has not signed up yet has
+# signedUp: false and is a contact other people added by email.
+type User @table(key: "id") {
+  id: String!
+  email: String! @unique
+  name: String
+  firstName: String
+  lastName: String
+  imageUrl: String
+  signedUp: Boolean!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}
+
+type Group @table(key: "id") {
+  id: UUID!
+  title: String!
+  description: String
+  imageUrl: String
+  type: String
+  currency: String! @default(value: "inr")
+  mute: Boolean! @default(value: false)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}
+
+type GroupMember @table(key: ["group", "user"]) {
+  group: Group!
+  user: User!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Friendship @table(key: ["user", "friend"]) {
+  user: User!
+  friend: User!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Expense @table(key: "id") {
+  id: UUID!
+  amount: Float!
+  currency: String! @default(value: "inr")
+  description: String!
+  category: String
+  type: ExpenseType!
+  tag: ExpenseTag!
+  group: Group!
+  creator: User!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}
+
+type UserPayment @table(key: "id") {
+  id: UUID!
+  amount: Float!
+  user: User!
+  expense: Expense!
+}
+
+type UserSplit @table(key: "id") {
+  id: UUID!
+  amount: Float!
+  percent: Float
+  user: User!
+  expense: Expense!
+}
+
+type Activity @table(key: "id") {
+  id: UUID!
+  type: ActivityType!
+  actor: User!
+  group: Group
+  subject: User
+  expenseId: UUID
+  amount: Float
+  title: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Feedback @table(key: "user") {
+  user: User!
+  title: String!
+  description: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}
+
+type AuthnDevice @table(key: "user") {
+  user: User!
+  devices: Any!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}

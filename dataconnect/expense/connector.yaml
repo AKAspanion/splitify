@@ -1,0 +1,3 @@
+# No generated SDK: the generated web SDK cannot take the [UserPayment_Data!]! lists these writes need, so callers
+# use mutationRef(dc, "CreateExpense", variables) from firebase/data-connect.
+connectorId: "expense"

@@ -1,0 +1,11 @@
+specVersion: "v1"
+serviceId: "splitify"
+location: "asia-south1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "splitify-fdc"
+connectorDirs: ["./app", "./admin", "./expense"]
