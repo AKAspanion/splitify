@@ -64,7 +64,7 @@ mutation UpdateGroup(
   )
 }
 
-# Returns the member ids it read before deleting. The group's activity goes with it, since Activity.group is
+# Returns the group's title and the member ids it read before deleting. The group's activity goes with it, since Activity.group is
 # optional and deleting the group would only null it.
 mutation DeleteGroup($id: UUID!)
 @auth(
@@ -75,6 +75,9 @@ mutation DeleteGroup($id: UUID!)
     caller: groupMember(key: { groupId: $id, userId_expr: "auth.uid" })
       @check(expr: "this != null", message: "Not found") {
       userId
+    }
+    group(key: { id: $id }) {
+      title
     }
     memberIds: groupMembers(where: { groupId: { eq: $id } }) {
       userId

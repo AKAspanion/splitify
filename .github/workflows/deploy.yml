@@ -40,9 +40,17 @@ jobs:
         env:
           HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
           FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_VAPID_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_VAPID_KEY }}
         run: |
           missing=""
           [ -n "$FIREBASE_PROJECT_ID" ] || missing="$missing FIREBASE_PROJECT_ID"
+          for name in NEXT_PUBLIC_FIREBASE_API_KEY NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN NEXT_PUBLIC_FIREBASE_PROJECT_ID NEXT_PUBLIC_FIREBASE_APP_ID NEXT_PUBLIC_FIREBASE_VAPID_KEY; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
           [ "$HAS_SERVICE_ACCOUNT" = "true" ] || missing="$missing FIREBASE_SERVICE_ACCOUNT(secret)"
           if [ -n "$missing" ]; then
             echo "::error::Missing repository settings:$missing. See README > Deploy."
@@ -63,8 +71,11 @@ jobs:
       - name: Build public pages
         env:
           NEXT_PUBLIC_GOOGLE_ADSENSE_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ADSENSE_ID }}
-          NEXT_PUBLIC_ONE_SIGNAL_APP_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_APP_ID }}
-          NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_VAPID_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_VAPID_KEY }}
         run: yarn build:hosting
       - name: Deploy hosting
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0

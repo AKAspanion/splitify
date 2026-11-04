@@ -144,6 +144,7 @@ const TABLES_CHILD_FIRST = [
   "expense",
   "groupMember",
   "friendship",
+  "pushToken",
   "feedback",
   "authnDevice",
   "group",

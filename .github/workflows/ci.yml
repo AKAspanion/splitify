@@ -43,8 +43,11 @@ jobs:
         # The public pages export to out/ and are served by the Hosting emulator.
         env:
           NEXT_PUBLIC_GOOGLE_ADSENSE_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_ADSENSE_ID }}
-          NEXT_PUBLIC_ONE_SIGNAL_APP_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_APP_ID }}
-          NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID: ${{ vars.NEXT_PUBLIC_ONE_SIGNAL_SAFARI_WEB_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-key' }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'demo-splitify.firebaseapp.com' }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-splitify' }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID || '1:0:web:0' }}
+          NEXT_PUBLIC_FIREBASE_VAPID_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_VAPID_KEY || 'demo-vapid-key' }}
         run: |
           yarn build:hosting
           yarn check:hosting
