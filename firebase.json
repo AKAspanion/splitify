@@ -6,7 +6,9 @@
     {
       "source": "functions",
       "codebase": "default",
-      "runtime": "nodejs22"
+      "runtime": "nodejs24",
+      "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"],
+      "ignore": ["node_modules", ".git", "src", "firebase-debug.log", "*.local"]
     }
   ],
   "emulators": {

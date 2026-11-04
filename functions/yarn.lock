@@ -79,6 +79,13 @@
   dependencies:
     tslib "^2.1.0"
 
+"@google-cloud/billing@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/billing/-/billing-6.2.0.tgz#00b61d2b9f9593784f150cb31ef7bc7872cf5d0e"
+  integrity sha512-nD0zQj9WyVeNf4Di060HldGchzhxtmbmYeH5pzx8MtrnZY2lOtSSeCUUwInz9dJIP3aSbBO3EbYeSEAckH2S8Q==
+  dependencies:
+    google-gax "^6.0.0"
+
 "@google-cloud/firestore-api@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@google-cloud/firestore-api/-/firestore-api-0.2.0.tgz#bf6d8ff3ffdf7491152b1bef2a0ce27d8d6e9131"
@@ -892,7 +899,7 @@ google-gax@^5.0.0:
     retry-request "^8.0.2"
     rimraf "^5.0.1"
 
-google-gax@^6.0.1:
+google-gax@^6.0.0, google-gax@^6.0.1:
   version "6.16.0"
   resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-6.16.0.tgz#eb0c929cd9ee0cc0dacdabeb0827ab67a5ebf83c"
   integrity sha512-qJz0RSuLgaPhiZDStTv04Q5MryjBNX6DJk7t3RlcOTHkLm3R3XxRhSjcSp1eDtU415IuBlV/bncyD5vnBFje1w==
@@ -1641,6 +1648,11 @@ type-is@^2.1.0:
     content-type "^2.0.0"
     media-typer "^1.1.0"
     mime-types "^3.0.0"
+
+typescript@~6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-6.0.3.tgz#90251dc007916e972786cb94d74d15b185577d21"
+  integrity sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==
 
 undici-types@~8.9.0:
   version "8.9.0"
