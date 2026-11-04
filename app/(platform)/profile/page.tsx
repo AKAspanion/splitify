@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import DeleteAccountAction from "./delete-account-action";
 import NotificationAction from "./notification-action";
 
 const ProfilePage = () => {
@@ -85,6 +86,7 @@ const ProfilePage = () => {
                 </Button>
               </Link>
               <NotificationAction />
+              <DeleteAccountAction />
             </div>
           </div>
           <div className="w-full">
