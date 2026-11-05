@@ -7,6 +7,7 @@ import {
   type DataConnect,
 } from "firebase/data-connect";
 import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
+import { EMULATOR_HOST, EMULATOR_PORTS } from "@/lib/firebase/emulators";
 
 // The `expense` connector has no generated SDK (its lists don't fit the generated web SDK), so its mutations are
 // called by name through mutationRef. The config is dataconnect/expense/connector.yaml.
@@ -52,7 +53,11 @@ function expenseConnector(): DataConnect {
   getFirebaseAuth();
   const client = getDataConnect(getFirebaseApp(), expenseConfig);
   if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true")
-    connectDataConnectEmulator(client, "127.0.0.1", 9399);
+    connectDataConnectEmulator(
+      client,
+      EMULATOR_HOST,
+      EMULATOR_PORTS.dataconnect,
+    );
   expenseClient = client;
   return client;
 }

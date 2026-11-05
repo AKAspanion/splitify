@@ -18,7 +18,7 @@ export default defineConfig({
       ".claude/**",
       "dataconnect/**/*.test.ts",
       "functions/src/**/*.test.ts",
-      "lib/firebase/**/*.test.ts",
+      "lib/firebase/auth.test.ts",
       "lib/data/**/*.rules.test.ts",
     ],
   },

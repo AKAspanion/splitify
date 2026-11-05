@@ -7,12 +7,21 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const EMULATORS =
-  "http://127.0.0.1:9099 http://127.0.0.1:9399 http://127.0.0.1:5001";
 
 const config = JSON.parse(
   readFileSync(path.join(root, "firebase.json"), "utf8"),
 );
+// The Auth, SQL Connect and Functions emulators, as read from firebase.json's emulators block.
+const EMULATORS = ["auth", "dataconnect", "functions"]
+  .map((name) => {
+    const { host, port } = config.emulators?.[name] ?? {};
+    if (!host || !port)
+      throw new Error(
+        `firebase.json's emulators.${name} needs a host and port`,
+      );
+    return `http://${host}:${port}`;
+  })
+  .join(" ");
 let changed = 0;
 for (const block of config.hosting.headers) {
   for (const header of block.headers) {

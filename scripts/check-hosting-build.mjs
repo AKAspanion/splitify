@@ -6,7 +6,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PORT = 5050;
+const { host: HOST, port: PORT } = JSON.parse(
+  readFileSync(path.join(root, "firebase.json"), "utf8"),
+).emulators.hosting;
 
 // Every scripts/hosting-pages/*.json is `{ pages: string[], requests: { path, expectText }[] }`: the files
 // `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file.
@@ -34,7 +36,7 @@ function fail(message) {
 
 // Phase 2, run inside the emulator.
 const checkServed = async () => {
-  const base = `http://127.0.0.1:${PORT}`;
+  const base = `http://${HOST}:${PORT}`;
   const get = async (route) => {
     const res = await fetch(base + route);
     return { res, body: await res.text() };

@@ -12,21 +12,20 @@
     }
   ],
   "emulators": {
-    "auth": {
-      "port": 9099
-    },
+    "singleProjectMode": true,
+    "hub": { "host": "127.0.0.1", "port": 2141 },
+    "auth": { "host": "127.0.0.1", "port": 2142 },
     "dataconnect": {
-      "port": 9399
+      "host": "127.0.0.1",
+      "port": 2143,
+      "postgresPort": 2144
     },
-    "functions": {
-      "port": 5001
-    },
-    "ui": {
-      "enabled": false
-    },
-    "hosting": {
-      "port": 5050
-    }
+    "functions": { "host": "127.0.0.1", "port": 2145 },
+    "eventarc": { "host": "127.0.0.1", "port": 2146 },
+    "pubsub": { "host": "127.0.0.1", "port": 2147 },
+    "hosting": { "host": "127.0.0.1", "port": 2148 },
+    "ui": { "enabled": true, "host": "127.0.0.1", "port": 2149 },
+    "logging": { "host": "127.0.0.1", "port": 2150 }
   },
   "hosting": {
     "public": "out",

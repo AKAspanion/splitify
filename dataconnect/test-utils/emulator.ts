@@ -19,13 +19,17 @@ import {
   getApps as getAdminApps,
 } from "firebase-admin/app";
 import { getDataConnect as getAdminDataConnect } from "firebase-admin/data-connect";
+import { EMULATOR_HOST, EMULATOR_PORTS } from "../../lib/firebase/emulators";
 
 export type TestUser = { uid: string; email: string; dc: DataConnect };
 
 const PROJECT_ID = "demo-splitify";
-const AUTH_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST ?? "127.0.0.1:9099";
+const AUTH_HOST =
+  process.env.FIREBASE_AUTH_EMULATOR_HOST ??
+  `${EMULATOR_HOST}:${EMULATOR_PORTS.auth}`;
 const DATA_CONNECT_HOST =
-  process.env.DATA_CONNECT_EMULATOR_HOST ?? "127.0.0.1:9399";
+  process.env.DATA_CONNECT_EMULATOR_HOST ??
+  `${EMULATOR_HOST}:${EMULATOR_PORTS.dataconnect}`;
 const PASSWORD = "test-password-123";
 
 // The admin SDK reads this to talk to the emulator, with no token, so `seed` bypasses `@auth`.

@@ -6,6 +6,7 @@ import { OnlineOnly } from "@/components/offline/online-only";
 import { markSignOutIntended } from "@/lib/auth-redirect";
 import { toUserMessage } from "@/lib/data/errors";
 import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
+import { EMULATOR_HOST, EMULATOR_PORTS } from "@/lib/firebase/emulators";
 import { signOut as firebaseSignOut } from "firebase/auth";
 import {
   connectFunctionsEmulator,
@@ -18,7 +19,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const REGION = "asia-south1";
-const FUNCTIONS_EMULATOR = { host: "127.0.0.1", port: 5001 };
 
 let functionsClient: ReturnType<typeof getFunctions> | undefined;
 
@@ -28,8 +28,8 @@ function deleteMyAccount() {
     if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true")
       connectFunctionsEmulator(
         functionsClient,
-        FUNCTIONS_EMULATOR.host,
-        FUNCTIONS_EMULATOR.port,
+        EMULATOR_HOST,
+        EMULATOR_PORTS.functions,
       );
   }
   return httpsCallable<undefined, { ok: true }>(

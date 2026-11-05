@@ -8,7 +8,7 @@
       "codebase": "default",
       "runtime": "nodejs24",
       "predeploy": [
-        "yarn --cwd \"$RESOURCE_DIR\" build"
+        "pnpm --dir \"$RESOURCE_DIR\" build"
       ],
       "ignore": [
         "node_modules",
@@ -20,20 +20,44 @@
     }
   ],
   "emulators": {
+    "singleProjectMode": true,
+    "hub": {
+      "host": "127.0.0.1",
+      "port": 2141
+    },
     "auth": {
-      "port": 9099
+      "host": "127.0.0.1",
+      "port": 2142
     },
     "dataconnect": {
-      "port": 9399
+      "host": "127.0.0.1",
+      "port": 2143,
+      "postgresPort": 2144
     },
     "functions": {
-      "port": 5001
+      "host": "127.0.0.1",
+      "port": 2145
     },
-    "ui": {
-      "enabled": false
+    "eventarc": {
+      "host": "127.0.0.1",
+      "port": 2146
+    },
+    "pubsub": {
+      "host": "127.0.0.1",
+      "port": 2147
     },
     "hosting": {
-      "port": 5050
+      "host": "127.0.0.1",
+      "port": 2148
+    },
+    "ui": {
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 2149
+    },
+    "logging": {
+      "host": "127.0.0.1",
+      "port": 2150
     }
   },
   "hosting": {
@@ -134,7 +158,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' http://127.0.0.1:9099 http://127.0.0.1:9399 http://127.0.0.1:5001 https://asia-south1-splitify-416321.cloudfunctions.net https://*.googleapis.com https://*.firebaseio.com https://firebaseinstallations.googleapis.com https://fcmregistrations.googleapis.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; frame-src https://splitify-416321.firebaseapp.com https://accounts.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' http://127.0.0.1:2142 http://127.0.0.1:2143 http://127.0.0.1:2145 https://asia-south1-splitify-416321.cloudfunctions.net https://*.googleapis.com https://*.firebaseio.com https://firebaseinstallations.googleapis.com https://fcmregistrations.googleapis.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; frame-src https://splitify-416321.firebaseapp.com https://accounts.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
           }
         ]
       },
