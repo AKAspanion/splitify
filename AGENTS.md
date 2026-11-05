@@ -14,14 +14,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 _Generated from `knowledge/`. Do not edit by hand._
 
-_85 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+_86 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
 
 - [api/](knowledge/api/) — 5 concepts
 - [data/](knowledge/data/) — 4 concepts
 - [decisions/](knowledge/decisions/) — 21 concepts
 - [design-system/](knowledge/design-system/) — 2 concepts
 - [domain/](knowledge/domain/) — 4 concepts
-- [features/](knowledge/features/) — 11 concepts
+- [features/](knowledge/features/) — 12 concepts
 - [findings/](knowledge/findings/) — 10 concepts
 - [integrations/](knowledge/integrations/) — 5 concepts
 - [operations/](knowledge/operations/) — 5 concepts

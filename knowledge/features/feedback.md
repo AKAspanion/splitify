@@ -16,11 +16,15 @@ A form with a title and description, saved as a `Feedback` row against the calle
 
 ## Screens and routes
 
-- `app/(platform)/(app)/(forms)/feedback/add/page.tsx` with `form.tsx`, calling `createFeedback`.
+- `app/(platform)/(app)/(forms)/feedback/add/page.tsx` with `form.tsx`, calling `useSendFeedback` (`lib/data/feedback.ts`) over [SQL Connect](../data/sql-connect.md).
 
 ## Rules
 
 - `Feedback.userId` is unique, so a second submission from the same person fails with "Failed to create feedback".
+
+## History
+
+- 2026-11-05: called the `createFeedback` action; now `useSendFeedback`, because spec 2b moved the screen.
 
 ## Sources
 
@@ -28,3 +32,4 @@ A form with a title and description, saved as a `Feedback` row against the calle
 - `app/(platform)/(app)/(forms)/feedback/add/form.tsx`
 - `actions/create-feedback/index.ts`
 - `prisma/schema.prisma`
+- `lib/data/feedback.ts`

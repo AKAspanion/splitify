@@ -19,15 +19,22 @@ plus its activity, its members and settings.
 
 ## Screens and routes
 
-- List: `app/(platform)/(app)/(screens)/groups/page.tsx`, fed by `GET /api/app/group`.
-- Create: `app/(platform)/(app)/(forms)/groups/add/page.tsx`, calling `createGroup`.
-- One group: `app/(platform)/(app)/(screens)/groups/[id]/page.tsx`; expenses page through `GET /api/app/group/:id/expense`
-  (`hooks/use-expenses.ts`).
-- Edit: `app/(platform)/(app)/(forms)/groups/[id]/edit/page.tsx`, calling `updateGroup`.
-- Add a member: `app/(platform)/(app)/(screens)/groups/[id]/add-member/page.tsx`, calling `updateGroupMember`.
+- List: `app/(platform)/(app)/(screens)/groups/page.tsx`, fed by `useMyGroups`.
+- Create: `app/(platform)/(app)/(forms)/groups/add/page.tsx`, calling `useCreateGroup`.
+- One group: `app/(platform)/(app)/(screens)/groups/[id]/page.tsx`; expenses page through `useGroupExpenses`; balances
+  come from `useGroupLedger` ([balances](balances.md)).
+- Edit: `app/(platform)/(app)/(forms)/groups/[id]/edit/page.tsx`, calling `useUpdateGroup`.
+- Add a member: `app/(platform)/(app)/(screens)/groups/[id]/add-member/page.tsx`, calling `useAddGroupMember`.
 - Settings and delete: `app/(platform)/(app)/(screens)/groups/[id]/settings/page.tsx`; `group-delete.tsx` asks for confirmation,
-  then calls `deleteGroup`.
+  then calls `useDeleteGroup`.
 - Group activity: `app/(platform)/(app)/(screens)/groups/[id]/activity/page.tsx`.
+
+## Data
+
+On the hosted site every group screen reads and writes through `lib/data/groups.ts` over [SQL Connect](../data/sql-connect.md);
+none calls a server action. A group the caller can't read, or that is gone, shows "We couldn't find that" with a link to
+`/groups`. "Download report" is hidden until the reports move to a Cloud Function (spec 2c): [reports](reports.md).
+The dashboard was a stub and stays one.
 
 ## Rules
 
@@ -38,6 +45,10 @@ plus its activity, its members and settings.
   group ([group member permissions](../decisions/group-member-permissions.md)).
 - Deleting a group deletes its expenses and activity ([data model](../data/model.md)).
 - Each change notifies through the [push-notification API](../api/push-notification.md).
+
+## History
+
+- 2026-11-05: read through the API and server actions; now through `lib/data/groups.ts`, with Download report hidden, because spec 2b moved the screens onto SQL Connect.
 
 ## Sources
 
@@ -57,3 +68,4 @@ plus its activity, its members and settings.
 - `actions/update-group/index.ts`
 - `actions/delete-group/index.ts`
 - `actions/update-group-member/index.ts`
+- `lib/data/groups.ts`

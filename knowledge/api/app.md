@@ -29,7 +29,8 @@ generated:
   `constants/numbers.ts`) and `queryText`, and returns `{ count, expenses }`.
 - `GET /api/app/group/:id/users` lists a group's members.
 - `GET /api/app/group/:id/your-share/:expenseId` returns the caller's "you owe / you get back" line for one
-  expense, from `yourShareInExpense` in `app/(platform)/(app)/_utils/expense.ts`.
+  expense, from `yourShareInExpense` in `app/(platform)/(app)/_utils/expense.ts`. The hosted screens compute the same
+  line in the browser and no longer call this route.
 - `GET /api/app/expense/:id/who-paid` returns the "who paid" line for one expense, from `whoPaidExpense`.
 
 ## Rules
@@ -40,6 +41,10 @@ generated:
   [missing membership checks on reads](../findings/missing-group-membership-checks-on-reads.md).
 - The same reads also exist as server actions (`actions/get-*`), used by server components; see
   [debt](../risks/debt.md).
+
+## History
+
+- 2026-11-05: the your-share route was what the screen used; now the screens compute it in the browser, because spec 2b removed the API from them.
 
 ## Sources
 
