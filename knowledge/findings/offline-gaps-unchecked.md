@@ -2,10 +2,10 @@
 type: Finding
 title: Offline gaps that were left open or not checked
 description: A connection that is up but carries no data still shows a load error over saved data; the update toast, push through the merged worker and a clean test:rules run were not confirmed.
-status: draft
 generated:
   by: ga-plugin/after-finish
   at: 2026-11-05T00:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Offline gaps that were left open or not checked

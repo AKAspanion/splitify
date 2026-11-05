@@ -5,6 +5,7 @@ description: eslint-plugin-react-hooks 7 flags a synchronous setState inside an 
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T09:20:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # React Compiler lint rules flag four components

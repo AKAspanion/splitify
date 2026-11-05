@@ -5,6 +5,7 @@ description: The code lets any signed-in person change anything. What should the
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Who may change a group, an expense or a contact?

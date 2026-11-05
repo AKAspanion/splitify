@@ -2,10 +2,10 @@
 type: Feature
 title: Biometric lock
 description: A person can register a passkey device; the signed-in app then asks for it once per browser session before showing anything.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Biometric lock

@@ -2,10 +2,10 @@
 type: Runbook
 title: Environment
 description: Every environment variable the app reads, listed in .env.sample, and where each is read.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Environment

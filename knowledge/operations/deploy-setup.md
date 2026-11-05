@@ -2,10 +2,10 @@
 type: Runbook
 title: Deploy setup, done once
 description: The one-time Google Cloud and GitHub steps before the deploy workflow and the budget kill switch work, and what is still unconfirmed about the deploy account's roles.
-status: draft
 generated:
   by: claude-code/claude-sonnet-5-5
   at: 2026-11-04T18:30:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Deploy setup, done once

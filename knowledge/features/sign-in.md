@@ -2,10 +2,10 @@
 type: Feature
 title: Sign in, sign up and forgot password
 description: The three Firebase Auth screens on the hosted site, their plain-language errors, the safe redirect after sign-in, and a reset answer that never reveals who has an account.
-status: draft
 generated:
   by: agent:after-finish
   at: 2026-11-05T12:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Sign in, sign up and forgot password

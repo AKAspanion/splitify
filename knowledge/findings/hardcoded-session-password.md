@@ -5,6 +5,7 @@ description: The iron-session password that sealed the WebAuthn challenge cookie
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Fixed: the session password was hard-coded

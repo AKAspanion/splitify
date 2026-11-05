@@ -2,10 +2,10 @@
 type: Application
 title: Cloud Functions
 description: The Firebase Cloud Functions in functions/: the reports and webauthn HTTP functions, deleteMyAccount, the contact merge, the push senders and the budget kill switch.
-status: draft
 generated:
   by: claude-code/claude-sonnet-5-5
   at: 2026-11-04T18:30:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Cloud Functions

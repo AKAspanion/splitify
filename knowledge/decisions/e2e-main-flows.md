@@ -2,10 +2,10 @@
 type: Decision
 title: Changes are tested with end-to-end tests of the main flows
 description: The project's testing is end-to-end tests that walk the main flows as a person would; which runner, and which flows count as main, aren't settled yet.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:57:30Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Changes are tested with end-to-end tests of the main flows

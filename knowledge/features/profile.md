@@ -2,10 +2,10 @@
 type: Feature
 title: Profile
 description: The profile screen of the hosted site: who is signed in, notifications, the biometric lock, feedback, theme, sign out and a link to delete the account.
-status: draft
 generated:
   by: agent:after-finish
   at: 2026-11-05T13:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Profile

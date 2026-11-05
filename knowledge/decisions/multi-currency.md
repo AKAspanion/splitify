@@ -2,10 +2,10 @@
 type: Decision
 title: Currencies per group and per expense, converted at the group's creation-date rate
 description: A group has its own currency and each expense can have its own; an expense in another currency is converted at the exchange rate of the day the group was created, which never changes afterwards.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:53:47Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Currencies per group and per expense, converted at the group's creation-date rate

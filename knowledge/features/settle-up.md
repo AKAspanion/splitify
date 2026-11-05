@@ -2,10 +2,10 @@
 type: Feature
 title: Settle up
 description: Record that one member paid another back, from a balance line, as a settlement expense.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Settle up

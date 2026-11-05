@@ -2,10 +2,10 @@
 type: Data Model
 title: Users and contacts
 description: A User is either a signed-up person, whose id is their Firebase uid, or an offline contact added by someone, with an spuser_ id.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Users and contacts

@@ -2,10 +2,10 @@
 type: Feature
 title: Reports
 description: Download a group's expenses as an Excel workbook, a CSV or a text file from the group screen, for the group's members only.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Reports

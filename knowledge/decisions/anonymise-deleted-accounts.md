@@ -2,10 +2,10 @@
 type: Decision
 title: Deleting an account anonymises the person, keeping shared expenses
 description: When someone deletes their account, their user row stays so the groups they shared still add up, but everything that identifies them is removed; their expenses, payments and splits are kept.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:24:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Deleting an account anonymises the person, keeping shared expenses

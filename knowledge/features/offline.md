@@ -2,10 +2,10 @@
 type: Feature
 title: Offline use
 description: What a person sees and can do with no connection: saved groups and expenses, queued expenses and settlements, online-only actions disabled, and a banner saying so.
-status: draft
 generated:
   by: ga-plugin/after-finish
   at: 2026-11-05T00:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Offline use

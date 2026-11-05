@@ -2,10 +2,10 @@
 type: Decision
 title: Keep the iOS Firebase config out of git
 description: packages/ios/src/Splitify/GoogleService-Info.plist is untracked and gitignored; a sample with placeholder values is committed beside it, and each developer drops in the real file from the Firebase console.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T11:30:54Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Keep the iOS Firebase config out of git

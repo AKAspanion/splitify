@@ -2,10 +2,10 @@
 type: Decision
 title: Check pull requests and deploy hosting from GitHub Actions; deploy Cloud Functions by hand
 description: GitHub Actions checks every pull request and deploys the public pages on push to main; the Cloud Functions deploy by hand from a project owner's machine, because the CI service account can't grant the IAM roles a functions deploy needs.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T19:27:51Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Check pull requests and deploy hosting from GitHub Actions; deploy Cloud Functions by hand

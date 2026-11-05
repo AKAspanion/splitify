@@ -2,10 +2,10 @@
 type: Feature
 title: Expenses
 description: Record what someone paid in a group and how it is split, see each expense's breakdown, edit its description, or delete it.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Expenses

@@ -2,10 +2,10 @@
 type: Business Rule
 title: Split types
 description: An expense is split EQUAL, EXACT or PERCENT; paid and split amounts must each add up to the total, and balances are rebuilt from the stored rows.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Split types

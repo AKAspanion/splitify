@@ -2,10 +2,10 @@
 type: Conventions
 title: Conventions
 description: How code is written in Splitify: where files go, how they are named, how errors travel, and which tools check style.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Conventions

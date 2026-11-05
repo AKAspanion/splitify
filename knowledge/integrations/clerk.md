@@ -2,10 +2,10 @@
 type: Integration
 title: Clerk (removed)
 description: Clerk, the old sign-in provider, and its webhook are removed; Firebase Auth replaced them.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Clerk (removed)

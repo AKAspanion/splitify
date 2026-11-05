@@ -2,10 +2,10 @@
 type: Feature
 title: Groups
 description: Create a group, see its expenses, balances and totals, edit it, add members, and delete it.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Groups

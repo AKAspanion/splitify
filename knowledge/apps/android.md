@@ -2,10 +2,10 @@
 type: Application
 title: Android app
 description: A Trusted Web Activity, in.spanion.splitify.twa, that opens the deployed web app at /groups.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Android app

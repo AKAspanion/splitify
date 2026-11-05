@@ -2,10 +2,10 @@
 type: Decision
 title: Serve a static build from Firebase Hosting, with Cloud Functions for the server routes
 description: The Next.js app is built with output export and served from Firebase Hosting with no server rendering; the few routes that need a server run as Cloud Functions under /api on the same domain.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:05:46Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Serve a static build from Firebase Hosting, with Cloud Functions for the server routes

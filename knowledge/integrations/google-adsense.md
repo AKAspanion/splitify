@@ -2,10 +2,10 @@
 type: Integration
 title: Google AdSense
 description: The AdSense script is loaded on every page in production when a publisher id is set.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Google AdSense

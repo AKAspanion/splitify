@@ -2,10 +2,10 @@
 type: Technical Debt
 title: Technical debt
 description: Known weak spots in the code worth fixing, apart from the security findings.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Technical debt

@@ -2,10 +2,10 @@
 type: API Contract
 title: Push-notification API (removed)
 description: There is no push-notification route; Cloud Functions triggers send each change's push through FCM.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Push-notification API (removed)

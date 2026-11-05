@@ -2,10 +2,10 @@
 type: Decision
 title: Editing an expense changes only its description
 description: An expense's description is the only thing that can be edited; amounts, payers, splits and category are corrected by deleting the expense and adding it again.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:55:12Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Editing an expense changes only its description

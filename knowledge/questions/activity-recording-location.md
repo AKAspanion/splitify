@@ -22,11 +22,12 @@ why it was done this way.
 
 ## Status
 
-Answered: yes; each server action writes its activity entry in the same transaction as its change, and sends
-its pushes on the server. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
+Answered: yes; each mutation writes its activity entry in the same transaction as its change, and a Cloud Functions
+trigger sends its pushes. See [activity in mutations, pushes from triggers](../decisions/activity-in-mutations-pushes-from-triggers.md).
 
 ## History
 
+- 2026-11-05: the answer named the server actions' decision; now the mutations and the push trigger, because that decision was superseded.
 - 2026-11-05: the question named the push-notification routes and server actions, now removed; Sources now point at the mutation that writes the activity and the function that pushes, because spec 2c removed the server.
 
 ## Sources

@@ -2,10 +2,10 @@
 type: Feature
 title: Friends and contacts
 description: Find a signed-up person by email and add them as a friend, or add someone who hasn't signed up as an offline contact.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Friends and contacts

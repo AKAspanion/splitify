@@ -2,10 +2,10 @@
 type: Decision
 title: Send push notifications with Firebase Cloud Messaging
 description: Pushes move from OneSignal to Firebase Cloud Messaging; each browser and the iOS app register an FCM token on the signed-in person's account, and a Cloud Function triggered by each change sends the push built from its activity.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T19:00:12Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Send push notifications with Firebase Cloud Messaging

@@ -2,10 +2,10 @@
 type: Decision
 title: Turn billing off when spend reaches the monthly budget
 description: A Cloud Function, copied from the flash-cards project, unlinks the project's billing account once actual spend reaches the budget; the app and the Cloud SQL instance stop, and the data is kept if billing is turned back on within 30 days.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T17:23:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Turn billing off when spend reaches the monthly budget

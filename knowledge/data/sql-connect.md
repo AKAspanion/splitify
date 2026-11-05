@@ -2,11 +2,11 @@
 type: Data Model
 title: SQL Connect schema and connectors
 description: The tables, keys and three connectors of the SQL Connect database, and the rules every operation's access check follows.
-status: draft
 work_item: tmp-sql-connect-foundation
 generated:
   by: agent:after-finish
   at: 2026-11-04T17:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # SQL Connect schema and connectors

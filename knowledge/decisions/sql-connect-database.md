@@ -2,10 +2,10 @@
 type: Decision
 title: Store data in Firebase SQL Connect in asia-south1
 description: Prisma over MySQL is replaced by Firebase SQL Connect (Cloud SQL for PostgreSQL) in GCP project splitify-416321, region asia-south1, starting with an empty database; its access rules read Firebase Auth.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:05:46Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Store data in Firebase SQL Connect in asia-south1

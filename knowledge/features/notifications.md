@@ -2,10 +2,10 @@
 type: Feature
 title: Push notifications
 description: Members get a push through Firebase Cloud Messaging when an expense, settlement, group or membership changes; each device registers its token on the signed-in account, and the profile lets a person allow them.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Push notifications

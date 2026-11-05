@@ -2,10 +2,10 @@
 type: API Contract
 title: WebAuthn API
 description: The webauthn Cloud Function: six routes that register a person's passkey devices and check one, used by the biometric lock.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # WebAuthn API

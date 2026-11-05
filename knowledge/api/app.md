@@ -2,10 +2,10 @@
 type: API Contract
 title: App API (removed)
 description: The read-only /api/app route handlers are gone; the screens read through SQL Connect queries in lib/data/.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # App API (removed)

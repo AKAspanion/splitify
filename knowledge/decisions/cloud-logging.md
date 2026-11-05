@@ -2,10 +2,10 @@
 type: Decision
 title: Log to Cloud Logging instead of a Log table
 description: The Log table and APILogger's database logging are dropped; Cloud Functions write structured logs to Cloud Logging, which is where logs are read.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:30:02Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Log to Cloud Logging instead of a Log table

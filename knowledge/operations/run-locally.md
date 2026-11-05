@@ -2,10 +2,10 @@
 type: Runbook
 title: Run locally
 description: Install with yarn, fill in .env, run the Next.js dev server against the Firebase emulators, and check the static build on the Hosting emulator.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Run locally

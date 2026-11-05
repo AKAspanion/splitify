@@ -2,10 +2,10 @@
 type: Security
 title: Data protection
 description: What Splitify stores that is personal or sensitive, where it lives, and what protects it.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Data protection

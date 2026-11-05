@@ -2,10 +2,10 @@
 type: Component Inventory
 title: Components
 description: shadcn/ui primitives in components/ui, and the app's shared form, container and feedback components in components/.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Components
