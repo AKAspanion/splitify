@@ -30,13 +30,27 @@ const MESSAGES: Record<string, string> = {
   "auth/user-disabled": "This account is turned off.",
 };
 
-/** What a person sees for a failed sign-in, never Firebase's own message. */
-export function authErrorMessage(error: unknown): string {
+/** A Firebase error's code (`auth/...`), the cause class a log may carry; undefined for anything else. */
+export function authErrorCode(error: unknown): string | undefined {
   const code =
     typeof error === "object" && error !== null && "code" in error
       ? (error as { code: unknown }).code
       : undefined;
-  if (typeof code === "string" && Object.hasOwn(MESSAGES, code))
+  return typeof code === "string" ? code : undefined;
+}
+
+/** True when an email link's one-time code can't be used again: past its time, already used, or not a code. */
+export function isSpentActionCode(error: unknown): boolean {
+  const code = authErrorCode(error);
+  return (
+    code === "auth/expired-action-code" || code === "auth/invalid-action-code"
+  );
+}
+
+/** What a person sees for a failed sign-in, never Firebase's own message. */
+export function authErrorMessage(error: unknown): string {
+  const code = authErrorCode(error);
+  if (code !== undefined && Object.hasOwn(MESSAGES, code))
     return MESSAGES[code];
   return "Something went wrong. Try again.";
 }

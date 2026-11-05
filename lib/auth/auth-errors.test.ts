@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { authErrorMessage } from "./auth-errors";
+import {
+  authErrorCode,
+  authErrorMessage,
+  isSpentActionCode,
+} from "./auth-errors";
 
 const withCode = (code: string) => Object.assign(new Error("raw"), { code });
 
@@ -59,4 +63,37 @@ describe("authErrorMessage", () => {
       expect(authErrorMessage(error)).toBe("Something went wrong. Try again.");
     },
   );
+});
+
+describe("authErrorCode", () => {
+  it("gives a Firebase error's code", () => {
+    expect(authErrorCode(withCode("auth/network-request-failed"))).toBe(
+      "auth/network-request-failed",
+    );
+  });
+
+  it.each([new Error("boom"), { code: 42 }, "x", null, undefined])(
+    "gives nothing for %s",
+    (error) => {
+      expect(authErrorCode(error)).toBeUndefined();
+    },
+  );
+});
+
+describe("isSpentActionCode", () => {
+  it.each(["auth/expired-action-code", "auth/invalid-action-code"])(
+    "is true for %s",
+    (code) => {
+      expect(isSpentActionCode(withCode(code))).toBe(true);
+    },
+  );
+
+  it.each([
+    withCode("auth/network-request-failed"),
+    withCode("constructor"),
+    new Error("auth/expired-action-code"),
+    null,
+  ])("is false for %s", (error) => {
+    expect(isSpentActionCode(error)).toBe(false);
+  });
 });
