@@ -34,6 +34,10 @@ describe("authErrorMessage", () => {
       "Google sign-in isn't available here. Use email and password.",
     ],
     [
+      "auth/web-storage-unsupported",
+      "Google sign-in isn't available here. Use email and password.",
+    ],
+    [
       "auth/popup-closed-by-user",
       "Google sign-in was closed before it finished.",
     ],

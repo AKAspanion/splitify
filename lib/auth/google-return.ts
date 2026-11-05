@@ -1,4 +1,4 @@
-import { completeGoogleSignIn } from "@/lib/firebase/auth";
+import { clearGoogleRedirect, completeGoogleSignIn } from "@/lib/firebase/auth";
 import { authErrorMessage } from "./auth-errors";
 
 /** What a form does once the page loads: finish a Google redirect, if one is coming back. */
@@ -29,4 +29,19 @@ export async function finishGoogleReturn(): Promise<GoogleReturn> {
     );
     return { kind: "failed", message: authErrorMessage(error) };
   }
+}
+
+/**
+ * While the page is leaving for Google: when the browser restores it from its back/forward cache instead (the person
+ * pressed Back), clears the redirect marker and calls onRestore, so the form can be used at once. Returns the function
+ * that stops listening.
+ */
+export function whenRestoredAfterGoogle(onRestore: () => void): () => void {
+  const listener = (event: PageTransitionEvent) => {
+    if (!event.persisted) return;
+    clearGoogleRedirect();
+    onRestore();
+  };
+  window.addEventListener("pageshow", listener);
+  return () => window.removeEventListener("pageshow", listener);
 }

@@ -2,20 +2,32 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const MARKER = "splitify:google-redirect";
 
-const { auth, signInWithRedirect, signInWithPopup, getRedirectResult, upsertMe } =
-  vi.hoisted(() => ({
-    auth: { name: "the app's Auth" },
-    signInWithRedirect: vi.fn(),
-    signInWithPopup: vi.fn(),
-    getRedirectResult: vi.fn(),
-    upsertMe: vi.fn(),
-  }));
+const {
+  auth,
+  signInWithRedirect,
+  signInWithPopup,
+  getRedirectResult,
+  signOut,
+  upsertMe,
+  clearSavedCache,
+  unregisterThisDevice,
+} = vi.hoisted(() => ({
+  auth: { name: "the app's Auth" },
+  signInWithRedirect: vi.fn(),
+  signInWithPopup: vi.fn(),
+  getRedirectResult: vi.fn(),
+  signOut: vi.fn(),
+  upsertMe: vi.fn(),
+  clearSavedCache: vi.fn(),
+  unregisterThisDevice: vi.fn(),
+}));
 
 vi.mock("firebase/auth", async (importOriginal) => ({
   ...(await importOriginal<typeof import("firebase/auth")>()),
   signInWithRedirect,
   signInWithPopup,
   getRedirectResult,
+  signOut,
 }));
 vi.mock("@dataconnect/app", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@dataconnect/app")>()),
@@ -25,12 +37,13 @@ vi.mock("./app", () => ({
   getFirebaseAuth: () => auth,
   getDataConnectClient: () => "dc-handle",
 }));
-vi.mock("../offline/persist", () => ({ clearSavedCache: vi.fn() }));
-vi.mock("../push/register", () => ({ unregisterThisDevice: vi.fn() }));
+vi.mock("../offline/persist", () => ({ clearSavedCache }));
+vi.mock("../push/register", () => ({ unregisterThisDevice }));
 
 import { GoogleAuthProvider } from "firebase/auth";
 
 import {
+  clearGoogleRedirect,
   completeGoogleSignIn,
   googleRedirectPending,
   signInWithGoogle,
@@ -96,6 +109,16 @@ describe("signInWithGoogle", () => {
     expect(storage.getItem(MARKER)).toBeNull();
     expect(googleRedirectPending()).toBe(false);
   });
+
+  it("rejects with auth/web-storage-unsupported, without starting the redirect, where there is no sessionStorage", async () => {
+    vi.unstubAllGlobals();
+    expect(typeof sessionStorage).toBe("undefined");
+
+    await expect(signInWithGoogle()).rejects.toMatchObject({
+      code: "auth/web-storage-unsupported",
+    });
+    expect(signInWithRedirect).not.toHaveBeenCalled();
+  });
 });
 
 describe("completeGoogleSignIn", () => {
@@ -117,6 +140,7 @@ describe("completeGoogleSignIn", () => {
     expect(upsertMe).toHaveBeenCalledTimes(1);
     expect(upsertMe).toHaveBeenCalledWith("dc-handle");
     expect(storage.getItem(MARKER)).toBeNull();
+    expect(signOut).not.toHaveBeenCalled();
   });
 
   it("clears the marker and resolves false when the person came back without signing in", async () => {
@@ -140,15 +164,43 @@ describe("completeGoogleSignIn", () => {
     expect(storage.getItem(MARKER)).toBeNull();
   });
 
-  it("clears the marker and rethrows when UpsertMe fails", async () => {
+  it("signs the person out of Firebase Auth, clears the marker and rethrows when UpsertMe fails", async () => {
     storage.setItem(MARKER, "1");
     getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
     const error = new Error("UpsertMe failed");
     upsertMe.mockRejectedValue(error);
+    signOut.mockResolvedValue(undefined);
 
     await expect(completeGoogleSignIn()).rejects.toBe(error);
 
+    expect(signOut).toHaveBeenCalledTimes(1);
+    expect(signOut).toHaveBeenCalledWith(auth);
+    // Firebase Auth's own sign-out only: the app's signOut would also clear caches and push tokens.
+    expect(clearSavedCache).not.toHaveBeenCalled();
+    expect(unregisterThisDevice).not.toHaveBeenCalled();
     expect(storage.getItem(MARKER)).toBeNull();
+  });
+
+  it("still rethrows UpsertMe's error when signing out after it also fails", async () => {
+    storage.setItem(MARKER, "1");
+    getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
+    const error = new Error("UpsertMe failed");
+    upsertMe.mockRejectedValue(error);
+    signOut.mockRejectedValue(authError("auth/network-request-failed"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      await expect(completeGoogleSignIn()).rejects.toBe(error);
+
+      expect(signOut).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith(
+        "Google sign-in: signing out after UpsertMe failed did not finish",
+        "Error",
+      );
+      expect(storage.getItem(MARKER)).toBeNull();
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it("runs UpsertMe once when it is called again while the first call is still reading the result", async () => {
@@ -205,6 +257,24 @@ describe("googleRedirectPending", () => {
     storage.setItem(MARKER, "1");
 
     expect(googleRedirectPending()).toBe(true);
+  });
+});
+
+describe("clearGoogleRedirect", () => {
+  it("removes the marker", () => {
+    storage.setItem(MARKER, "1");
+
+    clearGoogleRedirect();
+
+    expect(storage.getItem(MARKER)).toBeNull();
+    expect(googleRedirectPending()).toBe(false);
+  });
+
+  it("does nothing, without throwing, where there is no sessionStorage", () => {
+    vi.unstubAllGlobals();
+    expect(typeof sessionStorage).toBe("undefined");
+
+    expect(() => clearGoogleRedirect()).not.toThrow();
   });
 });
 

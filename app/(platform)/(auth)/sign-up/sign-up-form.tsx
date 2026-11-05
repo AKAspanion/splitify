@@ -12,7 +12,10 @@ import {
   signUpWithEmail,
 } from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
-import { finishGoogleReturn } from "@/lib/auth/google-return";
+import {
+  finishGoogleReturn,
+  whenRestoredAfterGoogle,
+} from "@/lib/auth/google-return";
 import { safeNextPath } from "@/lib/auth/next-path";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
@@ -50,6 +53,12 @@ export function SignUpForm() {
       active = false;
     };
   }, [next, router]);
+
+  // Back from Google's page without signing in, the browser may restore this page as it was left: button loading.
+  useEffect(() => {
+    if (pending !== "google") return;
+    return whenRestoredAfterGoogle(() => setPending(null));
+  }, [pending]);
 
   const submit = async () => {
     if (password.length < MIN_PASSWORD_LENGTH) {

@@ -1,11 +1,64 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { completeGoogleSignIn } = vi.hoisted(() => ({
+const { completeGoogleSignIn, clearGoogleRedirect } = vi.hoisted(() => ({
   completeGoogleSignIn: vi.fn<() => Promise<boolean>>(),
+  clearGoogleRedirect: vi.fn<() => void>(),
 }));
-vi.mock("@/lib/firebase/auth", () => ({ completeGoogleSignIn }));
+vi.mock("@/lib/firebase/auth", () => ({
+  completeGoogleSignIn,
+  clearGoogleRedirect,
+}));
 
-import { finishGoogleReturn } from "./google-return";
+import { finishGoogleReturn, whenRestoredAfterGoogle } from "./google-return";
+
+/** A pageshow event as the browser fires it; persisted is true when the page came back from the back/forward cache. */
+const pageshow = (persisted: boolean) =>
+  Object.assign(new Event("pageshow"), { persisted });
+
+describe("whenRestoredAfterGoogle", () => {
+  let page: EventTarget;
+
+  beforeEach(() => {
+    clearGoogleRedirect.mockReset();
+    page = new EventTarget();
+    vi.stubGlobal("window", page);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("clears the redirect marker and calls back when the page is restored from the back/forward cache", () => {
+    const onRestore = vi.fn();
+    whenRestoredAfterGoogle(onRestore);
+
+    page.dispatchEvent(pageshow(true));
+
+    expect(clearGoogleRedirect).toHaveBeenCalledTimes(1);
+    expect(onRestore).toHaveBeenCalledTimes(1);
+  });
+
+  it("does nothing on a page load that isn't a restore", () => {
+    const onRestore = vi.fn();
+    whenRestoredAfterGoogle(onRestore);
+
+    page.dispatchEvent(pageshow(false));
+
+    expect(clearGoogleRedirect).not.toHaveBeenCalled();
+    expect(onRestore).not.toHaveBeenCalled();
+  });
+
+  it("stops listening once the returned function is called", () => {
+    const onRestore = vi.fn();
+    const stop = whenRestoredAfterGoogle(onRestore);
+
+    stop();
+    page.dispatchEvent(pageshow(true));
+
+    expect(clearGoogleRedirect).not.toHaveBeenCalled();
+    expect(onRestore).not.toHaveBeenCalled();
+  });
+});
 
 /** A Firebase-shaped error whose own message must never reach the person. */
 const firebaseError = (code: string) =>
