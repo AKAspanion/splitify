@@ -12,6 +12,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { appVersion } from "@/lib/offline/version";
 import { registerQueuedWrites } from "@/lib/offline/queued-writes";
+import { syncOnlineState } from "@/lib/offline/online-state";
 import { CACHE_MAX_AGE_MS, createPersister } from "@/lib/offline/persist";
 
 // Signed out, nothing is saved or restored.
@@ -36,6 +37,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
     });
     // Before the cache is restored, so a write paused before a reload finds its send by key.
     registerQueuedWrites(client);
+    syncOnlineState(globalThis.navigator);
     return client;
   });
   const { status, user } = useAuth();
