@@ -1,11 +1,13 @@
 import { connectorConfig } from "@dataconnect/app";
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import {
+  browserPopupRedirectResolver,
   connectAuthEmulator,
   indexedDBLocalPersistence,
   inMemoryPersistence,
   initializeAuth,
   type Auth,
+  type Dependencies,
 } from "firebase/auth";
 import {
   connectDataConnectEmulator,
@@ -36,17 +38,27 @@ export function getFirebaseApp(): FirebaseApp {
   });
 }
 
-/** Auth for the app: IndexedDB persistence in the browser, so the person is restored on the next visit. */
+/**
+ * What Auth is built with. In the browser: IndexedDB persistence, so the person is restored on the next visit, and
+ * the popup resolver, which initializeAuth (unlike getAuth) doesn't add itself: without it signInWithPopup throws
+ * auth/argument-error. Node (tests, server rendering) has neither IndexedDB nor popups.
+ */
+export function authOptions(inBrowser: boolean): Dependencies {
+  return inBrowser
+    ? {
+        persistence: indexedDBLocalPersistence,
+        popupRedirectResolver: browserPopupRedirectResolver,
+      }
+    : { persistence: inMemoryPersistence };
+}
+
 export function getFirebaseAuth(): Auth {
   if (auth) return auth;
   const app = getFirebaseApp();
-  // Node (tests, server rendering) has no IndexedDB.
-  const created = initializeAuth(app, {
-    persistence:
-      typeof window === "undefined"
-        ? inMemoryPersistence
-        : indexedDBLocalPersistence,
-  });
+  const created = initializeAuth(
+    app,
+    authOptions(typeof window !== "undefined"),
+  );
   if (shouldUseEmulators())
     connectAuthEmulator(created, AUTH_EMULATOR, { disableWarnings: true });
   auth = created;

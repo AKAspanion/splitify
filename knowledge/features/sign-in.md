@@ -30,7 +30,13 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
   failures (network, too many attempts) show their error.
 - After email sign-up the person can use the app at once; the screen tells them to check their inbox to verify
   ([decision](../decisions/firebase-auth.md)).
-- Google sign-in being blocked (popup blocked, unsupported environment) says to use email and password instead.
+- Google sign-in being blocked (popup blocked, unsupported environment, or the site's domain missing from Firebase
+  Auth's authorized domains) says to use email and password instead; a popup closed before it finished says so.
+- Google sign-in needs `popupRedirectResolver: browserPopupRedirectResolver` in the browser's Auth
+  (`authOptions` in `lib/firebase/app.ts`): Auth is built with `initializeAuth`, which, unlike `getAuth`, adds no
+  resolver, and without one `signInWithPopup` throws `auth/argument-error` before opening anything.
+- The hosted domain, `splitify.spanion.in`, must be one of Firebase Auth's authorized domains, or Google's popup
+  refuses it ([deploy setup](../operations/deploy-setup.md)).
 - Someone already signed in who opens a form is sent on to `next`; a sign-in in flight finishes writing the person's
   row (`UpsertMe`) first.
 
@@ -45,6 +51,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-05: Google sign-in failed on the hosted site with "Something went wrong" (no popup resolver, and the domain wasn't authorized); now Auth gets the resolver, the domain is authorized, and popup failures have their own messages.
 - 2026-11-05: had nothing about offline; now the screens are disabled offline and sign-out deletes the cache, because the offline feature was built. See [offline](offline.md).
 
 ## Sources
@@ -55,4 +62,5 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 - `lib/auth/auth-errors.ts`
 - `lib/auth/next-path.ts`
 - `lib/firebase/auth.ts`
+- `lib/firebase/app.ts`
 - `components/offline/offline-sign-in-note.tsx`
