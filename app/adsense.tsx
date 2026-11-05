@@ -2,11 +2,19 @@
 
 import Script from "next/script";
 import { usePathname } from "next/navigation";
-import { adsAllowedOn } from "@/lib/ads/ads-allowed";
+import { adsAllowedFor } from "@/lib/ads/ads-allowed";
 
 /**
- * The AdSense script, in production only. Left out of pages whose URL can carry a one-time code (`adsAllowedOn`), so
- * a third-party script never reads it from the address bar.
+ * The page this document first loaded, read once when the module loads in the browser. While prerendering there is
+ * no document, and the page being rendered is its first.
+ */
+const FIRST_PATH =
+  typeof window === "undefined" ? null : window.location.pathname;
+
+/**
+ * The AdSense script, in production only. Left out of a document whose first page or current page can carry a
+ * one-time code (`adsAllowedFor`), so a third-party script never reads it from the address bar or the navigation
+ * entry.
  */
 const Adsense: React.FC<{ pId?: string }> = ({ pId }) => {
   const pathname = usePathname();
@@ -14,7 +22,7 @@ const Adsense: React.FC<{ pId?: string }> = ({ pId }) => {
   if (process.env.NODE_ENV !== "production") {
     return null;
   }
-  if (!pId || !adsAllowedOn(pathname)) {
+  if (!pId || !adsAllowedFor(FIRST_PATH ?? pathname, pathname)) {
     return null;
   }
 
