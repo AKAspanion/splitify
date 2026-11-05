@@ -37,15 +37,20 @@ verified: human:ankitp@geekyants.com
   `script-src` and `style-src` allow `'unsafe-inline'`, because Next's static export inlines its hydration scripts and
   styles; the developer accepts it or asks for script hashes later, and production may load more AdSense hosts, so
   watch for CSP violations after the first deploy.
+- `frame-src` allows `'self'` because Firebase's auth iframe runs on the site's own origin (the auth domain is
+  `splitify.spanion.in`); Hosting sends no CSP or `X-Frame-Options` on `/__/auth/iframe`, so the site-wide `DENY` and
+  `frame-ancestors 'none'` stay. `lib/security/csp.test.ts` pins the `frame-src` list.
 - `.claude/settings.json` stops Claude reading `.env` files.
 
 ## History
 
+- 2026-11-05: `frame-src` framed only Firebase's `firebaseapp.com` host and Google; now it also allows `'self'`, because Google sign-in became a redirect and Firebase's auth iframe runs on the site's own origin. See [sign-in](../features/sign-in.md).
 - 2026-11-05: was Clerk sessions, `AuthnDevice.data` and the `Log` table over MySQL; now ID-token checks, `AuthnDevice.devices` through the admin connector, Cloud Logging and the Hosting security headers, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
 
 ## Sources
 
 - `firebase.json`
+- `lib/security/csp.test.ts`
 - `functions/src/webauthn/index.ts`
 - `functions/src/http/guard.ts`
 - `dataconnect/schema/schema.gql`
