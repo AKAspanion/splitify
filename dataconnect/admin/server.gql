@@ -83,3 +83,26 @@ mutation DeleteUserData($userId: String!) @auth(level: NO_ACCESS) @transaction {
     where: { friendId: { eq: $userId } }
   )
 }
+
+# The groups the person belongs to, each with its members, so account deletion can tell the ones nobody else is in.
+query ListUserGroupsWithMembers($userId: String!) @auth(level: NO_ACCESS) {
+  groupMembers(where: { userId: { eq: $userId } }) {
+    groupId
+    group {
+      members: groupMembers_on_group {
+        userId
+      }
+    }
+  }
+}
+
+# Deletes a group with everything in it, as DeleteGroup does for a member. Used for a group whose only member is the
+# person being deleted.
+mutation DeleteGroupAdmin($id: UUID!) @auth(level: NO_ACCESS) @transaction {
+  activity_deleteMany(where: { groupId: { eq: $id } })
+  userSplit_deleteMany(where: { expense: { groupId: { eq: $id } } })
+  userPayment_deleteMany(where: { expense: { groupId: { eq: $id } } })
+  expense_deleteMany(where: { groupId: { eq: $id } })
+  groupMember_deleteMany(where: { groupId: { eq: $id } })
+  group_delete(key: { id: $id })
+}

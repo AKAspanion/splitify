@@ -134,6 +134,50 @@ describe("deleteMyAccount", () => {
     await expect(auth().getUser(BOB)).resolves.toBeTruthy();
   });
 
+  it("deletes a group only the caller was in, with its expenses and activity, and keeps a shared group", async () => {
+    const SOLO = "66666666-6666-4666-8666-666666666666";
+    const SOLO_EXPENSE = "77777777-7777-4777-8777-777777777777";
+    await seedGroup({ id: SOLO, title: "Solo", memberIds: [ALICE] });
+    await seed(
+      `mutation {
+        expense_insert(data: { id: "${SOLO_EXPENSE}", groupId: "${SOLO}", amount: 10, description: "Tea", type: EQUAL, tag: EXPENSE, creatorId: "${ALICE}" })
+        userSplit_insert(data: { id: "88888888-8888-4888-8888-888888888888", expenseId: "${SOLO_EXPENSE}", userId: "${ALICE}", amount: 10 })
+        userPayment_insert(data: { id: "99999999-9999-4999-8999-999999999999", expenseId: "${SOLO_EXPENSE}", userId: "${ALICE}", amount: 10 })
+        activity_insert(data: { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", type: EXPENSE_PLUS, actorId: "${ALICE}", groupId: "${SOLO}", expenseId: "${SOLO_EXPENSE}", title: "Tea" })
+      }`,
+    );
+
+    await expect(call(ALICE)).resolves.toEqual({ ok: true });
+
+    const left = (await seed(`query {
+      groups { id }
+      expenses { id }
+      activities { id }
+      groupMembers { groupId userId }
+      userSplits { expenseId }
+      userPayments { expenseId }
+    }`)) as {
+      groups: { id: string }[];
+      expenses: { id: string }[];
+      activities: { id: string }[];
+      groupMembers: { groupId: string }[];
+      userSplits: { expenseId: string }[];
+      userPayments: { expenseId: string }[];
+    };
+    // The database returns UUIDs without dashes.
+    const bare = (id: string) => id.replaceAll("-", "");
+    expect(left.groups.map((g) => g.id)).toEqual([bare(G)]);
+    expect(left.expenses.map((e) => e.id)).toEqual([bare(EXPENSE)]);
+    expect(left.activities).toEqual([]);
+    expect(left.groupMembers.every((m) => m.groupId === bare(G))).toBe(true);
+    expect(left.userSplits.every((s) => s.expenseId === bare(EXPENSE))).toBe(
+      true,
+    );
+    expect(left.userPayments.every((p) => p.expenseId === bare(EXPENSE))).toBe(
+      true,
+    );
+  });
+
   it("shows Deleted user where Alice was in Bob's view of the expense", async () => {
     await call(ALICE);
     const data = (await seed(

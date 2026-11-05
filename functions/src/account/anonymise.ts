@@ -18,7 +18,26 @@ export function adminApp(): App {
 }
 
 /**
- * Replaces what identifies the person on their row, then removes the data that is theirs alone (push tokens,
+ * Deletes each group whose only member is the person, with its expenses, payments, splits, members and activity:
+ * nobody else's data is in it. Groups with other members stay.
+ */
+async function deleteSoleMemberGroups(userId: string): Promise<void> {
+  const connector = getDataConnect(
+    { serviceId: SERVICE, location: REGION, connector: "admin" },
+    adminApp(),
+  );
+  const { data } = await connector.executeQuery<
+    { groupMembers: { groupId: string; group: { members: unknown[] } }[] },
+    { userId: string }
+  >("ListUserGroupsWithMembers", { userId });
+  for (const { groupId, group } of data.groupMembers) {
+    if (group.members.length === 1)
+      await connector.executeMutation("DeleteGroupAdmin", { id: groupId });
+  }
+}
+
+/**
+ * Deletes the groups only the person was in, replaces what identifies the person on their row, then removes the data that is theirs alone (push tokens,
  * feedback, devices, friendships) in one transaction. Memberships, expenses, payments and splits stay.
  * Safe to run twice: it sets the same values again.
  */
@@ -27,6 +46,7 @@ export async function anonymiseUser(userId: string): Promise<void> {
     { serviceId: SERVICE, location: REGION, connector: "admin" },
     adminApp(),
   );
+  await deleteSoleMemberGroups(userId);
   await connector.executeMutation("AnonymiseUser", {
     userId,
     name: DELETED_NAME,
