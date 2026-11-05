@@ -54,3 +54,6 @@ packages/ios/src/Splitify/GoogleService-Info.plist
 
 # Emulator state saved between runs
 .emulator-data/
+
+# Functions emulator's generated SESSION_PASSWORD
+/functions/.secret.local
