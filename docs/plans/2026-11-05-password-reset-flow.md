@@ -1,5 +1,7 @@
 # Password Reset Flow Implementation Plan
 
+**Status:** complete, commits 6440767..ba64d66, 2026-11-06. Record: [2026-11-05-password-reset-flow.record.md](2026-11-05-password-reset-flow.record.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -118,31 +120,31 @@ export function verifyEmailWithCode(code: string): Promise<void>;
 - On the Auth emulator: after `signUpWithEmail` (still signed in, `emailVerified` false), `verifyEmailWithCode` with the `VERIFY_EMAIL` code from `oobCodes` resolves, and `onUserChanged`'s latest user, or `reloadEmailVerified()`, shows `emailVerified: true`. Called again with the same code, it rejects with `auth/invalid-action-code`.
 - On the Auth emulator: `verifyEmailWithCode` with a valid code and nobody signed in resolves without throwing.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case: the parsing and error cases in `lib/auth/action-link.test.ts` and `lib/auth/auth-errors.test.ts`, the emulator cases in `lib/firebase/auth.test.ts` (its `oobCodes()` helper reads the emulator's codes; widen its return type to include `oobCode`)
+- [x] **Step 1: Write the failing tests** for each Acceptance case: the parsing and error cases in `lib/auth/action-link.test.ts` and `lib/auth/auth-errors.test.ts`, the emulator cases in `lib/firebase/auth.test.ts` (its `oobCodes()` helper reads the emulator's codes; widen its return type to include `oobCode`)
 
-- [ ] **Step 2: Run the unit tests to verify they fail**
+- [x] **Step 2: Run the unit tests to verify they fail**
 
 Run: `pnpm vitest run lib/auth/action-link.test.ts lib/auth/auth-errors.test.ts`
 Expected: FAIL on the assertions. Create `lib/auth/action-link.ts` with its real exports first, so the tests fail on behaviour, not on a missing module
 
-- [ ] **Step 3: Run the emulator tests to verify they fail**
+- [x] **Step 3: Run the emulator tests to verify they fail**
 
 Run: `pnpm test:rules`
 Expected: the new `lib/firebase/auth.test.ts` cases FAIL (the three functions exist with their signatures but do nothing); the existing cases pass
 
-- [ ] **Step 4: Write the minimal implementation** to the Interfaces: `parseActionLink` with `URLSearchParams`, the three Auth functions over `verifyPasswordResetCode`, `confirmPasswordReset` and `applyActionCode`, and the four new error messages
+- [x] **Step 4: Write the minimal implementation** to the Interfaces: `parseActionLink` with `URLSearchParams`, the three Auth functions over `verifyPasswordResetCode`, `confirmPasswordReset` and `applyActionCode`, and the four new error messages
 
-- [ ] **Step 5: Run the unit tests to verify they pass**
+- [x] **Step 5: Run the unit tests to verify they pass**
 
 Run: `pnpm vitest run lib/auth/action-link.test.ts lib/auth/auth-errors.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: Run the emulator tests to verify they pass**
+- [x] **Step 6: Run the emulator tests to verify they pass**
 
 Run: `pnpm test:rules`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add lib/auth/action-link.ts lib/auth/action-link.test.ts lib/firebase/auth.ts lib/firebase/auth.test.ts lib/auth/auth-errors.ts lib/auth/auth-errors.test.ts
@@ -194,18 +196,18 @@ keeps the parsed link in state, so its own re-renders don't lose it. For `kind: 
 - Given any link, once the page has read it, the address bar shows `/auth/action/` with no query string.
 - `pnpm build` writes `out/auth/action/index.html`.
 
-- [ ] **Step 1: Write the page wrapper and the handler's state switch** to the Interfaces, rendering "Checking your link…" for every state
+- [x] **Step 1: Write the page wrapper and the handler's state switch** to the Interfaces, rendering "Checking your link…" for every state
 
-- [ ] **Step 2: Build it to verify the route exists**
+- [x] **Step 2: Build it to verify the route exists**
 
 Run: `pnpm build`
 Expected: the build passes and `out/auth/action/index.html` exists
 
-- [ ] **Step 3: Write the reset form and the verify result** with each Acceptance state's copy
+- [x] **Step 3: Write the reset form and the verify result** with each Acceptance state's copy
 
-- [ ] **Step 4: Walk each state in the running dev server** (`ga.mjs run dev`): open `/auth/action/?mode=resetPassword&oobCode=<code from the Auth emulator's oobCodes>`, a used code, `?mode=verifyEmail&oobCode=<code>`, `?mode=recoverEmail&oobCode=x`, and `/auth/action/` alone. Check each state's copy, and that the address bar is cleaned, at 390 and 1280 pixels wide
+- [x] **Step 4: Walk each state in the running dev server** (`ga.mjs run dev`): open `/auth/action/?mode=resetPassword&oobCode=<code from the Auth emulator's oobCodes>`, a used code, `?mode=verifyEmail&oobCode=<code>`, `?mode=recoverEmail&oobCode=x`, and `/auth/action/` alone. Check each state's copy, and that the address bar is cleaned, at 390 and 1280 pixels wide
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(auth)/auth/action/page.hosting.tsx" "app/(platform)/(auth)/auth/action/action-handler.tsx" "app/(platform)/(auth)/auth/action/reset-password-form.tsx" "app/(platform)/(auth)/auth/action/verify-email-result.tsx"
@@ -249,21 +251,21 @@ is false. It still renders nothing outside production or without `pId`.
 - `cacheStrategy` still gives `"network-first-page"` for `/auth/`, `/auth/actions/` and `/sign-in/` (the rule matches the path exactly, not as a prefix of a longer segment), and every existing case is unchanged.
 - `adsAllowedOn("/auth/action/")` and `adsAllowedOn("/auth/action")` are false; `adsAllowedOn("/")`, `adsAllowedOn("/groups/")`, `adsAllowedOn("/sign-in/")` and `adsAllowedOn("/auth/actions/")` are true.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case in `lib/offline/sw-routing.test.ts` and `lib/ads/ads-allowed.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case in `lib/offline/sw-routing.test.ts` and `lib/ads/ads-allowed.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/offline/sw-routing.test.ts lib/ads/ads-allowed.test.ts`
 Expected: FAIL on the assertions. Create `lib/ads/ads-allowed.ts` with its real export first
 
-- [ ] **Step 3: Write the minimal implementation**: the bypass in `cacheStrategy`, `adsAllowedOn`, and `app/adsense.tsx` reading the path
+- [x] **Step 3: Write the minimal implementation**: the bypass in `cacheStrategy`, `adsAllowedOn`, and `app/adsense.tsx` reading the path
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/offline/sw-routing.test.ts lib/ads/ads-allowed.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/offline/sw-routing.js lib/offline/sw-routing.test.ts lib/ads/ads-allowed.ts lib/ads/ads-allowed.test.ts app/adsense.tsx
@@ -300,14 +302,14 @@ Task 2's change to it: the sign-in and sign-up screens link to the privacy polic
   plain link, never disabled).
 - `pnpm build` passes, and `out/sign-in/index.html` and `out/sign-up/index.html` each contain `href="/privacy/"`.
 
-- [ ] **Step 1: Add the link to both forms**
+- [x] **Step 1: Add the link to both forms**
 
-- [ ] **Step 2: Build and check both pages carry the link**
+- [x] **Step 2: Build and check both pages carry the link**
 
 Run: `pnpm build`
 Expected: the build passes, and `grep -c 'href="/privacy/"' out/sign-in/index.html out/sign-up/index.html` counts at least 1 in each
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx"
