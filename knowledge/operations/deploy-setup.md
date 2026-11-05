@@ -22,7 +22,7 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
 - Run the SQL Connect deploy by hand again (`deploy_dataconnect` ticked) after any schema change: the `PushToken` table is new and nothing deploys it otherwise.
 - Run the first SQL Connect deploy by hand from a machine signed in with `firebase login`, because only the
   interactive CLI offers the free-trial Cloud SQL instance ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)).
-- Deploy the Cloud Functions by hand, `yarn deploy:functions`, signed in to the Firebase CLI as a project owner: the
+- Deploy the Cloud Functions by hand, `pnpm deploy:functions`, signed in to the Firebase CLI as a project owner: the
   CLI grants Google Cloud's service agents the roles a functions deploy needs, which `github-deploy@` can't
   ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)).
 - Set up the budget kill switch: its `billing-kill-switch@` account, the Cloud Run Invoker grant for the trigger, and

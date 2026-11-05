@@ -23,7 +23,7 @@ the right to change IAM. The hosting deploy in the same workflow works and stays
 
 - Pull requests run CI in GitHub Actions; a push to `main` runs CI again and then deploys the public pages to
   Firebase Hosting ([public pages first](public-pages-on-firebase-hosting-first.md)).
-- **Cloud Functions** deploy by hand, `yarn deploy:functions`, from a machine signed in to the Firebase CLI as a
+- **Cloud Functions** deploy by hand, `pnpm deploy:functions`, from a machine signed in to the Firebase CLI as a
   project owner. The deploy workflow doesn't deploy them.
 - **The SQL Connect schema and connectors** deploy only when the deploy workflow is started by hand with its
   checkbox ticked, since a schema change can drop columns. The first deploy, which creates the Cloud SQL instance,

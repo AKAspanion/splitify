@@ -29,7 +29,7 @@ Each handler goes from `auth()` straight to `db.*.update`, `delete` or `create` 
 
 ## Status
 
-Fixed. The server actions are gone; each write is a SQL Connect operation whose `@auth` rule checks that the caller is a member of the group, or owns the contact, in the same transaction ([roles](../security/roles.md), [group member permissions](../decisions/group-member-permissions.md)). The rule tests are `yarn test:rules`.
+Fixed. The server actions are gone; each write is a SQL Connect operation whose `@auth` rule checks that the caller is a member of the group, or owns the contact, in the same transaction ([roles](../security/roles.md), [group member permissions](../decisions/group-member-permissions.md)). The rule tests are `pnpm test:rules`.
 
 ## History
 

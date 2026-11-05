@@ -30,13 +30,15 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
 - `app/manifest.webmanifest`: the PWA manifest.
 - `app/not-found.hosting.tsx`: the 404 page; Hosting serves it as `404.html` for any path that is not a page.
-- The dev server's port is Next's default; `scripts.dev` in `package.json` passes none.
+- The dev server runs on `127.0.0.1:2140` (`scripts.dev:web`), started by `pnpm dev` ([run locally](../operations/run-locally.md)).
 
 ## The one static build
 
+In `next dev` only, the config is a function of the phase: it drops the export and adds dev-only rewrites to the Functions emulator ([run locally](../operations/run-locally.md)).
+
 `next.config.mjs` always builds a static export, for Firebase Hosting ([decision](../decisions/static-build-on-firebase-hosting.md)):
 `output: "export"`, `trailingSlash`, unoptimised images, and `pageExtensions: ["hosting.tsx"]`, so only `*.hosting.tsx`
-files are routes. `yarn build` and `yarn build:hosting` are the same build; there is no server build, no route handler,
+files are routes. `pnpm build` and `pnpm build:hosting` are the same build; there is no server build, no route handler,
 no server action and no middleware. The `*.hosting.tsx` entries re-export the pages and layouts that sit beside them.
 `firebase.json` rewrites `/api/reports/**` and `/api/webauthn/**` to the [Cloud Functions](functions.md), serves the
 404 page for any other path that is not a page, and sets the security headers and the Content-Security-Policy
@@ -54,7 +56,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
   from the address with `useRouteIds` (`hooks/use-route-ids.ts`), never from the page's params. Such a route's
   `page.hosting.tsx` is a small server wrapper that renders the client page beside `generateStaticParams`: Next refuses
   `generateStaticParams` re-exported next to a `"use client"` default.
-- `yarn check:hosting` (`scripts/check-hosting-build.mjs`) reads one manifest per area from `scripts/hosting-pages/*.json`:
+- `pnpm check:hosting` (`scripts/check-hosting-build.mjs`) reads one manifest per area from `scripts/hosting-pages/*.json`:
   the pages that must exist in `out/` and the requests that must answer 200 with given text.
 - `components/providers.tsx` keys a `PersistQueryClientProvider` by the signed-in uid, because the saved cache is read only at mount ([offline](../features/offline.md)), and makes one `QueryClient` per mount (through `useState`): one made on every render left
   invalidation after a write reaching nobody.
@@ -63,7 +65,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
   signed-in person, so `callFunction` throws before any request and the lock stays off.
 - `scripts/emulator-firebase-config.mjs` writes `firebase.emulators.json`: `firebase.json` with the Auth, SQL Connect and
   Functions emulators' addresses added to the CSP's `connect-src`, so the app served by the Hosting emulator may call
-  them. It is generated, so the two cannot drift; `yarn check:hosting` regenerates it. Use it with `--config` for local
+  them. It is generated, so the two cannot drift; `pnpm check:hosting` regenerates it. Use it with `--config` for local
   checks, and never deploy with it ([run locally](../operations/run-locally.md)).
 
 ## Screens and routes
@@ -111,6 +113,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-05: `next.config.mjs` always built the static export; now in `next dev` only it drops the export and rewrites `/api/reports/**` and `/api/webauthn/**` to the Functions emulator, because the dev server has no Hosting in front. See [run locally](../operations/run-locally.md).
 - 2026-11-05: had no offline support; now a saved cache, a service worker and queued writes, because spec 4 was built. See [offline](../features/offline.md).
 - 2026-11-05: was a Next.js server with a separate hosting build target, a coming-soon page and a Clerk stub; now one static build with a 404 page, and `firebase.emulators.json` generated for local checks, because spec 2c removed the server, Clerk, OneSignal, UploadThing and Vercel analytics. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build had only the public pages and sign-in; now it holds the signed-in screens, their shell and the id routes, because spec 2b moved the screens onto SQL Connect. See [decision](../decisions/static-build-on-firebase-hosting.md).
