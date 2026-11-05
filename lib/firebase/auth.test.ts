@@ -1,3 +1,5 @@
+// Sign-out deletes the signed-out person's saved cache from IndexedDB, which Node does not have.
+import "fake-indexeddb/auto";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 // Read when lib/firebase/app.ts first builds the app, so they are set before the dynamic import below.
