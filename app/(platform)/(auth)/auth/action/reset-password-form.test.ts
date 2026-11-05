@@ -11,6 +11,7 @@ vi.mock("@/lib/firebase/auth", () => ({
   verifyEmailWithCode: vi.fn(),
 }));
 
+import { newCodeAttempts } from "./code-call";
 import { checkResetLink, saveNewPassword } from "./reset-password-form";
 
 const CODE = "secret-oob-code";
@@ -50,13 +51,10 @@ describe("checkResetLink", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it.each(SPENT_CODES)(
-    "calls a link with %s spent",
-    async (code) => {
-      readPasswordResetEmail.mockRejectedValue(authError(code));
-      expect(await checkResetLink(CODE)).toEqual({ kind: "spent" });
-    },
-  );
+  it.each(SPENT_CODES)("calls a link with %s spent", async (code) => {
+    readPasswordResetEmail.mockRejectedValue(authError(code));
+    expect(await checkResetLink(CODE)).toEqual({ kind: "spent" });
+  });
 
   it("gives the app's own words for a network failure, and logs its cause class without the code", async () => {
     readPasswordResetEmail.mockRejectedValue(
@@ -83,7 +81,7 @@ describe("checkResetLink", () => {
 
 describe("saveNewPassword", () => {
   it("refuses a password of 7 characters and calls nothing", async () => {
-    expect(await saveNewPassword(CODE, "1234567")).toEqual({
+    expect(await saveNewPassword(CODE, "1234567", newCodeAttempts())).toEqual({
       kind: "failed",
       message: "Use at least 8 characters.",
     });
@@ -92,25 +90,50 @@ describe("saveNewPassword", () => {
 
   it("sets a password of 8 characters", async () => {
     resetPassword.mockResolvedValue();
-    expect(await saveNewPassword(CODE, "12345678")).toEqual({
+    expect(await saveNewPassword(CODE, "12345678", newCodeAttempts())).toEqual({
       kind: "saved",
     });
     expect(resetPassword).toHaveBeenCalledWith(CODE, "12345678");
   });
 
-  it.each(SPENT_CODES)(
-    "calls a link with %s spent",
-    async (code) => {
-      resetPassword.mockRejectedValue(authError(code));
-      expect(await saveNewPassword(CODE, "12345678")).toEqual({
-        kind: "spent",
-      });
-    },
-  );
+  it.each(SPENT_CODES)("calls a link with %s spent", async (code) => {
+    resetPassword.mockRejectedValue(authError(code));
+    expect(await saveNewPassword(CODE, "12345678", newCodeAttempts())).toEqual({
+      kind: "spent",
+    });
+  });
+
+  it("says the password may already be changed when a retry is refused as spent after a save lost its reply", async () => {
+    const attempts = newCodeAttempts();
+    resetPassword
+      .mockRejectedValueOnce(authError("auth/network-request-failed"))
+      .mockRejectedValueOnce(authError("auth/invalid-action-code"));
+
+    expect(await saveNewPassword(CODE, "12345678", attempts)).toMatchObject({
+      kind: "failed",
+    });
+    expect(await saveNewPassword(CODE, "12345678", attempts)).toEqual({
+      kind: "maybe-done",
+    });
+  });
+
+  it("still calls a spent code spent when the earlier save failed for another reason", async () => {
+    const attempts = newCodeAttempts();
+    resetPassword
+      .mockRejectedValueOnce(authError("auth/too-many-requests"))
+      .mockRejectedValueOnce(authError("auth/invalid-action-code"));
+
+    await saveNewPassword(CODE, "12345678", attempts);
+    expect(await saveNewPassword(CODE, "12345678", attempts)).toEqual({
+      kind: "spent",
+    });
+  });
 
   it("keeps the form on a network failure, with the app's own words, and logs without the code or password", async () => {
     resetPassword.mockRejectedValue(authError("auth/network-request-failed"));
-    expect(await saveNewPassword(CODE, "my-new-password")).toEqual({
+    expect(
+      await saveNewPassword(CODE, "my-new-password", newCodeAttempts()),
+    ).toEqual({
       kind: "failed",
       message: "Couldn't reach Splitify. Check your connection.",
     });

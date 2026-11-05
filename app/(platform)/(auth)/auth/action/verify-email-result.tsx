@@ -4,35 +4,34 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { verifyEmailWithCode } from "@/lib/firebase/auth";
-import {
-  authErrorCode,
-  authErrorMessage,
-  isSpentActionCode,
-} from "@/lib/auth/auth-errors";
 import { cn } from "@/lib/utils";
+import { callWithCode, newCodeAttempts, type CodeAttempts } from "./code-call";
 
-/** What applying a verify-email link came to. */
+/**
+ * What applying a verify-email link came to. `maybe-done`: refused as spent after an earlier attempt lost its reply,
+ * so the email may already be verified.
+ */
 export type VerifyResult =
   | { kind: "verified" }
   | { kind: "spent" }
+  | { kind: "maybe-done" }
   | { kind: "failed"; message: string };
 
-/** Applies the link's code. A failure logs its cause class only, never the code. */
-export async function verifyEmailLink(code: string): Promise<VerifyResult> {
-  try {
-    await verifyEmailWithCode(code);
-    return { kind: "verified" };
-  } catch (error) {
-    console.warn(
-      "Verify email: applying the link failed",
-      authErrorCode(error) ?? "no code",
-    );
-    if (isSpentActionCode(error)) return { kind: "spent" };
-    return { kind: "failed", message: authErrorMessage(error) };
-  }
+/** Applies the link's code. `attempts` is the page's own, kept across tries. */
+export async function verifyEmailLink(
+  code: string,
+  attempts: CodeAttempts,
+): Promise<VerifyResult> {
+  const result = await callWithCode(
+    "Verify email: applying the link failed",
+    () => verifyEmailWithCode(code),
+    attempts,
+  );
+  return result.kind === "done" ? { kind: "verified" } : result;
 }
 
 export function VerifyEmailResult({ code }: { code: string }) {
+  const attempts = useRef<CodeAttempts>(newCodeAttempts());
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<VerifyResult | null>(null);
   const call = useRef<{
@@ -45,7 +44,11 @@ export function VerifyEmailResult({ code }: { code: string }) {
   // rather than applying a spent code and showing it as used.
   useEffect(() => {
     if (call.current?.code !== code || call.current.attempt !== attempt)
-      call.current = { code, attempt, result: verifyEmailLink(code) };
+      call.current = {
+        code,
+        attempt,
+        result: verifyEmailLink(code, attempts.current),
+      };
     let active = true;
     void call.current.result.then((next) => {
       if (active) setResult(next);
@@ -68,6 +71,19 @@ export function VerifyEmailResult({ code }: { code: string }) {
       <div className="space-y-4">
         <p role="status" className="text-sm">
           Your email is verified.
+        </p>
+        <Link href="/groups/" className={cn(buttonVariants(), "w-full")}>
+          Continue
+        </Link>
+      </div>
+    );
+  }
+
+  if (result.kind === "maybe-done") {
+    return (
+      <div className="space-y-4">
+        <p role="alert" className="text-sm">
+          Your email may already be verified. Continue to Splitify to check.
         </p>
         <Link href="/groups/" className={cn(buttonVariants(), "w-full")}>
           Continue
