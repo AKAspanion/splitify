@@ -85,3 +85,50 @@ describe("verifyEmailLink", () => {
     expect(logged).not.toContain(CODE);
   });
 });
+
+describe("one document's verify calls", () => {
+  /** A fresh copy of the module is a fresh document: the calls it made live at module scope. */
+  async function freshDocument() {
+    vi.resetModules();
+    return await import("./verify-email-result");
+  }
+
+  it("applies the code once for two mounts, and both see it verified", async () => {
+    const { verifyLinkOnce } = await freshDocument();
+    verifyEmailWithCode.mockResolvedValue();
+
+    // Signed in, the providers remount the page while the first mount's call is in flight.
+    const first = verifyLinkOnce(CODE);
+    const second = verifyLinkOnce(CODE);
+    expect(await first).toEqual({ kind: "verified" });
+    expect(await second).toEqual({ kind: "verified" });
+    // And a mount after it settled.
+    expect(await verifyLinkOnce(CODE)).toEqual({ kind: "verified" });
+
+    expect(verifyEmailWithCode).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies the code again on a retry after a network failure, and a later mount sees the retry's outcome", async () => {
+    const { verifyLinkOnce, retryVerifyLink } = await freshDocument();
+    verifyEmailWithCode
+      .mockRejectedValueOnce(authError("auth/network-request-failed"))
+      .mockRejectedValueOnce(authError("auth/invalid-action-code"));
+
+    expect(await verifyLinkOnce(CODE)).toMatchObject({ kind: "failed" });
+    // The lost reply is remembered across mounts, so the spent answer reads "may already".
+    expect(await retryVerifyLink(CODE)).toEqual({ kind: "maybe-done" });
+    expect(await verifyLinkOnce(CODE)).toEqual({ kind: "maybe-done" });
+
+    expect(verifyEmailWithCode).toHaveBeenCalledTimes(2);
+  });
+
+  it("doesn't apply again on a retry once the code was applied", async () => {
+    const { verifyLinkOnce, retryVerifyLink } = await freshDocument();
+    verifyEmailWithCode.mockResolvedValue();
+
+    await verifyLinkOnce(CODE);
+    expect(await retryVerifyLink(CODE)).toEqual({ kind: "verified" });
+
+    expect(verifyEmailWithCode).toHaveBeenCalledTimes(1);
+  });
+});

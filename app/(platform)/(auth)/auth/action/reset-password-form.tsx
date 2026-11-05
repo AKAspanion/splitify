@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,11 +60,60 @@ export async function saveNewPassword(
   return result.kind === "done" ? { kind: "saved" } : result;
 }
 
-type Phase =
-  | { kind: "checking" }
-  | ResetLinkCheck
-  | { kind: "saved" }
-  | { kind: "maybe-done" };
+/** A reset code's saves in this document: the latest save, its outcome once settled, and the attempts record. */
+type ResetSave = {
+  attempts: CodeAttempts;
+  result?: Promise<SaveResult>;
+  settled?: SaveResult;
+};
+
+/**
+ * Each code's saves, kept for the document's life rather than in the component: a save spends the code, and the
+ * handler can mount more than once in a load (the providers remount the page when auth changes). A remount that lost
+ * a save in flight or its success would check the link again and call the spent code expired.
+ */
+const resetSaves = new Map<string, ResetSave>();
+
+/**
+ * Saves the new password for this code. While a save is in flight, or once one has an outcome other than a failure,
+ * it is shared instead of saving again; after a failure the next save is a new attempt.
+ */
+export function savePasswordOnce(
+  code: string,
+  password: string,
+): Promise<SaveResult> {
+  let save = resetSaves.get(code);
+  if (!save) {
+    save = { attempts: newCodeAttempts() };
+    resetSaves.set(code, save);
+  }
+  if (save.result && save.settled?.kind !== "failed") return save.result;
+  const current = save;
+  current.settled = undefined;
+  current.result = saveNewPassword(code, password, current.attempts).then(
+    (result) => {
+      current.settled = result;
+      return result;
+    },
+  );
+  return current.result;
+}
+
+/**
+ * What a mount of the form shows: a save made in this document (in flight, or settled other than a failure), or else
+ * the link checked again. Checking only reads the code, so it may repeat.
+ */
+export function resetLinkPhase(
+  code: string,
+): Promise<ResetLinkCheck | SaveResult> {
+  const save = resetSaves.get(code)?.result;
+  if (!save) return checkResetLink(code);
+  return save.then<ResetLinkCheck | SaveResult>((result) =>
+    result.kind === "failed" ? checkResetLink(code) : result,
+  );
+}
+
+type Phase = { kind: "checking" } | ResetLinkCheck | SaveResult;
 
 export function ResetPasswordForm({ code }: { code: string }) {
   const online = useOnline();
@@ -73,12 +122,11 @@ export function ResetPasswordForm({ code }: { code: string }) {
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const attempts = useRef<CodeAttempts>(newCodeAttempts());
 
-  // Checking reads the code without spending it, so Strict Mode's second run only asks again.
+  // A save already made in this document wins; otherwise the link is checked, which Strict Mode may repeat harmlessly.
   useEffect(() => {
     let active = true;
-    void checkResetLink(code).then((result) => {
+    void resetLinkPhase(code).then((result) => {
       if (active) setPhase(result);
     });
     return () => {
@@ -89,7 +137,7 @@ export function ResetPasswordForm({ code }: { code: string }) {
   const submit = async () => {
     setSaving(true);
     setError(null);
-    const result = await saveNewPassword(code, password, attempts.current);
+    const result = await savePasswordOnce(code, password);
     setSaving(false);
     if (result.kind === "failed") setError(result.message);
     else setPhase(result);

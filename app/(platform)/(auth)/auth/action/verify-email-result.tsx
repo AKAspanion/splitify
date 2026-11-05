@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { verifyEmailWithCode } from "@/lib/firebase/auth";
@@ -30,27 +30,58 @@ export async function verifyEmailLink(
   return result.kind === "done" ? { kind: "verified" } : result;
 }
 
+/** A verify code's latest attempt in this document: the call, its outcome once settled, and its attempts record. */
+type VerifyCall = {
+  attempts: CodeAttempts;
+  result: Promise<VerifyResult>;
+  settled?: VerifyResult;
+};
+
+/**
+ * Each code's latest attempt, kept for the document's life rather than in the component: applying spends the code,
+ * and the handler can mount more than once in a load (the providers remount the page once auth is restored, and
+ * Strict Mode runs effects twice). A remount that applied the code again would show a spent link for an email it had
+ * just verified.
+ */
+const verifyCalls = new Map<string, VerifyCall>();
+
+function startVerify(code: string, attempts: CodeAttempts): VerifyCall {
+  const call: VerifyCall = {
+    attempts,
+    result: verifyEmailLink(code, attempts).then((result) => {
+      call.settled = result;
+      return result;
+    }),
+  };
+  verifyCalls.set(code, call);
+  return call;
+}
+
+/** The outcome of applying this code in this document: the first call applies it, every later one shares it. */
+export function verifyLinkOnce(code: string): Promise<VerifyResult> {
+  return (verifyCalls.get(code) ?? startVerify(code, newCodeAttempts())).result;
+}
+
+/**
+ * A new attempt, for Try again after a failure: applies the code again, with the attempts record the earlier ones
+ * kept. While a call is in flight, or once one has an outcome other than a failure, it is shared instead.
+ */
+export function retryVerifyLink(code: string): Promise<VerifyResult> {
+  const call = verifyCalls.get(code);
+  if (!call) return verifyLinkOnce(code);
+  if (call.settled?.kind !== "failed") return call.result;
+  return startVerify(code, call.attempts).result;
+}
+
 export function VerifyEmailResult({ code }: { code: string }) {
-  const attempts = useRef<CodeAttempts>(newCodeAttempts());
+  // Bumped by Try again, which has already started the new attempt (retryVerifyLink).
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<VerifyResult | null>(null);
-  const call = useRef<{
-    code: string;
-    attempt: number;
-    result: Promise<VerifyResult>;
-  } | null>(null);
 
-  // Applying spends the code, so it is asked once per attempt: Strict Mode's second run reuses the first run's call
-  // rather than applying a spent code and showing it as used.
+  // Every mount shows the code's latest attempt in this document, applying it only if none was made yet.
   useEffect(() => {
-    if (call.current?.code !== code || call.current.attempt !== attempt)
-      call.current = {
-        code,
-        attempt,
-        result: verifyEmailLink(code, attempts.current),
-      };
     let active = true;
-    void call.current.result.then((next) => {
+    void verifyLinkOnce(code).then((next) => {
       if (active) setResult(next);
     });
     return () => {
@@ -114,6 +145,7 @@ export function VerifyEmailResult({ code }: { code: string }) {
         type="button"
         className="w-full"
         onClick={() => {
+          void retryVerifyLink(code);
           setResult(null);
           setAttempt((n) => n + 1);
         }}

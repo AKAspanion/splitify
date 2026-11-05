@@ -143,3 +143,64 @@ describe("saveNewPassword", () => {
     expect(logged(warn)).not.toContain("my-new-password");
   });
 });
+
+describe("one document's reset link", () => {
+  /** A fresh copy of the module is a fresh document: the saves it made live at module scope. */
+  async function freshDocument() {
+    vi.resetModules();
+    return await import("./reset-password-form");
+  }
+
+  it("shares a save in flight with a second submit, and a remount then shows it saved, not spent", async () => {
+    const { savePasswordOnce, resetLinkPhase } = await freshDocument();
+    resetPassword.mockResolvedValue();
+    // The code is spent once the save lands, so checking the link again would say so.
+    readPasswordResetEmail.mockRejectedValue(
+      authError("auth/invalid-action-code"),
+    );
+
+    const first = savePasswordOnce(CODE, "12345678");
+    // A remount while the save is in flight finds it, rather than checking the link.
+    const remounted = resetLinkPhase(CODE);
+    const second = savePasswordOnce(CODE, "12345678");
+    expect(await first).toEqual({ kind: "saved" });
+    expect(await second).toEqual({ kind: "saved" });
+    expect(await remounted).toEqual({ kind: "saved" });
+    // And a mount after it settled.
+    expect(await resetLinkPhase(CODE)).toEqual({ kind: "saved" });
+
+    expect(resetPassword).toHaveBeenCalledTimes(1);
+    expect(readPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it("checks the link on a first mount", async () => {
+    const { resetLinkPhase } = await freshDocument();
+    readPasswordResetEmail.mockResolvedValue("ana@example.com");
+
+    expect(await resetLinkPhase(CODE)).toEqual({
+      kind: "ready",
+      email: "ana@example.com",
+    });
+  });
+
+  it("saves again after a failed save, remembering its lost reply across mounts, and a remount after a failure checks the link", async () => {
+    const { savePasswordOnce, resetLinkPhase } = await freshDocument();
+    resetPassword
+      .mockRejectedValueOnce(authError("auth/network-request-failed"))
+      .mockRejectedValueOnce(authError("auth/invalid-action-code"));
+    readPasswordResetEmail.mockResolvedValue("ana@example.com");
+
+    expect(await savePasswordOnce(CODE, "12345678")).toMatchObject({
+      kind: "failed",
+    });
+    expect(await resetLinkPhase(CODE)).toEqual({
+      kind: "ready",
+      email: "ana@example.com",
+    });
+    expect(await savePasswordOnce(CODE, "12345678")).toEqual({
+      kind: "maybe-done",
+    });
+
+    expect(resetPassword).toHaveBeenCalledTimes(2);
+  });
+});
