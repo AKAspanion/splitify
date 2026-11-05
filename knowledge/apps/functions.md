@@ -15,6 +15,11 @@ deployed by hand with `pnpm deploy:functions` from a project owner's machine, no
 ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). `functions/src/index.ts` exports them. All run in
 `asia-south1`.
 
+`functions/package.json` lists `@google-cloud/functions-framework` though no code imports it. `functions/` has its
+own `pnpm-lock.yaml`, so Cloud Build installs it with pnpm, and with pnpm the Node.js buildpack refuses to build
+unless the Framework is a declared dependency (with npm it adds it itself). Keeping `functions/` out of the root
+workspace is what keeps that lockfile in the uploaded folder ([run locally](../operations/run-locally.md)).
+
 ## Functions
 
 - `reports` (`functions/src/reports/index.ts`): HTTP, `POST /api/reports/expenses` with `{ groupId, format }`, format
@@ -81,4 +86,5 @@ token from `Authorization: Bearer` with the admin SDK, then reads the JSON body 
 - `lib/functions/call.ts`
 - `functions/src/activity-text.ts`
 - `functions/package.json`
+- `functions/pnpm-lock.yaml`
 - `firebase.json`
