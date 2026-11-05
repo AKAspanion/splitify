@@ -25,7 +25,8 @@
     "pubsub": { "host": "127.0.0.1", "port": 2147 },
     "hosting": { "host": "127.0.0.1", "port": 2148 },
     "ui": { "enabled": true, "host": "127.0.0.1", "port": 2149 },
-    "logging": { "host": "127.0.0.1", "port": 2150 }
+    "logging": { "host": "127.0.0.1", "port": 2150 },
+    "tasks": { "host": "127.0.0.1", "port": 2151 }
   },
   "hosting": {
     "public": "out",

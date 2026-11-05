@@ -25,12 +25,12 @@ describe("the browser's emulator addresses", () => {
 });
 
 describe("firebase.json's emulators", () => {
-  it("use 2141 to 2150, each once, and every block binds 127.0.0.1", () => {
+  it("use 2141 to 2151, each once, and every block binds 127.0.0.1", () => {
     const ports = Object.values(emulators)
       .flatMap((block) => [block.port, block.postgresPort])
       .filter((port) => port !== undefined);
     expect([...ports].sort()).toEqual(
-      Array.from({ length: 10 }, (_, i) => 2141 + i),
+      Array.from({ length: 11 }, (_, i) => 2141 + i),
     );
     for (const block of Object.values(emulators)) {
       expect(block.host).toBe("127.0.0.1");

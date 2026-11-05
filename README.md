@@ -1,28 +1,37 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Local development
 
-First, run the development server:
+You need Node 24 and Java (the emulators use it). Then:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+pnpm functions:install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:2140](http://localhost:2140) with your browser to see the result.
+`pnpm dev` builds the functions, then runs the functions watcher, every Firebase emulator as the project `demo-splitify`
+and the app on [http://localhost:2140](http://localhost:2140). No `.env` file is needed. The Emulator UI is on
+[http://127.0.0.1:2149](http://127.0.0.1:2149). The emulators keep their data in `.emulator-data/` between runs: stop
+`pnpm dev` with one Ctrl+C and wait, since the export happens as it stops; a second Ctrl+C kills everything at once and skips it.
+
+| Ports       | What                                                                                                                        |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 2140        | The Next.js dev server                                                                                                      |
+| 2141 - 2151 | The dev emulators; `firebase.json`'s `emulators` block holds each one                                                       |
+| 2152 - 2156 | The emulators of `pnpm test:rules`, written to the generated `firebase.rules-test.json`, so the tests run beside `pnpm dev` |
+
+SQL Connect-triggered functions (`mergeContactOnSignUp`, `sendActivityPush*`, `sendGroupDeletedPush`) do not run in
+firebase-tools 15.34.2's emulator.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-To run against the emulators, generate the emulator Hosting config with `node scripts/emulator-firebase-config.mjs`, then
-start them with `npx --yes firebase-tools@15.34.2 emulators:start --config firebase.emulators.json --project demo-splitify`.
-It is `firebase.json` with the emulators' addresses added to the CSP's `connect-src`; `yarn check:hosting` regenerates it
+To check the Hosting build against the emulator, generate the emulator Hosting config with
+`node scripts/emulator-firebase-config.mjs`, then start it with
+`pnpm exec firebase emulators:start --config firebase.emulators.json --project demo-splitify`.
+It is `firebase.json` with the emulators' addresses added to the CSP's `connect-src`; `pnpm check:hosting` regenerates it
 itself, and it is never deployed.
 
 ## Learn More
@@ -49,11 +58,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 | `codeql.yml`     | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                     |
 | `dependabot.yml` | Weekly                                         | Grouped dependency and GitHub Actions updates                                                                                                              |
 
-Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI always runs as
-`npx --yes firebase-tools@15.34.2`. The whole site is one static export (`yarn build`, written to `out/`), and a page that stops exporting fails the CI build.
+Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI is pinned to `firebase-tools@15.34.2`: a devDependency locally, `pnpm dlx` in CI. The whole site is one static export (`pnpm build`, written to `out/`), and a page that stops exporting fails the CI build.
 
 The Cloud Functions in `functions/` are not deployed by CI either. Deploy them by hand from your machine, signed in to the
-Firebase CLI as a project owner: `yarn deploy:functions`.
+Firebase CLI as a project owner: `pnpm deploy:functions`.
 
 `deploy.yml` reads these repository settings (Settings > Secrets and variables > Actions) and fails with a message
 naming what is missing, before anything installs:
@@ -96,7 +104,7 @@ Run these once, signed in as the project owner.
 3. **Add the key to GitHub:** create a JSON key for `github-deploy`, save its contents as the secret
    `FIREBASE_SERVICE_ACCOUNT`, then delete the downloaded file. Add the variable `FIREBASE_PROJECT_ID` and,
    if wanted, `APP_URL` and the optional Variables above.
-4. **First SQL Connect deploy, by hand:** run `yarn deploy:dataconnect` from a machine signed in with `firebase login`.
+4. **First SQL Connect deploy, by hand:** run `pnpm deploy:dataconnect` from a machine signed in with `firebase login`.
    It creates the free-trial Cloud SQL instance `splitify-fdc`, which takes several minutes. After that, the
    **deploy_dataconnect** option of `deploy.yml` deploys schema changes.
 5. **Custom domain:** Firebase console > Hosting > **Add custom domain** > `splitify.spanion.in`. Add the DNS
@@ -118,7 +126,7 @@ Setup in the Google Cloud console for `splitify-416321`, signed in as the projec
 1. **Service account:** IAM & Admin > Service accounts > create `billing-kill-switch` with the **Project Billing
    Manager** role. That role is all it needs to turn billing off for this project.
 2. **API:** enable the Cloud Billing API (`cloudbilling.googleapis.com`; step 1 above already does).
-3. **Deploy:** `yarn deploy:functions`. This creates the function and its topic `budget-alerts`.
+3. **Deploy:** `pnpm deploy:functions`. This creates the function and its topic `budget-alerts`.
 4. **Let the trigger call the function:** Cloud Run > `billingkillswitch` > Permissions > add principal
    `billing-kill-switch@splitify-416321.iam.gserviceaccount.com` with the **Cloud Run Invoker** role. Pub/Sub
    delivers as that account, and the Firebase CLI only grants invoke rights for HTTP and scheduled functions. Without

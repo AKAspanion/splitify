@@ -10,7 +10,7 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./", import.meta.url)),
     },
   },
-  // Tests that need the Firebase emulators run only through `yarn test:rules`.
+  // Tests that need the Firebase emulators run only through `pnpm test:rules`.
   test: {
     environment: "node",
     exclude: [

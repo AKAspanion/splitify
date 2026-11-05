@@ -52,6 +52,9 @@ packages/ios/src/Splitify/GoogleService-Info.plist
 *-debug.log
 .dataconnect
 
+# Written by `pnpm test:rules`: firebase.json with the rule tests' own emulator ports
+firebase.rules-test.json
+
 # Emulator state saved between runs
 .emulator-data/
 

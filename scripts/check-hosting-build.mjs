@@ -1,5 +1,5 @@
 // Checks the hosting build in out/: which pages exist, then what the Firebase Hosting emulator serves from it.
-// Run after `yarn build`. Exits non-zero on the first failure, with a line naming it.
+// Run after `pnpm build`. Exits non-zero on the first failure, with a line naming it.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -155,15 +155,18 @@ for (const { name, pages } of readManifests()) {
   }
 }
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.
-spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
+const config = spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
   cwd: root,
   stdio: "inherit",
 });
+if (config.status !== 0) {
+  fail(
+    `scripts/emulator-firebase-config.mjs failed${config.error ? `: ${config.error.message}` : ""}`,
+  );
+}
 const result = spawnSync(
-  "npx",
+  path.join(root, "node_modules", ".bin", "firebase"),
   [
-    "--yes",
-    "firebase-tools@15.34.2",
     "emulators:exec",
     "--config",
     "firebase.emulators.json",

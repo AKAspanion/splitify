@@ -1,6 +1,6 @@
 // Writes firebase.emulators.json: firebase.json with the emulators' addresses added to the hosting CSP's connect-src,
 // so the app served by the Hosting emulator may call the Auth, SQL Connect and Functions emulators. Generated from
-// firebase.json so the two cannot drift. Used with `--config firebase.emulators.json` by `yarn check:hosting` and
+// firebase.json so the two cannot drift. Used with `--config firebase.emulators.json` by `pnpm check:hosting` and
 // browser checks. Never deploy with it.
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

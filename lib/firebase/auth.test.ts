@@ -1,16 +1,13 @@
 // Sign-out deletes the signed-out person's saved cache from IndexedDB, which Node does not have.
 import "fake-indexeddb/auto";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { EMULATOR_HOST, EMULATOR_PORTS } from "./emulators";
+import { AUTH_HOST } from "../../dataconnect/test-utils/emulator-ports";
 
 // Read when lib/firebase/app.ts first builds the app, so they are set before the dynamic import below.
 process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "demo-splitify";
 process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "demo-key";
 process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS = "true";
 
-const AUTH_HOST =
-  process.env.FIREBASE_AUTH_EMULATOR_HOST ??
-  `${EMULATOR_HOST}:${EMULATOR_PORTS.auth}`;
 const PASSWORD = "test-password-123";
 
 type Auth = typeof import("./auth");

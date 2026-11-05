@@ -58,6 +58,10 @@
     "logging": {
       "host": "127.0.0.1",
       "port": 2150
+    },
+    "tasks": {
+      "host": "127.0.0.1",
+      "port": 2151
     }
   },
   "hosting": {
