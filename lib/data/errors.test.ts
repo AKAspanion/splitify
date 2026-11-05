@@ -16,6 +16,15 @@ describe("toUserMessage", () => {
     ).toBe(text);
   });
 
+  it("passes deleteMyAccount's fresh sign-in message through, as the Functions SDK raises it", () => {
+    expect(
+      toUserMessage({
+        code: "functions/unauthenticated",
+        message: "Sign in again to delete your account.",
+      }),
+    ).toBe("Sign in again to delete your account.");
+  });
+
   it("answers an unauthenticated error with the sign-in line", () => {
     expect(toUserMessage({ code: "unauthorized", message: "no token" })).toBe(
       "Sign in again to continue.",

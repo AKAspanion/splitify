@@ -189,6 +189,28 @@ describe("CreateGroup", () => {
     expect(data.groups).toHaveLength(2); // Trip and the one that passed
   });
 
+  it("refuses a type over 50 characters and accepts 50", async () => {
+    await expect(
+      run(alice.dc, "CreateGroup", {
+        id: uuid(),
+        title: "ok",
+        type: "t".repeat(51),
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow();
+    const id = uuid();
+    await run(alice.dc, "CreateGroup", {
+      id,
+      title: "ok",
+      type: "t".repeat(50),
+      activityId: uuid(),
+    });
+    const data = (await seed(`query { groups { id } }`)) as {
+      groups: unknown[];
+    };
+    expect(data.groups).toHaveLength(2); // Trip and the one that passed
+  });
+
   it("fails on an existing id and leaves the group as it was", async () => {
     await expect(
       run(carol.dc, "CreateGroup", {
@@ -227,6 +249,32 @@ describe("UpdateGroup", () => {
       actor: { id: bob.uid },
       title: "Renamed",
     });
+  });
+
+  it("refuses a type over 50 characters, leaves the group unchanged, and accepts 50", async () => {
+    await expect(
+      run(bob.dc, "UpdateGroup", {
+        id: G,
+        title: "Renamed",
+        type: "t".repeat(51),
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow();
+    const read = async () =>
+      (
+        (await seed(
+          `query($id: UUID!) { group(key: { id: $id }) { title type } }`,
+          { id: G },
+        )) as { group: { title: string; type: string | null } }
+      ).group;
+    expect(await read()).toEqual({ title: "Trip", type: null });
+    await run(bob.dc, "UpdateGroup", {
+      id: G,
+      title: "Renamed",
+      type: "t".repeat(50),
+      activityId: uuid(),
+    });
+    expect(await read()).toEqual({ title: "Renamed", type: "t".repeat(50) });
   });
 });
 

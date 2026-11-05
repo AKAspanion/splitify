@@ -9,7 +9,7 @@ mutation CreateGroup(
   $activityId: UUID!
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500) && (!has(vars.type) || vars.type == null || vars.type.size() <= 50)"
 )
 @transaction {
   group_insert(
@@ -35,7 +35,7 @@ mutation UpdateGroup(
   $activityId: UUID!
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500) && (!has(vars.type) || vars.type == null || vars.type.size() <= 50)"
 )
 @transaction {
   query @redact {

@@ -3,7 +3,7 @@
 
 query ListMyActivity($limit: Int!, $offset: Int!)
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.limit <= 100"
 ) {
   activities(
     where: {

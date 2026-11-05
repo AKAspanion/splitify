@@ -139,6 +139,17 @@ describe("ListMyActivity and GetActivity", () => {
     expect(carolList.activities).toEqual([]);
   });
 
+  it("refuses a limit of 101 and accepts 100", async () => {
+    await expect(
+      query(alice.dc, "ListMyActivity", { limit: 101, offset: 0 }),
+    ).rejects.toThrow();
+    const { activities } = await query(alice.dc, "ListMyActivity", {
+      limit: 100,
+      offset: 0,
+    });
+    expect(activities).toHaveLength(2);
+  });
+
   it("refuses both when nobody is signed in", async () => {
     const dc = signedOutConnector(connectorConfig);
     await expect(

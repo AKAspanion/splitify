@@ -15,7 +15,7 @@ mutation CreateExpense(
   $activityId: UUID!
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.amount > 0 && vars.amount <= 10000000 && vars.description.size() <= 500 && vars.payments.size() <= 50 && vars.splits.size() <= 50 && vars.payments.all(p, p.expenseId == vars.id && p.amount >= 0 && p.amount <= 10000000) && vars.splits.all(s, s.expenseId == vars.id && s.amount >= 0 && s.amount <= 10000000)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.amount > 0 && vars.amount <= 10000000 && vars.description.size() <= 500 && (!has(vars.category) || vars.category == null || vars.category.size() <= 50) && vars.payments.size() <= 50 && vars.splits.size() <= 50 && vars.payments.all(p, p.expenseId == vars.id && p.amount >= 0 && p.amount <= 10000000) && vars.splits.all(s, s.expenseId == vars.id && s.amount >= 0 && s.amount <= 10000000)"
 )
 @transaction {
   query @redact {

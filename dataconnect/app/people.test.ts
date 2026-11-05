@@ -55,11 +55,18 @@ beforeEach(async () => {
 
 const run = (dc: DataConnect, name: string, vars?: Record<string, unknown>) =>
   executeMutation(mutationRef(dc, name, vars as never));
+// From the server every time: the SDK caches a query's result by its variables, which would carry one test's rows
+// into the next.
 const read = async <T>(
   dc: DataConnect,
   name: string,
   vars?: Record<string, unknown>,
-) => (await executeQuery(queryRef(dc, name, vars as never))).data as T;
+) =>
+  (
+    await executeQuery(queryRef(dc, name, vars as never), {
+      fetchPolicy: "SERVER_ONLY",
+    })
+  ).data as T;
 
 type Rows = Record<string, { id: string; name: string | null }[]>;
 const ACTIVITIES = `query { activities { type title actor { id } subject { id } group { id } } }`;
@@ -197,6 +204,32 @@ describe("UpdateContact", () => {
     expect(data.user).toEqual({ name: "Dee", email: "d2@example.test" });
   });
 
+  it("refuses an email another user has, and leaves the contact's email unchanged", async () => {
+    await expect(
+      run(alice.dc, "UpdateContact", {
+        id: "spuser_d",
+        email: carol.email,
+        name: "D",
+      }),
+    ).rejects.toThrow(/That email is already in use/);
+    const data = (await seed(
+      `query { user(key: { id: "spuser_d" }) { email } }`,
+    )) as { user: { email: string } };
+    expect(data.user.email).toBe("d@example.test");
+  });
+
+  it("keeps the contact's own email while renaming it", async () => {
+    await run(alice.dc, "UpdateContact", {
+      id: "spuser_d",
+      email: "d@example.test",
+      name: "Dee",
+    });
+    const data = (await seed(
+      `query { user(key: { id: "spuser_d" }) { name email } }`,
+    )) as { user: { name: string; email: string } };
+    expect(data.user).toEqual({ name: "Dee", email: "d@example.test" });
+  });
+
   it("answers Not found for a signed-up friend, and leaves them unchanged", async () => {
     await expect(
       run(alice.dc, "UpdateContact", {
@@ -234,6 +267,53 @@ describe("ListFriends and GetFriend", () => {
       "ListFriends",
     );
     expect(carolList.friendships).toEqual([]);
+  });
+
+  it("refuses a limit over 500 or an explicit null, and accepts 500", async () => {
+    await expect(
+      read(alice.dc, "ListFriends", { limit: 501 }),
+    ).rejects.toThrow();
+    await expect(
+      read(alice.dc, "ListFriends", { limit: null }),
+    ).rejects.toThrow();
+    const data = await read<{ friendships: unknown[] }>(
+      alice.dc,
+      "ListFriends",
+      { limit: 500 },
+    );
+    expect(data.friendships).toHaveLength(1);
+  });
+
+  it("returns at most 500 friends when no limit is given", async () => {
+    const ids = Array.from({ length: 501 }, (_, i) => `spuser_many${i}`);
+    // The emulator takes at most 100 rows per insertMany.
+    for (let i = 0; i < ids.length; i += 100) {
+      const batch = ids.slice(i, i + 100);
+      await seed(
+        `mutation($users: [User_Data!]!, $rows: [Friendship_Data!]!) {
+          user_insertMany(data: $users)
+          friendship_insertMany(data: $rows)
+        }`,
+        {
+          users: batch.map((id) => ({
+            id,
+            email: `${id}@example.test`,
+            signedUp: false,
+          })),
+          rows: batch.map((friendId) => ({ userId: carol.uid, friendId })),
+        },
+      );
+    }
+    const seeded = (await seed(
+      `query($id: String!) { friendships(where: { userId: { eq: $id } }, limit: 1000) { friendId } }`,
+      { id: carol.uid },
+    )) as { friendships: unknown[] };
+    expect(seeded.friendships).toHaveLength(501);
+    const data = await read<{ friendships: unknown[] }>(
+      carol.dc,
+      "ListFriends",
+    );
+    expect(data.friendships).toHaveLength(500);
   });
 
   it("returns a friend, and null for someone who is not one", async () => {
@@ -352,6 +432,112 @@ describe("AddFriend", () => {
         activityId: uuid(),
       }),
     ).rejects.toThrow(/Not found/);
+  });
+});
+
+// Bob created the offline contact Mom and put her in group G, which Alice (playing the attacker) shares with them.
+// Only Mom's existing friends may befriend her: see knowledge/decisions/contacts-editable-only-by-their-friends.md.
+describe("AddFriend on someone else's offline contact", () => {
+  const MOM = "spuser_mom";
+  type World = {
+    friendships: { userId: string; friendId: string }[];
+    groupMembers: { userId: string }[];
+    activities: { id: string }[];
+  };
+  const world = async () =>
+    (await seed(
+      `query { friendships { userId friendId } groupMembers { userId } activities { id } }`,
+    )) as World;
+
+  beforeEach(async () => {
+    await seedUser({
+      id: MOM,
+      email: "mom@example.test",
+      signedUp: false,
+      name: "Mom",
+    });
+    await seedFriendship(bob.uid, MOM);
+    await seedGroup({
+      id: G,
+      title: "Family",
+      memberIds: [alice.uid, bob.uid, MOM],
+    });
+  });
+
+  it("answers Not found to a group-mate who is not her friend, with or without the group, and writes nothing", async () => {
+    const before = await world();
+    await expect(
+      run(alice.dc, "AddFriend", {
+        friendId: MOM,
+        withGroup: false,
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow(/Not found/);
+    await expect(
+      run(alice.dc, "AddFriend", {
+        friendId: MOM,
+        groupId: G,
+        withGroup: true,
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow(/Not found/);
+    expect(await world()).toEqual(before);
+  });
+
+  it("lets her creator and friend add her again", async () => {
+    await run(bob.dc, "AddFriend", {
+      friendId: MOM,
+      groupId: G,
+      withGroup: true,
+      activityId: uuid(),
+    });
+    const after = await world();
+    expect(after.friendships).toHaveLength(2);
+    expect(after.activities).toHaveLength(1);
+  });
+
+  it("still lets anyone add a signed-up user", async () => {
+    await run(alice.dc, "AddFriend", {
+      friendId: carol.uid,
+      groupId: G,
+      withGroup: true,
+      activityId: uuid(),
+    });
+    const after = await world();
+    expect(after.friendships).toContainEqual({
+      userId: alice.uid,
+      friendId: carol.uid,
+    });
+    expect(after.groupMembers.map((m) => m.userId)).toContain(carol.uid);
+  });
+
+  it("stops the takeover: Mom keeps her email and her memberships after AddFriend, UpdateContact and UpsertMe", async () => {
+    await expect(
+      run(alice.dc, "AddFriend", {
+        friendId: MOM,
+        groupId: G,
+        withGroup: true,
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow(/Not found/);
+    await expect(
+      run(alice.dc, "UpdateContact", {
+        id: MOM,
+        email: alice.email,
+        name: "Mom",
+      }),
+    ).rejects.toThrow(/Not found/);
+    await run(alice.dc, "UpsertMe", {});
+
+    const data = (await seed(
+      `query($id: String!) {
+        user(key: { id: $id }) { email }
+        groupMembers(where: { userId: { eq: $id } }) { groupId }
+      }`,
+      { id: MOM },
+    )) as { user: { email: string }; groupMembers: { groupId: string }[] };
+    expect(data.user.email).toBe("mom@example.test");
+    expect(data.groupMembers).toEqual([{ groupId: flat(G) }]);
   });
 });
 

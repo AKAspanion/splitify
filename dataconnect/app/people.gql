@@ -51,6 +51,16 @@ mutation UpdateContact($id: String!, $email: String!, $name: String!)
       @check(expr: "this != null && !this.signedUp", message: "Not found") {
       signedUp
     }
+    # As in CreateContact: no contact may take an email another user has, or the merge on that user's next sign-in
+    # would hand them the contact's groups.
+    taken: users(where: { email: { eq: $email }, id: { ne: $id } }, limit: 1)
+      @check(
+        expr: "this.size() == 0"
+        message: "That email is already in use"
+        optional: true
+      ) {
+      id
+    }
   }
   user_update(
     key: { id: $id }
@@ -58,9 +68,11 @@ mutation UpdateContact($id: String!, $email: String!, $name: String!)
   )
 }
 
-query ListFriends($limit: Int)
+# At most 500 friends, the most the app asks for (lib/data/groups.ts): an omitted limit means 500, and a null one is
+# refused, since it would mean no limit.
+query ListFriends($limit: Int = 500)
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.limit) || (vars.limit != null && vars.limit <= 500))"
 ) {
   friendships(
     where: { userId: { eq_expr: "auth.uid" } }
@@ -101,9 +113,21 @@ mutation AddFriend(
     ) @check(expr: "!vars.withGroup || this.size() > 0", message: "Not found") {
       userId
     }
+    # Someone else's offline contact (signedUp false) answers as a missing one unless the caller is already its
+    # friend: knowledge/decisions/contacts-editable-only-by-their-friends.md.
     friend: user(key: { id: $friendId })
-      @check(expr: "this != null", message: "Not found") {
+      @check(
+        expr: "this != null && (this.signedUp || this.callerFriendship.size() > 0)"
+        message: "Not found"
+      ) {
       name
+      signedUp
+      callerFriendship: friendships_on_friend(
+        where: { userId: { eq_expr: "auth.uid" } }
+        limit: 1
+      ) {
+        userId
+      }
     }
     groups(
       where: {

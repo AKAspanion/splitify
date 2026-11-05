@@ -8,6 +8,8 @@ const CHECK_MESSAGES = [
   "That email is already in use",
   "You can only add your friends to a group",
   "That request is too large.",
+  // deleteMyAccount's answer to a sign-in older than 5 minutes (functions/src/account/delete-my-account.ts).
+  "Sign in again to delete your account.",
 ] as const;
 
 const SIGN_IN_AGAIN = "Sign in again to continue.";
