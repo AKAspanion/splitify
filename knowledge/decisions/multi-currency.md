@@ -30,7 +30,11 @@ Decided by the developer, from the ga dashboard, on 2026-11-04.
 - For a long-running group, the locked rate can drift far from the day's real rate.
 - Not decided yet: where the rates come from, and whether a person can override a rate.
 
+## History
+
+- 2026-11-05: wrote the paths of files that spec 2c removed (prisma/schema.prisma) as plain text, so verify no longer expects them; the decision itself is unchanged.
+
 ## Sources
 
-- `prisma/schema.prisma`
+- prisma/schema.prisma
 - `constants/ui.ts`

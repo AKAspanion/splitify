@@ -31,23 +31,24 @@ plus its activity, its members and settings.
 
 ## Data
 
-On the hosted site every group screen reads and writes through `lib/data/groups.ts` over [SQL Connect](../data/sql-connect.md);
-none calls a server action. A group the caller can't read, or that is gone, shows "We couldn't find that" with a link to
-`/groups`. "Download report" is hidden until the reports move to a Cloud Function (spec 2c): [reports](reports.md).
+Every group screen reads and writes through `lib/data/groups.ts` over [SQL Connect](../data/sql-connect.md);
+there is no server action. A group the caller can't read, or that is gone, shows "We couldn't find that" with a link to
+`/groups`. "Download report" calls the reports function ([reports](reports.md)).
 The dashboard was a stub and stays one.
 
 ## Rules
 
 - Group images are placeholders the create form picks: `/images/placeholder/groups/<n>.png`
   (`app/(platform)/(app)/(forms)/groups/add/form.tsx`).
-- Any signed-in user can edit or delete any group, or add a member to it, by its id:
-  [missing authorization on writes](../findings/missing-authorization-on-writes.md). The rule is any member of the
-  group ([group member permissions](../decisions/group-member-permissions.md)).
+- Any member of a group can edit it, delete it or add a member, and nobody else can: the rule is in the SQL Connect
+  operations ([group member permissions](../decisions/group-member-permissions.md),
+  [missing authorization on writes](../findings/missing-authorization-on-writes.md), fixed).
 - Deleting a group deletes its expenses and activity ([data model](../data/model.md)).
-- Each change notifies through the [push-notification API](../api/push-notification.md).
+- Each change writes its activity row, and a function trigger sends the push ([push functions](../apps/functions.md)).
 
 ## History
 
+- 2026-11-05: Download report was hidden, any signed-in user could change any group and pushes came from the push API; now the report is back, only members can change a group and triggers push, because spec 2c removed the server.
 - 2026-11-05: read through the API and server actions; now through `lib/data/groups.ts`, with Download report hidden, because spec 2b moved the screens onto SQL Connect.
 
 ## Sources
@@ -63,9 +64,4 @@ The dashboard was a stub and stays one.
 - `app/(platform)/(app)/(screens)/groups/[id]/settings/page.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/settings/group-delete.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/activity/page.tsx`
-- `hooks/use-expenses.ts`
-- `actions/create-group/index.ts`
-- `actions/update-group/index.ts`
-- `actions/delete-group/index.ts`
-- `actions/update-group-member/index.ts`
 - `lib/data/groups.ts`

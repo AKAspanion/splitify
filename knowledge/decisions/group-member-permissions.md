@@ -36,9 +36,13 @@ have no recorded creator.
 - A member can remove anyone, including the group's original creator, and delete the group for everyone. The
   developer chose this over recording an owner.
 
+## History
+
+- 2026-11-05: wrote the paths of files that spec 2c removed (actions/delete-group/index.ts, actions/update-contact/index.ts, actions/update-group/index.ts, prisma/schema.prisma) as plain text, so verify no longer expects them; the decision itself is unchanged.
+
 ## Sources
 
-- `prisma/schema.prisma`
-- `actions/update-group/index.ts`
-- `actions/delete-group/index.ts`
-- `actions/update-contact/index.ts`
+- prisma/schema.prisma
+- actions/update-group/index.ts
+- actions/delete-group/index.ts
+- actions/update-contact/index.ts
