@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -36,11 +35,14 @@ const LandingPage = () => {
       {status === "loading" ? (
         <Skeleton className="mt-6 h-11 w-52" aria-label="Loading" />
       ) : status === "signed-out" ? (
-        <Link href="/sign-up/">
-          <Button className="mt-6" size="lg">
-            Join Splitify for free
-          </Button>
-        </Link>
+        // A full page load, so an ad script this page loaded can't follow into sign-up
+        // (knowledge/decisions/adsense-on-public-pages-only.md).
+        <a
+          className={buttonVariants({ size: "lg", className: "mt-6" })}
+          href="/sign-up/"
+        >
+          Join Splitify for free
+        </a>
       ) : null}
     </div>
   );

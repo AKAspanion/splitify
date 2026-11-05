@@ -21,10 +21,33 @@ describe("escapeSearch", () => {
     expect(new RegExp(escapeSearch(".*")).test("anything")).toBe(false);
   });
 
-  it("cuts a 150-character input to 100 characters before escaping", () => {
+  it("cuts plain text to 100 characters", () => {
     expect(escapeSearch("a".repeat(150))).toBe("a".repeat(100));
-    // 100 dots cut first, then escaped: 200 characters, not 300.
-    expect(escapeSearch(".".repeat(150))).toHaveLength(200);
+  });
+
+  // The server refuses a search over 100 characters, and it bounds the escaped text, so the escaped text is what fits.
+  it("keeps 100 regular-expression characters within 100 once escaped", () => {
+    const escaped = escapeSearch(".".repeat(100));
+    expect(escaped.length).toBeLessThanOrEqual(100);
+    expect(escaped).toBe("\\.".repeat(50));
+    expect(new RegExp(`^${escaped}$`).test(".".repeat(50))).toBe(true);
+  });
+
+  it("never ends on half an escape", () => {
+    // 99 letters then a dot: the dot's escape needs two characters and only one is left, so it is left out whole.
+    const escaped = escapeSearch(`${"a".repeat(99)}.`);
+    expect(escaped).toBe("a".repeat(99));
+    expect(() => new RegExp(escaped)).not.toThrow();
+
+    const mixed = escapeSearch("a.".repeat(80));
+    expect(mixed.length).toBeLessThanOrEqual(100);
+    expect(mixed.endsWith("\\")).toBe(false);
+    expect(new RegExp(`^${mixed}$`).test("a.".repeat(33) + "a")).toBe(true);
+  });
+
+  it("never splits a character outside the basic plane", () => {
+    const escaped = escapeSearch(`${"a".repeat(99)}😀`);
+    expect(escaped).toBe("a".repeat(99));
   });
 
   it("leaves plain text alone", () => {

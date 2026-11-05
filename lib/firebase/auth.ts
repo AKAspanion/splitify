@@ -235,9 +235,14 @@ export async function sendPasswordReset(email: string): Promise<void> {
 /**
  * Signs out this browser only: deletes the person's saved cache, then removes this device's push token while the
  * sign-in still authorises it.
+ *
+ * `toSignIn` is for a sign-out the app asks for so the person signs in again: the auth guard then sends them to sign in
+ * and back to the page they were on, not home.
  */
-export async function signOut(): Promise<void> {
-  markSignOutIntended(true);
+export async function signOut(
+  options: { toSignIn?: boolean } = {},
+): Promise<void> {
+  markSignOutIntended(!options.toSignIn);
   try {
     const uid = getFirebaseAuth().currentUser?.uid;
     if (uid) await clearSavedCache(uid);

@@ -7,13 +7,12 @@ import {
   registerAppWorker,
   registerWebPush,
 } from "@/lib/push/register";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export const Launch = () => {
   const { user } = useAuth();
   const uid = user?.uid ?? null;
-  const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "" || pathname === "/";
 
@@ -47,9 +46,11 @@ export const Launch = () => {
     return stopListening;
   }, [uid]);
 
+  // Someone signed in on the landing page goes to the app by a full page load, never a client navigation: the landing
+  // page may have loaded the ad script, which would carry over (knowledge/decisions/adsense-on-public-pages-only.md).
   useEffect(() => {
     if (uid && isHome) {
-      router.push("/groups");
+      window.location.replace("/groups/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
