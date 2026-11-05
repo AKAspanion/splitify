@@ -7,7 +7,7 @@
       "source": "functions",
       "codebase": "default",
       "runtime": "nodejs24",
-      "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"],
+      "predeploy": ["pnpm --dir \"$RESOURCE_DIR\" build"],
       "ignore": ["node_modules", ".git", "src", "firebase-debug.log", "*.local"]
     }
   ],

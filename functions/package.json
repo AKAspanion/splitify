@@ -19,9 +19,5 @@
   "devDependencies": {
     "typescript": "~6.0.3"
   },
-  "resolutions": {
-    "exceljs/**/archiver-utils/**/minimatch": "3.1.5",
-    "exceljs/**/zip-stream/**/minimatch": "3.1.5",
-    "exceljs/**/readdir-glob/minimatch": "5.1.9"
-  }
+  "packageManager": "pnpm@11.0.8"
 }

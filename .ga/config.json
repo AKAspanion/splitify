@@ -12,11 +12,11 @@
     },
     "checks": {
       "commands": {
-        "typecheck": "yarn tsc --noEmit",
-        "lint": "yarn lint",
+        "typecheck": "pnpm tsc --noEmit",
+        "lint": "pnpm lint",
         "lint-fix": null,
-        "format-check": "yarn prettier --check .",
-        "test": "yarn test",
+        "format-check": "pnpm prettier --check .",
+        "test": "pnpm test",
         "e2e": null
       }
     },
