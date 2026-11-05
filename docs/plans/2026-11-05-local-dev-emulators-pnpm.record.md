@@ -38,3 +38,5 @@ Task 3: agent implementer a956e6b29cfc27fc0
 Note: End checks on 2c5a486: typecheck pass, lint pass (0 errors, 5 existing warnings), smoke pass; fix wave also ran pnpm test 192/192 and pnpm test:rules 204/204 beside pnpm dev
 Note: Open finding: [findings/sql-connect-triggers-not-run-locally](../../knowledge/findings/sql-connect-triggers-not-run-locally.md) — SQL Connect-triggered functions don't run in firebase-tools 15.34.2's Functions emulator
 Run: finished 2026-11-05 15:08
+Signed: Cloud Tasks emulator, which always starts with Functions, goes on 2151; the port test covers 2141-2151 — the developer answered "Yes, keep them" on 2026-11-05
+Signed: pnpm test:rules runs its own emulators on 2152 hub, 2153 auth, 2154 SQL Connect, 2155 its Postgres, 2156 logging, from a generated config, and the rule-test helpers refuse to run without the emulator env instead of falling back to the dev ports — the developer answered "Yes, keep them" on 2026-11-05

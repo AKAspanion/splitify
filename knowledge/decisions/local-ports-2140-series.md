@@ -21,14 +21,18 @@ The developer's rule of 2026-11-05: every local port is in the 2140 series, assi
 emulator hub 2141, Auth 2142, and so on in order. The values are in the `emulators` block of `firebase.json` and, for the
 rule tests, in `scripts/rules-test-firebase-config.mjs`; this concept doesn't copy the table.
 
-Provisional rulings the developer has not yet signed off on: the Cloud Tasks emulator, which always starts with Functions,
-is on 2151 (it took a port outside the series otherwise); and `pnpm test:rules` runs its own emulators on 2152 to 2156 so it
-can run while `pnpm dev` runs and cannot empty the dev data. The developer confirms both.
+The Cloud Tasks emulator, which always starts with Functions, is on 2151, because otherwise it takes a port outside the
+series. `pnpm test:rules` runs its own emulators on 2152 to 2156, so it can run while `pnpm dev` runs and can't empty the
+dev data. The developer confirmed both on 2026-11-05.
 
 ## Consequences
 
 - `lib/firebase/emulators.ts` mirrors the browser's three ports, and its test holds them equal to `firebase.json`.
 - The Emulator UI is on 2149.
+
+## History
+
+- 2026-11-05: Cloud Tasks on 2151 and the rule-test emulators on 2152 to 2156 were provisional; now confirmed, because the developer signed them off.
 
 ## Sources
 
