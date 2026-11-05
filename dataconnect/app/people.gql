@@ -1,11 +1,30 @@
 # Users, contacts and friends. The caller is always auth.uid, never a variable. A record the caller may not see
 # answers as a missing one: null from a query, "Not found" from a mutation.
 
+# Only someone the caller can add: a signed-up user, or a contact the caller is already friends with. Someone else's
+# offline contact answers as a missing one, as AddFriend would refuse it.
 query SearchUserByEmail($email: String!)
 @auth(
   expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.email.size() <= 254"
 ) {
-  users(where: { email: { eq: $email } }, limit: 1) {
+  users(
+    where: {
+      _and: [
+        { email: { eq: $email } }
+        {
+          _or: [
+            { signedUp: { eq: true } }
+            {
+              friendships_on_friend: {
+                exist: { userId: { eq_expr: "auth.uid" } }
+              }
+            }
+          ]
+        }
+      ]
+    }
+    limit: 1
+  ) {
     id
     name
     imageUrl
@@ -51,6 +70,22 @@ mutation UpdateContact($id: String!, $email: String!, $name: String!)
       @check(expr: "this != null && !this.signedUp", message: "Not found") {
       signedUp
     }
+    # Only the contact's sole friend may change its email: the address picks who the contact merges into at sign-up,
+    # and a second friend (from before AddFriend's rule) could otherwise set an address they own and take it over.
+    # The app sends the email lowercased, so a stored address in another case still counts as unchanged.
+    sole: user(key: { id: $id })
+      @check(
+        expr: "this == null || vars.email == this.email || vars.email == this.email.lowerAscii() || this.otherFriends.size() == 0"
+        message: "This contact is shared with someone else, so you can only change their name"
+      ) {
+      email
+      otherFriends: friendships_on_friend(
+        where: { userId: { ne_expr: "auth.uid" } }
+        limit: 1
+      ) {
+        userId
+      }
+    }
     # As in CreateContact: no contact may take an email another user has, or the merge on that user's next sign-in
     # would hand them the contact's groups.
     taken: users(where: { email: { eq: $email }, id: { ne: $id } }, limit: 1)
@@ -72,7 +107,7 @@ mutation UpdateContact($id: String!, $email: String!, $name: String!)
 # refused, since it would mean no limit.
 query ListFriends($limit: Int = 500)
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.limit) || (vars.limit != null && vars.limit <= 500))"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.limit) || (vars.limit != null && vars.limit >= 0 && vars.limit <= 500))"
 ) {
   friendships(
     where: { userId: { eq_expr: "auth.uid" } }

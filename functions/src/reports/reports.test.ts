@@ -239,6 +239,22 @@ describe("reports", () => {
     expect(lines[1]).toBe("Description,Amount,Category,Type");
   });
 
+  it("escapes the text file's cells as the CSV does, title included", async () => {
+    await seed(
+      `mutation($g: UUID!) {
+        group_update(key: { id: $g }, data: { title: "=cmd" })
+        expense_update(key: { id: "${E(1)}" }, data: { description: "=HYPERLINK(\\"http://x\\")", category: "@SUM(A1)" })
+      }`,
+      { g: G },
+    );
+    const a = await call({ groupId: G, format: "text" });
+    expect(a.status).toBe(200);
+    const lines = (a.sent as string).split("\n");
+    expect(lines[0]).toBe("'=cmd");
+    expect(lines).toContain(`"'=HYPERLINK(""http://x"")",90,'@SUM(A1),EQUAL`);
+    expect(lines).toContain('"Taxi, airport",30,,EQUAL');
+  });
+
   it("keeps a hostile group title out of the file name header", async () => {
     await seed(
       `mutation($g: UUID!, $t: String!) { group_update(key: { id: $g }, data: { title: $t }) }`,

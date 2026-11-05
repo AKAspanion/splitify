@@ -6,6 +6,7 @@ describe("toUserMessage", () => {
     "Not found",
     "Only members of this group can be added to an expense",
     "That email is already in use",
+    "This contact is shared with someone else, so you can only change their name",
     "You can only add your friends to a group",
     "That request is too large.",
   ])("passes the check message %j through unchanged", (text) => {

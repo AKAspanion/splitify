@@ -16,6 +16,12 @@ import {
   signInTestUser,
   type TestUser,
 } from "../test-utils/emulator";
+import {
+  getApps as getAdminApps,
+  initializeApp as initializeAdminApp,
+} from "firebase-admin/app";
+import { getAuth as getAdminAuth } from "firebase-admin/auth";
+import { mergeContactForUser } from "../../functions/src/merge-contact";
 
 const G = "11111111-1111-4111-8111-111111111111";
 const uuid = () => crypto.randomUUID();
@@ -73,6 +79,40 @@ const ACTIVITIES = `query { activities { type title actor { id } subject { id } 
 const FRIENDSHIPS = `query { friendships { userId friendId } }`;
 
 describe("SearchUserByEmail", () => {
+  it("returns nothing for someone else's offline contact", async () => {
+    await seedUser({
+      id: "spuser_mom",
+      email: "mom@example.test",
+      signedUp: false,
+      name: "Mom",
+    });
+    await seedFriendship(bob.uid, "spuser_mom");
+    const data = await read<{ users: unknown[] }>(
+      carol.dc,
+      "SearchUserByEmail",
+      { email: "mom@example.test" },
+    );
+    expect(data.users).toEqual([]);
+  });
+
+  it("finds the caller's own offline contact", async () => {
+    await seedUser({
+      id: "spuser_mom",
+      email: "mom@example.test",
+      signedUp: false,
+      name: "Mom",
+    });
+    await seedFriendship(bob.uid, "spuser_mom");
+    const data = await read<{ users: { id: string }[] }>(
+      bob.dc,
+      "SearchUserByEmail",
+      { email: "mom@example.test" },
+    );
+    expect(data.users).toEqual([
+      { id: "spuser_mom", name: "Mom", imageUrl: null },
+    ]);
+  });
+
   it("returns id, name and image for an exact match, and no email", async () => {
     const data = await read<{ users: Record<string, unknown>[] }>(
       carol.dc,
@@ -246,6 +286,129 @@ describe("UpdateContact", () => {
   });
 });
 
+// Bob created the offline contact Mom; Alice became her friend through the AddFriend that let anyone befriend a
+// contact, before contacts-editable-only-by-their-friends. Only a contact's sole friend may change her email.
+describe("UpdateContact on a contact with two friends", () => {
+  const MOM = "spuser_mom";
+  const SHARED = /This contact is shared with someone else/;
+  const mom = async () =>
+    (await seed(
+      `query($id: String!) {
+          user(key: { id: $id }) { name email }
+          groupMembers(where: { userId: { eq: $id } }) { groupId }
+        }`,
+      { id: MOM },
+    )) as {
+      user: { name: string; email: string };
+      groupMembers: { groupId: string }[];
+    };
+
+  beforeEach(async () => {
+    await seedUser({
+      id: MOM,
+      email: "mom@example.test",
+      signedUp: false,
+      name: "Mom",
+    });
+    await seedFriendship(bob.uid, MOM);
+    await seedFriendship(alice.uid, MOM);
+    await seedGroup({ id: G, title: "Family", memberIds: [bob.uid, MOM] });
+  });
+
+  it("refuses a second friend's email change, and leaves her email unchanged", async () => {
+    await expect(
+      run(alice.dc, "UpdateContact", {
+        id: MOM,
+        email: "alice.alt@example.test",
+        name: "Mom",
+      }),
+    ).rejects.toThrow(SHARED);
+    // A change of case only is a change too: the merge looks the address up in lowercase.
+    await expect(
+      run(alice.dc, "UpdateContact", {
+        id: MOM,
+        email: "MOM@example.test",
+        name: "Mom",
+      }),
+    ).rejects.toThrow(SHARED);
+    expect((await mom()).user.email).toBe("mom@example.test");
+  });
+
+  it("refuses her creator too while someone else is her friend", async () => {
+    await expect(
+      run(bob.dc, "UpdateContact", {
+        id: MOM,
+        email: "mom2@example.test",
+        name: "Mom",
+      }),
+    ).rejects.toThrow(SHARED);
+    expect((await mom()).user.email).toBe("mom@example.test");
+  });
+
+  it("lets a second friend rename her", async () => {
+    await run(alice.dc, "UpdateContact", {
+      id: MOM,
+      email: "mom@example.test",
+      name: "Mama",
+    });
+    expect((await mom()).user).toEqual({
+      name: "Mama",
+      email: "mom@example.test",
+    });
+  });
+
+  it("lets her sole friend change her email", async () => {
+    await seed(
+      `mutation($a: String!, $m: String!) {
+        friendship_deleteMany(where: { _or: [{ userId: { eq: $a }, friendId: { eq: $m } }, { userId: { eq: $m }, friendId: { eq: $a } }] })
+      }`,
+      { a: alice.uid, m: MOM },
+    );
+    await run(bob.dc, "UpdateContact", {
+      id: MOM,
+      email: "mom2@example.test",
+      name: "Mom",
+    });
+    expect((await mom()).user.email).toBe("mom2@example.test");
+  });
+
+  it("stops the takeover: a second friend's own address, verified, merges nothing of hers", async () => {
+    const attackerEmail = "alice.alt@example.test";
+    await expect(
+      run(alice.dc, "UpdateContact", {
+        id: MOM,
+        email: attackerEmail,
+        name: "Mom",
+      }),
+    ).rejects.toThrow(SHARED);
+
+    // Alice signs up with the address she owns, verifies it, and the sign-up merge runs for her new account.
+    const attackerUid = "alice-alt-uid";
+    const auth = getAdminAuth(
+      getAdminApps().find((a) => a.name === "test-people-auth") ??
+        initializeAdminApp({ projectId: "demo-splitify" }, "test-people-auth"),
+    );
+    await auth.deleteUser(attackerUid).catch(() => undefined);
+    await auth.createUser({
+      uid: attackerUid,
+      email: attackerEmail,
+      emailVerified: true,
+    });
+    await seedUser({
+      id: attackerUid,
+      email: attackerEmail,
+      signedUp: true,
+      name: "Alice alt",
+    });
+    expect(await mergeContactForUser(attackerUid)).toBe("none");
+
+    const after = await mom();
+    expect(after.user.email).toBe("mom@example.test");
+    expect(after.groupMembers).toEqual([{ groupId: flat(G) }]);
+    await auth.deleteUser(attackerUid);
+  });
+});
+
 describe("ListFriends and GetFriend", () => {
   beforeEach(async () => {
     await seedFriendship(alice.uid, bob.uid);
@@ -269,7 +432,16 @@ describe("ListFriends and GetFriend", () => {
     expect(carolList.friendships).toEqual([]);
   });
 
-  it("refuses a limit over 500 or an explicit null, and accepts 500", async () => {
+  it("refuses a limit below 0, over 500 or an explicit null, and accepts 0 and 500", async () => {
+    await expect(
+      read(alice.dc, "ListFriends", { limit: -1 }),
+    ).rejects.toThrow();
+    const none = await read<{ friendships: unknown[] }>(
+      alice.dc,
+      "ListFriends",
+      { limit: 0 },
+    );
+    expect(none.friendships).toEqual([]);
     await expect(
       read(alice.dc, "ListFriends", { limit: 501 }),
     ).rejects.toThrow();

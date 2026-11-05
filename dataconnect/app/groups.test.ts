@@ -413,6 +413,20 @@ describe("ListMyGroups", () => {
     const one = await read<GroupsRead>(alice.dc, "ListMyGroups", { limit: 1 });
     expect(one.groups.map((g) => g.title)).toEqual(["Goa trip"]);
   });
+
+  // 200 is MY_GROUPS_LIMIT in lib/data/groups.ts, the most the app asks for.
+  it("refuses a limit below 0, over 200 or null, and accepts 0 and 200", async () => {
+    for (const limit of [-1, 201, null])
+      await expect(read(alice.dc, "ListMyGroups", { limit })).rejects.toThrow();
+    const none = await read<GroupsRead>(alice.dc, "ListMyGroups", {
+      limit: 0,
+    });
+    expect(none.groups).toEqual([]);
+    const most = await read<GroupsRead>(alice.dc, "ListMyGroups", {
+      limit: 200,
+    });
+    expect(most.groups).toHaveLength(2);
+  });
 });
 
 describe("signed out", () => {
