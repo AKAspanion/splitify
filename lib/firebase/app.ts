@@ -30,9 +30,9 @@ export function getFirebaseApp(): FirebaseApp {
   // The NEXT_PUBLIC_ keys are written out in full so Next inlines them into the browser bundle.
   return initializeApp({
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-key",
+    // The hosted site's own domain, so the redirect back from Google stays on it (no third-party storage needed).
     authDomain:
-      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
-      "splitify-416321.firebaseapp.com",
+      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "splitify.spanion.in",
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "splitify-416321",
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
   });
@@ -40,8 +40,9 @@ export function getFirebaseApp(): FirebaseApp {
 
 /**
  * What Auth is built with. In the browser: IndexedDB persistence, so the person is restored on the next visit, and
- * the popup resolver, which initializeAuth (unlike getAuth) doesn't add itself: without it signInWithPopup throws
- * auth/argument-error. Node (tests, server rendering) has neither IndexedDB nor popups.
+ * the popup and redirect resolver, which initializeAuth (unlike getAuth) doesn't add itself: without it
+ * signInWithRedirect and getRedirectResult throw auth/argument-error. Node (tests, server rendering) has neither
+ * IndexedDB nor redirects.
  */
 export function authOptions(inBrowser: boolean): Dependencies {
   return inBrowser
