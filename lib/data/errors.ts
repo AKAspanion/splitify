@@ -7,6 +7,7 @@ const CHECK_MESSAGES = [
   "Only members of this group can be added to an expense",
   "That email is already in use",
   "You can only add your friends to a group",
+  "That request is too large.",
 ] as const;
 
 const SIGN_IN_AGAIN = "Sign in again to continue.";

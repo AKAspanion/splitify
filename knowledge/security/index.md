@@ -2,8 +2,8 @@
 
 <!-- GA-GENERATED:index -->
 
-- [Authentication](auth.md) - Clerk signs people in, and its middleware requires a session on every route except a short public list; a WebAuthn check can add a browser-side lock.
+- [Authentication](auth.md) - Firebase Auth signs people in; the browser guards the signed-in screens, SQL Connect rules and each Cloud Function's ID-token guard check every call; a WebAuthn check can add a lock.
 - [Data protection](data-protection.md) - What Splitify stores that is personal or sensitive, where it lives, and what protects it.
-- [Roles](roles.md) - There are no roles: every signed-in person can call every action and route, on any group, expense or user, and could once open the admin logs page.
+- [Roles](roles.md) - There are no roles: any member of a group may act on it. SQL Connect's rules and the functions' membership checks enforce it.
 
 <!-- GA-GENERATED:END -->

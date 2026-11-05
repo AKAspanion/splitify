@@ -1,13 +1,10 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import dynamic from "next/dynamic";
-import GroupFormLoading from "@/app/(platform)/(app)/_components/group-form-loading";
+import Form from "./form";
 
-const Form = dynamic(() => import("./form"), {
-  loading: () => <GroupFormLoading />,
-});
-
-const GroupAddPage = async () => {
+const GroupAddPage = () => {
   return (
     <AutoContainer
       header={<Header backTo={"/groups"} title="Create a group" />}

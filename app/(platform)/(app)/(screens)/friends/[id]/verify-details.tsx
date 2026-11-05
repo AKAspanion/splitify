@@ -1,7 +1,7 @@
-import { User } from "@/generated/prisma/browser";
 import Link from "next/link";
+import type { Friend } from "@/lib/data/people";
 
-const VerifyDetails = async ({ friend }: { friend: User | null }) => {
+const VerifyDetails = ({ friend }: { friend: Friend | null }) => {
   return friend ? (
     <div>
       <div className="font-semibold text-normal pb-3">Verification pending</div>
@@ -10,7 +10,7 @@ const VerifyDetails = async ({ friend }: { friend: User | null }) => {
           {friend.name} has not signed up yet. <br />
           This message will go away once they signup using the email address
           &apos;
-          {friend?.email}&apos;
+          {friend.email}&apos;
         </div>
         <Link
           href={`/friends/${friend.id}/edit/contact`}

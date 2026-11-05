@@ -21,7 +21,7 @@ switch, with Google and email-and-password sign-in.
 
 ## Decision
 
-- Firebase Auth is the only sign-in. Clerk, its webhook and `proxy.ts` are removed.
+- Firebase Auth is the only sign-in. Clerk, its webhook and proxy.ts are removed.
 - Sign-in methods: Google, and email and password. Password reset is Firebase's reset email.
 - A person's `User` row is written by a `upsertMe` mutation the browser runs after sign-in. Its id, email and name
   come from the signed token (`auth.uid`, `auth.token.email`, `auth.token.name`), never from the request. Emails are
@@ -43,10 +43,11 @@ switch, with Google and email-and-password sign-in.
 
 ## History
 
+- 2026-11-05: wrote the paths of files that spec 2c removed (app/api/webhook/clerk/route.ts, proxy.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
 - 2026-11-05: what an unverified email-and-password account could do was unset; now it can use the app with a banner asking it to verify, because the developer chose that over blocking it.
 
 ## Sources
 
-- `proxy.ts`
-- `app/api/webhook/clerk/route.ts`
+- proxy.ts
+- app/api/webhook/clerk/route.ts
 - `components/providers.tsx`

@@ -1,9 +1,9 @@
 "use client";
 
-import { formateDate, relativeFormatDate } from "@/utils/date";
+import { relativeFormatDate } from "@/utils/date";
 
 type ExpenseDateProps = {
-  date: Date;
+  date: Date | string;
 };
 
 export const ExpenseDate = (props: ExpenseDateProps) => {

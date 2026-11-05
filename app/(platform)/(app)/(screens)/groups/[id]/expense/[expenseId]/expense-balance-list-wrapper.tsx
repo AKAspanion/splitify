@@ -1,22 +1,14 @@
-import { User } from "@/generated/prisma/browser";
-import { db } from "@/lib/db";
+import type { User } from "@/types/shared";
+import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { BalanceList } from "./expense-balance-list";
 
-const BalanceListWrapper = async ({
-  expenseId,
+const BalanceListWrapper = ({
+  expense,
   users,
 }: {
   users: User[];
-  expenseId: string;
+  expense: ExpenseWithPaymentWithSplit;
 }) => {
-  const expense = await db.expense.findUnique({
-    where: { id: expenseId || "null" },
-    include: {
-      payments: { include: { user: true } },
-      splits: { include: { user: true } },
-    },
-  });
-
   return <BalanceList expense={expense} users={users} />;
 };
 

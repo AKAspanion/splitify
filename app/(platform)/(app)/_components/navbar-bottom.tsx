@@ -1,14 +1,14 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { ActivityIcon, UserIcon, UsersRoundIcon } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
+import { getAvatarLetters } from "@/utils/func";
 
 export const NavbarBottom = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const pathname = usePathname();
   return (
     <div className="bg-background z-10 block sm:hidden fixed bottom-0 w-screen p-4 px-8 border-t">
@@ -40,13 +40,12 @@ export const NavbarBottom = () => {
           </Link>
           {user ? (
             <Link href="/profile">
-              <Image
-                className="rounded-full"
-                src={user?.imageUrl}
-                alt="Profile logo"
-                height={36}
-                width={36}
-              />
+              <span
+                aria-label="Profile"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-sm font-medium text-secondary-foreground"
+              >
+                {getAvatarLetters(user.name || user.email)}
+              </span>
             </Link>
           ) : null}
         </div>

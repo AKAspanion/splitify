@@ -1,36 +1,11 @@
-import { Skeleton } from "@/components/ui/skeleton";
+"use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import dynamic from "next/dynamic";
-import { BalancesLoader } from "./balances-loader";
-import { ExpenseListLoader } from "./expenses-list";
-// import { Search } from "@/app/(platform)/(app)/_components/search";
+import Balances from "./balances";
+import ExpensesList from "./expenses-list";
+import Totals from "./totals";
 
-const ExpensesList = dynamic(() => import("./expenses-list"), {
-  loading: () => (
-    <div className="py-6">
-      <ExpenseListLoader />
-    </div>
-  ),
-});
-
-const Balances = dynamic(() => import("./balances"), {
-  loading: () => <BalancesLoader />,
-});
-
-const Totals = dynamic(() => import("./totals"), {
-  loading: () => (
-    <div className="py-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {[1, 2].map((i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <Skeleton className="h-6 w-[180px]" />
-          <Skeleton className="h-6 w-[90px]" />
-        </div>
-      ))}
-    </div>
-  ),
-});
-
-const ExpensesTabs = async ({
+const ExpensesTabs = ({
   id,
   tab,
   backUrl,
@@ -54,8 +29,6 @@ const ExpensesTabs = async ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value={"Expenses"}>
-          {/* <div className="h-3" /> */}
-          {/* <Search path={`/groups/${id}`} queryText={searchText} /> */}
           <ExpensesList groupId={id} backUrl={backUrl} />
         </TabsContent>
         <TabsContent value={"Balances"}>

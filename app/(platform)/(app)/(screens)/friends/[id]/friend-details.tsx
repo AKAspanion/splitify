@@ -1,71 +1,99 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { db } from "@/lib/db";
 import Image from "next/image";
-import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { getYouKeyword } from "@/utils/validate";
-import { GroupCardLoading } from "@/app/(platform)/(app)/_components/group-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import VerifyDetails from "./verify-details";
-import { auth } from "@clerk/nextjs/server";
+import { Button } from "@/components/ui/button";
 import { NoData } from "@/components/no-data";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouteIds } from "@/hooks/use-route-ids";
+import { toUserMessage } from "@/lib/data/errors";
+import { DEFAULT_AVATAR, useFriend } from "@/lib/data/people";
+import SharedGroups from "./shared-groups";
+import VerifyDetails from "./verify-details";
 
-const SharedGroups = dynamic(() => import("./shared-groups"), {
-  loading: () => (
-    <div>
-      <Skeleton className="mb-3 h-6 w-[100px]" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <GroupCardLoading key={i} compact />
-        ))}
-      </div>
-    </div>
-  ),
-});
+const FriendDetails = () => {
+  const { friendId } = useRouteIds();
+  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const backTo = searchParams.get("back") || "/friends";
 
-const FriendDetails = async ({
-  params,
-  searchParams,
-}: ServerSideComponentProp) => {
-  const { userId } = await auth();
-  const id = params["id"] || "null";
-  const friend = await db.user.findUnique({ where: { id } });
+  const { data: friend, isPending, error, refetch } = useFriend(friendId);
 
-  const backTo = searchParams["back"] || "";
+  const header = <Header title="" backTo={backTo} />;
 
-  const isVerified = friend?.id?.startsWith("sp") ? friend?.fromClerk : true;
+  if (friendId === null || (!isPending && !error && friend === null))
+    return (
+      <AutoContainer header={header}>
+        <NoData
+          title="We couldn't find that. It may have been deleted, or you may not be a member."
+          action={
+            <Link href="/groups">
+              <Button type="button" variant="outline">
+                Go to groups
+              </Button>
+            </Link>
+          }
+        />
+      </AutoContainer>
+    );
 
-  const isYou = userId === id;
+  if (error)
+    return (
+      <AutoContainer header={header}>
+        <NoData
+          title={toUserMessage(error)}
+          action={
+            <Button type="button" variant="outline" onClick={() => refetch()}>
+              Try again
+            </Button>
+          }
+        />
+      </AutoContainer>
+    );
+
+  if (isPending || !friend)
+    return (
+      <AutoContainer header={header}>
+        <div className="flex flex-col gap-6">
+          <Skeleton className="h-14 w-14 rounded-full" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-4 w-[150px]" />
+            <Skeleton className="h-3 w-[200px]" />
+          </div>
+        </div>
+      </AutoContainer>
+    );
+
+  const isYou = user?.uid === friend.id;
 
   return (
-    <AutoContainer
-      header={<Header title="" backTo={backTo ? backTo : `/friends`} />}
-    >
-      {friend ? (
-        <div className="flex flex-col gap-6">
-          <Image
-            alt="profile pic"
-            width={56}
-            height={56}
-            className="rounded-full"
-            src={friend?.profile_image_url || ""}
-          />
-          <div>
-            <div className="">
-              {getYouKeyword(userId || "null", id, friend?.name || "-")}
-            </div>
-            <div className="text-sm font-light">{friend?.email}</div>
+    <AutoContainer header={header}>
+      <div className="flex flex-col gap-6">
+        <Image
+          alt="profile pic"
+          width={56}
+          height={56}
+          className="rounded-full"
+          src={friend.imageUrl || DEFAULT_AVATAR}
+        />
+        <div>
+          <div className="">
+            {getYouKeyword(user?.uid || "null", friend.id, friend.name || "-")}
           </div>
-          {isYou ? null : (
-            <>
-              {!isVerified ? <VerifyDetails friend={friend} /> : null}
-              <SharedGroups id={id} />
-            </>
-          )}
+          <div className="text-sm font-light break-all">{friend.email}</div>
         </div>
-      ) : (
-        <NoData title="Friend not found" />
-      )}
+        {isYou ? null : (
+          <>
+            {!friend.signedUp ? <VerifyDetails friend={friend} /> : null}
+            <SharedGroups id={friend.id} />
+          </>
+        )}
+      </div>
     </AutoContainer>
   );
 };

@@ -19,12 +19,17 @@ can change the amount and confirm; the app records it as a settlement and notifi
 
 - `app/(platform)/(app)/(forms)/groups/[id]/settle/page.tsx`, reached from `balances-list.tsx` with `user1Id`, `user2Id` and
   `owes` in the query string. The form (`app/(platform)/(app)/(forms)/groups/[id]/settle/(form)/form.tsx`) calls
-  `createSettlement`, then `POST /api/push-notification/create-settlement`.
+  `useCreateSettlement` (`lib/data/expenses.ts`), which writes through the `expense` connector's `CreateSettlement`
+  ([SQL Connect](../data/sql-connect.md)); the push to the group is sent by a Cloud Function, not by the form.
 
 ## Rules
 
 - `user1Id` is the one who pays and `user2Id` the one paid. How a settlement is stored is in
   [settlements](../domain/settlements.md).
+
+## History
+
+- 2026-11-05: called the `createSettlement` action and the push API; now `useCreateSettlement` over SQL Connect, because spec 2b moved the screen.
 
 ## Sources
 
@@ -32,4 +37,5 @@ can change the amount and confirm; the app records it as a settlement and notifi
 - `app/(platform)/(app)/(forms)/groups/[id]/settle/settle-expense.tsx`
 - `app/(platform)/(app)/(forms)/groups/[id]/settle/(form)/form.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/balances-list.tsx`
-- `actions/create-settlement/index.ts`
+- `dataconnect/expense/expense-writes.gql`
+- `lib/data/expenses.ts`

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { isSignOutIntended, signedOutDestination } from "@/lib/auth-redirect";
 import Spinner from "@/components/ui/spinner";
 
 /** Renders its children when signed in, a full-page spinner while loading, and sends signed-out people to sign in. */
@@ -13,7 +14,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "signed-out")
-      router.replace(`/sign-in/?next=${encodeURIComponent(pathname)}`);
+      router.replace(signedOutDestination(pathname, isSignOutIntended()));
   }, [status, pathname, router]);
 
   if (status !== "signed-in") {

@@ -1,11 +1,16 @@
 "use client";
 
 import { FormInput } from "@/components/form/form-input";
-import { FormSubmit } from "@/components/form/form-submit";
-import { useAction } from "@/hooks/use-action";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
-import { updateContact } from "@/actions/update-contact";
+import { toUserMessage } from "@/lib/data/errors";
+import {
+  useUpdateContact,
+  validateContact,
+  type ContactFieldErrors,
+} from "@/lib/data/people";
 
 const Form = ({
   backTo,
@@ -19,45 +24,62 @@ const Form = ({
   name?: string;
 }) => {
   const router = useRouter();
-  const { execute, fieldErrors } = useAction(updateContact, {
-    onSuccess: ({ user }) => {
-      toast.success("Contact updated successfully");
-      router.push(backTo);
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
+  const [name, setName] = useState(nameProp || "");
+  const [email, setEmail] = useState(mailProp || "");
+  const [errors, setErrors] = useState<ContactFieldErrors>({});
+  const { mutate, isPending } = useUpdateContact();
 
-  const onSubmit = async (formData: FormData) => {
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const check = validateContact({ name, email });
+    if (!check.ok) {
+      setErrors(check.errors);
+      return;
+    }
+    setErrors({});
 
-    execute({ id, name, email });
+    mutate(
+      { id, ...check.value },
+      {
+        onSuccess: () => {
+          toast.success("Contact updated successfully");
+          router.push(backTo);
+        },
+        // What was typed stays in the fields.
+        onError: (error) => toast.error(toUserMessage(error)),
+      },
+    );
   };
 
   return (
-    <form className="flex flex-col gap-6" action={onSubmit}>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <FormInput
           label="Name"
           id="name"
           name="name"
-          defaultValue={nameProp}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={isPending}
           placeholder="Enter name"
-          errors={fieldErrors?.name}
+          errors={errors.name ? [errors.name] : undefined}
         />
         <FormInput
           label="Email"
           id="email"
           name="email"
-          defaultValue={mailProp}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isPending}
           placeholder="Enter an email"
-          errors={fieldErrors?.email}
+          errors={errors.email ? [errors.email] : undefined}
         />
       </div>
-      <FormSubmit>Update</FormSubmit>
+      <div className="flex justify-end items-center">
+        <Button type="submit" loading={isPending} disabled={isPending}>
+          Update
+        </Button>
+      </div>
     </form>
   );
 };

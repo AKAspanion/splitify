@@ -1,32 +1,41 @@
-import { db } from "@/lib/db";
+"use client";
+
+import {
+  useGroupLedger,
+  useGroupMembers,
+  toUserModel,
+} from "@/lib/data/groups";
 import { BalancesList } from "./balances-list";
-import { auth } from "@clerk/nextjs/server";
+import { BalancesLoader } from "./balances-loader";
+import { LoadError } from "./_components/group-states";
 
-const Balances = async ({
-  id,
-  onlyList,
-}: {
-  id: string;
-  onlyList?: boolean;
-}) => {
-  const { userId } = await auth();
+const Balances = ({ id, onlyList }: { id: string; onlyList?: boolean }) => {
+  const ledger = useGroupLedger(id);
+  const members = useGroupMembers(id);
 
-  const [expenses, group] = await db.$transaction([
-    db.expense.findMany({
-      where: { groupId: id },
-      orderBy: [{ createdAt: "desc" }],
-      include: {
-        payments: { include: { user: true } },
-        splits: { include: { user: true } },
-      },
-    }),
-    db.group.findUnique({
-      where: { id, users: { some: { id: userId || "null" } } },
-      include: { users: true },
-    }),
-  ]);
+  const error = ledger.error ?? members.error;
+  if (error)
+    return (
+      <LoadError
+        error={error}
+        onRetry={() => {
+          ledger.refetch();
+          members.refetch();
+        }}
+      />
+    );
 
-  return <BalancesList expenses={expenses} group={group} onlyList={onlyList} />;
+  if (!ledger.data || !members.data)
+    return <BalancesLoader onlyList={onlyList} />;
+
+  return (
+    <BalancesList
+      groupId={id}
+      expenses={ledger.data}
+      users={members.data.map(toUserModel)}
+      onlyList={onlyList}
+    />
+  );
 };
 
 export default Balances;

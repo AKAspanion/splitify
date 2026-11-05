@@ -6,6 +6,12 @@ export function dc(): DataConnect {
   return getDataConnectClient();
 }
 
+/**
+ * Options every generated query call passes. The SDK's default cache policy (PREFER_CACHE) answers a query it has
+ * run before from its own copy and would hide a write made since; TanStack Query is the cache here.
+ */
+export const FRESH = { fetchPolicy: "SERVER_ONLY" } as const;
+
 const key =
   (name: string) =>
   (variables?: unknown): readonly unknown[] =>

@@ -6,30 +6,36 @@ import {
 import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { User } from "@/generated/prisma/browser";
-import { useQuery } from "@tanstack/react-query";
-import { GET_METHOD_CALLBACK } from "@/utils/api";
+import { useGroupMembers, toUserModel } from "@/lib/data/groups";
+import { toUserMessage } from "@/lib/data/errors";
 
 const GroupUsers = ({ id, backUrl }: { id: string; backUrl: string }) => {
-  // const { users, loading } = useGroupUsers(id);
+  const { data: members, isLoading, error, refetch } = useGroupMembers(id);
 
-  const { data: users, isLoading } = useQuery<User[]>({
-    queryKey: [`group-users`],
-    queryFn: GET_METHOD_CALLBACK(`/api/app/group/${id}/users`, {}),
-    enabled: true,
-  });
+  if (error)
+    return (
+      <div className="flex items-center gap-3 text-sm">
+        <span>{toUserMessage(error)}</span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+        >
+          Try again
+        </Button>
+      </div>
+    );
 
-  const noData = !users || users.length === 0;
+  if (isLoading || !members) return <UserAvatarsLoading />;
 
-  return isLoading || noData ? (
-    <UserAvatarsLoading />
-  ) : (
+  return (
     <UserAvatars
-      users={users}
+      users={members.map(toUserModel)}
       action={
         <div className="h-10 flex items-center justify-center">
           <Link href={`/groups/${id}/add-member?back=${backUrl}`}>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label="Add members">
               <PlusCircleIcon className="text-sparkle" />
             </Button>
           </Link>

@@ -1,34 +1,47 @@
 "use client";
 
 import { RUPEE_SYMBOL } from "@/constants/ui";
-import { useQuery } from "@tanstack/react-query";
-import { GET_METHOD_CALLBACK } from "@/utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/use-auth";
+import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
+import {
+  toUserModel,
+  useGroupLedger,
+  useGroupMembers,
+} from "@/lib/data/groups";
 
 const WhoPaid = ({
+  groupId,
   expenseId,
   amount,
 }: {
+  groupId: string;
   expenseId: string;
   amount: number;
 }) => {
-  const { data: whoPaid, isLoading } = useQuery<string>({
-    queryKey: [`group-${expenseId}-who-paid-${amount}`],
-    queryFn: GET_METHOD_CALLBACK(`/api/app/expense/${expenseId}/who-paid`, {}),
-    enabled: true,
+  const { user } = useAuth();
+  const ledger = useGroupLedger(groupId);
+  const members = useGroupMembers(groupId);
+
+  if (!ledger.data || !members.data)
+    return ledger.error || members.error ? null : (
+      <Skeleton className="h-3 w-20" />
+    );
+
+  const payments = (
+    ledger.data.find((e) => e.id === expenseId)?.payments ?? []
+  ).map((p) => {
+    const member = members.data.find((m) => m.id === p.userId);
+    return { ...p, user: member ? toUserModel(member) : p.user };
   });
 
-  let whoPaidValue = whoPaid;
+  let whoPaidValue = whoPaidExpense(payments, user?.uid);
 
   if (amount) {
     whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${amount}`;
   }
 
-  return isLoading ? (
-    <Skeleton className="h-3 w-20" />
-  ) : (
-    <div>{whoPaidValue}</div>
-  );
+  return <div>{whoPaidValue}</div>;
 };
 
 export default WhoPaid;

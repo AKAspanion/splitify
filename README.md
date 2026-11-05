@@ -20,6 +20,11 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+To run against the emulators, generate the emulator Hosting config with `node scripts/emulator-firebase-config.mjs`, then
+start them with `npx --yes firebase-tools@15.34.2 emulators:start --config firebase.emulators.json --project demo-splitify`.
+It is `firebase.json` with the emulators' addresses added to the CSP's `connect-src`; `yarn check:hosting` regenerates it
+itself, and it is never deployed.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -37,15 +42,15 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## CI and deploy
 
-| Workflow | When | What |
-| --- | --- | --- |
-| `ci.yml` | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator |
-| `deploy.yml` | Push to `main` | Runs CI, then deploys the public pages to Firebase Hosting and the Cloud Functions in `functions/`. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
-| `codeql.yml` | PRs, pushes, weekly | CodeQL security analysis of the code and the workflows |
-| `dependabot.yml` | Weekly | Grouped dependency and GitHub Actions updates |
+| Workflow         | When                                           | What                                                                                                                                                                                                       |
+| ---------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`         | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator                                                                                                            |
+| `deploy.yml`     | Push to `main`                                 | Runs CI, then deploys the public pages to Firebase Hosting and the Cloud Functions in `functions/`. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
+| `codeql.yml`     | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                                                                     |
+| `dependabot.yml` | Weekly                                         | Grouped dependency and GitHub Actions updates                                                                                                                                                              |
 
 Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI always runs as
-`npx --yes firebase-tools@15.34.2`. The signed-in web app itself is not deployed by these workflows; only the public pages (`yarn build:hosting`, written to `out/`) are, and a public page that stops exporting fails the CI build.
+`npx --yes firebase-tools@15.34.2`. The whole site is one static export (`yarn build`, written to `out/`), and a page that stops exporting fails the CI build.
 
 `deploy.yml` reads these repository settings (Settings > Secrets and variables > Actions) and fails with a message
 naming what is missing, before anything installs:

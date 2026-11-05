@@ -1,15 +1,16 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
-
+import { useSearchParams } from "next/navigation";
 import Search from "./search";
-import { resolvePageProps } from "@/utils/page";
 
-const FriendsAddPage = async (pageProps: ServerSidePageProp) => {
-  const { searchParams } = await resolvePageProps(pageProps);
-  const backTo = searchParams["back"];
-  const groupId = searchParams["groupId"];
-  const mail = searchParams["email"];
+const FriendsAddPage = () => {
+  const searchParams = useSearchParams();
+  const backTo = searchParams.get("back") || undefined;
+  const groupId = searchParams.get("groupId") || undefined;
+  const mail = searchParams.get("email") || undefined;
 
-  const keyString = `back=${searchParams?.["back"]}&groupId=${searchParams?.["groupId"]}&&email=${searchParams?.["email"]}`;
+  const keyString = `back=${backTo}&groupId=${groupId}&email=${mail}`;
 
   return (
     <AutoContainer key={keyString}>

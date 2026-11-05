@@ -1,18 +1,36 @@
 // Checks the hosting build in out/: which pages exist, then what the Firebase Hosting emulator serves from it.
-// Run after `yarn build:hosting`. Exits non-zero on the first failure, with a line naming it.
-import { existsSync } from "node:fs";
+// Run after `yarn build`. Exits non-zero on the first failure, with a line naming it.
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = 5050;
-const SOON = "Splitify is coming back soon";
 
-const fail = (message) => {
+// Every scripts/hosting-pages/*.json is `{ pages: string[], requests: { path, expectText }[] }`: the files
+// `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file.
+const manifestDir = path.join(root, "scripts", "hosting-pages");
+const readManifests = () =>
+  readdirSync(manifestDir)
+    .filter((name) => name.endsWith(".json"))
+    .sort()
+    .map((name) => {
+      const manifest = JSON.parse(
+        readFileSync(path.join(manifestDir, name), "utf8"),
+      );
+      if (!Array.isArray(manifest.pages) || !Array.isArray(manifest.requests)) {
+        fail(
+          `scripts/hosting-pages/${name} needs "pages" and "requests" lists`,
+        );
+      }
+      return { name, ...manifest };
+    });
+
+function fail(message) {
   console.error(`FAIL: ${message}`);
   process.exit(1);
-};
+}
 
 // Phase 2, run inside the emulator.
 const checkServed = async () => {
@@ -23,38 +41,35 @@ const checkServed = async () => {
   };
   const expect = (cond, message) => cond || fail(message);
 
-  const pages = [
-    ["/", "Splitting Expenses"],
-    ["/privacy", "Privacy Policy"],
-    ["/delete-account", "Delete your account"],
-    ["/groups/abc", SOON],
-    ["/sign-in", "Sign in"],
-    ["/sign-up", "Sign up"],
-    ["/forgot-password", "Reset your password"],
-    ["/coming-soon", SOON],
-  ];
-  for (const [route, text] of pages) {
-    const { res, body } = await get(route);
-    expect(res.status === 200, `${route} answered ${res.status}, not 200`);
-    expect(body.includes(text), `${route} does not contain "${text}"`);
+  for (const { name, requests } of readManifests()) {
+    for (const { path: route, expectText } of requests) {
+      const { res, body } = await get(route);
+      expect(
+        res.status === 200,
+        `${name}: ${route} answered ${res.status}, not 200`,
+      );
+      expect(
+        body.includes(expectText),
+        `${name}: ${route} does not contain "${expectText}"`,
+      );
+    }
   }
 
-  const links = await get("/coming-soon");
-  for (const href of ["/", "/privacy", "/delete-account"]) {
-    expect(
-      links.body.includes(`href="${href}"`) ||
-        links.body.includes(`href="${href}/"`),
-      `/coming-soon has no link to ${href}`,
-    );
-  }
+  // Any path that is not a page gets the 404 page, with a way back into the app.
+  const missing = await get("/no-such-page");
   expect(
-    links.body.includes(
-      "We&#x27;re moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
-    ) ||
-      links.body.includes(
-        "We're moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
-      ),
-    "/coming-soon body text is not as specified",
+    missing.res.status === 404,
+    `/no-such-page answered ${missing.res.status}, not 404`,
+  );
+  expect(
+    missing.body.includes("We couldn&#x27;t find that page.") ||
+      missing.body.includes("We couldn't find that page."),
+    "the 404 page does not say it couldn't find the page",
+  );
+  expect(
+    missing.body.includes('href="/groups"') ||
+      missing.body.includes('href="/groups/"'),
+    "the 404 page has no link to /groups",
   );
 
   const assetlinks = await get("/.well-known/assetlinks.json");
@@ -86,7 +101,7 @@ const checkServed = async () => {
   };
   const everyResponse = [
     ["/", await get("/")],
-    ["/groups/abc", await get("/groups/abc")],
+    ["/privacy", await get("/privacy")],
     [staticMatch[0], asset],
   ];
   for (const [route, { res }] of everyResponse) {
@@ -102,6 +117,21 @@ const checkServed = async () => {
       "public, max-age=31536000, immutable",
     `${staticMatch[0]}: cache-control is "${asset.res.headers.get("cache-control")}"`,
   );
+  for (const [route, { res }] of everyResponse) {
+    const csp = res.headers.get("content-security-policy") ?? "";
+    for (const part of [
+      "default-src 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "worker-src 'self'",
+      "upgrade-insecure-requests",
+    ]) {
+      expect(
+        csp.includes(part),
+        `${route}: content-security-policy lacks "${part}"`,
+      );
+    }
+  }
   const home = (await get("/")).res;
   expect(
     home.headers.get("cache-control") === "no-cache",
@@ -116,30 +146,25 @@ if (process.argv[2] === "--served") {
 }
 
 // Phase 1: what out/ holds.
-const must = [
-  "index.html",
-  "privacy/index.html",
-  "delete-account/index.html",
-  "coming-soon/index.html",
-  "sign-in/index.html",
-  "sign-up/index.html",
-  "forgot-password/index.html",
-];
-for (const file of must) {
-  if (!existsSync(path.join(root, "out", file))) fail(`out/${file} is missing`);
+for (const { name, pages } of readManifests()) {
+  for (const file of pages) {
+    if (!existsSync(path.join(root, "out", file)))
+      fail(`${name}: out/${file} is missing`);
+  }
 }
-for (const dir of ["groups", "profile", "api", "logs"]) {
-  if (existsSync(path.join(root, "out", dir)))
-    fail(`out/${dir}/ must not exist`);
-}
-
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.
+spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
+  cwd: root,
+  stdio: "inherit",
+});
 const result = spawnSync(
   "npx",
   [
     "--yes",
     "firebase-tools@15.34.2",
     "emulators:exec",
+    "--config",
+    "firebase.emulators.json",
     "--only",
     "hosting",
     "--project",

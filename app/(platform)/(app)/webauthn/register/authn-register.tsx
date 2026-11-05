@@ -1,5 +1,8 @@
+"use client";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 
 const AuthnActions = dynamic(() => import("./authn-actions"), {
   loading: () => (
@@ -19,11 +22,14 @@ const AuthnDevices = dynamic(() => import("./authn-devices"), {
   ),
 });
 
-const AuthnRegister = async () => {
+const AuthnRegister = () => {
+  // The actions change the devices; bumping this makes the list load them again.
+  const [version, setVersion] = useState(0);
+
   return (
     <div>
-      <AuthnActions />
-      <AuthnDevices />
+      <AuthnActions onChange={() => setVersion((v) => v + 1)} />
+      <AuthnDevices version={version} />
     </div>
   );
 };

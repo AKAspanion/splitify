@@ -1,7 +1,7 @@
 ---
 type: Runbook
 title: Logging
-description: APILogger writes to the console by default and to the Log table when ENABLE_DB_LOGGING is YES; Prisma query logging is a separate switch.
+description: Cloud Functions write structured logs to Cloud Logging; the browser logs to its console; there is no Log table or logging switch.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -10,23 +10,22 @@ generated:
 
 # Logging
 
-## Variables
+There is no `APILogger`, no `Log` table and no logging switch (`ENABLE_*`): [the decision](../decisions/cloud-logging.md)
+chose Cloud Logging, and the server code that logged is removed.
 
-- `ENABLE_CONSOLE_LOGGING`: console output is on unless it is `NO`.
-- `ENABLE_DB_LOGGING`: rows are written to `Log` only when it is `YES`.
-- `ENABLE_PRISMA_QUERY_LOGGING`: when `YES`, and not in production, `lib/db.ts` prints every query and its duration.
+- Cloud Functions log with `firebase-functions/logger`, read in Cloud Logging for the Firebase project. A line carries
+  the operation and the error's class, never its message, a token, a request body or personal data
+  ([Cloud Functions](../apps/functions.md)). The guard logs a refused sign-in by class only.
+- `app/global-error.tsx` logs the error to the browser console and shows its message with a retry button. Browser errors are
+  collected nowhere else.
+- There is no admin page for logs ([decision](../decisions/remove-admin-logs-page.md)).
 
-## Where each is read
+## History
 
-- `APILogger` in `lib/logger.ts` has `info` and `error`. `info` stores the body it is given in `Log.body`; `error`
-  stores only the message. The push-notification routes are its main callers.
-- Logged rows are listed on `/logs` (`app/(admin)/logs/logs-list.tsx`), which any signed-in user can open:
-  [admin logs unprotected](../findings/admin-logs-unprotected.md).
-- `app/global-error.tsx` logs the error to the browser console and shows its message with a retry button.
+- 2026-11-05: was `APILogger` writing to the console or the `Log` table, with Prisma query logging and a logs page; now Cloud Logging only, because spec 2c removed the server code that logged. See [decision](../decisions/cloud-logging.md).
 
 ## Sources
 
-- `lib/logger.ts`
-- `lib/db.ts`
-- `app/(admin)/logs/logs-list.tsx`
+- `functions/src/http/guard.ts`
+- `functions/src/webauthn/index.ts`
 - `app/global-error.tsx`

@@ -1,25 +1,19 @@
 "use client";
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { NoData } from "@/components/no-data";
-import React from "react";
-import useActivities from "@/hooks/use-activities";
+import { useMyActivity } from "@/lib/data/activity";
 import ActivityPaginate from "./activity-paginate";
 
 const ActivityList = () => {
-  const { activities, count, loading } = useActivities();
-
-  const noData = !loading && count === 0;
+  const query = useMyActivity();
 
   return (
     <AutoContainer id="activitylist" header={<Header title={"Activity"} />}>
-      {noData ? (
-        <NoData
-          title="No activities found"
-          subtitle="All your group and expense related activities will show up here"
-        />
-      ) : null}
-      <ActivityPaginate />
+      <ActivityPaginate
+        query={query}
+        emptyTitle="No activities found"
+        emptySubtitle="All your group and expense related activities will show up here"
+      />
       <div className="h-16" />
     </AutoContainer>
   );

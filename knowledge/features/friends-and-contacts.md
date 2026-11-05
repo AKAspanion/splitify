@@ -22,19 +22,28 @@ generated:
 
 - Friends list: `app/(platform)/(app)/(screens)/friends/page.tsx`; one friend: `app/(platform)/(app)/(screens)/friends/[id]/page.tsx`, with
   `shared-groups.tsx` and `verify-details.tsx`.
-- Search and add: `app/(platform)/(app)/(forms)/friends/add/page.tsx` (`search.tsx` calls `searchUser`, `action.tsx` calls
-  `createFriend`).
-- New contact: `app/(platform)/(app)/(forms)/friends/add/contact/page.tsx`, calling `createContact`, then back to the search
+- Search and add: `app/(platform)/(app)/(forms)/friends/add/page.tsx` (`search.tsx` runs the search, `action.tsx` adds the friend).
+- New contact: `app/(platform)/(app)/(forms)/friends/add/contact/page.tsx`, creating the contact, then back to the search
   with the new email filled in.
-- Edit contact: `app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.tsx`, calling `updateContact`.
+- Edit contact: `app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.tsx`, saving the change.
+
+## Data
+
+These screens use `lib/data/people.ts` over [SQL Connect](../data/sql-connect.md): `useFriends`, `useFriend`,
+`useSharedGroups`, `useSearchUser`, `useAddFriend`, `useCreateContact` and `useUpdateContact`. A contact's id is `spuser_`
+plus a random id made in the browser (`contactId`), as the connector requires.
 
 ## Rules
 
-- A person can't befriend themselves (`createFriend` refuses).
-- Search excludes the caller and matches the email exactly (`actions/search-user/index.ts`).
+- Search matches the email exactly (`SearchUserByEmail` in `dataconnect/app/people.gql`).
 - How a contact becomes a real user when they sign up is in [contact identity](../domain/contact-identity.md).
-- `updateContact` changes any user's name and email, not only the caller's contacts:
+- `UpdateContact` changes a name and email only on a contact (not signed up) that is the caller's friend, which closes
   [missing authorization on writes](../findings/missing-authorization-on-writes.md).
+
+## History
+
+- 2026-11-05: described the server actions' rules (a self-friend refusal, an `updateContact` that changed any user); now the SQL Connect operations' rules, because spec 2c removed the actions.
+- 2026-11-05: used server actions; now `lib/data/people.ts`, because spec 2b moved the screens onto SQL Connect.
 
 ## Sources
 
@@ -48,7 +57,5 @@ generated:
 - `app/(platform)/(app)/(forms)/friends/add/contact/page.tsx`
 - `app/(platform)/(app)/(forms)/friends/add/contact/form.tsx`
 - `app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.tsx`
-- `actions/search-user/index.ts`
-- `actions/create-friend/index.ts`
-- `actions/create-contact/index.ts`
-- `actions/update-contact/index.ts`
+- `dataconnect/app/people.gql`
+- `lib/data/people.ts`

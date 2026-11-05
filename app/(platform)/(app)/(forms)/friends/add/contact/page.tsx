@@ -1,22 +1,24 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-
+import { useSearchParams } from "next/navigation";
+import { peopleHref } from "@/lib/data/people";
 import Form from "./form";
-import { urlEncode } from "@/utils/func";
-import { resolvePageProps } from "@/utils/page";
 
-const FriendsAddContactPage = async (pageProps: ServerSidePageProp) => {
-  const { searchParams } = await resolvePageProps(pageProps);
-  const backTo = searchParams["back"];
-  const groupId = searchParams["groupId"];
-  const mail = searchParams["email"];
+const FriendsAddContactPage = () => {
+  const searchParams = useSearchParams();
+  const backTo = searchParams.get("back") || undefined;
+  const groupId = searchParams.get("groupId") || undefined;
+  const mail = searchParams.get("email") || undefined;
 
-  const to = urlEncode({
-    path: "/friends/add",
-    query: { groupId: groupId || "", back: backTo, email: mail },
+  const to = peopleHref("/friends/add", {
+    groupId,
+    back: backTo,
+    email: mail,
   });
 
-  const keyString = `back=${searchParams?.["back"]}&groupId=${searchParams?.["groupId"]}&&email=${searchParams?.["email"]}`;
+  const keyString = `back=${backTo}&groupId=${groupId}&email=${mail}`;
 
   return (
     <AutoContainer

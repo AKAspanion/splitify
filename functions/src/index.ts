@@ -5,7 +5,10 @@ import { projectID } from "firebase-functions/params";
 import { onMessagePublished } from "firebase-functions/v2/pubsub";
 import { enforceBudget, parseNotification } from "./kill-switch";
 
+export { deleteMyAccount } from "./account/delete-my-account";
 export { mergeContactOnSignUp } from "./merge-contact";
+export { reports } from "./reports";
+export { webauthn } from "./webauthn";
 export {
   sendActivityPushApp,
   sendActivityPushExpense,
@@ -42,7 +45,10 @@ export const billingKillSwitch = onMessagePublished(
     const outcome = await enforceBudget(notification, projectId, billing);
     const details = { projectId, ...notification };
     if (outcome === "disabled")
-      logger.error("Budget exceeded: billing disabled for the project", details);
+      logger.error(
+        "Budget exceeded: billing disabled for the project",
+        details,
+      );
     else logger.info(`Budget check: ${outcome}`, details);
   },
 );

@@ -32,6 +32,10 @@ already registered.
 - No app, asset link or passkey changes because of the outage.
 - The DNS record lives outside this repository; nothing here notices if it goes missing again.
 
+## History
+
+- 2026-11-05: wrote the paths of files that spec 2c removed (app/api/webauthn/verify-registration/route.ts, proxy.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
+
 ## Sources
 
 - `packages/android/source/app/build.gradle`
@@ -39,5 +43,5 @@ already registered.
 - `public/.well-known/assetlinks.json`
 - `packages/ios/src/Splitify/Settings.swift`
 - `packages/ios/src/Splitify/Entitlements/Entitlements.plist`
-- `app/api/webauthn/verify-registration/route.ts`
-- `proxy.ts`
+- app/api/webauthn/verify-registration/route.ts
+- proxy.ts

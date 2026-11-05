@@ -16,9 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Group } from "@/generated/prisma/browser";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { GroupWIthUsers } from "@/types/shared";
+import type { MyGroup } from "@/lib/data/expenses";
 import { useFormStatus } from "react-dom";
 import { GROUP_CATEGORY_ICONS, GroupType } from "@/constants/ui";
 
@@ -27,7 +26,7 @@ type GroupComboboxProps = {
   value: string;
   open?: boolean;
   disabled?: boolean;
-  groups?: GroupWIthUsers[];
+  groups?: MyGroup[];
   setOpen?: (open: boolean) => void;
   setValue: (value: string) => void;
 };
@@ -73,7 +72,7 @@ export function GroupCombobox(props: GroupComboboxProps) {
             <CommandEmpty>No group found.</CommandEmpty>
             <CommandGroup>
               {groups.map((group) => {
-                const type = group?.type as GroupType;
+                const type = (group?.type ?? "") as GroupType;
                 const GroupIcon = GROUP_CATEGORY_ICONS[type] || NotepadText;
                 return (
                   <CommandItem

@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "friends/index.html",
+    "friends/_/index.html",
+    "friends/add/index.html",
+    "friends/add/contact/index.html",
+    "friends/_/edit/contact/index.html"
+  ],
+  "requests": [
+    { "path": "/friends/", "expectText": "Friends" },
+    { "path": "/friends/abc/", "expectText": "Friend" },
+    { "path": "/friends/add/", "expectText": "Add a friend" },
+    { "path": "/friends/add/contact/", "expectText": "Add new contact" },
+    { "path": "/friends/abc/edit/contact/", "expectText": "Update contact" }
+  ]
+}

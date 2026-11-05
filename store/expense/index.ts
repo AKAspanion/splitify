@@ -1,7 +1,5 @@
-import { Expense } from "@/generated/prisma/browser";
 import { createStore } from "zustand/vanilla";
-// import { persist, createJSONStorage } from "zustand/middleware";
-import { getExpenses } from "@/actions/get-expenses";
+import type { Expense } from "@/types/shared";
 
 type ShareDataObj = { text: string; color: string };
 export type ExpenseState = {
@@ -16,7 +14,6 @@ export type ExpenseState = {
 };
 
 export type ExpenseActions = {
-  addExpenses: (groupId: string) => void;
   clearExpenses: (groupId: string) => void;
   // setPage: (groupId: string, val: number) => void;
   setWhoPaid: (expenseId: string, val: string) => void;
@@ -46,39 +43,6 @@ export const createExpenseStore = (
     // persist(
     (set, get) => ({
       ...initState,
-      addExpenses: async (grp) => {
-        const page = get().page?.[grp] || 0;
-        const tCount = get().count?.[grp];
-        const totalCount = tCount === undefined ? Infinity : tCount;
-        const expensesCount = get().expenses?.[grp]?.length || 0;
-
-        const canLoad = expensesCount < totalCount;
-        if (!canLoad) {
-          return;
-        }
-        set((state) => ({
-          pageLoading: { ...(state?.pageLoading || {}), [grp]: true },
-        }));
-
-        const nextPage = page + 1;
-        const { data, error } = await getExpenses(nextPage, grp);
-        if (!error) {
-          set((state) => ({
-            page: { ...(state?.page || {}), [grp]: nextPage },
-            count: { ...(state?.count || {}), [grp]: data?.count },
-            expenses: {
-              ...(state?.expenses || {}),
-              [grp]: [
-                ...(state?.expenses?.[grp] || []),
-                ...(data?.expenses || []),
-              ],
-            },
-          }));
-        }
-        set((state) => ({
-          pageLoading: { ...(state?.pageLoading || {}), [grp]: false },
-        }));
-      },
       clearExpenses: (grp) =>
         set((state) => ({
           expenses: { ...(state?.expenses || {}), [grp]: [] },

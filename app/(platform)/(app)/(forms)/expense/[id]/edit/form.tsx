@@ -1,59 +1,69 @@
 "use client";
 
+import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
-import { FormSubmit } from "@/components/form/form-submit";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Suspense } from "react";
-import { useAction } from "@/hooks/use-action";
+import { useState } from "react";
 import { toast } from "sonner";
-import { updateExpense } from "@/actions/update-expense";
+import { toUserMessage } from "@/lib/data/errors";
+import { useUpdateExpense } from "@/lib/data/expenses";
 
-type FormProps = { id: string; description: string };
+type FormProps = { id: string; description: string; groupId: string };
 
-const FormComp = ({ id, description }: FormProps) => {
+const Form = ({ id, description, groupId }: FormProps) => {
   const router = useRouter();
+  const update = useUpdateExpense();
+  const [fieldError, setFieldError] = useState<string[] | undefined>();
 
-  const { loading, execute, fieldErrors } = useAction(updateExpense, {
-    onSuccess: ({ expense, userId }) => {
-      toast.success("Expense updated successfully");
-      router.push(
-        `/groups/${expense?.groupId || ""}/expense/${expense?.id || ""}`,
-      );
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
-
-  const onSubmit = (formData: FormData) => {
-    const description = formData.get("description") as string;
-
-    execute({ id, description });
+  // Not a form action: React would clear what was typed when the action ends, and it has to stay on an error.
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = (
+      new FormData(event.currentTarget).get("description") as string
+    ).trim();
+    if (text.length < 3) {
+      setFieldError(["Minimum 3 chars required"]);
+      return;
+    }
+    setFieldError(undefined);
+    try {
+      await update.mutateAsync({ id, description: text, groupId });
+    } catch {
+      return;
+    }
+    toast.success("Expense updated successfully");
+    router.push(`/groups/${groupId}/expense/${id}`);
   };
 
   return (
-    <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
+    <form className="flex flex-col gap-4 sm:gap-6" onSubmit={onSubmit}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <FormInput
           id="description"
           name="description"
           label="Description"
           placeholder="Enter a description"
-          errors={fieldErrors?.description}
+          errors={fieldError}
           defaultValue={description || ""}
-          disabled={loading}
+          disabled={update.isPending}
         />
       </div>
-      <FormSubmit>Update</FormSubmit>
+      <FormErrors
+        id="update-expense"
+        errors={update.error ? [toUserMessage(update.error)] : undefined}
+      />
+      <div className="flex justify-end items-center">
+        <Button
+          type="submit"
+          loading={update.isPending}
+          disabled={update.isPending}
+        >
+          Update
+        </Button>
+      </div>
     </form>
   );
 };
 
-export default function Form(props: FormProps) {
-  return (
-    <Suspense>
-      <FormComp {...props} />
-    </Suspense>
-  );
-}
+export default Form;

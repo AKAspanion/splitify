@@ -24,7 +24,7 @@ had to trust a member list from the browser when a group is deleted, since the g
 
 - Each server action that changes a group, a member, an expense, a settlement or a friendship writes its `Activity`
   row in the same transaction as the change, with the session's user as the actor.
-- It sends its pushes on the server after the change commits, through `lib/onesignal.ts`, without making the action
+- It sends its pushes on the server after the change commits, through lib/onesignal.ts, without making the action
   wait or fail when OneSignal does.
 - The `/api/push-notification` routes, `NotificationService` and the browser calls to it are removed.
 
@@ -35,9 +35,10 @@ had to trust a member list from the browser when a group is deleted, since the g
 
 ## History
 
-- 2026-11-04: Sources named `lib/notification/service/index.ts` and `app/api/push-notification/route.ts`, the removed route and its client; now `lib/notification/notify.ts`, because the code those described is gone.
+- 2026-11-05: wrote the paths of files that spec 2c removed (lib/notification/notify.ts, lib/onesignal.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
+- 2026-11-04: Sources named `lib/notification/service/index.ts` and `app/api/push-notification/route.ts`, the removed route and its client; now lib/notification/notify.ts, because the code those described is gone.
 
 ## Sources
 
-- `lib/onesignal.ts`
-- `lib/notification/notify.ts`
+- lib/onesignal.ts
+- lib/notification/notify.ts

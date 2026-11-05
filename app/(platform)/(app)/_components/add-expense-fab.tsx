@@ -3,11 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useRouteIds } from "@/hooks/use-route-ids";
 
 export const AddExpenseFab = () => {
-  const params = useParams();
-  const groupId = params["id"] || "";
+  const { groupId } = useRouteIds();
 
   const query = groupId ? `?groupId=${groupId}` : "";
 

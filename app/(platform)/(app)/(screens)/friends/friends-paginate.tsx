@@ -1,24 +1,18 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
-const FriendsPaginate = async ({
+const FriendsPaginate = ({
   page,
   count,
+  total,
 }: {
   page: number;
   count: number;
+  total: number;
 }) => {
-  const { userId } = await auth();
-
-  const totalCount = await db.user.count({
-    where: { friends: { some: { id: userId || "null" } } },
-  });
-
-  const more = totalCount > count;
-
-  return more ? (
+  return total > count ? (
     <div className="flex w-full items-center justify-center">
       <Link href={`/friends?page=${page + 1}`}>
         <Button type="button" variant={"secondary"}>

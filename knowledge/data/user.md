@@ -1,7 +1,7 @@
 ---
 type: Data Model
 title: Users and contacts
-description: A User is either a Clerk sign-up, created by Clerk's webhook, or an offline contact added by someone, with an spuser_ id.
+description: A User is either a signed-up person, whose id is their Firebase uid, or an offline contact added by someone, with an spuser_ id.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -12,38 +12,34 @@ generated:
 
 ## Fields
 
-- `User.id` is the primary key. For a Clerk sign-up it is Clerk's user id, so it equals `(await auth()).userId`. For an
-  offline contact, `createContact` sets it to `spuser_` plus a random id (`actions/create-contact/index.ts`).
-- `User.fromClerk` is `true` for rows written by Clerk's webhook and `false` for contacts.
-- `User.email` is `@unique`: it is how a contact is matched when that person signs up
-  ([contact identity](../domain/contact-identity.md)).
-- `User.uid` is a separate `nanoid()` value; nothing in the app reads it.
-- `User.image_url` and `User.profile_image_url` come from Clerk; contacts get the placeholder
+- `User.id` is the primary key. For a signed-up person it is their Firebase uid, written by `UpsertMe` from the signed
+  token; for an offline contact it is `spuser_` plus a random id made in the browser (`contactId` in `lib/data/people.ts`).
+- `User.signedUp` is `true` for a signed-up person and `false` for a contact.
+- `User.email` is `@index`, not unique: a contact and the account that later signs up with its email share it until the
+  merge ([contact identity](../domain/contact-identity.md)); `CreateContact` itself refuses an email another row has.
+- `User.imageUrl` comes from the sign-in provider; contacts and deleted accounts get the placeholder
   `public/images/placeholder/avatar.jpeg`.
-
-## Under SQL Connect
-
-A contact is a `User` with `signedUp: false` and an `spuser_` id; a signed-up person's id is their Firebase uid
-([schema](sql-connect.md)). `email` is indexed but not unique, so `CreateContact` itself refuses an email another row
-already has. Planned for the running app in spec 2.
+- Tables, keys and access rules are in [SQL Connect schema](sql-connect.md).
 
 ## Rules
 
-- A contact shows as "Verification pending" on its friend page until it becomes a Clerk user
+- A contact shows as "Verification pending" on its friend page until it becomes a signed-up user
   (`app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx` and `verify-details.tsx`).
-- Friendship is symmetric: `createFriend` connects both users ([model](model.md)).
+- Friendship is symmetric: adding a friend writes both directions ([model](model.md)).
+- A deleted account keeps its row, renamed and with its email replaced, so shared expenses still add up
+  ([decision](../decisions/anonymise-deleted-accounts.md)).
 
 ## History
 
+- 2026-11-05: described Clerk-created rows (`fromClerk`, a unique email, `createContact`'s action); now Firebase uids, `signedUp` and an indexed email, because spec 2c removed Clerk, Prisma and the actions.
+- 2026-11-05: a contact's id was made by an action; now in the browser, because spec 2b has no server for it.
 - 2026-11-04: added the SQL Connect shape, because its schema was built.
 
 ## Sources
 
-- `prisma/schema.prisma`
 - `dataconnect/schema/schema.gql`
 - `dataconnect/app/people.gql`
-- `actions/create-contact/index.ts`
-- `actions/create-friend/index.ts`
-- `app/api/webhook/clerk/route.ts`
+- `lib/data/people.ts`
+- `public/images/placeholder/avatar.jpeg`
 - `app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx`
 - `app/(platform)/(app)/(screens)/friends/[id]/verify-details.tsx`

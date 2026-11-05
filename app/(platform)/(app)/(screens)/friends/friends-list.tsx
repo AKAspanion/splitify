@@ -1,38 +1,30 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { UserPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
+import { useSearchParams } from "next/navigation";
+import {
+  UserCard,
+  UserCardLoading,
+} from "@/app/(platform)/(app)/_components/user-card";
 import { Header } from "@/components/container/header";
 import { NoData } from "@/components/no-data";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import { FRIENDS_PAGE_COUNT } from "@/constants/numbers";
+import { toUserMessage } from "@/lib/data/errors";
+import { toCardUser, useFriends } from "@/lib/data/people";
+import FriendsPaginate from "./friends-paginate";
 
-const FriendsPaginate = dynamic(() => import("./friends-paginate"), {
-  loading: () => (
-    <div className="py-6 flex w-full items-center justify-center">
-      <Skeleton className="h-10 w-[108px]" />
-    </div>
-  ),
-});
+const FriendsList = () => {
+  const searchParams = useSearchParams();
+  const pageNo = parseInt(searchParams.get("page") || "1", 10);
+  const page = Number.isNaN(pageNo) || pageNo < 1 ? 1 : pageNo;
 
-const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
-  const pageNo = searchParams["page"] || "1";
-  const { userId } = await auth();
+  const { data: friends, isPending, error, refetch } = useFriends();
 
-  const page = isNaN(pageNo) ? 1 : parseInt(pageNo);
-
-  const friends = await db.user.findMany({
-    take: page * FRIENDS_PAGE_COUNT,
-    where: { friends: { some: { id: userId || "null" } } },
-  });
-
-  const count = friends ? friends?.length : 0;
-
-  const noData = count === 0;
+  const total = friends?.length ?? 0;
+  const shown = friends?.slice(0, page * FRIENDS_PAGE_COUNT) ?? [];
 
   return (
     <AutoContainer
@@ -40,7 +32,7 @@ const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
         <Header
           title="Friends"
           actions={
-            <Link href="/friends/add">
+            <Link href="/friends/add" aria-label="Add a friend">
               <Button variant="ghost" size="icon">
                 <UserPlusIcon />
               </Button>
@@ -49,25 +41,42 @@ const FriendsList = async ({ searchParams }: ServerSideComponentProp) => {
         />
       }
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {friends?.map((d) => (
-          <Link href={`/friends/${d.id}`} key={d.id}>
-            <UserCard user={d} />
-          </Link>
-        ))}
-      </div>
-      {noData ? (
+      {isPending ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <UserCardLoading key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <NoData
+          title={toUserMessage(error)}
+          action={
+            <Button type="button" variant="outline" onClick={() => refetch()}>
+              Try again
+            </Button>
+          }
+        />
+      ) : total === 0 ? (
         <NoData
           title="Your friends and group mates will show up here"
           action={<CreateButton />}
         />
       ) : (
-        <div className="flex flex-col gap-6 py-6">
-          <FriendsPaginate count={count} page={page} />
-          <div className="flex justify-center">
-            <CreateButton />
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {shown.map((d) => (
+              <Link href={`/friends/${d.id}`} key={d.id}>
+                <UserCard user={toCardUser(d)} />
+              </Link>
+            ))}
           </div>
-        </div>
+          <div className="flex flex-col gap-6 py-6">
+            <FriendsPaginate count={shown.length} total={total} page={page} />
+            <div className="flex justify-center">
+              <CreateButton />
+            </div>
+          </div>
+        </>
       )}
       <div className="h-16" />
     </AutoContainer>
