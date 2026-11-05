@@ -1,6 +1,8 @@
 # The Screens on SQL Connect (Spec 2b) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** complete
+
+> **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Move every signed-in screen onto SQL Connect and Firebase Auth and into the hosting build, so the app runs on Firebase Hosting with no server.
 
@@ -75,21 +77,21 @@ export function toLedgerExpenses(ledger: GetGroupLedgerData["expenses"]): Expens
 - Given `navbar.tsx` and `navbar-bottom.tsx`, then neither imports `@clerk/nextjs`, the avatar and links come from `useAuth()`, and `yarn tsc --noEmit` passes.
 - Given `yarn build:hosting && yarn check:hosting`, then the check reads `scripts/hosting-pages/*.json` and today's assertions still pass from `public.json`; `/webauthn/register` still answers the coming-soon page.
 
-- [ ] **Step 1: Write the failing tests** for `routeIdsFromPath` and `toLedgerExpenses` in `hooks/use-route-ids.test.ts` and `lib/data/ledger.test.ts`, and the manifest-reading check
+- [x] **Step 1: Write the failing tests** for `routeIdsFromPath` and `toLedgerExpenses` in `hooks/use-route-ids.test.ts` and `lib/data/ledger.test.ts`, and the manifest-reading check
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `use-route-ids.test.ts` and `ledger.test.ts`
 
-- [ ] **Step 3: Write the shell, banner, id routes, adapter and check changes** to the Interfaces, until they pass
+- [x] **Step 3: Write the shell, banner, id routes, adapter and check changes** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/layout.hosting.tsx" "app/(platform)/(app)/_components/navbar.tsx" "app/(platform)/(app)/_components/navbar-bottom.tsx" components/auth/verify-email-banner.tsx hooks/use-route-ids.ts hooks/use-route-ids.test.ts lib/data/ledger.ts lib/data/ledger.test.ts firebase.json scripts/check-hosting-build.mjs scripts/hosting-pages/public.json scripts/hosting-pages/shell.json
@@ -185,21 +187,21 @@ export function invalidatedByGroupWrite(op: "CreateGroup" | "UpdateGroup" | "Del
 - Given each list's loading, empty and error state, and each form's sending and error state, then each shows as the Global Constraints say, checked once in the browser.
 - Given `yarn build:hosting && yarn check:hosting`, then `groups.json`'s pages exist and its requests (`/groups/`, `/groups/abc/`, `/groups/abc/settings/`, `/dashboard/`) answer 200 with their screen's text.
 
-- [ ] **Step 1: Write the failing tests** for `invalidatedByGroupWrite` in `lib/data/groups.test.ts`, and `scripts/hosting-pages/groups.json`
+- [x] **Step 1: Write the failing tests** for `invalidatedByGroupWrite` in `lib/data/groups.test.ts`, and `scripts/hosting-pages/groups.json`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `groups.test.ts`
 
-- [ ] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
+- [x] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS, then the browser check of every group screen
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(forms)/groups/[id]/edit/form.tsx" "app/(platform)/(app)/(forms)/groups/[id]/edit/group-edit.tsx" "app/(platform)/(app)/(forms)/groups/[id]/edit/page.tsx" "app/(platform)/(app)/(forms)/groups/add/form.tsx" "app/(platform)/(app)/(forms)/groups/add/page.tsx" "app/(platform)/(app)/(screens)/dashboard/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx" "app/(platform)/(app)/(screens)/groups/[id]/add-member/action.tsx" "app/(platform)/(app)/(screens)/groups/[id]/add-member/add-member.tsx" "app/(platform)/(app)/(screens)/groups/[id]/add-member/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/balances-list.tsx" "app/(platform)/(app)/(screens)/groups/[id]/balances-loader.tsx" "app/(platform)/(app)/(screens)/groups/[id]/balances.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense-card.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense-date.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expenses-list.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expenses-paginate.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expenses-tabs.tsx" "app/(platform)/(app)/(screens)/groups/[id]/group-client.tsx" "app/(platform)/(app)/(screens)/groups/[id]/group-details.tsx" "app/(platform)/(app)/(screens)/groups/[id]/group-users.tsx" "app/(platform)/(app)/(screens)/groups/[id]/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/group-delete.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/group-members.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/group-settings.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/totals-list.tsx" "app/(platform)/(app)/(screens)/groups/[id]/totals.tsx" "app/(platform)/(app)/(screens)/groups/[id]/who-paid.tsx" "app/(platform)/(app)/(screens)/groups/[id]/your-share.tsx" "app/(platform)/(app)/(screens)/groups/group-create.tsx" "app/(platform)/(app)/(screens)/groups/group-list.tsx" "app/(platform)/(app)/(screens)/groups/groups.tsx" "app/(platform)/(app)/(screens)/groups/page.tsx" "app/(platform)/(app)/(forms)/groups/[id]/edit/page.hosting.tsx" "app/(platform)/(app)/(forms)/groups/add/page.hosting.tsx" "app/(platform)/(app)/(screens)/dashboard/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/add-member/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/page.hosting.tsx" lib/data/groups.ts lib/data/groups.test.ts scripts/hosting-pages/groups.json
@@ -287,21 +289,21 @@ export function invalidatedByExpenseWrite(op: "CreateExpense" | "CreateSettlemen
 - Given each form's sending and error state, then each shows as the Global Constraints say, checked once in the browser.
 - Given `yarn build:hosting && yarn check:hosting`, then `expenses.json`'s pages exist and its requests (`/expense/add/`, `/groups/abc/expense/def/`, `/expense/abc/edit/`, `/groups/abc/settle/`) answer 200 with their screen's text.
 
-- [ ] **Step 1: Write the failing tests** for `invalidatedByExpenseWrite` and the id generation in `lib/data/expenses.test.ts`, and `scripts/hosting-pages/expenses.json`
+- [x] **Step 1: Write the failing tests** for `invalidatedByExpenseWrite` and the id generation in `lib/data/expenses.test.ts`, and `scripts/hosting-pages/expenses.json`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `expenses.test.ts`
 
-- [ ] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
+- [x] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS, then the browser check of every expense screen
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(forms)/expense/[id]/edit/edit-expense.tsx" "app/(platform)/(app)/(forms)/expense/[id]/edit/form.tsx" "app/(platform)/(app)/(forms)/expense/[id]/edit/page.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/_splits/equal-loader.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/_splits/equal.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/_splits/exact-loader.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/_splits/exact.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/_splits/percent.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/category-combobox.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/group-combobox.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/split-drawer.tsx" "app/(platform)/(app)/(forms)/expense/add/add-expense.tsx" "app/(platform)/(app)/(forms)/expense/add/page.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/(form)/form.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/page.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/settle-expense.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/settle-users.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-actions.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-added-by.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-balance-list-wrapper.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-balance-list.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-balance-summary-list.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-balance.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-client.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-details.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-header.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-users-client.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-users.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/page.tsx" "app/(platform)/(app)/_components/add-expense-fab.tsx" "app/(platform)/(app)/_components/expense-form-loading.tsx" "app/(platform)/(app)/(forms)/expense/[id]/edit/page.hosting.tsx" "app/(platform)/(app)/(forms)/expense/add/page.hosting.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/page.hosting.tsx" lib/data/expenses.ts lib/data/expenses.test.ts scripts/hosting-pages/expenses.json
@@ -371,21 +373,21 @@ export function normaliseEmail(email: string): string;
 - Given each list's and form's states, then each shows as the Global Constraints say, checked once in the browser.
 - Given `yarn build:hosting && yarn check:hosting`, then `people.json`'s pages exist and its requests (`/friends/`, `/friends/abc/`, `/friends/add/`, `/friends/add/contact/`, `/friends/abc/edit/contact/`) answer 200 with their screen's text.
 
-- [ ] **Step 1: Write the failing tests** for `normaliseEmail`, `contactId` and `useAddFriend`'s variables in `lib/data/people.test.ts`, and `scripts/hosting-pages/people.json`
+- [x] **Step 1: Write the failing tests** for `normaliseEmail`, `contactId` and `useAddFriend`'s variables in `lib/data/people.test.ts`, and `scripts/hosting-pages/people.json`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `people.test.ts`
 
-- [ ] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
+- [x] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS, then the browser check of every friend and contact screen
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/edit-contact.tsx" "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/form.tsx" "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.tsx" "app/(platform)/(app)/(forms)/friends/add/action.tsx" "app/(platform)/(app)/(forms)/friends/add/contact/form.tsx" "app/(platform)/(app)/(forms)/friends/add/contact/page.tsx" "app/(platform)/(app)/(forms)/friends/add/page.tsx" "app/(platform)/(app)/(forms)/friends/add/search.tsx" "app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx" "app/(platform)/(app)/(screens)/friends/[id]/page.tsx" "app/(platform)/(app)/(screens)/friends/[id]/shared-groups.tsx" "app/(platform)/(app)/(screens)/friends/[id]/verify-details.tsx" "app/(platform)/(app)/(screens)/friends/friends-list.tsx" "app/(platform)/(app)/(screens)/friends/friends-paginate.tsx" "app/(platform)/(app)/(screens)/friends/page.tsx" "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.hosting.tsx" "app/(platform)/(app)/(forms)/friends/add/contact/page.hosting.tsx" "app/(platform)/(app)/(forms)/friends/add/page.hosting.tsx" "app/(platform)/(app)/(screens)/friends/[id]/page.hosting.tsx" "app/(platform)/(app)/(screens)/friends/page.hosting.tsx" lib/data/people.ts lib/data/people.test.ts scripts/hosting-pages/people.json
@@ -451,21 +453,21 @@ export function useSendFeedback(): UseMutationResult<void, Error, { title: strin
 - Given each list's and form's states, then each shows as the Global Constraints say, checked once in the browser.
 - Given `yarn build:hosting && yarn check:hosting`, then `activity.json`'s pages exist and its requests (`/activity/`, `/activity/abc/`, `/groups/abc/activity/`, `/feedback/add/`, `/profile/`) answer 200 with their screen's text.
 
-- [ ] **Step 1: Write the failing tests** for `activityLine` in `lib/data/activity.test.ts`, and `scripts/hosting-pages/activity.json`
+- [x] **Step 1: Write the failing tests** for `activityLine` in `lib/data/activity.test.ts`, and `scripts/hosting-pages/activity.json`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `activity.test.ts`
 
-- [ ] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
+- [x] **Step 3: Write the hooks and convert the screens** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build:hosting && yarn check:hosting`
 Expected: PASS, then the browser check of every activity, feedback and profile screen
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(forms)/feedback/add/form.tsx" "app/(platform)/(app)/(forms)/feedback/add/page.tsx" "app/(platform)/(app)/(screens)/activity/[id]/page.tsx" "app/(platform)/(app)/(screens)/activity/activity-list.tsx" "app/(platform)/(app)/(screens)/activity/activity-paginate.tsx" "app/(platform)/(app)/(screens)/activity/page.tsx" "app/(platform)/(app)/(screens)/groups/[id]/activity/group-activity.tsx" "app/(platform)/(app)/(screens)/groups/[id]/activity/page.tsx" "app/(platform)/(app)/_components/activity-card.tsx" "app/(platform)/profile/delete-account-action.tsx" "app/(platform)/profile/notification-action.tsx" "app/(platform)/profile/page.tsx" "app/(platform)/(app)/(forms)/feedback/add/page.hosting.tsx" "app/(platform)/(app)/(screens)/activity/[id]/page.hosting.tsx" "app/(platform)/(app)/(screens)/activity/page.hosting.tsx" "app/(platform)/(app)/(screens)/groups/[id]/activity/page.hosting.tsx" "app/(platform)/profile/page.hosting.tsx" lib/data/activity.ts lib/data/activity.test.ts lib/data/feedback.ts scripts/hosting-pages/activity.json
