@@ -1,5 +1,7 @@
 # Local dev on emulators, 2140-series ports, pnpm — Implementation Plan
 
+**Status:** complete, commits 2844bcc..5a97bc5, 2026-11-05; record: `2026-11-05-local-dev-emulators-pnpm.record.md`
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -85,14 +87,14 @@ None: `run.checkpoints` names none, and plan runs here are unattended, so the se
 - Given CI's audit steps, then they run `pnpm audit --prod --audit-level high` for the root and for `functions/`, and fail the job on a finding, as the yarn bitmask check did.
 - Given `pnpm tsc --noEmit`, `pnpm lint` and `pnpm test`, then each passes, so pnpm's stricter `node_modules` broke no import. A broken phantom dependency is fixed by adding it to `package.json`, never by `node-linker=hoisted` or `shamefully-hoist`.
 
-- [ ] **Step 1: Write `pnpm-workspace.yaml` and `functions/pnpm-workspace.yaml`** with the overrides converted from `resolutions`, and set `packageManager` to `pnpm@11.0.8` in both `package.json` files; drop `resolutions`.
-- [ ] **Step 2: Import the lockfiles** with `pnpm import` in the root and in `functions/` (reads `yarn.lock`), then delete both `yarn.lock` files.
-- [ ] **Step 3: Install** with `pnpm install` and `pnpm functions:install`; add every package pnpm reports as a blocked build to `onlyBuiltDependencies`, and install again until it reports none.
-- [ ] **Step 4: Rewrite the scripts** to the table above, `firebase.json`'s predeploy to `pnpm --dir "$RESOURCE_DIR" build`, and `.gitignore`.
-- [ ] **Step 5: Rewrite the workflows**: `pnpm/action-setup` before `actions/setup-node` with `cache: pnpm` and both lockfiles as `cache-dependency-path`; `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm functions:install`, and the audits as above.
-- [ ] **Step 6: Point the policy's checks at pnpm**: `node "/Users/ankitkumarpandit/Documents/work/geekyants/claude-plugin/geekyants-claude-plugin/plugins/ga/scripts/ga.mjs" workflow set checks.commands.typecheck "pnpm tsc --noEmit"`, and the same for `lint` (`pnpm lint`), `format-check` (`pnpm prettier --check .`) and `test` (`pnpm test`).
-- [ ] **Step 7: Run** `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test`. Expected: PASS.
-- [ ] **Step 8: Commit**
+- [x] **Step 1: Write `pnpm-workspace.yaml` and `functions/pnpm-workspace.yaml`** with the overrides converted from `resolutions`, and set `packageManager` to `pnpm@11.0.8` in both `package.json` files; drop `resolutions`.
+- [x] **Step 2: Import the lockfiles** with `pnpm import` in the root and in `functions/` (reads `yarn.lock`), then delete both `yarn.lock` files.
+- [x] **Step 3: Install** with `pnpm install` and `pnpm functions:install`; add every package pnpm reports as a blocked build to `onlyBuiltDependencies`, and install again until it reports none.
+- [x] **Step 4: Rewrite the scripts** to the table above, `firebase.json`'s predeploy to `pnpm --dir "$RESOURCE_DIR" build`, and `.gitignore`.
+- [x] **Step 5: Rewrite the workflows**: `pnpm/action-setup` before `actions/setup-node` with `cache: pnpm` and both lockfiles as `cache-dependency-path`; `pnpm install --frozen-lockfile --ignore-scripts`, `pnpm functions:install`, and the audits as above.
+- [x] **Step 6: Point the policy's checks at pnpm**: `node "/Users/ankitkumarpandit/Documents/work/geekyants/claude-plugin/geekyants-claude-plugin/plugins/ga/scripts/ga.mjs" workflow set checks.commands.typecheck "pnpm tsc --noEmit"`, and the same for `lint` (`pnpm lint`), `format-check` (`pnpm prettier --check .`) and `test` (`pnpm test`).
+- [x] **Step 7: Run** `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test`. Expected: PASS.
+- [x] **Step 8: Commit**
 
 ```bash
 git add package.json pnpm-workspace.yaml pnpm-lock.yaml yarn.lock functions/package.json functions/pnpm-workspace.yaml functions/pnpm-lock.yaml functions/yarn.lock firebase.json .gitignore .github/workflows/ci.yml .github/workflows/deploy.yml .github/workflows/codeql.yml .ga/config.json CLAUDE.md AGENTS.md
@@ -141,20 +143,20 @@ export const EMULATOR_PORTS: {
 - Given `node scripts/emulator-firebase-config.mjs`, then `firebase.emulators.json`'s CSP `connect-src` contains `http://127.0.0.1:2142 http://127.0.0.1:2143 http://127.0.0.1:2145`, and `firebase.json`'s does not.
 - Given `pnpm test:rules`, then the rule tests pass on the new ports.
 
-- [ ] **Step 1: Write the failing tests** for the first two Acceptance cases in `lib/firebase/emulators.test.ts`, with `lib/firebase/emulators.ts` holding today's ports so the test fails on values, not on a missing module.
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for the first two Acceptance cases in `lib/firebase/emulators.test.ts`, with `lib/firebase/emulators.ts` holding today's ports so the test fails on values, not on a missing module.
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/firebase/emulators.test.ts`
 Expected: FAIL on the port values.
 
-- [ ] **Step 3: Set the ports** in `firebase.json` and `lib/firebase/emulators.ts`, and replace the hardcoded addresses in the files listed above with the module (browser and test utils) or `firebase.json` (scripts).
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Set the ports** in `firebase.json` and `lib/firebase/emulators.ts`, and replace the hardcoded addresses in the files listed above with the module (browser and test utils) or `firebase.json` (scripts).
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/firebase/emulators.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Regenerate and run the rule tests**: `node scripts/emulator-firebase-config.mjs`, then `pnpm test:rules`. Expected: PASS.
-- [ ] **Step 6: Commit**
+- [x] **Step 5: Regenerate and run the rule tests**: `node scripts/emulator-firebase-config.mjs`, then `pnpm test:rules`. Expected: PASS.
+- [x] **Step 6: Commit**
 
 ```bash
 git add firebase.json firebase.emulators.json lib/firebase/emulators.ts lib/firebase/emulators.test.ts lib/firebase/app.ts lib/data/expense-writes.ts "app/(platform)/profile/delete-account-action.tsx" dataconnect/test-utils/emulator.ts scripts/emulator-firebase-config.mjs scripts/check-hosting-build.mjs
@@ -207,20 +209,20 @@ export function ensureFunctionsSecret(functionsDir: string): "created" | "kept";
 - Given `pnpm dev` on a machine with no `.env`, then within 60 s `http://localhost:2140` answers 200, the Emulator UI answers on `http://127.0.0.1:2149`, the functions `reports`, `webauthn`, `deleteMyAccount`, `mergeContactOnSignUp`, `sendActivityPush*` and `billingKillSwitch` are loaded in the Functions emulator's log, and signing in through the Auth emulator lands on `/groups/`.
 - Given Ctrl+C on `pnpm dev`, then no process is left listening on 2140–2150, and `.emulator-data/` holds the exported data.
 
-- [ ] **Step 1: Write the failing tests** for the first three Acceptance cases in `scripts/dev-env.test.mjs`, with `scripts/dev-env.mjs` exporting the three functions with their real signatures and empty bodies that return the wrong values.
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for the first three Acceptance cases in `scripts/dev-env.test.mjs`, with `scripts/dev-env.mjs` exporting the three functions with their real signatures and empty bodies that return the wrong values.
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run scripts/dev-env.test.mjs`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Implement** `scripts/dev-env.mjs`, then `next.config.mjs`, `scripts/dev.mjs` and `functions/.env.demo-splitify`.
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Implement** `scripts/dev-env.mjs`, then `next.config.mjs`, `scripts/dev.mjs` and `functions/.env.demo-splitify`.
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run scripts/dev-env.test.mjs`
 Expected: PASS
 
-- [ ] **Step 5: Run the stack** with `pnpm dev` in the background, check the last three Acceptance cases, then stop it.
-- [ ] **Step 6: Commit**
+- [x] **Step 5: Run the stack** with `pnpm dev` in the background, check the last three Acceptance cases, then stop it.
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/dev.mjs scripts/dev-env.mjs scripts/dev-env.test.mjs next.config.mjs functions/.env.demo-splitify vitest.config.mts
