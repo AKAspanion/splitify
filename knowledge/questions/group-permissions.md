@@ -29,8 +29,11 @@ Answered: any member of a group may change the group, its members and its expens
 has them as a friend, and a Clerk user by nobody else. See
 [group member permissions](../decisions/group-member-permissions.md).
 
+## History
+
+- 2026-11-05: Sources pointed at the Prisma schema and the group actions; now the SQL Connect schema and group operations, which enforce the answer, because those were removed.
+
 ## Sources
 
-- `prisma/schema.prisma`
-- `actions/update-group/index.ts`
-- `actions/delete-group/index.ts`
+- `dataconnect/schema/schema.gql`
+- `dataconnect/app/groups.gql`

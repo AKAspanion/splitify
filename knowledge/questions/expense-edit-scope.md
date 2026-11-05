@@ -22,7 +22,10 @@ expense and adding it again, which loses its history.
 
 Answered: only the description is editable. See [expense edit description only](../decisions/expense-edit-description-only.md).
 
+## History
+
+- 2026-11-05: the question named `UpdateExpense` and its server action; the SQL Connect `UpdateExpense` mutation keeps the same limit, because the action was removed.
+
 ## Sources
 
-- `actions/update-expense/index.ts`
-- `actions/update-expense/schema.ts`
+- `dataconnect/app/expenses.gql`

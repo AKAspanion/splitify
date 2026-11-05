@@ -1,52 +1,55 @@
 ---
 type: API Contract
-title: Report exports
-description: Three POST routes that turn a group's expenses into an Excel, CSV-named Excel or plain-text download.
+title: Reports API
+description: The reports Cloud Function: one POST route that turns a group's expenses into an Excel workbook, a CSV or a text file, for the group's members only.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
 ---
 
-# Report exports
+# Reports API
 
-## Routes
+The three `/api/generate/{excel,csv,text}/expense` route handlers are gone. One Cloud Function, `reports`
+(`functions/src/reports/index.ts`, region `asia-south1`), replaces them; Hosting rewrites `/api/reports/**` to it
+([Cloud Functions](../apps/functions.md)).
 
-<!-- GA-GENERATED:routes app/api/generate -->
+## Route
 
-- `POST /api/generate/csv/expense`: `app/api/generate/csv/expense/route.ts`
-- `POST /api/generate/excel/expense`: `app/api/generate/excel/expense/route.ts`
-- `POST /api/generate/text/expense`: `app/api/generate/text/expense/route.ts`
+`POST /api/reports/expenses` with the JSON body `{ groupId, format }`, where `format` is `excel`, `csv` or `text`. The
+browser calls it through `callFunction` (`lib/functions/call.ts`), which sends the Firebase ID token. The answer is a file
+attachment named after the group:
 
-<!-- GA-GENERATED:END -->
+- `excel`: an `.xlsx` with a logo, then one row per expense followed by a row per member who paid or owes on it, with
+  `paid` and `owed` (`functions/src/reports/excel.ts`).
+- `csv`: a real `.csv`: a header line (`Description,Amount,Category,Type`), then one line per expense, quoted where a cell
+  needs it (`functions/src/reports/csv.ts`). The old `csv` route sent an `.xlsx` despite its path.
+- `text`: the group's title, then the same header and lines, comma separated (`functions/src/reports/text.ts`).
 
-Each takes `{ groupId }` (`GenerateGroupReportBody` in `types/api.d.ts`) and returns a file as an attachment named
-after the group:
-
-- `POST /api/generate/excel/expense`: an `.xlsx` with one row per expense, followed by a row per member who paid or
-  owes on it, with `paid` and `owed`. This is the one the group screen's download button uses
-  (`app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx`), with `/api/generate/text/expense`. The hosted site hides that button until these routes are Cloud Functions (spec 2c).
-- `POST /api/generate/csv/expense`: despite its path, an `.xlsx` of the expenses only (description, amount,
-  category, type), on a sheet named `Group 1`.
-- `POST /api/generate/text/expense`: a comma-separated `.txt` of the same four columns.
-
-Workbooks are built by `generateXLS` in `lib/excel.ts`.
+The group screen's download button (`app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx`) offers all
+three ([reports](../features/reports.md)).
 
 ## Rules
 
-- `401` without a session, `400` without `groupId`, `404` when the group has no expenses.
-- None checks that the caller belongs to the group: see
+- The guard runs first: `401` without a valid ID token, `413` over 65536 bytes, `415` for a body that is not JSON, `400`
+  for a body that cannot be read ([auth](../security/auth.md)).
+- `405` for any method but POST; `400` for a missing `groupId` or an unknown format.
+- `404` for a group that does not exist, an id that is not a UUID, and a group the caller is not a member of, all with the
+  same answer; `404` "No expenses found" when the group has none. This closes
   [missing membership checks on reads](../findings/missing-group-membership-checks-on-reads.md).
+- `500` "Something went wrong" otherwise, with the failing operation and the error's class in Cloud Logging.
+- `Content-Disposition` carries a sanitised file name, so a group title cannot inject headers.
+- It reads the ledger through the `admin` connector (`IsGroupMember`, `GetGroupLedgerAdmin`).
 
 ## History
 
-- 2026-11-05: the group screen offered the download; now hidden on the hosted site, because spec 2b leaves reports to 2c.
+- 2026-11-05: was three `POST /api/generate/*/expense` routes behind Clerk that checked no membership, with a csv route that sent an xlsx; now one function for members only, with a real csv and a title on the text file, because spec 2c moved the server's work into functions. See [static build decision](../decisions/static-build-on-firebase-hosting.md).
 
 ## Sources
 
-- `app/api/generate/excel/expense/route.ts`
-- `app/api/generate/csv/expense/route.ts`
-- `app/api/generate/text/expense/route.ts`
-- `lib/excel.ts`
-- `types/api.d.ts`
+- `functions/src/reports/index.ts`
+- `functions/src/reports/excel.ts`
+- `functions/src/reports/csv.ts`
+- `functions/src/reports/text.ts`
 - `app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx`
+- `lib/functions/call.ts`

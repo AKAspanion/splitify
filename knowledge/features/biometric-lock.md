@@ -22,13 +22,18 @@ generated:
 - Register: `app/(platform)/(app)/webauthn/register/page.tsx` (`authn-register.tsx`, `authn-devices.tsx`, `authn-actions.tsx`).
 - The lock: `components/biometric/biometric.tsx`, mounted in `app/(platform)/layout.tsx`; it skips the paths in its
   `publicRoutes` list.
-- Routes: the [WebAuthn API](../api/webauthn.md).
+- Functions: the lock and the register page call the [WebAuthn API](../api/webauthn.md) through `callFunction` (`lib/functions/call.ts`).
 
 ## Rules
 
-- The lock runs in the browser and hides the screen; it does not stop requests. The server still trusts the Clerk
-  session alone ([auth](../security/auth.md)).
+- The lock runs in the browser and hides the screen; it does not stop requests. The data and functions still trust the
+  Firebase ID token alone ([auth](../security/auth.md)); the `webauthn` function only holds the person's devices in
+  `AuthnDevice.devices`.
 - `app/(platform)/(app)/webauthn/test/page.tsx` is a test page left in the app ([debt](../risks/debt.md)).
+
+## History
+
+- 2026-11-05: its calls went to route handlers behind Clerk; now they go to the `webauthn` Cloud Function through `callFunction`, because spec 2c removed the server. See [WebAuthn API](../api/webauthn.md).
 
 ## Sources
 
@@ -38,4 +43,5 @@ generated:
 - `app/(platform)/(app)/webauthn/register/authn-register.tsx`
 - `app/(platform)/(app)/webauthn/register/authn-devices.tsx`
 - `app/(platform)/(app)/webauthn/register/authn-actions.tsx`
+- `lib/functions/call.ts`
 - `app/(platform)/(app)/webauthn/test/page.tsx`

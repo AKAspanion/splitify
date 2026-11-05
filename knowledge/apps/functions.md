@@ -1,7 +1,7 @@
 ---
 type: Application
 title: Cloud Functions
-description: The Firebase Cloud Functions in functions/: the contact merge after sign-up, the push senders and the budget kill switch.
+description: The Firebase Cloud Functions in functions/: the reports and webauthn HTTP functions, deleteMyAccount, the contact merge, the push senders and the budget kill switch.
 status: draft
 generated:
   by: claude-code/claude-sonnet-5-5
@@ -11,10 +11,25 @@ generated:
 # Cloud Functions
 
 Node 24 functions in `functions/`, built with their own `typescript` and `tsconfig.json` (test files excluded),
-deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.ts` exports them.
+deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.ts` exports them. All run in
+`asia-south1`.
 
 ## Functions
 
+- `reports` (`functions/src/reports/index.ts`): HTTP, `POST /api/reports/expenses` with `{ groupId, format }`, format
+  `excel`, `csv` or `text`; Hosting rewrites `/api/reports/**` to it. It answers members of the group only (a group
+  that does not exist and one the caller isn't in answer the same 404) and reads through the `admin` connector. See
+  [reports](../features/reports.md) and [the reports API](../api/generate.md).
+- `webauthn` (`functions/src/webauthn/index.ts`): HTTP, the six `/api/webauthn/*` routes of the
+  [biometric lock](../features/biometric-lock.md); Hosting rewrites `/api/webauthn/**` to it. It holds the registered
+  devices in `AuthnDevice.devices` through the `admin` connector, and the challenge between a request's options and its
+  verification in an iron-session cookie named `__session` (the only cookie Hosting forwards to a function). It uses
+  the `SESSION_PASSWORD` secret (at least 32 characters, else it answers 500) and the params `AUTHN_RP_ID` and
+  `AUTHN_EXPECTED_ORIGIN`, whose defaults are the production host. See [the WebAuthn API](../api/webauthn.md).
+- `deleteMyAccount` (`functions/src/account/delete-my-account.ts`, `anonymise.ts`): a callable. It deletes the groups
+  whose only member is the caller (with their expenses and activity), anonymises the caller's row and removes the data
+  that is theirs alone, then deletes their Firebase Auth user, in that order so a retry after a failure finishes the job
+  ([decision](../decisions/anonymise-deleted-accounts.md), [profile](../features/profile.md)).
 - `mergeContactOnSignUp` (`functions/src/merge-contact.ts`): a SQL Connect trigger on the `app` connector's
   `UpsertMe` mutation, in `asia-south1`. It merges a contact into the verified new account through the `admin`
   connector ([SQL Connect schema](../data/sql-connect.md), [contact identity](../domain/contact-identity.md)).
@@ -37,8 +52,16 @@ deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.
   actual spend reaches the budget ([decision](../decisions/budget-kill-switch.md)). Its tests cover
   `parseNotification`, `enforceBudget` and the trigger options; the handler body itself has no direct test.
 
+## The guard
+
+Every HTTP function the browser calls runs `guard` (`functions/src/http/guard.ts`) first: it verifies the Firebase ID
+token from `Authorization: Bearer` with the admin SDK, then reads the JSON body (at most 65536 bytes), and answers
+`401`, `413`, `415` or `400` itself. The callable gets its caller from Firebase. The browser side is
+`lib/functions/call.ts` ([auth](../security/auth.md)). Logs carry an error's class, never its message.
+
 ## History
 
+- 2026-11-05: had the merge, the push senders and the kill switch; now also `reports`, `webauthn` and `deleteMyAccount`, because spec 2c moved the server's work into functions. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: had the merge and the kill switch; now also the three push senders, because pushes moved to FCM.
 
 ## Sources
@@ -47,6 +70,13 @@ deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.
 - `functions/src/merge-contact.ts`
 - `functions/src/kill-switch.ts`
 - `functions/src/push-activity.ts`
+- `functions/src/reports/index.ts`
+- `functions/src/webauthn/index.ts`
+- `functions/src/webauthn/session.ts`
+- `functions/src/account/delete-my-account.ts`
+- `functions/src/account/anonymise.ts`
+- `functions/src/http/guard.ts`
+- `lib/functions/call.ts`
 - `functions/src/activity-text.ts`
 - `functions/package.json`
 - `firebase.json`

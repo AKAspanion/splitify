@@ -14,41 +14,41 @@ generated:
 
 - Files and folders are kebab-case (`expense-card.tsx`, `use-group-users.ts`). Exception: `components/confirm/`
   uses PascalCase (`Confirm.tsx`).
-- A server action is a folder `actions/<verb>-<noun>/` with `index.ts` (the `"use server"` handler), `schema.ts`
-  (zod) and `types.ts` (`InputType`, `ReturnType`), e.g. `actions/create-group/`. Read-only `get-*` actions have
-  only `index.ts`, e.g. `actions/get-group/index.ts`.
-- Client data hooks are `hooks/use-<thing>.ts`, e.g. `hooks/use-expenses.ts`.
+- Data access is one file per area in `lib/data/` (`groups.ts`, `expenses.ts`, `people.ts`, `activity.ts`,
+  `feedback.ts`, `profile.ts`): each exports the TanStack Query hooks (`useMyGroups`, `useCreateGroup`) over the SQL
+  Connect SDK, and a write's hook refreshes the affected queries itself ([SQL Connect schema](../data/sql-connect.md)).
+  A screen never calls the SDK directly.
+- A Cloud Function is a folder under `functions/src/<area>/` with its `index.ts`, tests beside it, and exported from
+  `functions/src/index.ts` ([Cloud Functions](../apps/functions.md)).
 
 ## Folder layout
 
 - Pages are under `app/` route groups: forms in `app/(platform)/(app)/(forms)/`, screens in
-  `app/(platform)/(app)/(screens)/`.
+  `app/(platform)/(app)/(screens)/`. Only `*.hosting.tsx` files are routes (`pageExtensions` in `next.config.mjs`).
+- A route with an id segment has a `page.hosting.tsx`, a small server wrapper that renders the client `page.tsx` beside
+  `generateStaticParams` (the placeholder id `_`); the client page reads the real ids with `useRouteIds`
+  (`hooks/use-route-ids.ts`). `firebase.json` rewrites real ids to it ([the web app](../apps/splitify.md)).
 - Components used by one route sit next to its `page.tsx`; ones shared inside the app go in
   `app/(platform)/(app)/_components/`; app-wide ones in `components/`, and shadcn primitives in `components/ui/`.
-- Route handlers are `app/api/<area>/.../route.ts`. Global request/response types are ambient in `types/*.d.ts`
-  (e.g. `types/api.d.ts`).
+- There are no route handlers, server actions or Prisma types: the app is a static build, and its server side is
+  `functions/` and SQL Connect. Types the SQL Connect SDK generates are in `dataconnect/generated/`, and global
+  shared types are ambient in `types/*.d.ts`.
 - Imports use the `@/` alias for the repository root (`tsconfig.json`).
-- Prisma model types and enums come from `@/generated/prisma/browser`, everywhere; only `lib/db.ts` imports
-  `@/generated/prisma/client`. The `client` entrypoint is server-only, and files without `"use client"` (stores,
-  hooks, `_utils`) are still bundled into client components.
-- A `page.tsx` takes `ServerSidePageProp` (Next passes `params` and `searchParams` as promises) and resolves them
-  once with `resolvePageProps` from `utils/page.ts`; the components under it take the resolved
-  `ServerSideComponentProp` (`types/common.d.ts`).
 
 ## Error handling
 
-- Server actions never throw to the client: they return `{ error, debugMessage }` (see
-  `actions/create-group/index.ts`), with `getErrorMessage` from `utils/validate.ts`; validation errors come back as
-  `fieldErrors` from `createSafeAction` (`lib/safe-actions.ts`).
-- Route handlers wrap their body in `try`/`catch` and return `NextResponse.json({ message }, { status })`: `401`
-  when `auth()` has no user, `400` for a bad body, `500` otherwise (see `app/api/app/group/[id]/route.ts`).
-- The client shows errors with a `sonner` toast in `useAction`'s `onError` (see
-  `app/(platform)/(app)/(forms)/friends/add/action.tsx`).
+- A data or function failure reaches the screen as a message a person can read: `toUserMessage` (`lib/data/errors.ts`)
+  maps SQL Connect, Auth and function errors, and `callFunction` (`lib/functions/call.ts`) throws an Error carrying
+  that message, never the raw text.
+- The client shows errors with a `sonner` toast (see `app/(platform)/profile/delete-account-action.tsx`).
+- Cloud Functions answer `{ message }` with a status: `401` for a failed sign-in, `400` for a bad request, `500`
+  otherwise, and log the error's class only, never its message ([logging](../operations/logging.md)). The shared guard
+  is `functions/src/http/guard.ts`.
 
 ## Tests
 
 - Unit tests are Vitest (`vitest.config.mts`), in a `*.test.ts` file beside the file they cover
-  (`actions/create-expense/index.test.ts`), run by `yarn test`.
+  (`lib/data/expenses.test.ts`, `functions/src/http/guard.test.ts`), run by `yarn test`.
 - SQL Connect rule tests sit beside their `.gql` file under `dataconnect/` and run on the emulators with `yarn test:rules`, not in `yarn test` ([run locally](../operations/run-locally.md)).
 - Changes are to be tested end to end through the main flows: [decision](../decisions/e2e-main-flows.md).
 
@@ -74,6 +74,7 @@ generated:
 
 ## History
 
+- 2026-11-05: described server actions (`createSafeAction`, `{ error, debugMessage }`), route handlers, `@/generated/prisma` types and `resolvePageProps`; now `lib/data/` hooks, Cloud Functions with the guard, `page.hosting.tsx` wrappers and `toUserMessage`, because spec 2c removed the server.
 - 2026-11-04: added the SQL Connect rule tests and `yarn test:rules`, because the schema's rules are tested apart from `yarn test`.
 - 2026-11-04: said the repository had no tests; now Vitest unit tests sit beside the code and end-to-end tests of the main flows are decided, because tests were added and the testing question was answered. See [e2e of the main flows](../decisions/e2e-main-flows.md).
 - 2026-11-04: lint was `next lint` with `.eslintrc.json`; now `eslint .` with `eslint.config.mjs`, because Next 16 removed `next lint`. See [upgrade](../decisions/upgrade-all-dependencies.md).
@@ -82,21 +83,19 @@ generated:
 
 - `vitest.config.mts`
 - `vitest.rules.config.mts`
-- `actions/create-expense/index.test.ts`
-- `utils/page.ts`
+- `lib/data/expenses.test.ts`
+- `functions/src/http/guard.test.ts`
+- `lib/data/groups.ts`
+- `lib/data/errors.ts`
+- `lib/functions/call.ts`
+- `functions/src/http/guard.ts`
+- `functions/src/index.ts`
+- `hooks/use-route-ids.ts`
+- `app/(platform)/(app)/(screens)/groups/[id]/page.hosting.tsx`
 - `types/common.d.ts`
-- `lib/db.ts`
 - `./eslint.config.mjs`
 - `./.prettierrc`
 - `./.prettierignore`
 - `tsconfig.json`
 - `package.json`
-- `lib/safe-actions.ts`
-- `utils/validate.ts`
-- `actions/create-group/index.ts`
-- `actions/create-group/types.ts`
-- `actions/get-group/index.ts`
-- `hooks/use-expenses.ts`
-- `types/api.d.ts`
-- `app/api/app/group/[id]/route.ts`
-- `app/(platform)/(app)/(forms)/friends/add/action.tsx`
+- `app/(platform)/profile/delete-account-action.tsx`

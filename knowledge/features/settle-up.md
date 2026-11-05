@@ -37,5 +37,5 @@ can change the amount and confirm; the app records it as a settlement and notifi
 - `app/(platform)/(app)/(forms)/groups/[id]/settle/settle-expense.tsx`
 - `app/(platform)/(app)/(forms)/groups/[id]/settle/(form)/form.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/balances-list.tsx`
-- `actions/create-settlement/index.ts`
+- `dataconnect/expense/expense-writes.gql`
 - `lib/data/expenses.ts`

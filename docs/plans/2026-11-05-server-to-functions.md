@@ -1,5 +1,7 @@
 # Server Pieces to Cloud Functions and a Static-Only Build (Spec 2c) Implementation Plan
 
+**Status:** complete
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:implement-with-subagents by default, or ga:implement. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Remove the server code and its packages, make the static export the only build, and move reports, the WebAuthn lock and account deletion into Cloud Functions.
@@ -123,21 +125,21 @@ export const MAX_BODY_BYTES = 65536;
 - Given the CSP, then loading `/`, `/sign-in/`, `/groups/` and a group page in the browser against the emulators reports no `securitypolicyviolation` (checked with a listener in the page).
 - Given the change, then `yarn tsc --noEmit`, `yarn lint`, `yarn test` and `yarn test:rules` pass, `yarn install --frozen-lockfile` (now safe) and `yarn --cwd functions install --frozen-lockfile` pass, and both workflows validate.
 
-- [ ] **Step 1: Write the failing tests** for `guard` and `callFunction` in `functions/src/http/guard.test.ts` and `lib/functions/call.test.ts`, and the admin operations' rules
+- [x] **Step 1: Write the failing tests** for `guard` and `callFunction` in `functions/src/http/guard.test.ts` and `lib/functions/call.test.ts`, and the admin operations' rules
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `guard.test.ts` and the admin operations' cases
 
-- [ ] **Step 3: Remove the server code and packages, switch to one build, and add the guard, the client, the operations, the rewrites and the CSP** to the Interfaces, until they pass
+- [x] **Step 3: Remove the server code and packages, switch to one build, and add the guard, the client, the operations, the rewrites and the CSP** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn test:rules && yarn build && yarn check:hosting`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git rm -r -q actions app/api "app/(platform)/(clerk)" app/analytics.tsx app/coming-soon/page.hosting.tsx lib/db.ts lib/safe-actions.ts lib/logger.ts lib/onesignal.ts lib/notification lib/clerk-hosting.tsx lib/excel.ts lib/account prisma prisma.config.ts proxy.ts proxy.test.ts components/uploadthing hooks/use-action.ts hooks/use-activities.ts hooks/use-expense.ts hooks/use-expenses.ts hooks/use-group-users.ts hooks/use-group.ts utils/api.ts
@@ -183,21 +185,21 @@ git commit -m "Remove the server code and its packages, build only the static ex
 - Given no token, then `401`, through the guard.
 - Given the group page in the browser against the emulators, then "Download report" shows again and each format downloads; a failure shows the error text in a toast.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/reports/reports.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/reports/reports.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `reports.test.ts`
 
-- [ ] **Step 3: Port the report builders and write the function and the button** to the Interfaces, until they pass
+- [x] **Step 3: Port the report builders and write the function and the button** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS, then the browser check of the download
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/reports/index.ts functions/src/reports/excel.ts functions/src/reports/csv.ts functions/src/reports/text.ts functions/src/reports/reports.test.ts "app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx" "app/(platform)/(app)/(screens)/groups/[id]/group-details.tsx"
@@ -242,21 +244,21 @@ git commit -m "Build the expense reports in a Cloud Function for members only, a
 - Given no token, then each route answers `401`; given `SESSION_PASSWORD` unset, then the function refuses to start the session and logs the cause class only.
 - Given `/webauthn/register` and `/webauthn/test` in the hosting build, then they answer 200 with their screens; in the browser against the emulators the register page lists devices and removing one updates the list.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/webauthn/webauthn.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/webauthn/webauthn.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `webauthn.test.ts`
 
-- [ ] **Step 3: Port the routes into the function and point the lock and pages at it** to the Interfaces, until they pass
+- [x] **Step 3: Port the routes into the function and point the lock and pages at it** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS, then the browser check of the register page
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/webauthn/index.ts functions/src/webauthn/session.ts functions/src/webauthn/webauthn.test.ts components/biometric/biometric.tsx "app/(platform)/(app)/webauthn/register/authn-actions.tsx" "app/(platform)/(app)/webauthn/register/authn-devices.tsx" "app/(platform)/(app)/webauthn/register/authn-register.tsx" "app/(platform)/(app)/webauthn/register/page.tsx" "app/(platform)/(app)/webauthn/register/page.hosting.tsx" "app/(platform)/(app)/webauthn/test/authn.tsx" "app/(platform)/(app)/webauthn/test/page.tsx" "app/(platform)/(app)/webauthn/test/page.hosting.tsx" scripts/hosting-pages/webauthn.json
@@ -293,21 +295,21 @@ git commit -m "Serve the WebAuthn lock from a Cloud Function behind the ID-token
 - Given an unauthenticated call, then it is refused with `unauthenticated` and nothing changes.
 - Given the profile in the browser against the emulators, then "Delete account" asks "Delete your account? Your shared expenses stay, shown as Deleted user. This can't be undone.", and confirming deletes the account, signs out and lands on `/`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/account/delete-my-account.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/account/delete-my-account.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test:rules`
 Expected: FAIL on the assertions in `delete-my-account.test.ts`
 
-- [ ] **Step 3: Port the anonymiser and write the callable and the profile's flow** to the Interfaces, until they pass
+- [x] **Step 3: Port the anonymiser and write the callable and the profile's flow** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test:rules`
 Expected: PASS, then the browser check of deleting an account
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/account/delete-my-account.ts functions/src/account/anonymise.ts functions/src/account/delete-my-account.test.ts "app/(platform)/profile/delete-account-action.tsx" "app/(platform)/profile/page.tsx"

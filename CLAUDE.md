@@ -122,13 +122,13 @@ _86 concepts, so sections other than project/ and apps/ show counts. Follow `kno
 ### apps
 
 - [Android app](knowledge/apps/android.md) _(Application)_ — A Trusted Web Activity, in.spanion.splitify.twa, that opens the deployed web app at /groups.
-- [Cloud Functions](knowledge/apps/functions.md) _(Application)_ — The Firebase Cloud Functions in functions/: the contact merge after sign-up, the push senders and the budget kill switch.
+- [Cloud Functions](knowledge/apps/functions.md) _(Application)_ — The Firebase Cloud Functions in functions/: the reports and webauthn HTTP functions, deleteMyAccount, the contact merge, the push senders and the budget kill switch.
 - [iOS app](knowledge/apps/ios.md) _(Application)_ — A Swift WebView wrapper that opens the deployed web app, with Firebase push messaging.
-- [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 16 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
+- [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the landing page, the signed-in app and the sign-in screens.
 
 ### project
 
-- [Architecture](knowledge/project/architecture.md) _(Architecture)_ — One Next.js App Router app: server actions write, route handlers read and notify, Prisma stores data in MySQL, Clerk signs people in.
+- [Architecture](knowledge/project/architecture.md) _(Architecture)_ — One static Next.js build on Firebase Hosting; the browser talks to SQL Connect and, for reports, passkeys and account deletion, to Cloud Functions.
 - [Conventions](knowledge/project/conventions.md) _(Conventions)_ — How code is written in Splitify: where files go, how they are named, how errors travel, and which tools check style.
 - [Splitify](knowledge/project/overview.md) _(Project Overview)_ — An app for splitting shared expenses in groups: one Next.js web app, wrapped as Android and iOS apps.
 

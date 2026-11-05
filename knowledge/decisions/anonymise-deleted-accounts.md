@@ -31,7 +31,11 @@ Deleting everything, including the expenses the person created, was the alternat
 - Shared expense history outlives the account; the privacy policy has to say so.
 - The person can sign up again with the same email as a new, unrelated user.
 
+## History
+
+- 2026-11-05: wrote the paths of files that spec 2c removed (app/api/webhook/clerk/route.ts, prisma/schema.prisma) as plain text, so verify no longer expects them; the decision itself is unchanged.
+
 ## Sources
 
-- `prisma/schema.prisma`
-- `app/api/webhook/clerk/route.ts`
+- prisma/schema.prisma
+- app/api/webhook/clerk/route.ts
