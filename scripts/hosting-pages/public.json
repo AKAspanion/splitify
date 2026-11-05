@@ -6,6 +6,7 @@
     "sign-in/index.html",
     "sign-up/index.html",
     "forgot-password/index.html",
+    "auth/action/index.html",
     "404.html"
   ],
   "requests": [
