@@ -2,6 +2,7 @@
 import "fake-indexeddb/auto";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { AUTH_HOST } from "../../dataconnect/test-utils/emulator-ports";
+import { isSpentActionCode } from "../auth/auth-errors";
 
 // Read when lib/firebase/app.ts first builds the app, so they are set before the dynamic import below.
 process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "demo-splitify";
@@ -189,6 +190,31 @@ describe("lib/firebase/auth", () => {
     await expect(
       auth.readPasswordResetEmail("not-a-code"),
     ).rejects.toMatchObject({ code: "auth/invalid-action-code" });
+  });
+
+  // The emulator answers invalid-action-code (and still reads a reset code's email); production can answer
+  // user-not-found. The action page reads both as a spent link.
+  it("refuses the reset and verify codes of a deleted account with a code the action page reads as spent", async () => {
+    await auth.signUpWithEmail("gone@example.test", PASSWORD, "Gone");
+    const uid = getFirebaseAuth().currentUser!.uid;
+    await auth.signOut();
+    await auth.sendPasswordReset("gone@example.test");
+    const resetCode = await latestCode("gone@example.test", "PASSWORD_RESET");
+    const verifyCode = await latestCode("gone@example.test", "VERIFY_EMAIL");
+    await deleteAccount(uid);
+
+    const refusals = await Promise.all([
+      auth.resetPassword(resetCode, "new-password-456").catch((e) => e),
+      auth.verifyEmailWithCode(verifyCode).catch((e) => e),
+    ]);
+    for (const refusal of refusals) {
+      expect(refusal).toMatchObject({
+        code: expect.stringMatching(
+          /^auth\/(invalid-action-code|user-not-found)$/,
+        ),
+      });
+      expect(isSpentActionCode(refusal)).toBe(true);
+    }
   });
 
   it("verifies the signed-in person's email with the code, and refuses the code a second time", async () => {

@@ -39,11 +39,16 @@ export function authErrorCode(error: unknown): string | undefined {
   return typeof code === "string" ? code : undefined;
 }
 
-/** True when an email link's one-time code can't be used again: past its time, already used, or not a code. */
+/**
+ * True when an email link's one-time code can't be used again: past its time, already used, not a code, or its
+ * account deleted (`auth/user-not-found`, which the sign-in forms still read as a mismatch through authErrorMessage).
+ */
 export function isSpentActionCode(error: unknown): boolean {
   const code = authErrorCode(error);
   return (
-    code === "auth/expired-action-code" || code === "auth/invalid-action-code"
+    code === "auth/expired-action-code" ||
+    code === "auth/invalid-action-code" ||
+    code === "auth/user-not-found"
   );
 }
 

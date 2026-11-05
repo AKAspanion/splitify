@@ -31,7 +31,12 @@ describe("verifyEmailLink", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it.each(["auth/expired-action-code", "auth/invalid-action-code"])(
+  it.each([
+    "auth/expired-action-code",
+    "auth/invalid-action-code",
+    // The link's account was deleted.
+    "auth/user-not-found",
+  ])(
     "calls a link with %s spent",
     async (code) => {
       verifyEmailWithCode.mockRejectedValue(authError(code));

@@ -14,6 +14,12 @@ vi.mock("@/lib/firebase/auth", () => ({
 import { checkResetLink, saveNewPassword } from "./reset-password-form";
 
 const CODE = "secret-oob-code";
+/** Firebase's answers for a code that can't be used again, the last when its account was deleted. */
+const SPENT_CODES = [
+  "auth/expired-action-code",
+  "auth/invalid-action-code",
+  "auth/user-not-found",
+];
 const authError = (code: string) =>
   Object.assign(new Error(`Firebase: raw (${code}) ${CODE}`), { code });
 
@@ -44,7 +50,7 @@ describe("checkResetLink", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it.each(["auth/expired-action-code", "auth/invalid-action-code"])(
+  it.each(SPENT_CODES)(
     "calls a link with %s spent",
     async (code) => {
       readPasswordResetEmail.mockRejectedValue(authError(code));
@@ -92,7 +98,7 @@ describe("saveNewPassword", () => {
     expect(resetPassword).toHaveBeenCalledWith(CODE, "12345678");
   });
 
-  it.each(["auth/expired-action-code", "auth/invalid-action-code"])(
+  it.each(SPENT_CODES)(
     "calls a link with %s spent",
     async (code) => {
       resetPassword.mockRejectedValue(authError(code));

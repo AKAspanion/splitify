@@ -81,12 +81,20 @@ describe("authErrorCode", () => {
 });
 
 describe("isSpentActionCode", () => {
-  it.each(["auth/expired-action-code", "auth/invalid-action-code"])(
-    "is true for %s",
-    (code) => {
-      expect(isSpentActionCode(withCode(code))).toBe(true);
-    },
-  );
+  it.each([
+    "auth/expired-action-code",
+    "auth/invalid-action-code",
+    // The link's account was deleted: production can answer this for a reset or verify code.
+    "auth/user-not-found",
+  ])("is true for %s", (code) => {
+    expect(isSpentActionCode(withCode(code))).toBe(true);
+  });
+
+  it("leaves the sign-in forms' words for user-not-found as they were", () => {
+    expect(authErrorMessage(withCode("auth/user-not-found"))).toBe(
+      "That email and password don't match.",
+    );
+  });
 
   it.each([
     withCode("auth/network-request-failed"),
