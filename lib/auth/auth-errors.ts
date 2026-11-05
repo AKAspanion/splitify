@@ -1,6 +1,7 @@
 const MISMATCH = "That email and password don't match.";
 const NO_GOOGLE =
   "Google sign-in isn't available here. Use email and password.";
+const GOOGLE_CLOSED = "Google sign-in was closed before it finished.";
 
 const MESSAGES: Record<string, string> = {
   "auth/wrong-password": MISMATCH,
@@ -14,6 +15,10 @@ const MESSAGES: Record<string, string> = {
     "Couldn't reach Splitify. Check your connection.",
   "auth/popup-blocked": NO_GOOGLE,
   "auth/operation-not-supported-in-this-environment": NO_GOOGLE,
+  // The site's domain isn't in Firebase Auth's authorized domains.
+  "auth/unauthorized-domain": NO_GOOGLE,
+  "auth/popup-closed-by-user": GOOGLE_CLOSED,
+  "auth/cancelled-popup-request": GOOGLE_CLOSED,
 };
 
 /** What a person sees for a failed sign-in, never Firebase's own message. */

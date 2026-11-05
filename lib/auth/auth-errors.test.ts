@@ -29,6 +29,18 @@ describe("authErrorMessage", () => {
       "auth/operation-not-supported-in-this-environment",
       "Google sign-in isn't available here. Use email and password.",
     ],
+    [
+      "auth/unauthorized-domain",
+      "Google sign-in isn't available here. Use email and password.",
+    ],
+    [
+      "auth/popup-closed-by-user",
+      "Google sign-in was closed before it finished.",
+    ],
+    [
+      "auth/cancelled-popup-request",
+      "Google sign-in was closed before it finished.",
+    ],
   ])("maps %s", (code, message) => {
     expect(authErrorMessage(withCode(code))).toBe(message);
   });
