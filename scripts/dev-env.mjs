@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { existsSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import path from "node:path";
 
 /** The env `next dev` gets so the browser talks to the emulators as demo-splitify. */
@@ -35,12 +35,17 @@ export function functionRewrites(firebaseJson, projectId) {
 /** Writes functions/.secret.local with a random 48-character SESSION_PASSWORD when the file is missing; never overwrites it. */
 export function ensureFunctionsSecret(functionsDir) {
   const file = path.join(functionsDir, ".secret.local");
-  if (existsSync(file)) return "kept";
   // 36 random bytes -> 48 base64url characters.
   const password = randomBytes(36).toString("base64url");
-  writeFileSync(file, `SESSION_PASSWORD=${password}\n`, {
-    mode: 0o600,
-    flag: "wx",
-  });
+  try {
+    // "wx" creates the file or fails if it exists, in one step, so an existing secret is never replaced.
+    writeFileSync(file, `SESSION_PASSWORD=${password}\n`, {
+      mode: 0o600,
+      flag: "wx",
+    });
+  } catch (error) {
+    if (error?.code === "EEXIST") return "kept";
+    throw error;
+  }
   return "created";
 }
