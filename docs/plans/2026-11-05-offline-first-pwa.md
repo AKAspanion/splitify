@@ -10,6 +10,8 @@
 
 **Spec:** [docs/specs/2026-11-05-offline-first-pwa.md](../specs/2026-11-05-offline-first-pwa.md)
 
+**Status:** complete
+
 ## Global Constraints
 
 - Install with `yarn install --frozen-lockfile`; emulator work in a worktree only through the run's `with-emulator-lock.sh`, with `--config firebase.emulators.json` for Hosting.
@@ -68,6 +70,8 @@ export function OfflineBanner(): JSX.Element | null; // reads useOnline and useM
 - `signOut()` calls `clearSavedCache(uid)` before signing out of Firebase.
 
 **Spec:**
+
+**Status:** complete
 - The saved cache: "react-query's cache is persisted to IndexedDB with `@tanstack/react-query-persist-client` and an IndexedDB"
 - The saved cache: "Signing out deletes that person's entry, so the next person on the device sees none of it."
 - Offline in the screens: "`hooks/use-online.ts` `useOnline()` follows `navigator.onLine` and the `online`/`offline` events."
@@ -85,21 +89,21 @@ export function OfflineBanner(): JSX.Element | null; // reads useOnline and useM
 - Given sign-out, then `clearSavedCache` runs for that person before Firebase's sign-out.
 - Given the change, then `yarn tsc --noEmit`, `yarn lint`, `yarn test` and `yarn build` pass, and `out/sw-manifest.js` exists.
 
-- [ ] **Step 1: Write the failing tests** for `persist.ts`, `useOnline` and the banner's text, in `lib/offline/persist.test.ts` and `hooks/use-online.test.ts`
+- [x] **Step 1: Write the failing tests** for `persist.ts`, `useOnline` and the banner's text, in `lib/offline/persist.test.ts` and `hooks/use-online.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `persist.test.ts` and `use-online.test.ts`
 
-- [ ] **Step 3: Write the persister, the hooks, the banner, the wrapper and the provider changes** to the Interfaces, until they pass
+- [x] **Step 3: Write the persister, the hooks, the banner, the wrapper and the provider changes** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json yarn.lock lib/offline/persist.ts lib/offline/persist.test.ts lib/offline/version.ts hooks/use-online.ts hooks/use-online.test.ts components/offline/offline-banner.tsx components/offline/online-only.tsx components/providers.tsx "app/(platform)/(app)/layout.hosting.tsx" lib/firebase/auth.ts scripts/build-sw.mjs
@@ -136,6 +140,8 @@ export function fallbackPage(pathname: string): string; // the cached page for a
 `out/sw-manifest.js` sets `self.__SW_MANIFEST = { version, files }` (every file under `out/` but `sw.js` and `sw-manifest.js`); `version` is a hash of the files' contents.
 
 **Spec:**
+
+**Status:** complete
 - One service worker: "`public/sw.js` replaces `public/firebase-messaging-sw.js`: it keeps the FCM background handling as it is today and"
 - One service worker: "`scripts/build-sw.mjs` runs after `next build` (`postbuild`) and writes `out/sw-manifest.js`: the list of every file"
 - One service worker: "A new version shows a toast"
@@ -153,21 +159,21 @@ export function fallbackPage(pathname: string): string; // the cached page for a
 - Given a waiting worker, then the toast "A new version of Splitify is ready." with "Reload" shows, and "Reload" posts `SKIP_WAITING` and reloads once the new worker takes control.
 - Given `yarn build && yarn check:hosting`, then `out/sw.js` and `out/sw-manifest.js` are served (`pwa.json`), and in the browser against the emulators, after one visit and going offline, `/` and a visited group page load from the worker.
 
-- [ ] **Step 1: Write the failing tests** for the manifest writer and the routing functions, in `scripts/build-sw.test.mjs` and `lib/offline/sw-routing.test.ts`
+- [x] **Step 1: Write the failing tests** for the manifest writer and the routing functions, in `scripts/build-sw.test.mjs` and `lib/offline/sw-routing.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `build-sw.test.mjs` and `sw-routing.test.ts`
 
-- [ ] **Step 3: Write the worker, the manifest writer, the routing, the registration and the toast** to the Interfaces, until they pass
+- [x] **Step 3: Write the worker, the manifest writer, the routing, the registration and the toast** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test && yarn build && yarn check:hosting`
 Expected: PASS, then the browser check offline
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git rm -q public/firebase-messaging-sw.js
@@ -205,6 +211,8 @@ export function withPending<T extends { id: string }>(rows: T[], pending: T[]): 
 `registerQueuedWrites` is called once where the query client is made (`components/providers.tsx` imports it; that one line is this task's, merged after Task 1).
 
 **Spec:**
+
+**Status:** complete
 - Writing offline: "`CreateExpense` and `CreateSettlement` are react-query mutations with defaults registered by key"
 - Writing offline: "When it is sent: success replaces the optimistic row with the server's; an"
 
@@ -220,21 +228,21 @@ export function withPending<T extends { id: string }>(rows: T[], pending: T[]): 
 - Given the expense card for a pending row, then it shows "Waiting to sync"; the add and settle forms go back to the group as they do online.
 - Given the browser against the emulators with the network off: load a group, go offline, reload (the group shows), add an expense and a settlement (both "Waiting to sync", "2 changes waiting to sync"), reload offline (still waiting), go online (they sync, the marks go, and the server has each exactly once).
 
-- [ ] **Step 1: Write the failing tests** for each unit Acceptance case, in `lib/offline/queued-writes.test.ts`
+- [x] **Step 1: Write the failing tests** for each unit Acceptance case, in `lib/offline/queued-writes.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `yarn test`
 Expected: FAIL on the assertions in `queued-writes.test.ts`
 
-- [ ] **Step 3: Write the queued writes and wire the hooks, card and forms** to the Interfaces, until they pass
+- [x] **Step 3: Write the queued writes and wire the hooks, card and forms** to the Interfaces, until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `yarn test`
 Expected: PASS, then the browser check with the network off
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/offline/queued-writes.ts lib/offline/queued-writes.test.ts lib/data/expenses.ts "app/(platform)/(app)/(screens)/groups/[id]/expense-card.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expenses-list.tsx" "app/(platform)/(app)/(forms)/expense/add/add-expense.tsx" "app/(platform)/(app)/(forms)/groups/[id]/settle/settle-expense.tsx" components/providers.tsx
@@ -270,6 +278,8 @@ git commit -m "Queue expenses and settlements made offline, show them as waiting
 - Produces: nothing new; each listed control is wrapped in `OnlineOnly` (or reads `useOnline` for a form's submit).
 
 **Spec:**
+
+**Status:** complete
 - Offline in the screens: "Online-only actions are disabled while offline, each with"
 - Offline in the screens: "The sign-in screens offline say"
 
@@ -284,21 +294,21 @@ git commit -m "Queue expenses and settlements made offline, show them as waiting
 - Given "Add expense" and "Settle up" offline, then they stay enabled (Task 3 queues them).
 - Given each screen in the browser against the emulators, light and dark at 390 pixels, then the disabled state and its message are visible and the layout doesn't overflow.
 
-- [ ] **Step 1: Write the failing test** for one representative control's offline state (the group delete button) in `components/offline/online-only.test.tsx` if a DOM test environment is available, else record the browser check as the test
+- [x] **Step 1: Write the failing test** for one representative control's offline state (the group delete button) in `components/offline/online-only.test.tsx` if a DOM test environment is available, else record the browser check as the test
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `yarn test`
 Expected: FAIL on the disabled assertion, or the browser check showing the control enabled offline
 
-- [ ] **Step 3: Wrap each listed control** to the Interfaces, until it passes
+- [x] **Step 3: Wrap each listed control** to the Interfaces, until it passes
 
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `yarn test && yarn build`
 Expected: PASS, then the browser check of every listed control offline
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(screens)/groups/group-create.tsx" "app/(platform)/(app)/(forms)/groups/add/form.tsx" "app/(platform)/(app)/(forms)/groups/[id]/edit/form.tsx" "app/(platform)/(app)/(screens)/groups/[id]/settings/group-delete.tsx" "app/(platform)/(app)/(screens)/groups/[id]/add-member/add-member.tsx" "app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-actions.tsx" "app/(platform)/(app)/(forms)/expense/[id]/edit/form.tsx" "app/(platform)/(app)/(forms)/friends/add/search.tsx" "app/(platform)/(app)/(forms)/friends/add/contact/form.tsx" "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/form.tsx" "app/(platform)/(app)/(forms)/feedback/add/form.tsx" "app/(platform)/profile/delete-account-action.tsx" "app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx" "app/(platform)/(app)/webauthn/register/authn-register.tsx" "app/(platform)/(app)/webauthn/register/authn-actions.tsx" "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx" "app/(platform)/(auth)/forgot-password/forgot-password-form.tsx"
