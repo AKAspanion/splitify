@@ -6,17 +6,28 @@ type HeaderRule = {
   headers: { key: string; value: string }[];
 };
 
-/** The `**` rule's Content-Security-Policy, as Firebase Hosting sends it on every page. */
-function sitewideCsp(): string {
-  const rules: HeaderRule[] = JSON.parse(readFileSync("firebase.json", "utf8"))
-    .hosting.headers;
-  const rule = rules.find(({ source }) => source === "**");
-  const csp = rule?.headers.find(
-    ({ key }) => key === "Content-Security-Policy",
+type FirebaseConfig = {
+  emulators: { auth: { host: string; port: number } };
+  hosting: { headers: HeaderRule[] };
+};
+
+function readConfig(file: string): FirebaseConfig {
+  return JSON.parse(readFileSync(file, "utf8"));
+}
+
+/** The `**` rule's value for one header, as Firebase Hosting sends it on every page. */
+function sitewideHeader(file: string, name: string): string {
+  const rule = readConfig(file).hosting.headers.find(
+    ({ source }) => source === "**",
   );
-  if (!csp)
-    throw new Error("firebase.json has no `**` Content-Security-Policy");
-  return csp.value;
+  const header = rule?.headers.find(({ key }) => key === name);
+  if (!header) throw new Error(`${file} has no \`**\` ${name}`);
+  return header.value;
+}
+
+/** The `**` rule's Content-Security-Policy, as Firebase Hosting sends it on every page. */
+function sitewideCsp(file = "firebase.json"): string {
+  return sitewideHeader(file, "Content-Security-Policy");
 }
 
 /** One directive's sources, split the way a browser splits them: on whitespace. */
@@ -54,5 +65,32 @@ describe("firebase.json's sitewide Content-Security-Policy", () => {
       expect(source).toMatch(/^https:\/\//);
       expect(source.indexOf("https://", 1)).toBe(-1);
     }
+  });
+});
+
+describe("firebase.json's Strict-Transport-Security", () => {
+  it("is sent on every path, for two years, with subdomains", () => {
+    expect(sitewideHeader("firebase.json", "Strict-Transport-Security")).toBe(
+      "max-age=63072000; includeSubDomains",
+    );
+  });
+});
+
+describe("firebase.emulators.json's sitewide Content-Security-Policy", () => {
+  const frameSrc = directiveSources(
+    sitewideCsp("firebase.emulators.json"),
+    "frame-src",
+  );
+  const { host, port } = readConfig("firebase.json").emulators.auth;
+
+  it("lets the pages frame the site's own origin and the Auth emulator, each its own token", () => {
+    expect(frameSrc).toContain("'self'");
+    expect(frameSrc).toContain(`http://${host}:${port}`);
+  });
+
+  it("names the Auth emulator at the port firebase.json gives it", () => {
+    expect(port).toBe(
+      readConfig("firebase.emulators.json").emulators.auth.port,
+    );
   });
 });

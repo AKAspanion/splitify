@@ -70,6 +70,89 @@ export function clearGoogleRedirect(): void {
   tabStorage()?.removeItem(GOOGLE_REDIRECT_MARKER);
 }
 
+/** Where indexedDBLocalPersistence keeps the signed-in user: Firebase Auth's own names. */
+const AUTH_DB = "firebaseLocalStorageDb";
+const AUTH_STORE = "firebaseLocalStorage";
+/** The keys Firebase Auth saves a user under, in IndexedDB and in web storage: `<prefix><apiKey>:<appName>`. */
+const SAVED_USER_PREFIXES = ["firebase:authUser:", "firebase:redirectUser:"];
+
+function isSavedUserKey(key: unknown): key is string {
+  return (
+    typeof key === "string" &&
+    SAVED_USER_PREFIXES.some((prefix) => key.startsWith(prefix))
+  );
+}
+
+/** Removes Firebase Auth's saved users from one web storage; does nothing where the browser has none or blocks it. */
+function removeSavedUsers(name: "localStorage" | "sessionStorage"): void {
+  let storage: Storage | undefined;
+  try {
+    storage = globalThis[name];
+  } catch {
+    return;
+  }
+  if (!storage) return;
+  for (let index = storage.length - 1; index >= 0; index--) {
+    const key = storage.key(index);
+    if (isSavedUserKey(key)) storage.removeItem(key);
+  }
+}
+
+/**
+ * Deletes Firebase Auth's saved users from its IndexedDB store, record by record, so its own open connection isn't
+ * blocked, as deleting the database would be. Creates no database when there is none.
+ */
+function removeSavedUsersFromIndexedDb(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof indexedDB === "undefined") return resolve();
+    const open = indexedDB.open(AUTH_DB);
+    // No database yet, so nothing is saved: abort the upgrade, and the open fails without creating one.
+    open.onupgradeneeded = () => open.transaction?.abort();
+    open.onerror = () =>
+      open.error?.name === "AbortError" ? resolve() : reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      if (!db.objectStoreNames.contains(AUTH_STORE)) {
+        db.close();
+        return resolve();
+      }
+      const tx = db.transaction(AUTH_STORE, "readwrite");
+      const cursor = tx.objectStore(AUTH_STORE).openCursor();
+      cursor.onsuccess = () => {
+        const current = cursor.result;
+        if (!current) return;
+        if (isSavedUserKey(current.key)) current.delete();
+        current.continue();
+      };
+      tx.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      tx.onerror = tx.onabort = () => {
+        db.close();
+        reject(tx.error);
+      };
+    };
+  });
+}
+
+/**
+ * Clears what Firebase Auth saved of the signed-in user, for when its own sign-out failed: without it the next load
+ * restores the user. Never rejects: a failure is logged with its class.
+ */
+async function clearSavedSignIn(): Promise<void> {
+  try {
+    removeSavedUsers("localStorage");
+    removeSavedUsers("sessionStorage");
+    await removeSavedUsersFromIndexedDb();
+  } catch (error) {
+    console.warn(
+      "Google sign-in: clearing the saved sign-in after sign-out failed did not finish",
+      error instanceof Error ? error.name : typeof error,
+    );
+  }
+}
+
 let completing: Promise<boolean> | undefined;
 
 /**
@@ -77,7 +160,8 @@ let completing: Promise<boolean> | undefined;
  * signed-in person and clears the marker. Resolves true when a Google sign-in completed, false when none was in
  * flight or the person came back without signing in. Rejects with Firebase's error, marker cleared. When UpsertMe
  * fails, signs the person out of Firebase Auth before rejecting with UpsertMe's error, so nobody stays signed in
- * without their User row.
+ * without their User row; when that sign-out fails too, clears the user Firebase Auth saved, so the next load
+ * doesn't restore them.
  *
  * A call made while another is still running shares its result, so UpsertMe runs once even when React runs the
  * calling effect twice.
@@ -95,14 +179,18 @@ export function completeGoogleSignIn(): Promise<boolean> {
         await upsertCurrentUser();
       } catch (error) {
         // Firebase Auth's sign-out only: the app's signOut also clears caches and push tokens nobody has yet.
-        await firebaseSignOut(getFirebaseAuth()).catch((signOutError) =>
+        try {
+          await firebaseSignOut(getFirebaseAuth());
+        } catch (signOutError) {
           console.warn(
             "Google sign-in: signing out after UpsertMe failed did not finish",
             signOutError instanceof Error
               ? signOutError.name
               : typeof signOutError,
-          ),
-        );
+          );
+          // Firebase drops the user from memory before it fails to delete the saved copy, which the next load restores.
+          await clearSavedSignIn();
+        }
         throw error;
       }
       return true;

@@ -1,6 +1,12 @@
+// Firebase Auth keeps the signed-in user in IndexedDB, which Node does not have.
+import "fake-indexeddb/auto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const MARKER = "splitify:google-redirect";
+// Where indexedDBLocalPersistence keeps the signed-in user: Firebase's own names.
+const AUTH_DB = "firebaseLocalStorageDb";
+const AUTH_STORE = "firebaseLocalStorage";
+const AUTH_USER_KEY = "firebase:authUser:demo-key:[DEFAULT]";
 
 const {
   auth,
@@ -64,16 +70,55 @@ function fakeSessionStorage(): Storage {
   };
 }
 
+function request<T>(req: IDBRequest<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/** Opens Firebase Auth's database as indexedDBLocalPersistence does, creating its store on first use. */
+async function openAuthDb(): Promise<IDBDatabase> {
+  const open = indexedDB.open(AUTH_DB, 1);
+  open.onupgradeneeded = () =>
+    open.result.createObjectStore(AUTH_STORE, { keyPath: "fbase_key" });
+  return request(open);
+}
+
+/** Saves records into Firebase Auth's store, the way it persists the signed-in user. */
+async function persist(records: Record<string, unknown>): Promise<void> {
+  const db = await openAuthDb();
+  const tx = db.transaction(AUTH_STORE, "readwrite");
+  for (const [key, value] of Object.entries(records))
+    tx.objectStore(AUTH_STORE).put({ fbase_key: key, value });
+  await new Promise((resolve) => (tx.oncomplete = resolve));
+  db.close();
+}
+
+async function persistedKeys(): Promise<string[]> {
+  const db = await openAuthDb();
+  const keys = await request(
+    db.transaction(AUTH_STORE).objectStore(AUTH_STORE).getAllKeys(),
+  );
+  db.close();
+  return keys as string[];
+}
+
+async function authDbExists(): Promise<boolean> {
+  return (await indexedDB.databases()).some(({ name }) => name === AUTH_DB);
+}
+
 function authError(code: string): Error {
   return Object.assign(new Error(`Firebase: Error (${code}).`), { code });
 }
 
 let storage: Storage;
 
-beforeEach(() => {
+beforeEach(async () => {
   vi.resetAllMocks();
   storage = fakeSessionStorage();
   vi.stubGlobal("sessionStorage", storage);
+  await request(indexedDB.deleteDatabase(AUTH_DB));
 });
 
 afterEach(() => {
@@ -196,6 +241,95 @@ describe("completeGoogleSignIn", () => {
       expect(warn).toHaveBeenCalledWith(
         "Google sign-in: signing out after UpsertMe failed did not finish",
         "Error",
+      );
+      expect(storage.getItem(MARKER)).toBeNull();
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("leaves Firebase's saved sign-in to Firebase when the sign-out after UpsertMe succeeds", async () => {
+    storage.setItem(MARKER, "1");
+    await persist({ [AUTH_USER_KEY]: { uid: "u1" } });
+    getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
+    const error = new Error("UpsertMe failed");
+    upsertMe.mockRejectedValue(error);
+    signOut.mockResolvedValue(undefined);
+
+    await expect(completeGoogleSignIn()).rejects.toBe(error);
+
+    expect(await persistedKeys()).toEqual([AUTH_USER_KEY]);
+  });
+
+  it("clears Firebase Auth's saved user, so nobody is signed in on the next load, when the sign-out after UpsertMe also fails", async () => {
+    storage.setItem(MARKER, "1");
+    storage.setItem("firebase:redirectUser:demo-key:[DEFAULT]", "{}");
+    const local = fakeSessionStorage();
+    local.setItem(AUTH_USER_KEY, "{}");
+    local.setItem("theme", "dark");
+    vi.stubGlobal("localStorage", local);
+    await persist({
+      [AUTH_USER_KEY]: { uid: "u1" },
+      "firebase:other:demo-key": "kept",
+    });
+    getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
+    const error = new Error("UpsertMe failed");
+    upsertMe.mockRejectedValue(error);
+    signOut.mockRejectedValue(authError("auth/internal-error"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      await expect(completeGoogleSignIn()).rejects.toBe(error);
+
+      expect(await persistedKeys()).toEqual(["firebase:other:demo-key"]);
+      expect(local.getItem(AUTH_USER_KEY)).toBeNull();
+      expect(local.getItem("theme")).toBe("dark");
+      expect(
+        storage.getItem("firebase:redirectUser:demo-key:[DEFAULT]"),
+      ).toBeNull();
+      expect(storage.getItem(MARKER)).toBeNull();
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("creates no Auth database when none was saved and the sign-out after UpsertMe fails", async () => {
+    storage.setItem(MARKER, "1");
+    getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
+    const error = new Error("UpsertMe failed");
+    upsertMe.mockRejectedValue(error);
+    signOut.mockRejectedValue(authError("auth/internal-error"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      await expect(completeGoogleSignIn()).rejects.toBe(error);
+
+      expect(await authDbExists()).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(1);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("still rejects with UpsertMe's error, and says why, when clearing the saved sign-in fails too", async () => {
+    storage.setItem(MARKER, "1");
+    getRedirectResult.mockResolvedValue({ user: { uid: "u1" } });
+    const error = new Error("UpsertMe failed");
+    upsertMe.mockRejectedValue(error);
+    signOut.mockRejectedValue(authError("auth/internal-error"));
+    vi.stubGlobal("indexedDB", {
+      open: () => {
+        throw new DOMException("IndexedDB is broken", "UnknownError");
+      },
+    });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      await expect(completeGoogleSignIn()).rejects.toBe(error);
+
+      expect(warn).toHaveBeenCalledWith(
+        "Google sign-in: clearing the saved sign-in after sign-out failed did not finish",
+        "UnknownError",
       );
       expect(storage.getItem(MARKER)).toBeNull();
     } finally {
