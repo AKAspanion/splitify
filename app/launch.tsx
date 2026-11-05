@@ -1,6 +1,6 @@
 "use client";
 
-import { onUserChanged } from "@/lib/firebase/auth";
+import { useAuth } from "@/hooks/use-auth";
 import { UpdateToast } from "@/components/offline/update-toast";
 import {
   listenForIosToken,
@@ -8,19 +8,25 @@ import {
   registerWebPush,
 } from "@/lib/push/register";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const Launch = () => {
-  const [uid, setUid] = useState<string | null>(null);
+  const { user } = useAuth();
+  const uid = user?.uid ?? null;
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "" || pathname === "/";
 
-  useEffect(() => onUserChanged((user) => setUid(user?.uid ?? null)), []);
-
   // The one service worker (offline shell and push) is registered for everyone, signed in or not.
+  // The worker only works in the exported build, not in next dev (see knowledge/operations/service-worker.md).
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
+    if (process.env.NODE_ENV !== "production") {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        for (const reg of regs) void reg.unregister();
+      });
+      return;
+    }
     registerAppWorker().catch((error) =>
       console.error(
         `[sw] registration failed: ${error instanceof Error ? error.name : "unknown"}`,

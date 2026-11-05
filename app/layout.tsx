@@ -29,9 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      {/* Sets the version the saved cache and the service worker share, before the app hydrates. */}
-      <Script src="/sw-manifest.js" strategy="beforeInteractive" />
-      <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
+      <head>
+        {/* Sets the version the saved cache and the service worker share, before the app hydrates. */}
+        <Script src="/sw-manifest.js" strategy="beforeInteractive" />
+        <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"

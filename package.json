@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 2140",
     "build": "next build",
     "postbuild": "node scripts/build-sw.mjs",
     "build:hosting": "next build",
@@ -15,9 +15,10 @@
     "dataconnect:generate": "npx --yes firebase-tools@15.34.2 dataconnect:sdk:generate",
     "deploy:functions": "npx --yes firebase-tools@15.34.2 deploy --only functions",
     "deploy:dataconnect": "npx --yes firebase-tools@15.34.2 deploy --only dataconnect",
+    "emulators": "npx --yes firebase-tools@15.34.2 emulators:start --only auth,firestore --project demo-app",
     "format": "prettier --write .",
     "postinstall": "yarn dataconnect:generate",
-    "ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 3000"
+    "ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 2140"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.4.1",

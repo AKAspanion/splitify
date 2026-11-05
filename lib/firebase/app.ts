@@ -26,10 +26,12 @@ export function getFirebaseApp(): FirebaseApp {
   if (getApps().length) return getApp();
   // The NEXT_PUBLIC_ keys are written out in full so Next inlines them into the browser bundle.
   return initializeApp({
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-key",
+    authDomain:
+      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+      "splitify-416321.firebaseapp.com",
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "splitify-416321",
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
   });
 }
 

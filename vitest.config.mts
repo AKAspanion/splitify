@@ -15,6 +15,7 @@ export default defineConfig({
     environment: "node",
     exclude: [
       ...configDefaults.exclude,
+      ".claude/**",
       "dataconnect/**/*.test.ts",
       "functions/src/**/*.test.ts",
       "lib/firebase/**/*.test.ts",

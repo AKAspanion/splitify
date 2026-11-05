@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       // Firebase failed to start (a missing web config): nobody can be signed in.
       console.error("auth: could not start Firebase Auth", error);
-      queueMicrotask(() => setState(SIGNED_OUT));
+      setState(SIGNED_OUT);
     }
   }, []);
 
