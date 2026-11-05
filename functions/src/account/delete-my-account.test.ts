@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { Auth, getAuth } from "firebase-admin/auth";
 import {
@@ -112,6 +120,15 @@ beforeEach(async () => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+// The users made here have no password, so a later file's signInTestUser("alice") could neither sign in as them nor
+// create its own: remove them once this file is done.
+afterAll(async () => {
+  for (const uid of [ALICE, BOB])
+    await auth()
+      .deleteUser(uid)
+      .catch(() => undefined);
 });
 
 describe("deleteMyAccount", () => {
