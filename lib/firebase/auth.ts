@@ -5,7 +5,7 @@ import {
   createUserWithEmailAndPassword,
   getRedirectResult,
   GoogleAuthProvider,
-  onAuthStateChanged,
+  onIdTokenChanged,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -194,12 +194,17 @@ export async function signOut(): Promise<void> {
   }
 }
 
+/**
+ * Calls back on sign-in and sign-out, and again whenever the person's token is refreshed. It is built on
+ * `onIdTokenChanged`, not `onAuthStateChanged` (which fires only when the uid changes), so a verified email reaches
+ * every listener once `verifyEmailWithCode` or `reloadEmailVerified` refreshes the token, without a reload.
+ */
 export function onUserChanged(
   cb: (
     user: { uid: string; email: string; emailVerified: boolean } | null,
   ) => void,
 ): () => void {
-  return onAuthStateChanged(getFirebaseAuth(), (user: User | null) =>
+  return onIdTokenChanged(getFirebaseAuth(), (user: User | null) =>
     cb(
       user
         ? {

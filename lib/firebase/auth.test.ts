@@ -54,6 +54,20 @@ async function deleteAccount(uid: string): Promise<void> {
     throw new Error(`Could not delete the account: ${response.status}`);
 }
 
+/** Applies a verify-email code straight on the Auth emulator, as another device opening the link would. */
+async function applyCodeElsewhere(oobCode: string): Promise<void> {
+  const response = await fetch(
+    `http://${AUTH_HOST}/identitytoolkit.googleapis.com/v1/accounts:update?key=demo-key`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ oobCode }),
+    },
+  );
+  if (!response.ok)
+    throw new Error(`Could not apply the code: ${response.status}`);
+}
+
 async function users() {
   return (
     (await seed(`query { users { id email name signedUp } }`)) as {
@@ -195,6 +209,45 @@ describe("lib/firebase/auth", () => {
     await expect(auth.verifyEmailWithCode(code)).rejects.toMatchObject({
       code: "auth/invalid-action-code",
     });
+    stop();
+  });
+
+  it("tells every listener the email is verified once verifyEmailWithCode applies the code, without a reload", async () => {
+    const seen: ({ uid: string; emailVerified: boolean } | null)[] = [];
+    const stop = auth.onUserChanged((u) => seen.push(u));
+    await auth.signUpWithEmail("verify4@example.test", PASSWORD, "Verify Four");
+    await vi.waitFor(() =>
+      expect(seen.at(-1)).toMatchObject({ emailVerified: false }),
+    );
+    const code = await latestCode("verify4@example.test", "VERIFY_EMAIL");
+
+    await auth.verifyEmailWithCode(code);
+
+    await vi.waitFor(() =>
+      expect(seen.at(-1)).toMatchObject({
+        uid: getFirebaseAuth().currentUser!.uid,
+        emailVerified: true,
+      }),
+    );
+    stop();
+  });
+
+  it("tells every listener the email is verified once reloadEmailVerified sees a verification done elsewhere", async () => {
+    const seen: ({ emailVerified: boolean } | null)[] = [];
+    const stop = auth.onUserChanged((u) => seen.push(u));
+    await auth.signUpWithEmail("verify5@example.test", PASSWORD, "Verify Five");
+    const code = await latestCode("verify5@example.test", "VERIFY_EMAIL");
+    // Applied on another device: this browser's SDK isn't told.
+    await applyCodeElsewhere(code);
+    await vi.waitFor(() =>
+      expect(seen.at(-1)).toMatchObject({ emailVerified: false }),
+    );
+
+    await expect(auth.reloadEmailVerified()).resolves.toBe(true);
+
+    await vi.waitFor(() =>
+      expect(seen.at(-1)).toMatchObject({ emailVerified: true }),
+    );
     stop();
   });
 
