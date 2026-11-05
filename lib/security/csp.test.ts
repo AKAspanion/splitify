@@ -76,9 +76,14 @@ describe("firebase.json's headers for the email action page", () => {
   // `/auth/action`, `/auth/action/` and anything under it, but not `/auth/actions/`.
   const headers = headersFor("/auth/action{,/**}");
 
-  it("keeps the page, whose URL carries a one-time code, out of every cache and never sends it as a referrer", () => {
+  it("keeps the page, whose URL carries a one-time code, out of every cache", () => {
     expect(headers["Cache-Control"]).toBe("no-store");
-    expect(headers["Referrer-Policy"]).toBe("no-referrer");
+  });
+
+  // Its Firebase calls still carry the origin, which a browser API key restricted by HTTP referrer needs; the path and
+  // query, and so the code, never leave.
+  it("sends only the site's origin as the referrer", () => {
+    expect(headers["Referrer-Policy"]).toBe("strict-origin");
   });
 
   it("keeps the sitewide Content-Security-Policy", () => {
