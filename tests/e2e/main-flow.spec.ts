@@ -22,25 +22,32 @@ test("signs in, creates a group, adds a contact and an equal expense, and shows 
   });
 
   const groupId = await test.step("create the group E2E Trip", async () => {
-    await page.getByRole("button", { name: "Create a group" }).click();
-    await page.getByLabel("Group name").fill("E2E Trip");
+    // A new user's /groups has two buttons named "Create a group": the header icon (aria-label only) and the empty
+    // state's button (visible text, group-create.tsx). Both go to /groups/add; the flow means the empty state's, and
+    // getByText sees only its visible text, so it resolves to that one element.
+    await page.getByText("Create a group", { exact: true }).click();
+    await page.getByLabel("Group name", { exact: true }).fill("E2E Trip");
     await page.getByRole("button", { name: "Create", exact: true }).click();
     await expect(page).toHaveURL(GROUP_URL);
-    await expect(
-      page.getByText("E2E Trip", { exact: true }).first(),
-    ).toBeVisible();
+    // The group card is the only place the group's name is shown (the header title is empty).
+    await expect(page.getByText("E2E Trip", { exact: true })).toBeVisible();
     return GROUP_URL.exec(new URL(page.url()).pathname)![1];
   });
 
   await test.step("add the contact Asha to the group", async () => {
-    await page.getByRole("button", { name: "Add members" }).click();
+    // The empty group page has two buttons named "Add members": the members row's icon (aria-label only) and the
+    // empty expenses list's button (visible text, expenses-list.tsx). Both go to the add-member page; the visible
+    // text belongs to the second only, so getByText resolves to that one element.
+    await page.getByText("Add members", { exact: true }).click();
     await page.getByRole("link", { name: "Add a friend" }).click();
     await page.getByLabel("Friend's email").fill(ashaEmail);
     await page.getByRole("button", { name: "Find", exact: true }).click();
     await page.getByRole("link", { name: "Add as a contact" }).click();
 
-    await page.getByLabel("Name").fill("Asha");
-    await expect(page.getByLabel("Email")).toHaveValue(ashaEmail);
+    await page.getByLabel("Name", { exact: true }).fill("Asha");
+    await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+      ashaEmail,
+    );
     await page.getByRole("button", { name: "Add", exact: true }).click();
     // Once the contact is saved, the form goes back to the search, which finds her.
     await expect(page).toHaveURL(/\/friends\/add\/?\?/);
@@ -70,6 +77,13 @@ test("signs in, creates a group, adds a contact and an equal expense, and shows 
     await expect(
       page.getByRole("button", { name: /Split\s*Equally/ }),
     ).toBeVisible();
+
+    // The payment drawer opens from its trigger and closes with Done, the way a person uses it.
+    await paidByMe.click();
+    const drawer = page.getByRole("dialog", { name: "Paid amount" });
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole("button", { name: "Done", exact: true }).click();
+    await expect(drawer).toBeHidden();
 
     await page.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page).toHaveURL(GROUP_URL);

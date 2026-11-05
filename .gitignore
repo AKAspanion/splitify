@@ -41,7 +41,6 @@ next-env.d.ts
 public/sw.js
 
 #db
-mysql-db
 # prisma client, written by prisma generate
 /generated/prisma
 
