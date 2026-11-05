@@ -36,8 +36,12 @@ Messaging and hands its token to the page as a `push-token` event (`packages/ios
 - The iOS app's Firebase config must be this project's (`splitify-416321`), or its tokens can't be sent to.
 - The browser's push service worker and spec 4's offline service worker must share one registration.
 
+## History
+
+- 2026-11-05: wrote the paths of files that spec 2c removed (lib/onesignal.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
+
 ## Sources
 
-- `lib/onesignal.ts`
+- lib/onesignal.ts
 - `app/launch.tsx`
 - `packages/ios/src/Splitify/PushNotifications.swift`

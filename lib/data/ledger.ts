@@ -1,5 +1,5 @@
 import type { GetGroupLedgerData } from "@dataconnect/app";
-import type { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 
 type LedgerExpense = GetGroupLedgerData["expenses"][number];

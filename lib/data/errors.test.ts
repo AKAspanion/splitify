@@ -7,6 +7,7 @@ describe("toUserMessage", () => {
     "Only members of this group can be added to an expense",
     "That email is already in use",
     "You can only add your friends to a group",
+    "That request is too large.",
   ])("passes the check message %j through unchanged", (text) => {
     expect(toUserMessage(Object.assign(new Error(`${text}`), {}))).toBe(text);
     // The server wraps the message in more text.

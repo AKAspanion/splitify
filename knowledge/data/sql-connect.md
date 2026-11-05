@@ -11,8 +11,8 @@ generated:
 
 # SQL Connect schema and connectors
 
-The database chosen in [Store data in Firebase SQL Connect](../decisions/sql-connect-database.md). The Prisma schema in
-[data model](model.md) is what the running app still uses until the app moves over; this is the schema it moves to.
+The database chosen in [Store data in Firebase SQL Connect](../decisions/sql-connect-database.md), and the only one: the
+Prisma schema over MySQL is removed. [Data model](model.md) says what each entity is for.
 
 ## Tables and keys
 
@@ -80,6 +80,7 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 
 ## History
 
+- 2026-11-05: said the Prisma schema was what the running app still used; now this is the only schema, because spec 2c removed Prisma.
 - 2026-11-05: had the core of the data layer; now a hook file per area and the `FRESH` fetch policy, because spec 2b moved the screens onto it.
 - 2026-11-05: had nine tables and no client layer; now also `PushToken`, `DeleteGroup`'s title and `lib/data/`, because spec 2a added push through FCM and the data layer's core.
 

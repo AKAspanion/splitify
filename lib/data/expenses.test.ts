@@ -6,7 +6,7 @@ import {
   validateExpense,
 } from "./expenses";
 import { yourShareInExpense } from "@/app/(platform)/(app)/_utils/expense";
-import type { User, UserPayment, UserSplit } from "@/generated/prisma/browser";
+import type { User, UserPayment, UserSplit } from "@/types/shared";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const GROUP = "11111111-1111-4111-8111-111111111111";

@@ -1,5 +1,5 @@
 // Checks the hosting build in out/: which pages exist, then what the Firebase Hosting emulator serves from it.
-// Run after `yarn build:hosting`. Exits non-zero on the first failure, with a line naming it.
+// Run after `yarn build`. Exits non-zero on the first failure, with a line naming it.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -55,22 +55,21 @@ const checkServed = async () => {
     }
   }
 
-  const links = await get("/coming-soon");
-  for (const href of ["/", "/privacy", "/delete-account"]) {
-    expect(
-      links.body.includes(`href="${href}"`) ||
-        links.body.includes(`href="${href}/"`),
-      `/coming-soon has no link to ${href}`,
-    );
-  }
+  // Any path that is not a page gets the 404 page, with a way back into the app.
+  const missing = await get("/no-such-page");
   expect(
-    links.body.includes(
-      "We&#x27;re moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
-    ) ||
-      links.body.includes(
-        "We're moving Splitify to a faster home. Signing in will be back shortly. Your privacy policy and account deletion pages are still here.",
-      ),
-    "/coming-soon body text is not as specified",
+    missing.res.status === 404,
+    `/no-such-page answered ${missing.res.status}, not 404`,
+  );
+  expect(
+    missing.body.includes("We couldn&#x27;t find that page.") ||
+      missing.body.includes("We couldn't find that page."),
+    "the 404 page does not say it couldn't find the page",
+  );
+  expect(
+    missing.body.includes('href="/groups"') ||
+      missing.body.includes('href="/groups/"'),
+    "the 404 page has no link to /groups",
   );
 
   const assetlinks = await get("/.well-known/assetlinks.json");
@@ -102,7 +101,7 @@ const checkServed = async () => {
   };
   const everyResponse = [
     ["/", await get("/")],
-    ["/coming-soon", await get("/coming-soon")],
+    ["/privacy", await get("/privacy")],
     [staticMatch[0], asset],
   ];
   for (const [route, { res }] of everyResponse) {
@@ -118,6 +117,21 @@ const checkServed = async () => {
       "public, max-age=31536000, immutable",
     `${staticMatch[0]}: cache-control is "${asset.res.headers.get("cache-control")}"`,
   );
+  for (const [route, { res }] of everyResponse) {
+    const csp = res.headers.get("content-security-policy") ?? "";
+    for (const part of [
+      "default-src 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "worker-src 'self'",
+      "upgrade-insecure-requests",
+    ]) {
+      expect(
+        csp.includes(part),
+        `${route}: content-security-policy lacks "${part}"`,
+      );
+    }
+  }
   const home = (await get("/")).res;
   expect(
     home.headers.get("cache-control") === "no-cache",
@@ -138,19 +152,19 @@ for (const { name, pages } of readManifests()) {
       fail(`${name}: out/${file} is missing`);
   }
 }
-// Not built yet: the API, the admin logs and the WebAuthn pages (2c) stay on the coming-soon page.
-for (const dir of ["api", "logs", "webauthn"]) {
-  if (existsSync(path.join(root, "out", dir)))
-    fail(`out/${dir}/ must not exist`);
-}
-
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.
+spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
+  cwd: root,
+  stdio: "inherit",
+});
 const result = spawnSync(
   "npx",
   [
     "--yes",
     "firebase-tools@15.34.2",
     "emulators:exec",
+    "--config",
+    "firebase.emulators.json",
     "--only",
     "hosting",
     "--project",

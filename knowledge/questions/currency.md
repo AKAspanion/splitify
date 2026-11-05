@@ -23,7 +23,11 @@ change how balances are added up.
 
 Answered: currencies per group and per expense, converted at the rate of the group's creation date. See [multi-currency](../decisions/multi-currency.md).
 
+## History
+
+- 2026-11-05: Sources pointed at the Prisma schema; now the SQL Connect schema, which keeps the same `currency` fields, because Prisma was removed.
+
 ## Sources
 
-- `prisma/schema.prisma`
+- `dataconnect/schema/schema.gql`
 - `constants/ui.ts`

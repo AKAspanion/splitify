@@ -1,7 +1,7 @@
 ---
 type: Application
 title: Splitify web app
-description: The Next.js 16 App Router app at the repository root: the landing page, the signed-in app, the admin logs page and the API.
+description: The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the landing page, the signed-in app and the sign-in screens.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -16,44 +16,41 @@ The whole product. Everything people do happens here; the Android and iOS apps o
 
 ## Stack
 
-Next.js App Router, React, Tailwind with shadcn/ui, Clerk for auth, Prisma over MySQL, react-query and zustand on
-the client. Versions are in `package.json`.
+Next.js App Router built as a static export, React, Tailwind with shadcn/ui, Firebase (Auth, SQL Connect, Cloud
+Functions, Hosting), react-query and zustand on the client. Versions are in `package.json`. There is no server: see
+[architecture](../project/architecture.md).
 
 ## Entry points
 
-- `app/layout.tsx`: the root layout. It loads the OneSignal web SDK script (the server actions still send through OneSignal), Google AdSense
-  (`app/adsense.tsx`), Vercel analytics (`app/analytics.tsx`), the theme provider and `components/providers.tsx`
-  (Clerk, react-query, the confirm dialog, the progress bar).
+- `app/layout.tsx`: the root layout. It loads Google AdSense (`app/adsense.tsx`), the theme provider and
+  `components/providers.tsx` (Firebase auth state, react-query, the confirm dialog, the progress bar).
 - `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the device for push
   ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups`.
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
-- `proxy.ts`: Clerk's `clerkMiddleware`; see [auth](../security/auth.md).
 - `app/manifest.webmanifest`: the PWA manifest.
+- `app/not-found.hosting.tsx`: the 404 page; Hosting serves it as `404.html` for any path that is not a page.
 - The dev server's port is Next's default; `scripts.dev` in `package.json` passes none.
 
-## The hosting build
+## The one static build
 
-`NEXT_BUILD_TARGET=hosting` (`yarn build:hosting`) makes `next.config.mjs` build a static export of only the public
-pages, for Firebase Hosting ([decision](../decisions/public-pages-on-firebase-hosting-first.md)): `output: "export"`,
-`trailingSlash`, unoptimised images, and `pageExtensions: ["hosting.tsx"]`, so only `*.hosting.tsx` files are routes
-and no route handler, server action, `proxy.ts` or `page.tsx` is part of it. The entries re-export the landing,
-`/privacy` and `/delete-account` pages and their layouts, so those pages are not copied; `app/coming-soon/page.hosting.tsx`
-is the page Hosting serves for every other route.
+`next.config.mjs` always builds a static export, for Firebase Hosting ([decision](../decisions/static-build-on-firebase-hosting.md)):
+`output: "export"`, `trailingSlash`, unoptimised images, and `pageExtensions: ["hosting.tsx"]`, so only `*.hosting.tsx`
+files are routes. `yarn build` and `yarn build:hosting` are the same build; there is no server build, no route handler,
+no server action and no middleware. The `*.hosting.tsx` entries re-export the pages and layouts that sit beside them.
+`firebase.json` rewrites `/api/reports/**` and `/api/webauthn/**` to the [Cloud Functions](functions.md), serves the
+404 page for any other path that is not a page, and sets the security headers and the Content-Security-Policy
+([data protection](../security/data-protection.md)).
 
-- Clerk is stubbed in this build: `@clerk/nextjs` resolves to `lib/clerk-hosting.tsx` (a signed-out stand-in), because
-  the Clerk account is gone and Clerk's Next package imports a server action that a static export refuses
-  ([Clerk](../integrations/clerk.md)). The rest of the app still uses Clerk.
-- The landing page and navbar are the exception: they read the Firebase Auth state (`useAuth`) and show the signed-in or
+- The landing page and navbar read the Firebase Auth state (`useAuth`) and show the signed-in or
   signed-out view, and the sign-in, sign-up and forgot-password screens are hosted routes ([sign in](../features/sign-in.md)).
-- `app/analytics.tsx` renders nothing in this build, since `/_vercel/insights` doesn't exist on Hosting.
 - The signed-in screens are in this build too. `app/(platform)/(app)/layout.hosting.tsx` is their shell: `RequireAuth`
   around the navbars, the [verify-email banner](../security/auth.md) (`components/auth/verify-email-banner.tsx`) and the
-  page; `(screens)/layout.hosting.tsx` mounts the Add Expense button, because the hosting build reads only
-  `layout.hosting.tsx` files, never `layout.tsx`. The navbars read `useAuth` and show initials, since `AuthUser` has no photo.
+  page; `(screens)/layout.hosting.tsx` mounts the Add Expense button, because only `layout.hosting.tsx` files
+  count as layouts, never `layout.tsx`. The navbars read `useAuth` and show initials, since `AuthUser` has no photo.
   Screens read and write through [SQL Connect](../data/sql-connect.md) hooks, not server actions.
 - A route with an id segment is built once, with the placeholder `_` (`generateStaticParams`), and `firebase.json` rewrites
-  every real id to that page, most specific path first, before the coming-soon catch-all. The screen reads the real ids
+  every real id to that page, most specific path first. The screen reads the real ids
   from the address with `useRouteIds` (`hooks/use-route-ids.ts`), never from the page's params. Such a route's
   `page.hosting.tsx` is a small server wrapper that renders the client page beside `generateStaticParams`: Next refuses
   `generateStaticParams` re-exported next to a `"use client"` default.
@@ -62,8 +59,12 @@ is the page Hosting serves for every other route.
 - `components/providers.tsx` makes one `QueryClient` per mount (through `useState`): one made on every render left
   invalidation after a write reaching nobody.
 - A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`).
-- Known and harmless: on `/privacy` and `/delete-account` the biometric lock fetches `/api/webauthn/devices`, which
-  Hosting answers with the coming-soon page; the failed parse is caught silently.
+- Known and harmless: on `/privacy` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
+  signed-in person, so `callFunction` throws before any request and the lock stays off.
+- `scripts/emulator-firebase-config.mjs` writes `firebase.emulators.json`: `firebase.json` with the Auth, SQL Connect and
+  Functions emulators' addresses added to the CSP's `connect-src`, so the app served by the Hosting emulator may call
+  them. It is generated, so the two cannot drift; `yarn check:hosting` regenerates it. Use it with `--config` for local
+  checks, and never deploy with it ([run locally](../operations/run-locally.md)).
 
 ## Screens and routes
 
@@ -94,25 +95,23 @@ is the page Hosting serves for every other route.
 - `/groups/add`: `app/(platform)/(app)/(forms)/groups/add/page.tsx`
 - `/privacy`: `app/(platform)/privacy/page.tsx`
 - `/profile`: `app/(platform)/profile/page.tsx`
-- `/sign-in/*`: `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx`
-- `/sign-up/*`: `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`
 - `/webauthn/register`: `app/(platform)/(app)/webauthn/register/page.tsx`
 - `/webauthn/test`: `app/(platform)/(app)/webauthn/test/page.tsx`
 
 <!-- GA-GENERATED:END -->
 
-The API's routes are in [app API](../api/app.md), [server actions](../api/server-actions.md),
-[reports](../api/generate.md), [push notifications](../api/push-notification.md) and
-[WebAuthn](../api/webauthn.md).
+The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api/webauthn.md); the other app APIs
+(app routes, server actions, push-notification routes) are gone and say what replaced them.
 
 ## Depends on
 
-[Clerk](../integrations/clerk.md), [OneSignal](../integrations/onesignal.md),
-[UploadThing](../integrations/uploadthing.md), [Vercel analytics](../integrations/vercel-analytics.md),
-[Google AdSense](../integrations/google-adsense.md), and MySQL ([run locally](../operations/run-locally.md)).
+[SQL Connect](../data/sql-connect.md), [Firebase Auth](../decisions/firebase-auth.md), [Cloud Functions](functions.md),
+[Google AdSense](../integrations/google-adsense.md) and FCM for push
+([decision](../decisions/firebase-cloud-messaging.md)).
 
 ## History
 
+- 2026-11-05: was a Next.js server with a separate hosting build target, a coming-soon page and a Clerk stub; now one static build with a 404 page, and `firebase.emulators.json` generated for local checks, because spec 2c removed the server, Clerk, OneSignal, UploadThing and Vercel analytics. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build had only the public pages and sign-in; now it holds the signed-in screens, their shell and the id routes, because spec 2b moved the screens onto SQL Connect. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build's landing page always showed the signed-out view; now it follows Firebase Auth and has the sign-in screens, because spec 2a moved sign-in to Firebase. See [decision](../decisions/firebase-auth.md).
 - 2026-11-05: added the hosting build target and its Clerk stub, because the public pages go to Firebase Hosting before the app moves. See [decision](../decisions/public-pages-on-firebase-hosting-first.md).
@@ -122,22 +121,21 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 
 - `package.json`
 - `next.config.mjs`
-- `lib/clerk-hosting.tsx`
-- `app/coming-soon/page.hosting.tsx`
 - `app/(landing)/page.hosting.tsx`
 - `app/layout.tsx`
 - `app/launch.tsx`
 - `app/(landing)/_components/navbar.tsx`
 - `components/auth/auth-provider.tsx`
 - `app/adsense.tsx`
-- `app/analytics.tsx`
 - `components/providers.tsx`
 - `app/(platform)/layout.tsx`
 - `app/(platform)/(app)/layout.tsx`
 - `app/manifest.webmanifest`
-- `proxy.ts`
 - `app/(platform)/(app)/(screens)/layout.hosting.tsx`
 - `scripts/hosting-pages/public.json`
+- `scripts/emulator-firebase-config.mjs`
+- `firebase.json`
+- `app/not-found.hosting.tsx`
 - `app/(platform)/(app)/layout.hosting.tsx`
 - `components/auth/verify-email-banner.tsx`
 - `hooks/use-route-ids.ts`

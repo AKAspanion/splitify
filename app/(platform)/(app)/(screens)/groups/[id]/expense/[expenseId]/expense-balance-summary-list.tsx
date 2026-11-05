@@ -4,7 +4,7 @@ import { replaceUserWithYou } from "@/app/(platform)/(app)/_utils/user";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
-import { User, UserPayment, UserSplit } from "@/generated/prisma/browser";
+import type { User, UserPayment, UserSplit } from "@/types/shared";
 import { useMemo, useState } from "react";
 import { getInitials } from "@/utils/func";
 import { yourShareInExpense } from "@/app/(platform)/(app)/_utils/expense";

@@ -1,7 +1,7 @@
 ---
 type: Data Model
 title: Data model
-description: The Prisma schema over MySQL: users, groups, expenses with their payments and splits, activity, devices, logs and feedback.
+description: The entities of the SQL Connect schema: users, groups, expenses with their payments and splits, activity, devices, push tokens and feedback.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -10,52 +10,34 @@ generated:
 
 # Data model
 
-## Entities
+The Prisma schema over MySQL is gone; the model is the SQL Connect schema in `dataconnect/schema/schema.gql`, described in
+[SQL Connect schema and connectors](sql-connect.md) (tables, keys, connectors and access rules). Read the file for fields.
+What each entity is for:
 
-<!-- GA-GENERATED:models prisma -->
-
-- `Activity`: `prisma/schema.prisma`
-- `AuthnDevice`: `prisma/schema.prisma`
-- `Expense`: `prisma/schema.prisma`
-- `Feedback`: `prisma/schema.prisma`
-- `Group`: `prisma/schema.prisma`
-- `Log`: `prisma/schema.prisma`
-- `User`: `prisma/schema.prisma`
-- `UserPayment`: `prisma/schema.prisma`
-- `UserSplit`: `prisma/schema.prisma`
-
-<!-- GA-GENERATED:END -->
-
-- [Users](user.md): people who signed up through Clerk, and offline contacts.
+- [Users](user.md): people who signed up (id is their Firebase uid), and offline contacts (`signedUp: false`).
 - `Group`: a set of users who share expenses. `Group.type` holds one of `GROUP_TYPES` in `constants/ui.ts`.
+- `GroupMember`: membership, one row per person and group, with no role.
+- `Friendship`: one row per direction, so a friendship is two rows.
 - [Expenses](expense.md): an `Expense` with its `UserPayment` rows (who paid) and `UserSplit` rows (who owes).
 - `Activity`: one line in the [activity feed](../features/activity-feed.md), typed by `ActivityType`.
-- `AuthnDevice`: one row per user holding all their WebAuthn devices as JSON in `AuthnDevice.data`; see
-  [WebAuthn API](../api/webauthn.md).
-- `Log`: rows written by `APILogger` when DB logging is on; see [logging](../operations/logging.md).
-- `Feedback`: what a person sent from the feedback form. `Feedback.userId` is `@unique`, so each person has at most one.
+- `AuthnDevice`: one row per user holding all their WebAuthn devices as JSON in `AuthnDevice.devices`, readable only
+  through the `admin` connector; see [WebAuthn API](../api/webauthn.md).
+- `PushToken`: a device's FCM token ([notifications](../features/notifications.md)).
+- `Feedback`: what a person sent from the feedback form. `Feedback.user` is the key, so each person has at most one.
+
+There is no `Log` table ([decision](../decisions/cloud-logging.md)).
 
 ## Relations
 
-- `User` and `Group` are many-to-many (`User.groups`, `Group.users`): membership has no row or role of its own.
-- Friendship is a self-relation named `UserFriends`. `User.symmetricFriends` exists only because Prisma needs the
-  second side, as the schema's comment says; the app reads `User.friends`, and `createFriend` connects both
-  directions.
-- Deleting a `Group` cascades to its expenses and activity; deleting an `Expense` cascades to its payments and splits
-  (`onDelete: Cascade` in the schema).
-- The datasource uses `relationMode = "prisma"`, so Prisma, not MySQL, enforces the relations, and each foreign key
-  has an `@@index`.
-- The client is generated into `generated/prisma` (git ignores it; `postinstall` runs `prisma generate`) and
-  connects through the MariaDB driver adapter in `lib/db.ts`, which Prisma 7 requires for MySQL.
-- `Bytes` columns (`AuthnDevice.data`, `Log.body`) come back as `Uint8Array`, not `Buffer`. Both hold UTF-8 text,
-  written with `TextEncoder` and read with `TextDecoder`; `Uint8Array.toString()` would give the byte values instead.
+- `User` and `Group` are many-to-many through `GroupMember`.
+- Deleting a `Group` cascades to its members and expenses, and an `Expense` to its payments and splits; `Activity.group`
+  is optional, so deleting a group sets it to null instead ([SQL Connect schema](sql-connect.md)).
+
+## History
+
+- 2026-11-05: described the Prisma schema over MySQL (with `Log` and `AuthnDevice.data`); now points at the SQL Connect schema, because spec 2c removed Prisma and MySQL. See [decision](../decisions/sql-connect-database.md).
 
 ## Sources
 
-- `prisma/schema.prisma`
-- `prisma.config.ts`
-- `lib/db.ts`
-- `lib/auth/service/devices.ts`
-- `lib/logger.ts`
+- `dataconnect/schema/schema.gql`
 - `constants/ui.ts`
-- `actions/create-friend/index.ts`

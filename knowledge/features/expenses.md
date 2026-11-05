@@ -19,21 +19,22 @@ drawer). The expense screen then shows who paid, the caller's share, and each me
 ## Screens and routes
 
 - Add: `app/(platform)/(app)/(forms)/expense/add/page.tsx`; the form is `app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx`, with
-  `payment-drawer.tsx`, `split-drawer.tsx` and the split editors in `_splits/`. It calls `createExpense`.
-- One expense: `app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/page.tsx`, using
-  `GET /api/app/expense/:id/who-paid` and `GET /api/app/group/:id/your-share/:expenseId`.
-- Edit: `app/(platform)/(app)/(forms)/expense/[id]/edit/page.tsx`, calling `updateExpense`.
-- Delete: `expense-actions.tsx` on the expense screen, calling `deleteExpense`.
+  `payment-drawer.tsx`, `split-drawer.tsx` and the split editors in `_splits/`. It calls `useCreateExpense` (`lib/data/expenses.ts`).
+- One expense: `app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/page.tsx`, which
+  computes "who paid" and the caller's share in the browser (`whoPaidExpense`, `yourShareInExpense` in
+  `app/(platform)/(app)/_utils/expense.ts`).
+- Edit: `app/(platform)/(app)/(forms)/expense/[id]/edit/page.tsx`, calling `useUpdateExpense`.
+- Delete: `expense-actions.tsx` on the expense screen, calling `useDeleteExpense`.
 
 ## Rules
 
 - How amounts are split and checked is in [split types](../domain/split-types.md).
 - Editing changes only the description, by decision: [expense edit description only](../decisions/expense-edit-description-only.md).
-- `createExpense` takes the creator (`createrId`) from the form, not from the session; and any signed-in user can
-  edit or delete any expense by its id: [missing authorization on writes](../findings/missing-authorization-on-writes.md).
+- The creator is always the signed-in person (`creatorId_expr: "auth.uid"`), and only members of the group can read, edit or
+  delete one of its expenses ([missing authorization on writes](../findings/missing-authorization-on-writes.md), fixed).
 - Amounts are shown with `RUPEE_SYMBOL` (`constants/ui.ts`); other currencies are decided in [multi-currency](../decisions/multi-currency.md).
 
-## Under SQL Connect
+## How it reads and writes
 
 The screens read and write through `lib/data/expenses.ts` (`useExpense`, `useCreateExpense`, `useUpdateExpense`,
 `useDeleteExpense`) and `lib/data/expense-writes.ts`. Reading, editing and deleting an expense is limited to members of its
@@ -43,6 +44,7 @@ line on an expense is the net amount ([balances](balances.md)).
 
 ## History
 
+- 2026-11-05: the creator came from the form and any signed-in user could change any expense, through server actions; now the creator is the caller and only members can, in SQL Connect, because spec 2c removed the actions.
 - 2026-11-05: planned for the running app; now the screens use it, because spec 2b moved them onto SQL Connect.
 - 2026-11-04: added the SQL Connect limits, because the expense operations were built.
 
@@ -55,10 +57,8 @@ line on an expense is the net amount ([balances](balances.md)).
 - `app/(platform)/(app)/(forms)/expense/[id]/edit/page.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/page.tsx`
 - `app/(platform)/(app)/(screens)/groups/[id]/expense/[expenseId]/expense-actions.tsx`
-- `actions/create-expense/index.ts`
-- `actions/create-expense/schema.ts`
-- `actions/update-expense/index.ts`
-- `actions/delete-expense/index.ts`
+- `app/(platform)/(app)/_utils/expense.ts`
+- `dataconnect/expense/expense-writes.gql`
 - `constants/ui.ts`
 - `dataconnect/app/expenses.gql`
 - `lib/data/expenses.ts`

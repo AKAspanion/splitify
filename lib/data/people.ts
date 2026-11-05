@@ -23,6 +23,7 @@ import {
   type GetFriendData,
   type ListMyGroupsData,
 } from "@dataconnect/app";
+import "@/lib/zod-config";
 import { z } from "zod";
 import { dc, FRESH, queryKeys } from "./client";
 

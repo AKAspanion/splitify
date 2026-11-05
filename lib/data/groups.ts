@@ -29,7 +29,7 @@ import {
   type ListGroupMembersData,
   type ListMyGroupsData,
 } from "@dataconnect/app";
-import type { Group, User } from "@/generated/prisma/browser";
+import type { Group, User } from "@/types/shared";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { dc, FRESH, queryKeys } from "./client";
 import { escapeSearch } from "./search";

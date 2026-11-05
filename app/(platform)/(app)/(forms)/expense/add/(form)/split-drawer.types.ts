@@ -1,4 +1,5 @@
-import { ExpenseType, User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
+import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
 
 export type SplitDrawerProps = {
   users?: User[];
