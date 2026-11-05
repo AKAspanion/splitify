@@ -2,6 +2,7 @@
 
 <!-- GA-GENERATED:index -->
 
+- [Any member can add a signed-up person to their group without asking](add-to-group-without-consent.md) - AddFriend with a group adds anyone found by email to the caller's group, skipping AddGroupMember's friends-only rule; the person gets a push with the group's title, and the group sees their email.
 - [Fixed: the admin logs page was open to every signed-in user](admin-logs-unprotected.md) - The /logs page listed every Log row, including logged request bodies, to anyone with a session; the page and the Log table were removed.
 - [Fixed: the Clerk webhook wasn't verified](clerk-webhook-unverified.md) - POST /api/webhook/clerk trusted any request body, so anyone could create users or overwrite a user's email, name and images; the webhook and Clerk were removed.
 - [Firebase config for iOS is committed](committed-firebase-config.md) - packages/ios/src/Splitify/GoogleService-Info.plist, which holds the iOS app's Firebase API key and project ids, is tracked in git.
