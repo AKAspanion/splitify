@@ -3,7 +3,6 @@
 import {
   deleteExpense,
   getExpense,
-  listGroupMembers,
   listMyGroups,
   updateExpense,
   type GetExpenseData,
@@ -26,6 +25,7 @@ import type { CreateExpenseVars, CreateSettlementVars } from "./expense-writes";
 import { fixedNum } from "@/utils/validate";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { toLedgerExpenses } from "./ledger";
+import { MY_GROUPS_LIMIT, useGroupMembers } from "./groups";
 
 export type ExpenseDetail = NonNullable<GetExpenseData["expense"]>;
 export type GroupMember = ListGroupMembersData["groupMembers"][number]["user"];
@@ -199,36 +199,33 @@ export function useExpense(
   });
 }
 
-/** The people in a group, as the expense screens use them. */
+/**
+ * The people in a group, as the expense screens use them. It is the group screen's own query (same key), so a group
+ * seen once is in the saved cache and the add and settle forms open offline.
+ */
 export function useExpenseGroupMembers(
   groupId: string | null,
 ): UseQueryResult<GroupMember[]> {
-  return useQuery({
-    queryKey: [...queryKeys.ListGroupMembers({ groupId }), "expense"],
-    enabled: !!groupId,
-    queryFn: async () => {
-      const result = await listGroupMembers(
-        dc(),
-        { groupId: groupId as string },
-        FRESH,
-      );
-      return result.data.groupMembers.map((m) => m.user);
-    },
-  });
+  return useGroupMembers(groupId);
 }
 
-/** The groups the caller is in, for the group picker of the add form. */
+/**
+ * The groups the caller is in, for the group picker of the add form. Same key as the groups list, for the reason
+ * above.
+ */
 export function useExpenseGroups(): UseQueryResult<MyGroup[]> {
   return useQuery({
-    queryKey: [...queryKeys.ListMyGroups({}), "expense"],
+    queryKey: queryKeys.ListMyGroups({ search: "", limit: MY_GROUPS_LIMIT }),
     queryFn: async () => {
-      const result = await listMyGroups(dc(), {}, FRESH);
-      return result.data.groups.map((g) => ({
-        id: g.id,
-        title: g.title,
-        type: g.type ?? null,
-      }));
+      const { data } = await listMyGroups(
+        dc(),
+        { limit: MY_GROUPS_LIMIT },
+        FRESH,
+      );
+      return data.groups;
     },
+    select: (groups) =>
+      groups.map((g) => ({ id: g.id, title: g.title, type: g.type ?? null })),
   });
 }
 
