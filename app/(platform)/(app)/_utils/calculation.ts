@@ -10,12 +10,12 @@ import { SplitifyService } from "@/lib/splitify/service/splitify-service";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { getInitials } from "@/utils/func";
 
-import {
+import type {
   User as DBUser,
   Expense as DBExpense,
   UserPayment,
   UserSplit,
-} from "@/generated/prisma/browser";
+} from "@/types/shared";
 
 const evaluateExpense = (
   service: SplitifyService,

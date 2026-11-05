@@ -1,27 +1,18 @@
 "use client";
-import { deleteExpense } from "@/actions/delete-expense";
 import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
-import { useAction } from "@/hooks/use-action";
-import { Expense } from "@/generated/prisma/browser";
+import { toUserMessage } from "@/lib/data/errors";
+import { useDeleteExpense, type ExpenseDetail } from "@/lib/data/expenses";
 import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-const ExpenseActions = ({ expense }: { expense: Expense | null }) => {
+const ExpenseActions = ({ expense }: { expense: ExpenseDetail }) => {
   const { getConfirmation } = useConfirm();
   const router = useRouter();
-  const { execute, loading } = useAction(deleteExpense, {
-    onSuccess: ({ userId, groupId, expenseDesc, expenseTag }) => {
-      toast.success("Expense deleted successfully");
-      router.push(`/groups/${groupId}`);
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
+  const remove = useDeleteExpense();
+
   const handleDelete = async () => {
     const confirm = await getConfirmation({
       title: "Delete expense?",
@@ -33,25 +24,29 @@ const ExpenseActions = ({ expense }: { expense: Expense | null }) => {
       return;
     }
 
-    if (expense?.id) {
-      execute({ expenseId: expense?.id, groupId: expense?.groupId || "" });
+    try {
+      await remove.mutateAsync({ id: expense.id, groupId: expense.groupId });
+    } catch (error) {
+      toast.error(toUserMessage(error));
+      return;
     }
+    toast.success("Expense deleted successfully");
+    router.push(`/groups/${expense.groupId}`);
   };
 
-  return expense ? (
-    <>
-      <Button
-        disabled={loading}
-        variant="ghost"
-        size="icon"
-        onClick={handleDelete}
-      >
-        <div className="text-red-500">
-          {loading ? <Spinner size="sm" /> : <TrashIcon width={20} />}
-        </div>
-      </Button>
-    </>
-  ) : null;
+  return (
+    <Button
+      disabled={remove.isPending}
+      variant="ghost"
+      size="icon"
+      aria-label="Delete expense"
+      onClick={handleDelete}
+    >
+      <div className="text-red-500">
+        {remove.isPending ? <Spinner size="sm" /> : <TrashIcon width={20} />}
+      </div>
+    </Button>
+  );
 };
 
 export default ExpenseActions;

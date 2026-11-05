@@ -1,47 +1,46 @@
 "use client";
 
-import { updateGroupMember } from "@/actions/update-group-member";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
-import { useAction } from "@/hooks/use-action";
+import { toUserMessage } from "@/lib/data/errors";
+import { useAddGroupMember } from "@/lib/data/groups";
 import { PlusCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export const Action = ({
   groupId,
   isInGroup,
-  memberClerkId,
+  memberId,
 }: {
   groupId: string;
-  memberClerkId: string;
+  memberId: string;
   isInGroup?: boolean;
 }) => {
-  const { execute, loading } = useAction(updateGroupMember, {
-    onSuccess: ({ groupId, userId, friendId }) => {
-      toast.success("Group member added successfully");
-    },
-    onError: (error, debug) => {
-      console.error(error, debug);
-      toast.error(error);
-    },
-  });
+  const { mutate, isPending } = useAddGroupMember();
 
-  const onRequest = async () => {
+  const onRequest = () => {
     if (isInGroup) return;
 
-    execute({ groupId, memberClerkId });
+    mutate(
+      { groupId, userId: memberId },
+      {
+        onSuccess: () => toast.success("Group member added successfully"),
+        onError: (error) => toast.error(toUserMessage(error)),
+      },
+    );
   };
   return (
     <div>
       <Button
-        disabled={isInGroup || loading}
+        disabled={isInGroup || isPending}
         type="button"
         variant={"ghost"}
         size={"icon"}
+        aria-label="Add to group"
         onClick={onRequest}
         className={isInGroup ? "text-green-500" : ""}
       >
-        {loading ? <Spinner size="sm" /> : <PlusCircleIcon />}
+        {isPending ? <Spinner size="sm" /> : <PlusCircleIcon />}
       </Button>
     </div>
   );

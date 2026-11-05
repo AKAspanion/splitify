@@ -20,7 +20,7 @@ on Cloud Run, which is slow from cold. The developer chose the static build.
 ## Decision
 
 - The app is a static Next.js build (`output: "export"`) served from Firebase Hosting. There is no server
-  rendering, no server actions and no `proxy.ts`; pages render in the browser and check the Firebase Auth user there.
+  rendering, no server actions and no proxy.ts; pages render in the browser and check the Firebase Auth user there.
 - What needs a server becomes a Cloud Function, served by a Hosting rewrite under `/api/` on the same domain: the
   push notifications, the report downloads, UploadThing and the WebAuthn routes.
 - Hosting moves off Vercel, so Vercel Analytics and Speed Insights go with it.
@@ -34,10 +34,11 @@ on Cloud Run, which is slow from cold. The developer chose the static build.
 
 ## History
 
+- 2026-11-05: wrote the paths of files that spec 2c removed (app/analytics.tsx, proxy.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
 - 2026-11-04: was: the wrappers open a new Firebase Hosting address; now: splitify.spanion.in is served by Firebase Hosting, because the developer kept the domain. See [keep the domain](keep-splitify-spanion-domain.md).
 
 ## Sources
 
 - `next.config.mjs`
-- `proxy.ts`
-- `app/analytics.tsx`
+- proxy.ts
+- app/analytics.tsx

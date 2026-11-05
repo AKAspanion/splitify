@@ -1,7 +1,7 @@
 ---
 type: Feature
 title: Push notifications
-description: Members get a OneSignal push when an expense, settlement, group or membership changes; the profile page lets a person allow them.
+description: Members get a push through Firebase Cloud Messaging when an expense, settlement, group or membership changes; each device registers its token on the signed-in account, and the profile lets a person allow them.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -12,26 +12,42 @@ generated:
 
 ## What it does
 
-After each change, the people involved get a push with a link back to the group or expense. Who gets which push is
-listed in the [push-notification API](../api/push-notification.md). On the profile page a person can allow
-notifications in the browser.
+After each change, the people involved get a push with a link back to the group or expense, sent by a Cloud Function
+from the activity the change recorded ([decision](../decisions/firebase-cloud-messaging.md)). On the profile page a
+person can allow notifications in the browser. Who gets which push is in [Cloud Functions](../apps/functions.md).
 
-## Screens and routes
+## Devices
 
-- `app/launch.tsx` starts OneSignal for a signed-in person, prompts for push, and logs in to OneSignal with their
-  user id, which is the `external_id` pushes are sent to.
-- `app/(platform)/profile/notification-action.tsx`: asks the browser for permission.
-- The OneSignal service workers are `public/OneSignalSDKWorker.js` and `public/OneSignalSDK.sw.js`.
+- `lib/push/register.ts`: `registerWebPush` asks permission, gets the browser's FCM token (service worker
+  `public/firebase-messaging-sw.js`, public VAPID key `NEXT_PUBLIC_FIREBASE_VAPID_KEY`) and registers it with `RegisterMyPushToken`; `listenForIosToken` registers the token the iOS wrapper hands
+  over in its `push-token` event; `unregisterThisDevice` removes this device's token. None of them ever rejects, and
+  they log only the error's class, never a token.
+- The token is kept in `localStorage` under `splitify.pushToken` so sign-out knows which one to remove; sign-out
+  (`lib/firebase/auth.ts`) removes it before signing out, and goes on whatever happens.
+- `app/launch.tsx` starts the iOS listener for a signed-in person and re-registers the browser's token when permission is already granted, without ever raising the prompt; `app/(platform)/profile/notification-action.tsx`
+  is the profile's control, which now only turns notifications on (its "Turn off" action went with OneSignal).
+- A token belongs to whoever is signed in on that device now: registering one another person holds moves it.
+- The push messaging uses its own named Firebase app, with the sender id taken from the web app id, until the
+  sender id moves into `lib/firebase/app.ts`.
 
 ## Rules
 
 - Notification links are made absolute with `NEXT_PUBLIC_HOST_URL` (`getUrlWithHost` in `utils/validate.ts`).
-- Setup and failure handling are in [OneSignal](../integrations/onesignal.md).
+- Not exercised in a real browser yet: the FCM token flow needs the VAPID key and the real project, and is tested
+  through fakes only.
+
+## History
+
+- 2026-11-05: was a OneSignal push, sent by server actions, with OneSignal service workers; now FCM, sent by Cloud Functions, with tokens registered per device, because of [the decision](../decisions/firebase-cloud-messaging.md).
 
 ## Sources
 
+- `lib/push/register.ts`
+- `lib/firebase/auth.ts`
+- `lib/firebase/app.ts`
+- `public/firebase-messaging-sw.js`
 - `app/launch.tsx`
 - `app/(platform)/profile/notification-action.tsx`
-- `public/OneSignalSDKWorker.js`
-- `public/OneSignalSDK.sw.js`
+- `functions/src/push-activity.ts`
+- `dataconnect/app/push-tokens.gql`
 - `utils/validate.ts`

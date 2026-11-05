@@ -1,13 +1,10 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
-import { UISpinner } from "@/components/ui-spinner";
-import dynamic from "next/dynamic";
+import Form from "./form";
 
-const Form = dynamic(() => import("./form"), {
-  loading: () => <UISpinner />,
-});
-
-const FeedbackAddPage = async () => {
+const FeedbackAddPage = () => {
   return (
     <AutoContainer
       header={<Header backTo={"/profile"} title="Send a feedback" />}

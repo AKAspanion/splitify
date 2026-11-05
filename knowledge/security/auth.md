@@ -1,7 +1,7 @@
 ---
 type: Security
 title: Authentication
-description: Clerk signs people in, and its middleware requires a session on every route except a short public list; a WebAuthn check can add a browser-side lock.
+description: Firebase Auth signs people in; the browser guards the signed-in screens, SQL Connect rules and each Cloud Function's ID-token guard check every call; a WebAuthn check can add a lock.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -12,50 +12,69 @@ generated:
 
 ## How users sign in
 
-- Through Clerk's hosted components on `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx` and
-  `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`. Clerk's keys and redirect URLs are the `CLERK_*` keys in
-  `.env.sample` ([environment](../operations/environment.md)).
-- `proxy.ts` (what Next 16 calls middleware) runs Clerk's `clerkMiddleware` on every page and API route. Its public
-  routes (`isPublicRoute`, reachable signed out) are `/`, `/privacy`, `/sign-in(.*)`, `/sign-up(.*)`,
-  `/api/webhook/clerk`, `/api/uploadthing`, `/api/test(.*)` and `/api/health-check(.*)`. The sign-in and sign-up pages
-  must be listed: `authMiddleware` let them through by itself, `clerkMiddleware` doesn't, and without them `/sign-in`
-  redirects to itself.
-- Signed out, a page redirects to sign-in (`auth.protect()`), and an API route answers `401` with
-  `{ message: "Unauthorized" }`. The `401` is kept on purpose: `auth.protect()` alone answers API calls `404`.
-- Behind the proxy, every route handler and server action checks `(await auth()).userId` itself and returns
-  `Unauthorized` without one. That is the only check: there is no membership or ownership check (see
+[Firebase Auth](../decisions/firebase-auth.md), with Google and email and password (`lib/firebase/auth.ts`, client
+setup in `lib/firebase/app.ts`); the screens are described in [sign in](../features/sign-in.md). Clerk, its middleware and
+its webhook are gone: nothing runs on a server, so access is enforced by the services the browser calls, not by a
+proxy ([Clerk](../integrations/clerk.md)).
+
+- `UpsertMe` (`dataconnect/app/me.gql`) writes a person's `User` row, taking id, email and name from the signed token,
+  never from the request. The merge of a contact into a new account is gated on a verified email
+  ([contact identity](../domain/contact-identity.md)).
+- A person's Firebase uid is their `User.id` ([users](../data/user.md)).
+- The browser's auth state is `AuthProvider` (`components/auth/auth-provider.tsx`) read through `useAuth`
+  (`hooks/use-auth.ts`), with a status of loading, signed in or signed out.
+- `RequireAuth` (`components/auth/require-auth.tsx`) shows a spinner while loading and sends a signed-out person to
+  `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`). It wraps every signed-in
+  screen (`app/(platform)/(app)/layout.hosting.tsx`, and the profile). It is a convenience: the data and the functions
+  refuse a caller without a valid token themselves.
+- While the person's email is unverified, `VerifyEmailBanner` (`components/auth/verify-email-banner.tsx`) shows above the
+  screens, with Resend email (60-second wait) and "I've verified" (reloads the user). The wording is provisional; the
+  decision names the banner but not its text.
+- The redirect target is checked by `safeNextPath`.
+- Signing out also removes this device's push token ([notifications](../features/notifications.md)).
+
+## What checks a call
+
+- **SQL Connect** operations carry `@auth` rules on the signed token ([SQL Connect schema](../data/sql-connect.md),
   [roles](roles.md)).
-- A person's Clerk user id is their `User.id` ([users](../data/user.md)).
+- **Cloud Functions over HTTP** (`reports`, `webauthn`) run the guard first (`functions/src/http/guard.ts`): it verifies
+  the Firebase ID token from `Authorization: Bearer` with the admin SDK, then reads a JSON body of at most `65536`
+  bytes, and answers `401`, `413`, `415` or `400` itself ([Cloud Functions](../apps/functions.md)). The browser sends
+  the token through `callFunction` (`lib/functions/call.ts`), which throws before any request when nobody is signed in
+  and turns a failure into a message a person can read.
+- **The `deleteMyAccount` callable** takes its caller from Firebase's own check (`request.auth`).
 
 ## Tokens and sessions
 
-- The session is Clerk's; the app stores no tokens of its own.
-- The WebAuthn flow keeps its challenge in an iron-session cookie named `challenge`, sealed with a password written in
-  the route files: [hard-coded session password](../findings/hardcoded-session-password.md).
-- The [biometric lock](../features/biometric-lock.md) is browser-side only: the server never asks whether it passed.
-
-## Firebase Auth (browser side, built; not yet what the app uses)
-
-[Firebase Auth](../decisions/firebase-auth.md) will replace Clerk, with Google and email and password
-(`lib/firebase/auth.ts`, client setup in `lib/firebase/app.ts`). `UpsertMe` (`dataconnect/app/me.gql`) writes a
-person's `User` row, taking id, email and name from the signed token, never from the request. The merge of a contact
-into a new account is gated on a verified email ([contact identity](../domain/contact-identity.md)). Planned for the
-running app in spec 2: today `proxy.ts` and Clerk still guard every route.
+- The session is Firebase's; the app stores no tokens of its own.
+- The WebAuthn flow keeps its challenge in an iron-session cookie named `__session`, sealed with the `SESSION_PASSWORD`
+  secret ([WebAuthn API](../api/webauthn.md); the old hard-coded password is
+  [fixed](../findings/hardcoded-session-password.md)).
+- The [biometric lock](../features/biometric-lock.md) is browser-side: the lock screen decides whether the page shows;
+  the functions only hold the person's registered devices.
 
 ## History
 
+- 2026-11-05: was Clerk with `proxy.ts` guarding every route and each route handler checking `auth()`; now Firebase Auth with the guard on each Cloud Function and the rules in SQL Connect, because spec 2c removed the server and Clerk.
+- 2026-11-05: the guard was unused; now it wraps the signed-in screens, with the verify-email banner and a home landing after sign-out, because spec 2b moved them to the hosting build.
+- 2026-11-05: the Firebase Auth section said built but unused; now says the hosted sign-in screens, the auth state and the guard use it, because spec 2a added them.
 - 2026-11-04: described the Firebase Auth pieces now built, because they exist in the code although no screen uses them yet.
 - 2026-11-04: was `authMiddleware` in `middleware.ts`, with `/api/webhook/clerk` and `/api/health-check` also in `ignoredRoutes`; now `clerkMiddleware` in `proxy.ts`, with those two simply public, because Clerk 7 removed `authMiddleware` and Next 16 renamed middleware to proxy. See [upgrade](../decisions/upgrade-all-dependencies.md).
 
 ## Sources
 
-- `proxy.ts`
-- `app/(platform)/(clerk)/sign-in/[[...sign-in]]/page.tsx`
-- `app/(platform)/(clerk)/sign-up/[[...sign-up]]/page.tsx`
-- `app/api/webauthn/generate-registration-options/route.ts`
-- `app/api/webauthn/verify-authentication/route.ts`
-- `components/biometric/biometric.tsx`
-- `.env.sample`
 - `lib/firebase/auth.ts`
 - `lib/firebase/app.ts`
 - `dataconnect/app/me.gql`
+- `components/auth/auth-provider.tsx`
+- `components/auth/require-auth.tsx`
+- `hooks/use-auth.ts`
+- `lib/auth/next-path.ts`
+- `app/(platform)/(app)/layout.hosting.tsx`
+- `components/auth/verify-email-banner.tsx`
+- `lib/auth-redirect.ts`
+- `functions/src/http/guard.ts`
+- `lib/functions/call.ts`
+- `functions/src/webauthn/session.ts`
+- `functions/src/account/delete-my-account.ts`
+- `components/biometric/biometric.tsx`

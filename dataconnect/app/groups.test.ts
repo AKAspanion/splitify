@@ -296,9 +296,13 @@ describe("DeleteGroup", () => {
     });
 
     const result = await run(alice.dc, "DeleteGroup", { id: G });
-    const memberIds = (
-      result.data as unknown as { query: { memberIds: { userId: string }[] } }
-    ).query.memberIds.map((m) => m.userId);
+    const returned = (
+      result.data as unknown as {
+        query: { group: { title: string }; memberIds: { userId: string }[] };
+      }
+    ).query;
+    const memberIds = returned.memberIds.map((m) => m.userId);
+    expect(returned.group.title).toBe("Trip 2");
     expect(memberIds.sort()).toEqual([alice.uid, bob.uid].sort());
 
     const data = (await seed(

@@ -18,6 +18,7 @@ export default defineConfig({
       "dataconnect/**/*.test.ts",
       "functions/src/**/*.test.ts",
       "lib/firebase/**/*.test.ts",
+      "lib/data/**/*.rules.test.ts",
     ],
     // The tests share one emulator database, so files run one after another.
     fileParallelism: false,

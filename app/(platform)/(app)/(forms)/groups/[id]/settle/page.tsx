@@ -1,39 +1,13 @@
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
-import { FormInputLoading } from "@/components/form/form-input-loading";
-import { resolvePageProps } from "@/utils/page";
+"use client";
 
-const SettleExpense = dynamic(() => import("./settle-expense"), {
-  loading: () => (
-    <div className="flex flex-col gap-4 px-8 py-6">
-      <div className="flex justify-between items-center gap-4 mb-3">
-        <Skeleton className="w-[120px] h-10 rounded-md" />
-      </div>
-      <div className="flex flex-col gap-6">
-        <div className="flex justify-between items-center gap-4">
-          <Skeleton className="w-[56px] h-[56px] rounded-full" />
-          <Skeleton className="w-10 h-10 rounded-md" />
-          <Skeleton className="w-[56px] h-[56px] rounded-full" />
-        </div>
-        <div className="flex justify-between items-center gap-4">
-          <Skeleton className="w-[56px] h-6 rounded-md" />
-          <Skeleton className="w-10 h-5 rounded-md" />
-          <Skeleton className="w-[56px] h-6 rounded-md" />
-        </div>
-      </div>
-      <div>
-        <FormInputLoading />
-      </div>
-      <div className="flex justify-end items-center gap-4">
-        <Skeleton className="w-[72px] h-10 rounded-md" />
-      </div>
-    </div>
-  ),
-});
+import { Suspense } from "react";
+import { UISpinner } from "@/components/ui-spinner";
+import SettleExpense from "./settle-expense";
 
-const ExpenseFormPage = async (pageProps: ServerSidePageProp) => {
-  const props = await resolvePageProps(pageProps);
-  return <SettleExpense {...props} />;
-};
+const SettlePage = () => (
+  <Suspense fallback={<UISpinner />}>
+    <SettleExpense />
+  </Suspense>
+);
 
-export default ExpenseFormPage;
+export default SettlePage;

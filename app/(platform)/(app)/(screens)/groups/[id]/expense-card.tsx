@@ -3,20 +3,19 @@ import { BanknoteIcon, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { EXPENSE_CATEGORY_ICONS, ExpenseCategoryType } from "@/constants/ui";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Expense } from "@/generated/prisma/browser";
-import { formateDate, indiaDate } from "@/utils/date";
+import type { GroupExpense } from "@/lib/data/groups";
 import WhoPaid from "./who-paid";
 import YourShare from "./your-share";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpenseDate } from "./expense-date";
 
 type ExpenseCardProps = {
-  expense: Expense;
+  expense: GroupExpense;
+  groupId: string;
 };
 
 export const ExpenseCard = (props: ExpenseCardProps) => {
-  const { expense } = props;
+  const { expense, groupId } = props;
 
   const category = (expense?.category || "General") as ExpenseCategoryType;
 
@@ -30,7 +29,7 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
   const createDate = expense?.createdAt ?? "";
 
   return expense ? (
-    <Link href={`/groups/${expense?.groupId}/expense/${expense.id}`}>
+    <Link href={`/groups/${groupId}/expense/${expense.id}`}>
       <ListItem
         icon={
           <div className="rounded-full w-10 h-10 flex items-center justify-center bg-foreground/10">
@@ -43,14 +42,20 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
           </div>
         }
         title={expense.description}
-        subtitle={<WhoPaid expenseId={expense?.id} amount={expense?.amount} />}
+        subtitle={
+          <WhoPaid
+            groupId={groupId}
+            expenseId={expense.id}
+            amount={expense.amount}
+          />
+        }
         actions={
           <div className="text-[10px] min-h-[18px] text-right flex flex-col gap-0.5">
             <div className="truncate capitalize">
               <ExpenseDate date={createDate} />
             </div>
             {isSettlement ? null : (
-              <YourShare expenseId={expense?.id} groupId={expense?.groupId} />
+              <YourShare expenseId={expense.id} groupId={groupId} />
             )}
           </div>
         }

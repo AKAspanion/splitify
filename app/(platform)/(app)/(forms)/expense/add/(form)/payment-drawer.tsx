@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 import { fixedNum } from "@/utils/validate";
-import { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";

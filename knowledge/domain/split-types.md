@@ -18,8 +18,8 @@ generated:
 - **EXACT:** each person's amount is entered; it is stored and used as is.
 - **PERCENT:** each person's percent is entered; the form turns it into an amount, and both `UserSplit.amount` and
   `UserSplit.percent` are stored. Balances use the stored amount, exactly as for EXACT.
-- **Totals must match.** `CreateExpense` (`actions/create-expense/schema.ts`) rejects an expense whose payments,
-  or whose splits, don't add up to `amount`. Both sides are compared after rounding to whole units
+- **Totals must match.** `validateExpense` (`lib/data/expenses.ts`) rejects, before anything is sent, an expense whose payments,
+  or whose splits, don't add up to `amount`; the `CreateExpense` mutation checks only the bounds and that everyone named is a member. Both sides are compared after rounding to whole units
   (`fixedNum(total, 0)`), so a difference under half a rupee passes.
 - **Several payers:** each payment is spread over the splits in proportion. The engine records one expense per payer
   with percent splits (`SplitifyService.addExpense` in `lib/splitify/service/splitify-service.ts`), and for EXACT it
@@ -27,14 +27,19 @@ generated:
 
 ## Where it is enforced
 
-- On save: the zod schema in `actions/create-expense/schema.ts`, through `createSafeAction`.
+- On save: `validateExpense` in `lib/data/expenses.ts`, and the `CreateExpense` mutation's checks in `dataconnect/expense/expense-writes.gql`.
 - In the form: the split editors in `app/(platform)/(app)/(forms)/expense/add/(form)/_splits/`.
 - When balances are computed: `evaluateExpense` in `app/(platform)/(app)/_utils/calculation.ts` maps each stored expense onto the split
   engine in `lib/splitify/`.
 
+## History
+
+- 2026-11-05: the totals check was a zod schema in a server action; now `validateExpense` in the browser, because spec 2c removed the actions. The mutation does not repeat the sum check.
+
 ## Sources
 
-- `actions/create-expense/schema.ts`
+- `lib/data/expenses.ts`
+- `dataconnect/expense/expense-writes.gql`
 - `lib/splitify/service/splitify-service.ts`
 - `lib/splitify/repository/expense-repository.ts`
 - `app/(platform)/(app)/_utils/calculation.ts`

@@ -1,10 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { GROUP_CATEGORY_ICONS, GroupType } from "@/constants/ui";
 import { cn } from "@/lib/utils";
-import { Group } from "@/generated/prisma/browser";
+import type { Group } from "@/types/shared";
 import { NotepadText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import "@/lib/zod-config";
 import { boolean } from "zod";
 
 type GroupCardProps = {

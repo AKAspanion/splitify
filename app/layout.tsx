@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Inter } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { Providers } from "@/components/providers";
@@ -8,7 +7,6 @@ import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
 import Adsense from "./adsense";
-import Analytics from "./analytics";
 
 import "./globals.css";
 
@@ -30,10 +28,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <Script
-        strategy="afterInteractive"
-        src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
-      />
       <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
       <body className={inter.className}>
         <ThemeProvider
@@ -52,7 +46,6 @@ export default function RootLayout({
             </Suspense>
           </Providers>
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   );

@@ -1,71 +1,77 @@
 "use client";
 
-import { deleteAccount } from "@/actions/delete-account";
+import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
+import { markSignOutIntended } from "@/lib/auth-redirect";
+import { toUserMessage } from "@/lib/data/errors";
+import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
+import { signOut as firebaseSignOut } from "firebase/auth";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useAction } from "@/hooks/use-action";
-import { useClerk } from "@clerk/nextjs";
+  connectFunctionsEmulator,
+  getFunctions,
+  httpsCallable,
+} from "firebase/functions";
 import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function DeleteAccountAction() {
-  const [open, setOpen] = useState(false);
-  const { signOut } = useClerk();
-  const router = useRouter();
+const REGION = "asia-south1";
+const FUNCTIONS_EMULATOR = { host: "127.0.0.1", port: 5001 };
 
-  const { execute, loading } = useAction(deleteAccount, {
-    onSuccess: () => {
-      signOut(() => router.push("/"));
-    },
-    onError: (error, debug) => {
-      console.error(error, debug);
-      toast.error(error);
-    },
-  });
+let functionsClient: ReturnType<typeof getFunctions> | undefined;
+
+function deleteMyAccount() {
+  if (!functionsClient) {
+    functionsClient = getFunctions(getFirebaseApp(), REGION);
+    if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true")
+      connectFunctionsEmulator(
+        functionsClient,
+        FUNCTIONS_EMULATOR.host,
+        FUNCTIONS_EMULATOR.port,
+      );
+  }
+  return httpsCallable<undefined, { ok: true }>(
+    functionsClient,
+    "deleteMyAccount",
+  )();
+}
+
+export default function DeleteAccountAction() {
+  const { getConfirmation } = useConfirm();
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    const confirmed = await getConfirmation({
+      title: "Delete your account?",
+      subtitle:
+        "Your shared expenses stay, shown as Deleted user. This can't be undone.",
+    });
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      await deleteMyAccount();
+    } catch (error) {
+      toast.error(toUserMessage(error));
+      setDeleting(false);
+      return;
+    }
+    // The Auth user is gone, so this browser's sign-in is too: leave home first, then clear it locally.
+    markSignOutIntended(true);
+    router.push("/");
+    try {
+      await firebaseSignOut(getFirebaseAuth());
+    } catch {
+      // The account is already deleted; the stale local session ends on the next token refresh.
+    }
+  };
 
   return (
-    <>
-      <Button variant="destructive" onClick={() => setOpen(true)}>
-        <Trash2Icon />
-        <div>Delete account</div>
-      </Button>
-      <Dialog open={open} onOpenChange={(next) => !loading && setOpen(next)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete your account?</DialogTitle>
-            <DialogDescription>
-              Your name, email, picture, passkey, friends and feedback are
-              removed. Expenses you share with others stay in their groups under
-              &quot;Deleted user&quot;. This can&apos;t be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              disabled={loading}
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              disabled={loading}
-              onClick={() => execute({})}
-            >
-              Delete my account
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+      <Trash2Icon />
+      <div>{deleting ? "Deleting account" : "Delete account"}</div>
+    </Button>
   );
 }

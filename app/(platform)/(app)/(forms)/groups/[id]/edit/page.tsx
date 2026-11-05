@@ -1,19 +1,7 @@
-import GroupFormLoading from "@/app/(platform)/(app)/_components/group-form-loading";
-import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import { resolvePageProps } from "@/utils/page";
+"use client";
 
-const GroupEdit = dynamic(() => import("./group-edit"), {
-  loading: () => <GroupFormLoading />,
-});
+import GroupEdit from "./group-edit";
 
-const GroupEditPage = async (pageProps: ServerSidePageProp) => {
-  const props = await resolvePageProps(pageProps);
-  return (
-    <Suspense>
-      <GroupEdit {...props} />
-    </Suspense>
-  );
-};
+const GroupEditPage = () => <GroupEdit />;
 
 export default GroupEditPage;

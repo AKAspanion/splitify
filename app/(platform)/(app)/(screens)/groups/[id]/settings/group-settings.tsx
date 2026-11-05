@@ -1,63 +1,40 @@
-import { db } from "@/lib/db";
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs/server";
-import { GroupCard } from "@/app/(platform)/(app)/_components/group-card";
-import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
+import {
+  GroupCard,
+  GroupCardLoading,
+} from "@/app/(platform)/(app)/_components/group-card";
 import { Header } from "@/components/container/header";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { NoData } from "@/components/no-data";
+import { useRouteIds } from "@/hooks/use-route-ids";
+import { toGroupModel, useGroup } from "@/lib/data/groups";
+import { GroupNotFound, LoadError } from "../_components/group-states";
+import GroupDelete from "./group-delete";
+import GroupMembers from "./group-members";
 
-const GroupMembers = dynamic(() => import("./group-members"), {
-  loading: () => (
-    <div className="flex flex-col my-6">
-      <Skeleton className="w-[100px] h-6 rounded-md" />
-      <div className="flex flex-col mt-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <UserCardLoading key={i} />
-        ))}
-      </div>
-    </div>
-  ),
-});
+const GroupSettings = () => {
+  const { groupId: id } = useRouteIds();
+  const params = useSearchParams();
+  const backTo = params.get("back") ?? "";
+  const showAll = params.get("show") === "all";
 
-const GroupDelete = dynamic(() => import("./group-delete"), {
-  loading: () => (
-    <div className="my-6">
-      <UserCardLoading />
-    </div>
-  ),
-});
-
-const GroupSettings = async ({
-  params,
-  searchParams,
-}: ServerSideComponentProp) => {
-  const id = params["id"] || "null";
-  const backTo = searchParams["back"];
-
-  const showAll = searchParams["show"] === "all";
-
-  const { userId } = await auth();
-
-  const group = await db.group.findUnique({
-    where: { id, users: { some: { id: userId || "null" } } },
-  });
+  const { data: group, isLoading, error, refetch } = useGroup(id);
 
   return (
     <AutoContainer
       header={
         <Header
-          backTo={backTo ? backTo : `/groups/${id}`}
+          backTo={backTo ? backTo : id ? `/groups/${id}` : "/groups"}
           title="Group Settings"
           actions={
             group ? (
               <Link href={`/groups/${id}/edit`}>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Edit group">
                   <PencilIcon className="w-5 h-5" />
                 </Button>
               </Link>
@@ -66,23 +43,29 @@ const GroupSettings = async ({
         />
       }
     >
-      {group ? (
+      {id === null ? (
+        <GroupNotFound />
+      ) : isLoading ? (
+        <GroupCardLoading />
+      ) : error ? (
+        <LoadError error={error} onRetry={() => refetch()} />
+      ) : !group ? (
+        <GroupNotFound />
+      ) : (
         <>
           <GroupCard
-            group={group}
+            group={toGroupModel(group)}
             description={
               <div className="pt-1 capitalize">
-                {group?.type ? <Badge size="sm">{group?.type}</Badge> : null}
+                {group.type ? <Badge size="sm">{group.type}</Badge> : null}
               </div>
             }
           />
           <GroupMembers showAll={showAll} id={id} backTo={backTo} />
           <hr />
           <div className="h-6" />
-          <GroupDelete id={group?.id} />
+          <GroupDelete id={group.id} />
         </>
-      ) : (
-        <NoData title="Group not found" />
       )}
     </AutoContainer>
   );

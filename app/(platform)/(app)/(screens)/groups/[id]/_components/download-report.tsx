@@ -10,77 +10,52 @@ import Spinner from "@/components/ui/spinner";
 import { DownloadIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { callFunction } from "@/lib/functions/call";
 import { downloadBlob } from "@/utils/dom";
+
+type ReportFormat = "excel" | "csv" | "text";
+
+const FORMATS: { format: ReportFormat; label: string }[] = [
+  { format: "excel", label: "Excel" },
+  { format: "csv", label: "CSV" },
+  { format: "text", label: "Text" },
+];
+
+/** The file name the `reports` function put in `Content-Disposition`, the UTF-8 form first. */
+const fileNameOf = (response: Response): string | undefined => {
+  const header = response.headers.get("content-disposition") ?? "";
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header)?.[1];
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded);
+    } catch {
+      // Fall through to the plain name.
+    }
+  }
+  return /filename="([^"]*)"/i.exec(header)?.[1];
+};
 
 export const DownloadReport = ({ groupId }: { groupId: string }) => {
   const [loading, setLoading] = useState(false);
 
-  const downloadExcel = async () => {
+  const download = async (format: ReportFormat, label: string) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const resp = await fetch("/api/generate/excel/expense", {
+      const response = await callFunction("/api/reports/expenses", {
         method: "POST",
-        headers: { "Content-Type": "blob" },
-        body: JSON.stringify({ groupId }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupId, format }),
       });
-
-      const blob = await resp.blob();
-      const fileName = resp.headers
-        ?.get("content-disposition")
-        ?.split("filename=")[1];
-
-      downloadBlob(blob, fileName);
-
-      toast.success("Excel report downloaded successfully");
-      setLoading(false);
+      downloadBlob(await response.blob(), fileNameOf(response));
+      toast.success(`${label} report downloaded successfully`);
     } catch (error) {
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : `Failed to download the ${label} report`,
+      );
+    } finally {
       setLoading(false);
-      toast.error("Failed to downloaded excel report");
-    }
-  };
-
-  const downloadCSV = () => {
-    //
-  };
-
-  const downloadText = async () => {
-    try {
-      setLoading(true);
-      const resp = await fetch("/api/generate/text/expense", {
-        method: "POST",
-        headers: { "Content-Type": "blob" },
-        body: JSON.stringify({ groupId }),
-      });
-
-      const blob = await resp.blob();
-      const fileName = resp.headers
-        ?.get("content-disposition")
-        ?.split("filename=")[1];
-
-      downloadBlob(blob, fileName);
-
-      toast.success("Text Report downloaded successfully");
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      toast.error("Failed to downloaded text report");
-    }
-  };
-
-  const handleDownload = async (type: string) => {
-    switch (type) {
-      case "excel":
-        await downloadExcel();
-        break;
-      case "csv":
-        await downloadCSV();
-        break;
-      case "text":
-        await downloadText();
-        break;
-
-      default:
-        break;
     }
   };
 
@@ -91,20 +66,19 @@ export const DownloadReport = ({ groupId }: { groupId: string }) => {
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label="Download report">
               <DownloadIcon />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleDownload("excel")}>
-              Excel
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem disabled onClick={() => handleDownload("csv")}>
-              CSV
-            </DropdownMenuItem> */}
-            <DropdownMenuItem onClick={() => handleDownload("text")}>
-              Text
-            </DropdownMenuItem>
+            {FORMATS.map(({ format, label }) => (
+              <DropdownMenuItem
+                key={format}
+                onClick={() => download(format, label)}
+              >
+                {label}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

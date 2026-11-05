@@ -31,10 +31,11 @@ neither read-only reference material nor the source for a replacement build.
 
 ## History
 
+- 2026-11-05: wrote the paths of files that spec 2c removed (prisma/) as plain text, so verify no longer expects them; the decision itself is unchanged.
 - 2026-11-04: was the Next.js and Prisma code continued in place; now the Next.js code is continued and Prisma over MySQL is replaced by SQL Connect, because the app moves to the browser on Firebase. See [SQL Connect](sql-connect-database.md).
 
 ## Sources
 
 - `.ga/project.json`
 - `package.json`
-- `prisma/`
+- prisma/

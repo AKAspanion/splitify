@@ -43,3 +43,4 @@ public/sw.js
 
 # packages
 packages
+firebase.emulators.json

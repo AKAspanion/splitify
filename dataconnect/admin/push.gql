@@ -1,0 +1,15 @@
+# Used only by the push functions, as the admin: the tokens to send to, and the dead ones to prune.
+
+query ListPushTokens($userIds: [String!]!) @auth(level: NO_ACCESS) {
+  pushTokens(where: { userId: { in: $userIds } }) {
+    token
+    user {
+      id
+    }
+    platform
+  }
+}
+
+mutation DeletePushTokens($tokens: [String!]!) @auth(level: NO_ACCESS) {
+  pushToken_deleteMany(where: { token: { in: $tokens } })
+}

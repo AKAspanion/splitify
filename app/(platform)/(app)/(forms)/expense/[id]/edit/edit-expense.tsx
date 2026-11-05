@@ -1,36 +1,46 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
-import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
-import { NoData } from "@/components/no-data";
+import { useSearchParams } from "next/navigation";
+import { useRouteIds } from "@/hooks/use-route-ids";
+import { useExpense } from "@/lib/data/expenses";
+import ExpenseFormLoading, {
+  ExpenseLoadError,
+  ExpenseNotFound,
+} from "@/app/(platform)/(app)/_components/expense-form-loading";
+import Form from "./form";
 
-const Form = dynamic(() => import("./form"), {
-  loading: () => <UISpinner />,
-});
+const EditExpense = () => {
+  const { expenseId } = useRouteIds();
+  const searchParams = useSearchParams();
+  const { data: expense, error, isPending, refetch } = useExpense(expenseId);
 
-const EditExpense = async ({
-  params,
-  searchParams,
-}: ServerSideComponentProp) => {
-  const expenseId = params["id"];
-
-  const expense = await db.expense.findUnique({
-    where: { id: expenseId },
-    select: { id: true, description: true, groupId: true },
-  });
-
-  const groupdId = searchParams["groupId"] || expense?.groupId || "";
-  const backTo = groupdId
-    ? `/groups/${groupdId}/expense/${expense?.id || ""}`
+  const groupId = searchParams.get("groupId") || expense?.groupId || "";
+  const backTo = groupId
+    ? `/groups/${groupId}/expense/${expenseId || ""}`
     : `/groups`;
+
+  // An id that is not a real expense id never leaves the browser: it is the not-found screen at once.
+  const body = !expenseId ? (
+    <ExpenseNotFound />
+  ) : error ? (
+    <ExpenseLoadError error={error} onRetry={() => refetch()} />
+  ) : isPending ? (
+    <ExpenseFormLoading />
+  ) : expense ? (
+    <Form
+      id={expense.id}
+      description={expense.description}
+      groupId={expense.groupId}
+    />
+  ) : (
+    <ExpenseNotFound />
+  );
 
   return (
     <AutoContainer header={<Header backTo={backTo} title="Update expense" />}>
-      <Suspense>
-        {expense ? <Form {...expense} /> : <NoData title="Expense not found" />}
-      </Suspense>
+      {body}
     </AutoContainer>
   );
 };

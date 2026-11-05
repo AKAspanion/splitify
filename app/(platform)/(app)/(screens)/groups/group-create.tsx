@@ -1,19 +1,19 @@
-import { db } from "@/lib/db";
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NoData } from "@/components/no-data";
 import { UserRoundPlusIcon } from "lucide-react";
 
-export default async function GroupCreate({
+export default function GroupCreate({
+  count,
   show,
-  where,
   searchText,
 }: {
-  where: any;
+  count: number;
   show: boolean;
   searchText: string;
 }) {
-  const count = await db.group.count({ where });
   const noData = count === 0;
 
   const showAll = !show && count > 6;

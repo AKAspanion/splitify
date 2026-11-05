@@ -7,16 +7,8 @@
       "source": "functions",
       "codebase": "default",
       "runtime": "nodejs24",
-      "predeploy": [
-        "yarn --cwd \"$RESOURCE_DIR\" build"
-      ],
-      "ignore": [
-        "node_modules",
-        ".git",
-        "src",
-        "firebase-debug.log",
-        "*.local"
-      ]
+      "predeploy": ["yarn --cwd \"$RESOURCE_DIR\" build"],
+      "ignore": ["node_modules", ".git", "src", "firebase-debug.log", "*.local"]
     }
   ],
   "emulators": {
@@ -42,8 +34,66 @@
     "trailingSlash": true,
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/coming-soon/index.html"
+        "source": "/api/reports/**",
+        "function": {
+          "functionId": "reports",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/api/webauthn/**",
+        "function": {
+          "functionId": "webauthn",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/groups/*/expense/*",
+        "destination": "/groups/_/expense/_/index.html"
+      },
+      {
+        "source": "/groups/*/expense",
+        "destination": "/groups/_/expense/index.html"
+      },
+      {
+        "source": "/groups/*/edit",
+        "destination": "/groups/_/edit/index.html"
+      },
+      {
+        "source": "/groups/*/settle",
+        "destination": "/groups/_/settle/index.html"
+      },
+      {
+        "source": "/groups/*/settings",
+        "destination": "/groups/_/settings/index.html"
+      },
+      {
+        "source": "/groups/*/add-member",
+        "destination": "/groups/_/add-member/index.html"
+      },
+      {
+        "source": "/groups/*/activity",
+        "destination": "/groups/_/activity/index.html"
+      },
+      {
+        "source": "/groups/*",
+        "destination": "/groups/_/index.html"
+      },
+      {
+        "source": "/expense/*/edit",
+        "destination": "/expense/_/edit/index.html"
+      },
+      {
+        "source": "/friends/*/edit/contact",
+        "destination": "/friends/_/edit/contact/index.html"
+      },
+      {
+        "source": "/friends/*",
+        "destination": "/friends/_/index.html"
+      },
+      {
+        "source": "/activity/*",
+        "destination": "/activity/_/index.html"
       }
     ],
     "headers": [
@@ -73,6 +123,10 @@
           {
             "key": "Cross-Origin-Opener-Policy",
             "value": "same-origin-allow-popups"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://asia-south1-splitify-416321.cloudfunctions.net https://*.googleapis.com https://*.firebaseio.com https://firebaseinstallations.googleapis.com https://fcmregistrations.googleapis.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; frame-src https://splitify-416321.firebaseapp.com https://accounts.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://adservice.google.com https://www.googletagservices.com https://partner.googleadservices.com https://tpc.googlesyndication.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
           }
         ]
       },

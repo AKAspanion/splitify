@@ -1,0 +1,26 @@
+# The caller's own push tokens. The caller is always auth.uid. A token belongs to whoever is signed in on that
+# device now, so registering one that another person holds moves it to the caller.
+
+mutation RegisterMyPushToken($token: String!, $platform: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.token.size() >= 1 && vars.token.size() <= 4096 && (vars.platform == 'web' || vars.platform == 'ios')"
+) {
+  pushToken_upsert(
+    data: {
+      token: $token
+      userId_expr: "auth.uid"
+      platform: $platform
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Returns the number of rows deleted: 0 when the token is someone else's or unknown.
+mutation RemoveMyPushToken($token: String!)
+@auth(
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.token.size() <= 4096"
+) {
+  pushToken_deleteMany(
+    where: { token: { eq: $token }, userId: { eq_expr: "auth.uid" } }
+  )
+}

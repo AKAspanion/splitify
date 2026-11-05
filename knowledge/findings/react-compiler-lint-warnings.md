@@ -22,7 +22,7 @@ which changes behaviour, so `eslint.config.mjs` sets both rules to `warn` instea
 ## Evidence
 
 - `app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx`: an effect resets the equal split when `users` changes.
-- `app/(platform)/profile/notification-action.tsx`: an effect reads push-subscription state on mount.
+- `app/(platform)/profile/notification-action.tsx`: an effect reads notification-permission state on mount.
 - `components/biometric/biometric.tsx`: an effect starts verification when the path changes.
 - `components/scroll-to.tsx`: `scrollTo` calls `performance.now()`.
 

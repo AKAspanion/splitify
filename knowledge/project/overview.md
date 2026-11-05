@@ -20,7 +20,8 @@ Amounts are shown in rupees.
 
 ## Applications
 
-- [The web app](../apps/splitify.md): the whole product, a Next.js app at the repository root.
+- [The web app](../apps/splitify.md): the whole product, a Next.js app at the repository root, built as one static site on Firebase Hosting.
+- [Cloud Functions](../apps/functions.md): reports, passkeys, account deletion, pushes and the contact merge; the only server-side code.
 - [Android](../apps/android.md): a Trusted Web Activity that opens the deployed web app.
 - [iOS](../apps/ios.md): a WebView wrapper around the deployed web app, with push notifications.
 
@@ -29,8 +30,12 @@ How the parts fit is in [Architecture](architecture.md); how code is written is 
 
 ## Open
 
-- The access-control gaps in [findings](../findings/index.md) and the questions in
+- The findings (most now fixed) in [findings](../findings/index.md) and the questions in
   [questions](../questions/index.md) are what a newcomer should read next.
+
+## History
+
+- 2026-11-05: described the web app as the whole product with an open list of access-control gaps; now a static site with Cloud Functions, and the gaps fixed, because spec 2c removed the server.
 
 ## Sources
 

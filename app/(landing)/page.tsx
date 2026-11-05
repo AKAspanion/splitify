@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ClerkLoaded, useUser } from "@clerk/nextjs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/use-auth";
 
 const textFont = Poppins({
   subsets: ["latin"],
@@ -12,7 +13,7 @@ const textFont = Poppins({
 });
 
 const LandingPage = () => {
-  const { user } = useUser();
+  const { status } = useAuth();
   return (
     <div className="flex items-center justify-center flex-col pt-12">
       <div className={cn("flex items-center justify-center flex-col")}>
@@ -32,15 +33,15 @@ const LandingPage = () => {
         Keep track of your shared expenses and balances with roommates, trips,
         groups, friends, and family.
       </div>
-      <ClerkLoaded>
-        {user ? null : (
-          <Link href="/sign-up">
-            <Button className="mt-6" size="lg">
-              Join Splitify for free
-            </Button>
-          </Link>
-        )}
-      </ClerkLoaded>
+      {status === "loading" ? (
+        <Skeleton className="mt-6 h-11 w-52" aria-label="Loading" />
+      ) : status === "signed-out" ? (
+        <Link href="/sign-up/">
+          <Button className="mt-6" size="lg">
+            Join Splitify for free
+          </Button>
+        </Link>
+      ) : null}
     </div>
   );
 };

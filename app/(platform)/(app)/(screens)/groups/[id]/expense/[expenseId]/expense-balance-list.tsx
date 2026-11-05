@@ -4,22 +4,22 @@ import { calcExpenseSplits } from "@/app/(platform)/(app)/_utils/calculation";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import { User } from "@/generated/prisma/browser";
+import { useAuth } from "@/hooks/use-auth";
+import type { User } from "@/types/shared";
 
 export const BalanceList = ({
   expense,
   users,
 }: {
   users: User[];
-  expense: ExpenseWithPaymentWithSplit | null;
+  expense: ExpenseWithPaymentWithSplit;
 }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [detailed] = useState(false);
   const balanceList = useMemo(() => {
-    return user?.id
+    return user?.uid
       ? calcExpenseSplits(
-          user?.id,
+          user?.uid,
           expense,
           users || [],
           expense?.payments || [],
@@ -27,7 +27,7 @@ export const BalanceList = ({
           detailed,
         ) || []
       : [];
-  }, [detailed, expense, users, user?.id]);
+  }, [detailed, expense, users, user?.uid]);
 
   const noDataText = useMemo(() => {
     let text = "";

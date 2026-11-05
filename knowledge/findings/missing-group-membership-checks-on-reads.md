@@ -1,15 +1,17 @@
 ---
 type: Finding
-title: Group reads don't check membership
-description: Several read routes and actions only check for a session, so any signed-in person can read any group's expenses, members, shares and reports by id.
+title: Fixed: group reads didn't check membership
+description: Several read routes and actions only checked for a session, so any signed-in person could read any group's expenses, members, shares and reports by id; SQL Connect's queries and the reports function now check membership.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
 ---
 
-# Group reads don't check membership
+# Fixed: group reads didn't check membership
 
 ## Finding
+
+As found, before the server was removed:
 
 These return data for the group or expense id they are given, to any signed-in caller, without checking that the
 caller is a member of the group:
@@ -27,21 +29,14 @@ Each of the files below queries by the given id with no membership condition, af
 
 ## Status
 
-Open.
+Fixed. The routes and actions are gone. Reads are SQL Connect queries whose `@auth` rule limits them to the caller's groups, and the `reports` function answers members only, with one answer for a group that does not exist and one the caller isn't in ([roles](../security/roles.md), [reports](../features/reports.md)).
+
+## History
+
+- 2026-11-05: was Open, naming the removed routes and actions; now Fixed, because reads are SQL Connect queries with membership rules and the reports function checks membership.
 
 ## Sources
 
-- `app/api/app/group/[id]/expense/route.ts`
-- `app/api/app/group/[id]/users/route.ts`
-- `app/api/app/group/[id]/your-share/[expenseId]/route.ts`
-- `app/api/app/expense/[id]/who-paid/route.ts`
-- `app/api/generate/excel/expense/route.ts`
-- `app/api/generate/csv/expense/route.ts`
-- `app/api/generate/text/expense/route.ts`
-- `actions/get-expenses/index.ts`
-- `actions/get-expense/index.ts`
-- `actions/get-group-users/index.ts`
-- `actions/get-share/index.ts`
-- `actions/get-who-paid/index.ts`
-- `app/api/app/group/[id]/route.ts`
-- `actions/get-group/index.ts`
+- `dataconnect/app/groups.gql`
+- `dataconnect/app/expenses.gql`
+- `functions/src/reports/index.ts`

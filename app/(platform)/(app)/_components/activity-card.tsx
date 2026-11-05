@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { relativeFormatDate } from "@/utils/date";
-import { Activity } from "@/generated/prisma/browser";
+import { activityLine, type ActivityItem } from "@/lib/data/activity";
 import {
   MessageSquareText,
   FileMinus2,
@@ -19,20 +19,17 @@ import {
 } from "lucide-react";
 
 type ActivityCardProps = {
-  currUserId: string | null;
-  activity: Activity | null;
-  disabled?: boolean;
+  currUserId: string;
+  activity: ActivityItem | null;
   actions?: React.ReactNode;
 };
 
 export const ActivityCard = (props: ActivityCardProps) => {
-  const { currUserId, disabled, activity, actions } = props;
+  const { currUserId, activity, actions } = props;
 
   const activityDate = activity?.createdAt
     ? new Date(activity?.createdAt).toString()
     : "";
-
-  // const isCurrUser = currUserId !== activity?.userId;
 
   const getIcon = () => {
     const type = activity?.type;
@@ -94,7 +91,7 @@ export const ActivityCard = (props: ActivityCardProps) => {
                   "line-through": canStrikeThrough(),
                 })}
               >
-                {activity.message}
+                {activityLine(activity, currUserId).body}
               </div>
               <div className="text-xs font-light">
                 <div className="capitalize">

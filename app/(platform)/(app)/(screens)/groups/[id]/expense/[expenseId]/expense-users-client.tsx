@@ -1,46 +1,34 @@
 "use client";
-import {
-  UserAvatars,
-  UserAvatarsLoading,
-} from "@/app/(platform)/(app)/_components/user-avatars";
+import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
 import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
 import { RUPEE_SYMBOL } from "@/constants/ui";
-import useExpense from "@/hooks/use-expense";
 import { UserPaymentWithUser } from "@/types/shared";
-import { useUser } from "@clerk/nextjs";
 
 const ExpenseUsersClient = ({
-  groupId,
-  expenseId,
   payments,
+  amount,
+  isSettlement,
+  userId,
   balance,
 }: {
-  expenseId: string;
-  groupId: string;
   payments: UserPaymentWithUser[];
+  amount: number;
+  isSettlement: boolean;
+  userId: string | null;
   balance: React.ReactNode;
 }) => {
-  const { user } = useUser();
-  const { expense } = useExpense(expenseId, groupId);
   const users = payments?.map((p) => p.user) || [];
 
-  const isSettlement = expense?.tag === "SETTLEMENT";
-
-  const whoPaid = whoPaidExpense(payments || [], user?.id || "");
-
-  let whoPaidValue = whoPaid;
-
-  if (expense?.amount) {
-    whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${expense?.amount}`;
+  let whoPaidValue = whoPaidExpense(payments || [], userId || "");
+  if (amount) {
+    whoPaidValue = whoPaidValue + ` ${RUPEE_SYMBOL}${amount}`;
   }
 
-  return isSettlement ? null : expense ? (
+  return isSettlement ? null : (
     <>
       <UserAvatars users={users} action={<>{whoPaidValue}</>} />
       {balance}
     </>
-  ) : (
-    <UserAvatarsLoading lg />
   );
 };
 

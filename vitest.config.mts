@@ -3,7 +3,12 @@ import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./", import.meta.url)) },
+    alias: {
+      "@dataconnect/app": fileURLToPath(
+        new URL("./dataconnect/generated/app", import.meta.url),
+      ),
+      "@": fileURLToPath(new URL("./", import.meta.url)),
+    },
   },
   // Tests that need the Firebase emulators run only through `yarn test:rules`.
   test: {
@@ -13,6 +18,7 @@ export default defineConfig({
       "dataconnect/**/*.test.ts",
       "functions/src/**/*.test.ts",
       "lib/firebase/**/*.test.ts",
+      "lib/data/**/*.rules.test.ts",
     ],
   },
 });

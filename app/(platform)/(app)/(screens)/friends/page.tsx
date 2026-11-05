@@ -1,23 +1,14 @@
-import dynamic from "next/dynamic";
+"use client";
 
-import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { Suspense } from "react";
+import { ScreenSkeleton } from "@/app/(platform)/(app)/_components/screen-skeleton";
 import { UserCardLoading } from "@/app/(platform)/(app)/_components/user-card";
-import { resolvePageProps } from "@/utils/page";
+import FriendsList from "./friends-list";
 
-const FriendsList = dynamic(() => import("./friends-list"), {
-  loading: () => <ScreenSkeleton card={<UserCardLoading />} />,
-});
-
-const FriendsPage = async (pageProps: ServerSidePageProp) => {
-  const props = await resolvePageProps(pageProps);
-  const keyString = `page=${props.searchParams?.["page"]}&search=${props.searchParams?.["search"]}&&text=${props.searchParams?.["text"]}`;
+const FriendsPage = () => {
   return (
-    <Suspense
-      key={keyString}
-      fallback={<ScreenSkeleton card={<UserCardLoading />} />}
-    >
-      <FriendsList {...props} />
+    <Suspense fallback={<ScreenSkeleton card={<UserCardLoading />} />}>
+      <FriendsList />
     </Suspense>
   );
 };

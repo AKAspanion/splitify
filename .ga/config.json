@@ -6,7 +6,9 @@
       "ticket": "none",
       "base": "main",
       "branch": "feat/<topic>",
-      "squash": false
+      "squash": false,
+      "push": "at-finish",
+      "merge-request": "at-finish"
     },
     "checks": {
       "commands": {
@@ -17,6 +19,9 @@
         "test": "yarn test",
         "e2e": null
       }
+    },
+    "run": {
+      "unattended": true
     }
   }
 }

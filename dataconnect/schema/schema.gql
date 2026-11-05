@@ -117,3 +117,13 @@ type AuthnDevice @table(key: "user") {
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp
 }
+
+# A device's push token. The token belongs to whoever is signed in on that device now, so registering it again
+# moves it to the new person. platform is "web" or "ios", checked by the operation.
+type PushToken @table(key: "token") {
+  token: String!
+  user: User!
+  platform: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp
+}

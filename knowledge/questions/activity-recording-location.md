@@ -25,8 +25,11 @@ why it was done this way.
 Answered: yes; each server action writes its activity entry in the same transaction as its change, and sends
 its pushes on the server. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
+## History
+
+- 2026-11-05: the question named the push-notification routes and server actions, now removed; Sources now point at the mutation that writes the activity and the function that pushes, because spec 2c removed the server.
+
 ## Sources
 
-- `lib/notification/service/index.ts`
-- `app/api/push-notification/create-expense/route.ts`
-- `actions/create-expense/index.ts`
+- `dataconnect/expense/expense-writes.gql`
+- `functions/src/push-activity.ts`

@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "expense/add/index.html",
+    "groups/_/expense/_/index.html",
+    "expense/_/edit/index.html",
+    "groups/_/settle/index.html"
+  ],
+  "requests": [
+    { "path": "/expense/add/", "expectText": "Add an expense" },
+    { "path": "/groups/abc/expense/def/", "expectText": "Expense details" },
+    { "path": "/expense/abc/edit/", "expectText": "Update expense" },
+    { "path": "/groups/abc/settle/", "expectText": "Settlement" }
+  ]
+}

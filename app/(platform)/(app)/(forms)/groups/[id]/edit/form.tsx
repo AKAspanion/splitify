@@ -1,22 +1,32 @@
 "use client";
 
-import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
-import { FormSubmit } from "@/components/form/form-submit";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { GROUP_CATEGORY_ICONS, GROUP_TYPES, GroupType } from "@/constants/ui";
-import { useAction } from "@/hooks/use-action";
+import { toUserMessage } from "@/lib/data/errors";
+import { useUpdateGroup } from "@/lib/data/groups";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateGroup } from "@/actions/update-group";
 
 type FormProps = {
   id: string;
   title: string;
   type?: string | null;
   description?: string | null;
+};
+
+type FieldErrors = { title?: string[]; description?: string[] };
+
+const validate = (title: string, description: string): FieldErrors => {
+  const errors: FieldErrors = {};
+  if (title.trim().length < 3) errors.title = ["Minimum 3 chars required"];
+  else if (title.length > 100) errors.title = ["Maximum 100 chars allowed"];
+  if (description.length > 500)
+    errors.description = ["Maximum 500 chars allowed"];
+  return errors;
 };
 
 const Form = ({
@@ -26,28 +36,31 @@ const Form = ({
   description: descriptionProp,
 }: FormProps) => {
   const router = useRouter();
-  // const [title, setTitle] = useState(titleProp);
-  // const [description, setDescription] = useState(descriptionProp || "");
+  const [title, setTitle] = useState(titleProp);
+  const [description, setDescription] = useState(descriptionProp || "");
   const [type, setType] = useState<GroupType | undefined>(
-    typeProp as GroupType,
+    (typeProp as GroupType | null) ?? undefined,
   );
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const { mutate, isPending } = useUpdateGroup();
 
-  const { execute, fieldErrors } = useAction(updateGroup, {
-    onSuccess: ({ group, userId }) => {
-      router.push(`/groups/${group.id}`);
-      toast.success("Group updated successfully");
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const errors = validate(title, description);
+    setFieldErrors(errors);
+    if (errors.title || errors.description) return;
 
-  const onSubmit = async (formData: FormData) => {
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-
-    execute({ title, type, description, groupId: id });
+    // What was typed stays in the fields if the write fails.
+    mutate(
+      { id, title: title.trim(), description: description.trim(), type },
+      {
+        onSuccess: () => {
+          router.push(`/groups/${id}`);
+          toast.success("Group updated successfully");
+        },
+        onError: (error) => toast.error(toUserMessage(error)),
+      },
+    );
   };
 
   const handleTypeChange = (t: GroupType) => {
@@ -55,23 +68,27 @@ const Form = ({
   };
 
   return (
-    <form className="flex flex-col gap-6" action={onSubmit}>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <FormInput
           label="Group name"
           id="title"
           name="title"
           placeholder="Enter a group name"
-          errors={fieldErrors?.title}
-          defaultValue={titleProp}
+          errors={fieldErrors.title}
+          value={title}
+          disabled={isPending}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <FormInput
           label="Description"
-          id="escription"
+          id="description"
           name="description"
           placeholder="Enter a description"
-          defaultValue={descriptionProp || ""}
-          errors={fieldErrors?.description}
+          errors={fieldErrors.description}
+          value={description}
+          disabled={isPending}
+          onChange={(e) => setDescription(e.target.value)}
         />
         <div>
           <Label className="text-sm font-semi-bold text-neutral-700 dark:text-neutral-50">
@@ -94,9 +111,12 @@ const Form = ({
             })}
           </div>
         </div>
-        <FormErrors errors={fieldErrors?.type} />
       </div>
-      <FormSubmit>Update</FormSubmit>
+      <div className="flex justify-end items-center">
+        <Button type="submit" loading={isPending} disabled={isPending}>
+          Update
+        </Button>
+      </div>
     </form>
   );
 };

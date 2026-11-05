@@ -1,7 +1,7 @@
 ---
 type: API Contract
 title: Push-notification API (removed)
-description: The /api/push-notification routes the browser called after each write are gone; the server actions now record activity and send pushes themselves.
+description: There is no push-notification route; Cloud Functions triggers send each change's push through FCM.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -10,12 +10,11 @@ generated:
 
 # Push-notification API (removed)
 
-There is no push-notification route any more. Each server action writes its `Activity` row and sends its pushes
-after its change commits, through `notifyAfterResponse` in `lib/notification/notify.ts`, with the message text built
-in `lib/notification/messages.ts` and the actor taken from the session
-([decision](../decisions/activity-and-notifications-in-actions.md)). Pushes go out through `sendNotification` in
-`lib/onesignal.ts` ([OneSignal](../integrations/onesignal.md)); a failed push is logged with the activity type only
-([logging](../operations/logging.md)).
+There is no push-notification route and no server action that sends one. A Cloud Functions trigger on each SQL Connect
+mutation sends the push through FCM, with the recipients and the text built from the activity row, not from anything
+the browser sends ([Cloud Functions](../apps/functions.md), [decision](../decisions/firebase-cloud-messaging.md),
+[notifications](../features/notifications.md)). The text comes from `functions/src/activity-text.ts`; a failed push is
+logged by its class only and never fails the change ([logging](../operations/logging.md)).
 
 ## Rules
 
@@ -25,10 +24,10 @@ in `lib/notification/messages.ts` and the actor taken from the session
 
 ## History
 
-- 2026-11-04: was a set of `POST /api/push-notification/*` routes the browser called after each action, taking the actor and group from the request body; now removed, because the actions do the work themselves. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
+- 2026-11-05: said the server actions sent pushes through OneSignal (`lib/notification/notify.ts`); now Cloud Functions triggers send them through FCM, because spec 2c removed the server actions and OneSignal. See [decision](../decisions/firebase-cloud-messaging.md).
+- 2026-11-04: was a set of `POST /api/push-notification/*` routes the browser called after each action, taking the actor and group from the request body; now removed, because the actions did the work themselves. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 
 ## Sources
 
-- `lib/notification/notify.ts`
-- `lib/notification/messages.ts`
-- `lib/onesignal.ts`
+- `functions/src/push-activity.ts`
+- `functions/src/activity-text.ts`

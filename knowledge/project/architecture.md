@@ -1,7 +1,7 @@
 ---
 type: Architecture
 title: Architecture
-description: One Next.js App Router app: server actions write, route handlers read and notify, Prisma stores data in MySQL, Clerk signs people in.
+description: One static Next.js build on Firebase Hosting; the browser talks to SQL Connect and, for reports, passkeys and account deletion, to Cloud Functions.
 status: draft
 generated:
   by: claude-code/claude-opus-5-5
@@ -12,57 +12,59 @@ generated:
 
 ## Services
 
-There is one deployable service, the Next.js app at the repository root (`next.config.mjs`). Inside it:
+There is no application server. The Next.js app at the repository root (`next.config.mjs`) is built as one static
+export (`output: "export"`) that Firebase Hosting serves, and the browser talks to Google services directly
+([static build decision](../decisions/static-build-on-firebase-hosting.md)):
 
 - **Pages** live in `app/`, in route groups: `app/(landing)` (public home page), `app/(platform)` (the signed-in
-  app, plus the Clerk sign-in pages and `/privacy`) and `app/(admin)` (the logs page). See
+  app, plus the sign-in screens and `/privacy`). Only `*.hosting.tsx` files are routes. See
   [the web app](../apps/splitify.md).
-- **The hosting build** (`NEXT_BUILD_TARGET=hosting` in `next.config.mjs`) exports only the public pages as a static
-  site for Firebase Hosting; see [the web app](../apps/splitify.md#the-hosting-build).
-- **Writes** go through server actions in `actions/<verb-noun>/`, each wrapped by `createSafeAction` in
-  `lib/safe-actions.ts`, which validates the input with its zod schema first. See
-  [server actions](../api/server-actions.md).
-- **Reads** are a mix: server components call the `actions/get-*` functions, and client components fetch the
-  `/api/app/...` route handlers through react-query hooks in `hooks/` (`utils/api.ts` wraps axios). Zustand stores in
-  `store/` cache groups, expenses and activities on the client. See [app API](../api/app.md).
+- **Data** is [SQL Connect](../data/sql-connect.md) (Cloud SQL Postgres) and Firebase Auth. Screens read and write
+  through the hooks in `lib/data/` (react-query over the generated SDK), and the SQL Connect schema and its auth
+  rules are the access control. Zustand stores in `store/` hold the groups, expenses and activities a screen is
+  showing.
+- **Cloud Functions** do what the browser must not: the `reports` and `webauthn` HTTP functions, which Hosting
+  rewrites `/api/reports/**` and `/api/webauthn/**` to; the `deleteMyAccount` callable; and the triggers that merge
+  contacts, send pushes and cut billing. The browser calls the HTTP functions with `callFunction`
+  (`lib/functions/call.ts`), which sends the Firebase ID token, and each checks it with the guard
+  (`functions/src/http/guard.ts`). See [Cloud Functions](../apps/functions.md) and [auth](../security/auth.md).
 - **Balances** are computed in memory on each render by the split engine in `lib/splitify/`, called from
   `app/(platform)/(app)/_utils/calculation.ts`. Nothing about balances is stored. See
   [split types](../domain/split-types.md) and [debt simplification](../domain/debt-simplification.md).
-- **Data** is Prisma over MySQL (`prisma/schema.prisma`, client in `lib/db.ts`). See [data model](../data/model.md).
-- **Auth** is Clerk, enforced by `proxy.ts`. See [auth](../security/auth.md).
+- **Auth** is Firebase Auth, checked in the browser by `RequireAuth` and on every function by the guard. See
+  [auth](../security/auth.md).
 
 ## Jobs and queues
 
-There are no background jobs or queues. Each server action writes its `Activity` row in the same transaction as its
-change, then sends its pushes after the response with `notifyAfterResponse` (`lib/notification/notify.ts`), which
-calls OneSignal through `lib/onesignal.ts`; a failed push doesn't fail the action. See
-[activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
+There are no queues. Each change writes its `Activity` row in the same SQL Connect mutation, and a Cloud Functions
+trigger on that mutation sends the pushes through FCM ([notifications](../features/notifications.md),
+[activity and notifications](../decisions/activity-and-notifications-in-actions.md)); a failed push never fails the
+change. A Pub/Sub trigger runs the [budget kill switch](../decisions/budget-kill-switch.md).
 
 ## Data flow
 
-1. A signed-in person submits a form; the client calls a server action through `useAction` (`hooks/use-action.ts`).
-2. The action checks `auth()` from Clerk and the caller's group membership, writes the change and its `Activity` row
-   with Prisma in one transaction, calls `revalidatePath`, and returns `{ data }` or `{ error, debugMessage }`.
-3. After the response, the action pushes to the group's members through OneSignal.
-4. Pages re-render; balance screens recompute balances from the group's expenses, payments and splits.
+1. A signed-in person submits a form; a `lib/data/` hook runs a SQL Connect mutation with their Firebase ID token.
+2. SQL Connect checks the caller against the schema's auth rules, writes the change and its `Activity` row, and the
+   hook invalidates the affected queries.
+3. A function trigger on the mutation pushes to the group's members through FCM.
+4. The screens re-render; balance screens recompute balances from the group's expenses, payments and splits.
 
-User rows are created and updated by Clerk's webhook, `POST /api/webhook/clerk` (see
-[Clerk](../integrations/clerk.md)), or as offline contacts by `createContact`.
+User rows are created on first sign-in by the `UpsertMe` mutation, and offline contacts by the contact screens
+([contact identity](../domain/contact-identity.md)).
 
 ## History
 
 - 2026-11-05: pushes and activity were sent by `/api/push-notification` routes the browser called after each action; now each action writes its activity and sends its pushes itself, because the security fixes removed those routes. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 - 2026-11-05: added the hosting build, because the public pages are served from Firebase Hosting first.
+- 2026-11-05: was a Next.js server (server actions, `/api` route handlers, Prisma over MySQL, Clerk, OneSignal); now one static build served by Firebase Hosting, with SQL Connect and Cloud Functions behind it, because spec 2c removed the server. See [static build on Firebase Hosting](../decisions/static-build-on-firebase-hosting.md).
 
 ## Sources
 
 - `next.config.mjs`
-- `proxy.ts`
-- `lib/safe-actions.ts`
-- `hooks/use-action.ts`
-- `utils/api.ts`
-- `lib/db.ts`
-- `prisma/schema.prisma`
-- `lib/notification/notify.ts`
-- `lib/onesignal.ts`
+- `firebase.json`
+- `lib/functions/call.ts`
+- `functions/src/http/guard.ts`
+- `functions/src/index.ts`
+- `lib/data/client.ts`
+- `components/auth/require-auth.tsx`
 - `app/(platform)/(app)/_utils/calculation.ts`

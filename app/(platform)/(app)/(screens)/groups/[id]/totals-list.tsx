@@ -4,7 +4,7 @@ import { RUPEE_SYMBOL } from "@/constants/ui";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo } from "react";
 import { evaluateTotals } from "@/app/(platform)/(app)/_utils/calculation";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
 import { fixedNum } from "@/utils/validate";
 
 export const TotalsList = ({
@@ -12,10 +12,10 @@ export const TotalsList = ({
 }: {
   expenses: ExpenseWithPaymentWithSplit[] | null;
 }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const data = useMemo(
-    () => evaluateTotals(expenses, user?.id),
-    [expenses, user?.id],
+    () => evaluateTotals(expenses, user?.uid),
+    [expenses, user?.uid],
   );
 
   return (
@@ -34,10 +34,6 @@ export const TotalsList = ({
           {fixedNum(data?.yours)}
         </div>
       </div>
-      {/* <div>
-        <div>Total group spending</div>
-        <div>-</div>
-      </div> */}
     </div>
   );
 };

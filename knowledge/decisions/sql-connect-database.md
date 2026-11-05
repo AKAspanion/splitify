@@ -42,12 +42,13 @@ The developer already has a GCP project for it, `splitify-416321`.
 
 ## History
 
+- 2026-11-05: wrote the paths of files that spec 2c removed (lib/db.ts, prisma/schema.prisma) as plain text, so verify no longer expects them; the decision itself is unchanged.
 - 2026-11-04: Clerk was the sign-in, bridged to Firebase Auth by a custom-token function; now Firebase Auth is the sign-in, because the database starts empty and the bridge added a function, a webhook and a second vendor. See [Firebase Auth](firebase-auth.md).
 - 2026-11-04: the old MySQL rows were to be migrated; now SQL Connect starts empty, because the old database was deleted for inactivity.
 - 2026-11-04: the Clerk session was exchanged through Clerk's Firebase integration; now a Cloud Function of ours mints the custom token, because Clerk has deprecated that integration and new apps can't enable it.
 
 ## Sources
 
-- `prisma/schema.prisma`
-- `lib/db.ts`
+- prisma/schema.prisma
+- lib/db.ts
 - `package.json`

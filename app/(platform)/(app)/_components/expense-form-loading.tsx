@@ -1,5 +1,9 @@
 import { FormInputLoading } from "@/components/form/form-input-loading";
+import { NoData } from "@/components/no-data";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toUserMessage } from "@/lib/data/errors";
+import Link from "next/link";
 
 const ExpenseFormLoading = ({ add }: { add?: boolean }) => {
   return (
@@ -32,3 +36,36 @@ const ExpenseFormLoading = ({ add }: { add?: boolean }) => {
 };
 
 export default ExpenseFormLoading;
+
+export const NOT_FOUND_TEXT =
+  "We couldn't find that. It may have been deleted, or you may not be a member.";
+
+/** What an expense screen shows when its record came back `null`. */
+export const ExpenseNotFound = () => (
+  <NoData
+    title={NOT_FOUND_TEXT}
+    action={
+      <Link href="/groups">
+        <Button variant="secondary">Go to groups</Button>
+      </Link>
+    }
+  />
+);
+
+/** What an expense screen shows when its read failed. */
+export const ExpenseLoadError = ({
+  error,
+  onRetry,
+}: {
+  error: unknown;
+  onRetry: () => void;
+}) => (
+  <NoData
+    title={toUserMessage(error)}
+    action={
+      <Button variant="secondary" onClick={onRetry}>
+        Try again
+      </Button>
+    }
+  />
+);
