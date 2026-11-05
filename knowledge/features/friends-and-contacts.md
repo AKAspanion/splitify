@@ -28,6 +28,12 @@ generated:
   with the new email filled in.
 - Edit contact: `app/(platform)/(app)/(forms)/friends/[id]/edit/contact/page.tsx`, calling `updateContact`.
 
+## Data
+
+On the hosted site these screens use `lib/data/people.ts` over [SQL Connect](../data/sql-connect.md): `useFriends`, `useFriend`,
+`useSharedGroups`, `useSearchUser`, `useAddFriend`, `useCreateContact` and `useUpdateContact`. A contact's id is `spuser_`
+plus a random id made in the browser (`contactId`), as the connector requires.
+
 ## Rules
 
 - A person can't befriend themselves (`createFriend` refuses).
@@ -35,6 +41,10 @@ generated:
 - How a contact becomes a real user when they sign up is in [contact identity](../domain/contact-identity.md).
 - `updateContact` changes any user's name and email, not only the caller's contacts:
   [missing authorization on writes](../findings/missing-authorization-on-writes.md).
+
+## History
+
+- 2026-11-05: used server actions; now `lib/data/people.ts`, because spec 2b moved the screens onto SQL Connect.
 
 ## Sources
 
@@ -52,3 +62,4 @@ generated:
 - `actions/create-friend/index.ts`
 - `actions/create-contact/index.ts`
 - `actions/update-contact/index.ts`
+- `lib/data/people.ts`

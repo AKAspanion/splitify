@@ -24,8 +24,8 @@ generated:
 ## Under SQL Connect
 
 A contact is a `User` with `signedUp: false` and an `spuser_` id; a signed-up person's id is their Firebase uid
-([schema](sql-connect.md)). `email` is indexed but not unique, so `CreateContact` itself refuses an email another row
-already has. Planned for the running app in spec 2.
+([schema](sql-connect.md)); a contact's id is `spuser_` plus a random id made in the browser (`contactId` in `lib/data/people.ts`). `email` is indexed but not unique, so `CreateContact` itself refuses an email another row
+already has.
 
 ## Rules
 
@@ -35,6 +35,7 @@ already has. Planned for the running app in spec 2.
 
 ## History
 
+- 2026-11-05: a contact's id was made by an action; now in the browser, because spec 2b has no server for it.
 - 2026-11-04: added the SQL Connect shape, because its schema was built.
 
 ## Sources
@@ -47,3 +48,4 @@ already has. Planned for the running app in spec 2.
 - `app/api/webhook/clerk/route.ts`
 - `app/(platform)/(app)/(screens)/friends/[id]/friend-details.tsx`
 - `app/(platform)/(app)/(screens)/friends/[id]/verify-details.tsx`
+- `lib/data/people.ts`

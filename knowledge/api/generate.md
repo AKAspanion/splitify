@@ -25,7 +25,7 @@ after the group:
 
 - `POST /api/generate/excel/expense`: an `.xlsx` with one row per expense, followed by a row per member who paid or
   owes on it, with `paid` and `owed`. This is the one the group screen's download button uses
-  (`app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx`), with `/api/generate/text/expense`.
+  (`app/(platform)/(app)/(screens)/groups/[id]/_components/download-report.tsx`), with `/api/generate/text/expense`. The hosted site hides that button until these routes are Cloud Functions (spec 2c).
 - `POST /api/generate/csv/expense`: despite its path, an `.xlsx` of the expenses only (description, amount,
   category, type), on a sheet named `Group 1`.
 - `POST /api/generate/text/expense`: a comma-separated `.txt` of the same four columns.
@@ -37,6 +37,10 @@ Workbooks are built by `generateXLS` in `lib/excel.ts`.
 - `401` without a session, `400` without `groupId`, `404` when the group has no expenses.
 - None checks that the caller belongs to the group: see
   [missing membership checks on reads](../findings/missing-group-membership-checks-on-reads.md).
+
+## History
+
+- 2026-11-05: the group screen offered the download; now hidden on the hosted site, because spec 2b leaves reports to 2c.
 
 ## Sources
 

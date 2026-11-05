@@ -35,12 +35,15 @@ drawer). The expense screen then shows who paid, the caller's share, and each me
 
 ## Under SQL Connect
 
-Reading, editing and deleting an expense is limited to members of its group, written in the operations in
-`dataconnect/app/expenses.gql`; creating one is in the `expense` connector
-([schema and connectors](../data/sql-connect.md)). Planned for the running app in spec 2.
+The screens read and write through `lib/data/expenses.ts` (`useExpense`, `useCreateExpense`, `useUpdateExpense`,
+`useDeleteExpense`) and `lib/data/expense-writes.ts`. Reading, editing and deleting an expense is limited to members of its
+group, written in the operations in `dataconnect/app/expenses.gql`; creating one is in the `expense` connector
+([schema and connectors](../data/sql-connect.md)). Every id is made in the browser with `crypto.randomUUID()`. The caller's
+line on an expense is the net amount ([balances](balances.md)).
 
 ## History
 
+- 2026-11-05: planned for the running app; now the screens use it, because spec 2b moved them onto SQL Connect.
 - 2026-11-04: added the SQL Connect limits, because the expense operations were built.
 
 ## Sources
@@ -58,3 +61,5 @@ Reading, editing and deleting an expense is limited to members of its group, wri
 - `actions/delete-expense/index.ts`
 - `constants/ui.ts`
 - `dataconnect/app/expenses.gql`
+- `lib/data/expenses.ts`
+- `lib/data/expense-writes.ts`

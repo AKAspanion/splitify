@@ -43,10 +43,12 @@ generated:
 ([the hosting build](../apps/splitify.md)). It does need the generated Prisma client and SQL Connect SDK, and the
 `functions/` dependencies, because `next build` typechecks the whole project. `yarn check:hosting` (`scripts/check-hosting-build.mjs`) then serves
 `out/` on the Hosting emulator (port in `firebase.json`, project `demo-splitify`) and checks which pages and headers it
-answers with.
+answers with: each area's pages and requests are in a manifest under `scripts/hosting-pages/*.json`, and the id routes
+answer through the rewrites in `firebase.json` ([the hosting build](../apps/splitify.md)).
 
 ## History
 
+- 2026-11-05: the hosting check read one list of pages; now one manifest per area and the id-route rewrites, because spec 2b added the signed-in screens.
 - 2026-11-05: the rules config skipped `lib/data/`; now it includes the `*.rules.test.ts` files there, because the expense writes' emulator test lives beside the code.
 - 2026-11-05: added the hosting build and its check, because the public pages are served from Firebase Hosting.
 - 2026-11-04: added the rule tests and SDK generation, because the SQL Connect schema and its rules were built.

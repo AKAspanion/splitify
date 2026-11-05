@@ -66,6 +66,13 @@ people-facing text for a failure), `search.ts` (`escapeSearch`, for `ListMyGroup
 `expense-writes.ts` (`createExpense` and `createSettlement`, typed wrappers over `mutationRef` that add `expenseId`
 to each payment and split row themselves).
 
+`lib/data/` also holds one file per area, each exporting TanStack Query hooks over the generated SDK and the invalidation a
+write needs: `groups.ts`, `expenses.ts`, `people.ts`, `activity.ts`, `feedback.ts`, `profile.ts`, and `ledger.ts`
+(the balances adapter, [balances](../features/balances.md)). Every generated query is called with `FRESH` from `client.ts`
+(`fetchPolicy: "SERVER_ONLY"`): the SDK's default `PREFER_CACHE` answered a query it had run before from its own copy
+and showed stale data after a write, and TanStack Query is the cache. `GetGroupLedger` returns each expense's `type`,
+because the split engine needs `EQUAL` apart from `EXACT`.
+
 ## Tests
 
 The rules are tested on the Auth and SQL Connect emulators ([run locally](../operations/run-locally.md)), in
@@ -73,6 +80,7 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 
 ## History
 
+- 2026-11-05: had the core of the data layer; now a hook file per area and the `FRESH` fetch policy, because spec 2b moved the screens onto it.
 - 2026-11-05: had nine tables and no client layer; now also `PushToken`, `DeleteGroup`'s title and `lib/data/`, because spec 2a added push through FCM and the data layer's core.
 
 ## Sources
@@ -91,3 +99,11 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 - `lib/data/search.ts`
 - `lib/data/expense-writes.ts`
 - `lib/data/expense-writes.rules.test.ts`
+- `lib/data/groups.ts`
+- `lib/data/expenses.ts`
+- `lib/data/people.ts`
+- `lib/data/activity.ts`
+- `lib/data/feedback.ts`
+- `lib/data/profile.ts`
+- `lib/data/ledger.ts`
+- `dataconnect/app/expenses.gql`

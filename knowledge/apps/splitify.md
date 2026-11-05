@@ -47,6 +47,21 @@ is the page Hosting serves for every other route.
 - The landing page and navbar are the exception: they read the Firebase Auth state (`useAuth`) and show the signed-in or
   signed-out view, and the sign-in, sign-up and forgot-password screens are hosted routes ([sign in](../features/sign-in.md)).
 - `app/analytics.tsx` renders nothing in this build, since `/_vercel/insights` doesn't exist on Hosting.
+- The signed-in screens are in this build too. `app/(platform)/(app)/layout.hosting.tsx` is their shell: `RequireAuth`
+  around the navbars, the [verify-email banner](../security/auth.md) (`components/auth/verify-email-banner.tsx`) and the
+  page; `(screens)/layout.hosting.tsx` mounts the Add Expense button, because the hosting build reads only
+  `layout.hosting.tsx` files, never `layout.tsx`. The navbars read `useAuth` and show initials, since `AuthUser` has no photo.
+  Screens read and write through [SQL Connect](../data/sql-connect.md) hooks, not server actions.
+- A route with an id segment is built once, with the placeholder `_` (`generateStaticParams`), and `firebase.json` rewrites
+  every real id to that page, most specific path first, before the coming-soon catch-all. The screen reads the real ids
+  from the address with `useRouteIds` (`hooks/use-route-ids.ts`), never from the page's params. Such a route's
+  `page.hosting.tsx` is a small server wrapper that renders the client page beside `generateStaticParams`: Next refuses
+  `generateStaticParams` re-exported next to a `"use client"` default.
+- `yarn check:hosting` (`scripts/check-hosting-build.mjs`) reads one manifest per area from `scripts/hosting-pages/*.json`:
+  the pages that must exist in `out/` and the requests that must answer 200 with given text.
+- `components/providers.tsx` makes one `QueryClient` per mount (through `useState`): one made on every render left
+  invalidation after a write reaching nobody.
+- A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`).
 - Known and harmless: on `/privacy` and `/delete-account` the biometric lock fetches `/api/webauthn/devices`, which
   Hosting answers with the coming-soon page; the failed parse is caught silently.
 
@@ -98,6 +113,7 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 
 ## History
 
+- 2026-11-05: the hosting build had only the public pages and sign-in; now it holds the signed-in screens, their shell and the id routes, because spec 2b moved the screens onto SQL Connect. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build's landing page always showed the signed-out view; now it follows Firebase Auth and has the sign-in screens, because spec 2a moved sign-in to Firebase. See [decision](../decisions/firebase-auth.md).
 - 2026-11-05: added the hosting build target and its Clerk stub, because the public pages go to Firebase Hosting before the app moves. See [decision](../decisions/public-pages-on-firebase-hosting-first.md).
 - 2026-11-04: was Next.js 14 with Clerk's `authMiddleware` in `middleware.ts`; now Next.js 16 with `clerkMiddleware` in `proxy.ts`. See [upgrade](../decisions/upgrade-all-dependencies.md).
@@ -120,3 +136,10 @@ The API's routes are in [app API](../api/app.md), [server actions](../api/server
 - `app/(platform)/(app)/layout.tsx`
 - `app/manifest.webmanifest`
 - `proxy.ts`
+- `app/(platform)/(app)/(screens)/layout.hosting.tsx`
+- `scripts/hosting-pages/public.json`
+- `app/(platform)/(app)/layout.hosting.tsx`
+- `components/auth/verify-email-banner.tsx`
+- `hooks/use-route-ids.ts`
+- `lib/auth-redirect.ts`
+- `scripts/check-hosting-build.mjs`

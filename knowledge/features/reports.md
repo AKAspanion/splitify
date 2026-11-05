@@ -22,7 +22,13 @@ paid and owes, or a plain-text list of the expenses.
 
 ## Rules
 
+- The hosted site hides the control until the reports are a Cloud Function (spec 2c): `download-report.tsx` renders nothing there.
+
 - A group with no expenses gets "No expenses found" (`404`).
+
+## History
+
+- 2026-11-05: always shown; now hidden on the hosted site, because the report routes need a server that spec 2c moves to Cloud Functions.
 
 ## Sources
 

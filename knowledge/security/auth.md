@@ -44,13 +44,18 @@ into a new account is gated on a verified email ([contact identity](../domain/co
 - The browser's auth state is `AuthProvider` (`components/auth/auth-provider.tsx`) read through `useAuth`
   (`hooks/use-auth.ts`), with a status of loading, signed in or signed out.
 - `RequireAuth` (`components/auth/require-auth.tsx`) shows a spinner while loading and sends a signed-out person to
-  `/sign-in/?next=<path>`. It is type-checked only: no hosted page uses it yet.
+  `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`). It wraps every signed-in
+  hosted screen (`app/(platform)/(app)/layout.hosting.tsx`, and the profile).
+- While the person's email is unverified, `VerifyEmailBanner` (`components/auth/verify-email-banner.tsx`) shows above the
+  screens, with Resend email (60-second wait) and "I've verified" (reloads the user). The wording is provisional; the
+  decision names the banner but not its text.
 - The redirect target is checked by `safeNextPath`, and the screens are described in [sign in](../features/sign-in.md).
 - Signing out also removes this device's push token ([notifications](../features/notifications.md)).
 - Until the signed-in routes move to the hosting build, `proxy.ts` and Clerk still guard every route of the server app.
 
 ## History
 
+- 2026-11-05: the guard was unused; now it wraps the signed-in screens, with the verify-email banner and a home landing after sign-out, because spec 2b moved them to the hosting build.
 - 2026-11-05: the Firebase Auth section said built but unused; now says the hosted sign-in screens, the auth state and the guard use it, because spec 2a added them.
 - 2026-11-04: described the Firebase Auth pieces now built, because they exist in the code although no screen uses them yet.
 - 2026-11-04: was `authMiddleware` in `middleware.ts`, with `/api/webhook/clerk` and `/api/health-check` also in `ignoredRoutes`; now `clerkMiddleware` in `proxy.ts`, with those two simply public, because Clerk 7 removed `authMiddleware` and Next 16 renamed middleware to proxy. See [upgrade](../decisions/upgrade-all-dependencies.md).
@@ -71,3 +76,6 @@ into a new account is gated on a verified email ([contact identity](../domain/co
 - `components/auth/require-auth.tsx`
 - `hooks/use-auth.ts`
 - `lib/auth/next-path.ts`
+- `app/(platform)/(app)/layout.hosting.tsx`
+- `components/auth/verify-email-banner.tsx`
+- `lib/auth-redirect.ts`
