@@ -12,6 +12,9 @@ export type TestUser = { email: string; password: string; name: string };
 /** The emulators' `host:port` addresses, each checked to be on this machine. */
 export type EmulatorHosts = { auth: string; dataConnect: string };
 
+/** The environment variables the helpers read: `process.env` fits, and so does a plain object in a test. */
+type Env = Readonly<Record<string, string | undefined>>;
+
 /** How long the emulators get to answer, and how long each request to them may take. */
 const EMULATOR_WAIT_MS = 180_000;
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -26,9 +29,7 @@ const API_KEY = "demo-key";
  * playwright.config.ts sets from firebase.json. Throws unless each is set to a loopback `host:port` and nothing else,
  * so the tests can never create a user on, or send anything to, a real project.
  */
-export function emulatorHosts(
-  env: NodeJS.ProcessEnv = process.env,
-): EmulatorHosts {
+export function emulatorHosts(env: Env = process.env): EmulatorHosts {
   return {
     auth: localHost(env, "FIREBASE_AUTH_EMULATOR_HOST"),
     dataConnect: localHost(env, "DATA_CONNECT_EMULATOR_HOST"),
@@ -38,7 +39,7 @@ export function emulatorHosts(
 const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "localhost", "[::1]"]);
 
 /** `env[name]` as the canonical `host:port` it parses to, when that is a loopback address with a port and nothing else. */
-function localHost(env: NodeJS.ProcessEnv, name: string): string {
+function localHost(env: Env, name: string): string {
   const value = env[name]?.trim();
   if (!value)
     throw new Error(
@@ -103,7 +104,7 @@ export async function waitForEmulators(
  * client calls. Refuses, before sending anything, unless the Auth emulator's address is set and local.
  */
 export async function createTestUser(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Env = process.env,
   fetchImpl: typeof fetch = fetch,
 ): Promise<TestUser> {
   const { auth } = emulatorHosts(env);

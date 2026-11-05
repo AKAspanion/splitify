@@ -105,7 +105,7 @@ test("shows the form's error for a wrong password and stays on sign-in", async (
 test.describe("the test user fixture", () => {
   // Each address that must stop the fixture before it sends anything: unset, empty, a real host, a path, and a
   // loopback host with someone else's host after it as user info.
-  const refused: [string, NodeJS.ProcessEnv][] = [
+  const refused: [string, Record<string, string | undefined>][] = [
     ["unset", {}],
     ["empty", { FIREBASE_AUTH_EMULATOR_HOST: "" }],
     [

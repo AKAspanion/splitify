@@ -27,8 +27,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       // Firebase failed to start (a missing web config): nobody can be signed in.
+      // The state is set in a microtask, not in the effect body, which would render twice in a row.
+      let cancelled = false;
       console.error("auth: could not start Firebase Auth", error);
-      setState(SIGNED_OUT);
+      queueMicrotask(() => {
+        if (!cancelled) setState(SIGNED_OUT);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
   }, []);
 
