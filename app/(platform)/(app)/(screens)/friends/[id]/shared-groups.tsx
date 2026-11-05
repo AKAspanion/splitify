@@ -6,7 +6,7 @@ import {
 } from "@/app/(platform)/(app)/_components/group-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Group } from "@/generated/prisma/browser";
+import type { Group } from "@/types/shared";
 import { toUserMessage } from "@/lib/data/errors";
 import { useSharedGroups, type GroupSummary } from "@/lib/data/people";
 

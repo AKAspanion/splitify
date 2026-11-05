@@ -1,8 +1,4 @@
-import { getExpense } from "@/actions/get-expense";
-import { getGroup } from "@/actions/get-group";
-import { getGroupUsers } from "@/actions/get-group-users";
-import { ExpenseWithUser } from "@/types/shared";
-import { Group, User } from "@/generated/prisma/browser";
+import type { ExpenseWithUser, Group, User } from "@/types/shared";
 import { createStore } from "zustand/vanilla";
 // import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -16,10 +12,7 @@ export type GroupState = {
 };
 
 export type GroupActions = {
-  setGroup: (groupId: string) => void;
-  setExpense: (expenseId: string, groupId: string) => void;
   setGroupLoading: (groupId: string, val: boolean) => void;
-  setGroupUsers: (groupId: string) => void;
   setGroupUsersLoading: (groupId: string, val: boolean) => void;
 };
 
@@ -42,64 +35,6 @@ export const createGroupStore = (
     // persist(
     (set, get) => ({
       ...initState,
-      setExpense: async (expenseId, grp) => {
-        const expenseStore = get().expenses?.[expenseId];
-        const expenseStoreLoading = get().expenseLoading?.[expenseId];
-
-        if (expenseStore) {
-          return;
-        }
-
-        if (expenseStoreLoading) {
-          return;
-        }
-
-        set((state) => ({
-          expenseLoading: { ...(state?.expenseLoading || {}), [grp]: true },
-        }));
-
-        const { data: expense } = await getExpense(expenseId, grp);
-        if (expense) {
-          set((state) => ({
-            expenses: { ...(state?.expenses || {}), [expenseId]: expense },
-          }));
-        }
-        set((state) => ({
-          expenseLoading: { ...(state?.expenseLoading || {}), [grp]: false },
-        }));
-      },
-      setGroupUsers: async (grp) => {
-        const groupUsersStore = get().groupUsers?.[grp];
-        const groupUsersStoreLoading = get().groupUsersLoading?.[grp];
-
-        if (groupUsersStore) {
-          return;
-        }
-
-        if (groupUsersStoreLoading) {
-          return;
-        }
-
-        set((state) => ({
-          groupUsersLoading: {
-            ...(state?.groupUsersLoading || {}),
-            [grp]: true,
-          },
-        }));
-
-        const { data: users, error } = await getGroupUsers(grp);
-        if (!error) {
-          set((state) => ({
-            groupUsers: { ...(state?.groupUsers || {}), [grp]: users || [] },
-          }));
-        }
-        set((state) => ({
-          groupUsersLoading: {
-            ...(state?.groupUsersLoading || {}),
-            [grp]: false,
-          },
-        }));
-      },
       setGroupUsersLoading: (gid, load) =>
         set((state) => ({
           groupUsersLoading: {
@@ -107,35 +42,6 @@ export const createGroupStore = (
             [gid]: load,
           },
         })),
-      setGroup: async (grp) => {
-        const groupStore = get().groups?.[grp];
-        const groupStoreLoading = get().groupLoading?.[grp];
-
-        if (groupStore) {
-          return;
-        }
-
-        if (groupStoreLoading) {
-          return;
-        }
-
-        set((state) => ({
-          groupLoading: { ...(state?.groupLoading || {}), [grp]: true },
-        }));
-
-        const { data: dataGroup } = await getGroup(grp);
-        if (dataGroup) {
-          set((state) => ({
-            groups: {
-              ...(state?.groups || {}),
-              [grp]: dataGroup,
-            },
-          }));
-        }
-        set((state) => ({
-          groupLoading: { ...(state?.groupLoading || {}), [grp]: false },
-        }));
-      },
       setGroupLoading: (gid, load) =>
         set((state) => ({
           groupLoading: {

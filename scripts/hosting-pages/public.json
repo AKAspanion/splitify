@@ -3,18 +3,35 @@
     "index.html",
     "privacy/index.html",
     "delete-account/index.html",
-    "coming-soon/index.html",
     "sign-in/index.html",
     "sign-up/index.html",
-    "forgot-password/index.html"
+    "forgot-password/index.html",
+    "404.html"
   ],
   "requests": [
-    { "path": "/", "expectText": "Splitting Expenses" },
-    { "path": "/privacy", "expectText": "Privacy Policy" },
-    { "path": "/delete-account", "expectText": "Delete your account" },
-    { "path": "/sign-in", "expectText": "Sign in" },
-    { "path": "/sign-up", "expectText": "Sign up" },
-    { "path": "/forgot-password", "expectText": "Reset your password" },
-    { "path": "/coming-soon", "expectText": "Splitify is coming back soon" }
+    {
+      "path": "/",
+      "expectText": "Splitting Expenses"
+    },
+    {
+      "path": "/privacy",
+      "expectText": "Privacy Policy"
+    },
+    {
+      "path": "/delete-account",
+      "expectText": "Delete your account"
+    },
+    {
+      "path": "/sign-in",
+      "expectText": "Sign in"
+    },
+    {
+      "path": "/sign-up",
+      "expectText": "Sign up"
+    },
+    {
+      "path": "/forgot-password",
+      "expectText": "Reset your password"
+    }
   ]
 }

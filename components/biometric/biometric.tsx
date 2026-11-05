@@ -12,7 +12,7 @@ import { startAuthentication } from "@simplewebauthn/browser";
 import { toast } from "sonner";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
 
 const publicRoutes = ["/webauthn", "/profile", "/sign-in", "/sign-out"];
 
@@ -22,7 +22,7 @@ export const Biometric = () => {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const { user } = useUser();
+  const { user } = useAuth();
 
   const begin = async () => {
     const verified = sessionStorage.getItem("verified") === "true";
@@ -91,7 +91,7 @@ export const Biometric = () => {
 
   useEffect(() => {
     if (
-      (user?.id,
+      (user?.uid,
       pathname &&
         prevPath !== pathname &&
         !publicRoutes.some((r) => pathname.includes(r)))
@@ -100,7 +100,7 @@ export const Biometric = () => {
       onVerify();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, pathname]);
+  }, [user?.uid, pathname]);
 
   return (
     <Dialog open={open}>

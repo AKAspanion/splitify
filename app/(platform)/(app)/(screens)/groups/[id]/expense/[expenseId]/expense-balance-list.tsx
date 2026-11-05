@@ -5,7 +5,7 @@ import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 
 export const BalanceList = ({
   expense,

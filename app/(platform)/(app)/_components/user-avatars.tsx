@@ -1,7 +1,7 @@
 import { ListItem } from "@/components/list-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import Image from "next/image";
 
 type UserAvatarsProps = { users?: User[] | null; action: React.ReactNode };

@@ -1,7 +1,5 @@
-import { Activity } from "@/generated/prisma/browser";
 import { createStore } from "zustand/vanilla";
-// import { persist, createJSONStorage } from "zustand/middleware";
-import { getActivities } from "@/actions/get-activities";
+import type { Activity } from "@/types/shared";
 
 export type ActivityState = {
   activities: Activity[];
@@ -11,9 +9,7 @@ export type ActivityState = {
 };
 
 export type ActivityActions = {
-  addActivities: () => void;
   clearActivities: () => void;
-  // setPage: (groupId: string, val: number) => void;
 };
 
 export type ActivityStore = ActivityState & ActivityActions;
@@ -29,46 +25,8 @@ export const createActivityStore = (
   propState: Partial<ActivityState> = defaultInitState,
 ) => {
   const initState = { ...defaultInitState, ...propState };
-  return createStore<ActivityStore>()(
-    // persist(
-    (set, get) => ({
-      ...initState,
-      addActivities: async () => {
-        const page = get().page || 0;
-        const tCount = get().count;
-        const totalCount = tCount === undefined ? Infinity : tCount;
-        const activitiesCount = get().activities?.length || 0;
-
-        const canLoad = activitiesCount < totalCount;
-        if (!canLoad) {
-          return;
-        }
-        set(() => ({ pageLoading: true }));
-
-        const nextPage = page + 1;
-        const { data, error } = await getActivities(nextPage);
-        if (!error) {
-          set((state) => ({
-            page: nextPage,
-            count: data?.count,
-            activities: [
-              ...(state?.activities || []),
-              ...(data?.activities || []),
-            ],
-          }));
-        }
-        set(() => ({ pageLoading: false }));
-      },
-      clearActivities: () => set(() => ({ activities: [] })),
-      // setPage: (grp, v) =>
-      //   set((state) => ({
-      //     activities: { ...(state?.page || {}), [grp]: v },
-      //   })),
-    }),
-    //   {
-    //     name: "activity-storage",
-    //     storage: createJSONStorage(() => sessionStorage),
-    //   },
-    // ),
-  );
+  return createStore<ActivityStore>()((set) => ({
+    ...initState,
+    clearActivities: () => set(() => ({ activities: [] })),
+  }));
 };

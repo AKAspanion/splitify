@@ -1,9 +1,0 @@
-{
-  "pages": [],
-  "requests": [
-    {
-      "path": "/webauthn/register",
-      "expectText": "Splitify is coming back soon"
-    }
-  ]
-}

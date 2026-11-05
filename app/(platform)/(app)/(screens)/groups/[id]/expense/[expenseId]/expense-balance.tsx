@@ -4,7 +4,7 @@ import BalanceSummaryList from "./expense-balance-summary-list";
 import BalanceList from "./expense-balance-list-wrapper";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import type { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 
 const Balance = ({

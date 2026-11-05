@@ -19,7 +19,7 @@ import {
   type MyGroup,
 } from "@/lib/data/expenses";
 import { FormErrors } from "@/components/form/form-errors";
-import { ExpenseType } from "@/generated/prisma/browser";
+import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
 import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
@@ -39,7 +39,7 @@ const FormComp = ({ groups }: FormProps) => {
   const [total, setTotal] = useState<number>(0);
   const [tag, setTag] = useState<string>("expense");
   const [category, setCategory] = useState<string>("general");
-  const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
+  const [splitType, setSplitType] = useState<ExpenseType>(ExpenseType.EQUAL);
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(normalizeId(paramsGroupId));
 

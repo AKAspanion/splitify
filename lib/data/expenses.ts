@@ -16,7 +16,7 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from "@tanstack/react-query";
-import type { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import { dc, FRESH, queryKeys } from "./client";
 import {
   createExpense,

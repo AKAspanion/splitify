@@ -45,7 +45,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 | `dependabot.yml` | Weekly | Grouped dependency and GitHub Actions updates |
 
 Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI always runs as
-`npx --yes firebase-tools@15.34.2`. The signed-in web app itself is not deployed by these workflows; only the public pages (`yarn build:hosting`, written to `out/`) are, and a public page that stops exporting fails the CI build.
+`npx --yes firebase-tools@15.34.2`. The whole site is one static export (`yarn build`, written to `out/`), and a page that stops exporting fails the CI build.
 
 `deploy.yml` reads these repository settings (Settings > Secrets and variables > Actions) and fails with a message
 naming what is missing, before anything installs:

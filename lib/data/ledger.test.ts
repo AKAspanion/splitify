@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { GetGroupLedgerData } from "@dataconnect/app";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
-import type { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import {
   calcGroupSplits,
   evaluateTotals,

@@ -1,4 +1,4 @@
-import { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { BalanceList } from "./expense-balance-list";
 

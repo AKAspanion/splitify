@@ -1,6 +1,6 @@
 "use client";
 import { calcGroupSplits } from "@/app/(platform)/(app)/_utils/calculation";
-import type { User } from "@/generated/prisma/browser";
+import type { User } from "@/types/shared";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";

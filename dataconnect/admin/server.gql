@@ -1,0 +1,85 @@
+# Used only by the Cloud Functions that answer the browser (reports, WebAuthn, account deletion), as the admin: no
+# signed-in person can call these, so each function checks who is asking before it runs one.
+
+# The caller's membership row of the group, or null when they are not in it (or the group does not exist).
+query IsGroupMember($groupId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  groupMember(key: { groupId: $groupId, userId: $userId }) {
+    groupId
+    userId
+  }
+}
+
+# What the expense reports print: the group's title and every expense, with who paid and who owes and their names.
+query GetGroupLedgerAdmin($groupId: UUID!) @auth(level: NO_ACCESS) {
+  group(id: $groupId) {
+    id
+    title
+    currency
+  }
+  expenses(
+    where: { groupId: { eq: $groupId } }
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    amount
+    currency
+    description
+    category
+    tag
+    type
+    createdAt
+    creator {
+      id
+      name
+    }
+    payments: userPayments_on_expense {
+      amount
+      user {
+        id
+        name
+      }
+    }
+    splits: userSplits_on_expense {
+      amount
+      percent
+      user {
+        id
+        name
+      }
+    }
+  }
+}
+
+# Replaces what identifies the person on their row. Their id, their memberships and every expense, payment and
+# split stay (decisions/anonymise-deleted-accounts), so other members' balances do not change.
+mutation AnonymiseUser(
+  $userId: String!
+  $name: String!
+  $email: String!
+  $imageUrl: String!
+) @auth(level: NO_ACCESS) {
+  user_update(
+    key: { id: $userId }
+    data: {
+      name: $name
+      firstName: null
+      lastName: null
+      email: $email
+      imageUrl: $imageUrl
+    }
+  )
+}
+
+# Removes the data that is the person's alone: their push tokens, feedback, devices and friendships. Memberships,
+# payments and splits are shared records and stay.
+mutation DeleteUserData($userId: String!) @auth(level: NO_ACCESS) @transaction {
+  pushToken_deleteMany(where: { userId: { eq: $userId } })
+  feedback_delete(key: { userId: $userId })
+  authnDevice_delete(key: { userId: $userId })
+  friendshipdeleteMany0: friendship_deleteMany(
+    where: { userId: { eq: $userId } }
+  )
+  friendshipdeleteMany1: friendship_deleteMany(
+    where: { friendId: { eq: $userId } }
+  )
+}
