@@ -24,7 +24,7 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
 
 - `app/layout.tsx`: the root layout. It loads Google AdSense (`app/adsense.tsx`), the theme provider and
   `components/providers.tsx` (Firebase auth state, react-query, the confirm dialog, the progress bar).
-- `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the device for push
+- `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the one service worker ([service worker](../operations/service-worker.md)) and the device for push
   ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups`.
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
@@ -56,7 +56,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
   `generateStaticParams` re-exported next to a `"use client"` default.
 - `yarn check:hosting` (`scripts/check-hosting-build.mjs`) reads one manifest per area from `scripts/hosting-pages/*.json`:
   the pages that must exist in `out/` and the requests that must answer 200 with given text.
-- `components/providers.tsx` makes one `QueryClient` per mount (through `useState`): one made on every render left
+- `components/providers.tsx` keys a `PersistQueryClientProvider` by the signed-in uid, because the saved cache is read only at mount ([offline](../features/offline.md)), and makes one `QueryClient` per mount (through `useState`): one made on every render left
   invalidation after a write reaching nobody.
 - A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`).
 - Known and harmless: on `/privacy` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
@@ -111,6 +111,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-05: had no offline support; now a saved cache, a service worker and queued writes, because spec 4 was built. See [offline](../features/offline.md).
 - 2026-11-05: was a Next.js server with a separate hosting build target, a coming-soon page and a Clerk stub; now one static build with a 404 page, and `firebase.emulators.json` generated for local checks, because spec 2c removed the server, Clerk, OneSignal, UploadThing and Vercel analytics. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build had only the public pages and sign-in; now it holds the signed-in screens, their shell and the id routes, because spec 2b moved the screens onto SQL Connect. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting build's landing page always showed the signed-out view; now it follows Firebase Auth and has the sign-in screens, because spec 2a moved sign-in to Firebase. See [decision](../decisions/firebase-auth.md).
@@ -141,3 +142,6 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 - `hooks/use-route-ids.ts`
 - `lib/auth-redirect.ts`
 - `scripts/check-hosting-build.mjs`
+- `components/providers.tsx`
+- `public/sw.js`
+- `lib/offline/persist.ts`

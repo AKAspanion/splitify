@@ -39,6 +39,14 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
 - If `UpsertMe` fails after Firebase sign-in succeeds, the form shows the error, but the signed-in state still
   redirects to `next`.
 
+## Offline
+
+The sign-in, sign-up and forgot-password screens say "You're offline. Connect to sign in." and disable their buttons (`components/offline/offline-sign-in-note.tsx`). Sign-out deletes the saved offline cache.
+
+## History
+
+- 2026-11-05: had nothing about offline; now the screens are disabled offline and sign-out deletes the cache, because the offline feature was built. See [offline](offline.md).
+
 ## Sources
 
 - `app/(platform)/(auth)/sign-in/sign-in-form.tsx`
@@ -47,3 +55,4 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
 - `lib/auth/auth-errors.ts`
 - `lib/auth/next-path.ts`
 - `lib/firebase/auth.ts`
+- `components/offline/offline-sign-in-note.tsx`

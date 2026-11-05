@@ -19,7 +19,7 @@ person can allow notifications in the browser. Who gets which push is in [Cloud 
 ## Devices
 
 - `lib/push/register.ts`: `registerWebPush` asks permission, gets the browser's FCM token (service worker
-  `public/firebase-messaging-sw.js`, public VAPID key `NEXT_PUBLIC_FIREBASE_VAPID_KEY`) and registers it with `RegisterMyPushToken`; `listenForIosToken` registers the token the iOS wrapper hands
+  `public/sw.js`, the one service worker the offline cache shares ([service worker](../operations/service-worker.md)), public VAPID key `NEXT_PUBLIC_FIREBASE_VAPID_KEY`) and registers it with `RegisterMyPushToken`; `listenForIosToken` registers the token the iOS wrapper hands
   over in its `push-token` event; `unregisterThisDevice` removes this device's token. None of them ever rejects, and
   they log only the error's class, never a token.
 - The token is kept in `localStorage` under `splitify.pushToken` so sign-out knows which one to remove; sign-out
@@ -38,6 +38,7 @@ person can allow notifications in the browser. Who gets which push is in [Cloud 
 
 ## History
 
+- 2026-11-05: the browser's push worker was `public/firebase-messaging-sw.js`; now `public/sw.js`, shared with the offline cache. See [service worker](../operations/service-worker.md).
 - 2026-11-05: was a OneSignal push, sent by server actions, with OneSignal service workers; now FCM, sent by Cloud Functions, with tokens registered per device, because of [the decision](../decisions/firebase-cloud-messaging.md).
 
 ## Sources
@@ -45,7 +46,7 @@ person can allow notifications in the browser. Who gets which push is in [Cloud 
 - `lib/push/register.ts`
 - `lib/firebase/auth.ts`
 - `lib/firebase/app.ts`
-- `public/firebase-messaging-sw.js`
+- `public/sw.js`
 - `app/launch.tsx`
 - `app/(platform)/profile/notification-action.tsx`
 - `functions/src/push-activity.ts`

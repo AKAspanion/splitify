@@ -29,8 +29,13 @@ account button.
   deletion.
 - It is a client page over `lib/data/profile.ts` (`useMe`, the `GetMe` query), guarded like the other signed-in screens.
 
+## Offline
+
+Delete account is online-only ([decision](../decisions/offline-first-scope.md)).
+
 ## History
 
+- 2026-11-05: had nothing about offline; now deleting the account is disabled offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: Delete account linked to a page that explained how to ask for deletion; now it deletes the account itself through `deleteMyAccount`, because spec 2c built the function.
 
 ## Sources

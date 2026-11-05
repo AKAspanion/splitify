@@ -49,6 +49,7 @@ generated:
 
 - Unit tests are Vitest (`vitest.config.mts`), in a `*.test.ts` file beside the file they cover
   (`lib/data/expenses.test.ts`, `functions/src/http/guard.test.ts`), run by `yarn test`.
+- A service worker file can't be imported, so `lib/offline/sw-navigation.test.ts` runs `public/sw.js` in a Node `vm` context with fake globals; follow it for worker code ([service worker](../operations/service-worker.md)). Tests that touch IndexedDB use `fake-indexeddb` (`lib/firebase/auth.test.ts`).
 - SQL Connect rule tests sit beside their `.gql` file under `dataconnect/` and run on the emulators with `yarn test:rules`, not in `yarn test` ([run locally](../operations/run-locally.md)).
 - Changes are to be tested end to end through the main flows: [decision](../decisions/e2e-main-flows.md).
 
@@ -74,6 +75,7 @@ generated:
 
 ## History
 
+- 2026-11-05: did not say how a service worker or IndexedDB is tested; now the `vm` harness and `fake-indexeddb`, because the offline feature added both.
 - 2026-11-05: described server actions (`createSafeAction`, `{ error, debugMessage }`), route handlers, `@/generated/prisma` types and `resolvePageProps`; now `lib/data/` hooks, Cloud Functions with the guard, `page.hosting.tsx` wrappers and `toUserMessage`, because spec 2c removed the server.
 - 2026-11-04: added the SQL Connect rule tests and `yarn test:rules`, because the schema's rules are tested apart from `yarn test`.
 - 2026-11-04: said the repository had no tests; now Vitest unit tests sit beside the code and end-to-end tests of the main flows are decided, because tests were added and the testing question was answered. See [e2e of the main flows](../decisions/e2e-main-flows.md).
@@ -99,3 +101,6 @@ generated:
 - `tsconfig.json`
 - `package.json`
 - `app/(platform)/profile/delete-account-action.tsx`
+- `lib/firebase/auth.test.ts`
+- `lib/offline/sw-navigation.test.ts`
+- `public/sw.js`

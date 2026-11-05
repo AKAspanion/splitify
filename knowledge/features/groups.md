@@ -46,8 +46,13 @@ The dashboard was a stub and stays one.
 - Deleting a group deletes its expenses and activity ([data model](../data/model.md)).
 - Each change writes its activity row, and a function trigger sends the push ([push functions](../apps/functions.md)).
 
+## Offline
+
+Creating, deleting and changing a group are online-only: `OnlineOnly` disables them offline with "You're offline. This needs a connection." The group screens are readable offline from the saved cache ([decision](../decisions/offline-first-scope.md)).
+
 ## History
 
+- 2026-11-05: had nothing about offline; now group changes are online-only and screens read the saved cache, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: Download report was hidden, any signed-in user could change any group and pushes came from the push API; now the report is back, only members can change a group and triggers push, because spec 2c removed the server.
 - 2026-11-05: read through the API and server actions; now through `lib/data/groups.ts`, with Download report hidden, because spec 2b moved the screens onto SQL Connect.
 

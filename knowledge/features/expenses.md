@@ -42,8 +42,16 @@ group, written in the operations in `dataconnect/app/expenses.gql`; creating one
 ([schema and connectors](../data/sql-connect.md)). Every id is made in the browser with `crypto.randomUUID()`. The caller's
 line on an expense is the net amount ([balances](balances.md)).
 
+## Offline
+
+Adding an expense offline queues it: the card shows "Waiting to sync" and isn't a link, and `useCreateExpense` retries
+and rolls back as [queue offline writes](../decisions/queue-offline-writes.md) says. The add form reads the same
+queries as the group screens (`useGroupMembers` and the groups list), so it opens offline for a group the person has
+seen. Delete and edit are online-only ([offline](offline.md)).
+
 ## History
 
+- 2026-11-05: had no offline behaviour; now adding queues offline, because the offline feature was built. See [decision](../decisions/queue-offline-writes.md).
 - 2026-11-05: the creator came from the form and any signed-in user could change any expense, through server actions; now the creator is the caller and only members can, in SQL Connect, because spec 2c removed the actions.
 - 2026-11-05: planned for the running app; now the screens use it, because spec 2b moved them onto SQL Connect.
 - 2026-11-04: added the SQL Connect limits, because the expense operations were built.
@@ -63,3 +71,4 @@ line on an expense is the net amount ([balances](balances.md)).
 - `dataconnect/app/expenses.gql`
 - `lib/data/expenses.ts`
 - `lib/data/expense-writes.ts`
+- `lib/offline/queued-writes.ts`

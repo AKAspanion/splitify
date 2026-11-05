@@ -27,8 +27,13 @@ can change the amount and confirm; the app records it as a settlement and notifi
 - `user1Id` is the one who pays and `user2Id` the one paid. How a settlement is stored is in
   [settlements](../domain/settlements.md).
 
+## Offline
+
+Recording a settlement works offline: it is queued like an expense and its form opens offline for a group seen before ([decision](../decisions/queue-offline-writes.md)). The offline toast has its own wording.
+
 ## History
 
+- 2026-11-05: had nothing about offline; now a settlement queues offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: called the `createSettlement` action and the push API; now `useCreateSettlement` over SQL Connect, because spec 2b moved the screen.
 
 ## Sources

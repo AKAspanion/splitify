@@ -53,6 +53,7 @@ Hosting rewrites, and `deleteMyAccount` through the callable.
 
 ## History
 
+- 2026-11-05: the build wrote only the static site; now `postbuild` also writes the service worker's file list into `out/`, and the worker works only in that build, not `next dev`, because of offline support. See [service worker](service-worker.md).
 - 2026-11-05: needed MySQL in Docker, Clerk, OneSignal and UploadThing keys, a Prisma schema push and a health-check route; now only Node, Java and the Firebase emulators, and the build is the one static site checked with `firebase.emulators.json`, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: the hosting check read one list of pages; now one manifest per area and the id-route rewrites, because spec 2b added the signed-in screens.
 - 2026-11-05: the rules config skipped `lib/data/`; now it includes the `*.rules.test.ts` files there, because the expense writes' emulator test lives beside the code.
