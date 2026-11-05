@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { FormErrors } from "@/components/form/form-errors";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toUserMessage } from "@/lib/data/errors";
@@ -94,10 +95,18 @@ const Form = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-end items-center">
-        <Button type="submit" loading={isPending} disabled={isPending}>
-          Send
-        </Button>
+      <div className="flex flex-col items-end">
+        <OnlineOnly>
+          {(offline) => (
+            <Button
+              type="submit"
+              loading={isPending}
+              disabled={isPending || offline}
+            >
+              Send
+            </Button>
+          )}
+        </OnlineOnly>
       </div>
     </form>
   );

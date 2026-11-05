@@ -7,8 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { sendPasswordReset } from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
+import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
+import { useOnline } from "@/hooks/use-online";
 
 export function ForgotPasswordForm() {
+  const online = useOnline();
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -66,11 +69,12 @@ export function ForgotPasswordForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={pending}
+          disabled={pending || !online}
           loading={pending}
         >
           Send reset link
         </Button>
+        <OfflineSignInNote />
       </form>
       <p className="text-center text-sm">
         <Link

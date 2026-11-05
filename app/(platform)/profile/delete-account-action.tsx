@@ -2,6 +2,7 @@
 
 import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { markSignOutIntended } from "@/lib/auth-redirect";
 import { toUserMessage } from "@/lib/data/errors";
 import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
@@ -69,9 +70,19 @@ export default function DeleteAccountAction() {
   };
 
   return (
-    <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-      <Trash2Icon />
-      <div>{deleting ? "Deleting account" : "Delete account"}</div>
-    </Button>
+    <div className="flex flex-col">
+      <OnlineOnly>
+        {(offline) => (
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleting || offline}
+          >
+            <Trash2Icon />
+            <div>{deleting ? "Deleting account" : "Delete account"}</div>
+          </Button>
+        )}
+      </OnlineOnly>
+    </div>
   );
 }

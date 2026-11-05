@@ -2,6 +2,7 @@
 
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -82,10 +83,18 @@ const Form = ({
         Contact added here is synced up after your friend signs up with the same
         email id. Make sure you are using the correct email id.
       </div>
-      <div className="flex justify-end items-center">
-        <Button type="submit" loading={isPending} disabled={isPending}>
-          Add
-        </Button>
+      <div className="flex flex-col items-end">
+        <OnlineOnly>
+          {(offline) => (
+            <Button
+              type="submit"
+              loading={isPending}
+              disabled={isPending || offline}
+            >
+              Add
+            </Button>
+          )}
+        </OnlineOnly>
       </div>
     </form>
   );

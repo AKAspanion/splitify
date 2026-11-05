@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { callFunction } from "@/lib/functions/call";
 import {
   startAuthentication,
@@ -122,24 +123,41 @@ const AuthnActions = ({ onChange }: AuthnActionsProps) => {
     }
   };
 
-  const disabled = registerLoading || verifyLoading || removeLoading;
+  const busy = registerLoading || verifyLoading || removeLoading;
 
   return (
-    <div className="flex flex-wrap gap-6">
-      <Button disabled={disabled} loading={registerLoading} onClick={register}>
-        Register
-      </Button>
-      <Button disabled={disabled} loading={verifyLoading} onClick={verify}>
-        Verify
-      </Button>
-      <Button
-        disabled={disabled}
-        loading={removeLoading}
-        variant="destructive"
-        onClick={remove}
-      >
-        Remove authentication
-      </Button>
+    <div className="flex flex-col gap-2">
+      <OnlineOnly>
+        {(offline) => {
+          const disabled = busy || offline;
+          return (
+            <div className="flex flex-wrap gap-6">
+              <Button
+                disabled={disabled}
+                loading={registerLoading}
+                onClick={register}
+              >
+                Register
+              </Button>
+              <Button
+                disabled={disabled}
+                loading={verifyLoading}
+                onClick={verify}
+              >
+                Verify
+              </Button>
+              <Button
+                disabled={disabled}
+                loading={removeLoading}
+                variant="destructive"
+                onClick={remove}
+              >
+                Remove authentication
+              </Button>
+            </div>
+          );
+        }}
+      </OnlineOnly>
     </div>
   );
 };

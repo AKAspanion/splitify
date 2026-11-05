@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { Action } from "./action";
 import { Header } from "@/components/container/header";
 import { ListItem } from "@/components/list-item";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { useRouteIds } from "@/hooks/use-route-ids";
 import {
   toUserModel,
@@ -90,16 +91,31 @@ const AddMember = () => {
   return (
     <AutoContainer header={header}>
       <div className="pb-6 flex flex-col gap-6">
-        <Link href={addFriendUrl}>
-          <ListItem title="Add a friend" icon={<UserPlusIcon />} />
-        </Link>
-        {friendsNotInGroup.map((d) => (
-          <UserCard
-            user={toUserModel(d)}
-            key={d.id}
-            actions={<Action groupId={id} memberId={d.id} />}
-          />
-        ))}
+        <OnlineOnly>
+          {(offline) => (
+            <>
+              {offline ? (
+                <div aria-disabled className="opacity-50 cursor-not-allowed">
+                  <ListItem title="Add a friend" icon={<UserPlusIcon />} />
+                </div>
+              ) : (
+                <Link href={addFriendUrl}>
+                  <ListItem title="Add a friend" icon={<UserPlusIcon />} />
+                </Link>
+              )}
+              {/* A disabled fieldset disables every button inside it. */}
+              <fieldset disabled={offline} className="contents">
+                {friendsNotInGroup.map((d) => (
+                  <UserCard
+                    user={toUserModel(d)}
+                    key={d.id}
+                    actions={<Action groupId={id} memberId={d.id} />}
+                  />
+                ))}
+              </fieldset>
+            </>
+          )}
+        </OnlineOnly>
         <div>
           {friendsInGroup.length === 0 ? null : (
             <div className="pb-3 font-semibold text-normal">Added in group</div>
