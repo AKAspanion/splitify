@@ -2,7 +2,7 @@
  *
  * Offline: `/sw-manifest.js` lists every file the export holds and a version that changes with any of them; install
  * precaches them into the cache named for that version, and activation deletes the older caches. Pages go to the
- * network first and fall back to the cache; the build's static files come from the cache first. The decisions are pure
+ * network first (a navigation waits 3 seconds) and fall back to the cache; the build's static files come from the cache first. The decisions are pure
  * functions in `/sw-routing.js` (lib/offline/sw-routing.js). The worker never caches `/api/**` or another origin.
  * Both imported scripts are revalidated with the worker, so a new build updates it and shows the update toast.
  *
@@ -96,20 +96,52 @@ async function cacheFirst(request) {
   return response;
 }
 
+// A navigation that gets no answer in this long is answered from the cache instead (a connection that is up but
+// does not carry data would otherwise leave the page blank until the browser gives up).
+const NAVIGATION_TIMEOUT_MS = 3000;
+
+async function cachedAnswer(request) {
+  const cached = await caches.match(request, { ignoreSearch: true });
+  if (cached) return cached;
+  if (request.mode === "navigate") {
+    return caches.match(routing.fallbackPage(new URL(request.url).pathname));
+  }
+  return undefined;
+}
+
 async function networkFirst(request) {
+  const pending = fetch(request);
   try {
-    const response = await fetch(request);
+    let response;
+    if (request.mode === "navigate") {
+      const late = Symbol("late");
+      const first = await Promise.race([
+        pending,
+        new Promise((resolve) =>
+          setTimeout(() => resolve(late), NAVIGATION_TIMEOUT_MS),
+        ),
+      ]);
+      if (first === late) {
+        // Slow: the cached page answers if there is one, and the network's answer still refreshes the cache.
+        const cached = await cachedAnswer(request);
+        if (cached) {
+          pending
+            .then((later) => remember(request, later))
+            .catch(() => undefined);
+          return cached;
+        }
+        response = await pending;
+      } else {
+        response = first;
+      }
+    } else {
+      response = await pending;
+    }
     await remember(request, response.clone());
     return response;
   } catch (error) {
-    const cached = await caches.match(request, { ignoreSearch: true });
+    const cached = await cachedAnswer(request);
     if (cached) return cached;
-    if (request.mode === "navigate") {
-      const page = await caches.match(
-        routing.fallbackPage(new URL(request.url).pathname),
-      );
-      if (page) return page;
-    }
     throw error;
   }
 }
