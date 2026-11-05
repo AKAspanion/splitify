@@ -22,7 +22,7 @@ and the app on [http://localhost:2140](http://localhost:2140). No `.env` file is
 | 2152 - 2156 | The emulators of `pnpm test:rules`, written to the generated `firebase.rules-test.json`, so the tests run beside `pnpm dev` |
 
 SQL Connect-triggered functions (`mergeContactOnSignUp`, `sendActivityPush*`, `sendGroupDeletedPush`) do not run in
-firebase-tools 15.34.2's emulator.
+firebase-tools 15.35.0's emulator.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
@@ -51,14 +51,15 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## CI and deploy
 
-| Workflow         | When                                           | What                                                                                                                                                       |
-| ---------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`         | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator                                                            |
-| `deploy.yml`     | Push to `main`                                 | Runs CI, then deploys the site to Firebase Hosting. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
-| `codeql.yml`     | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                     |
-| `dependabot.yml` | Weekly                                         | Grouped dependency and GitHub Actions updates                                                                                                              |
+| Workflow           | When                                           | What                                                                                                                                                                                                                                               |
+| ------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`           | Every pull request, and called by `deploy.yml` | Install, format check, lint, type-check, unit and rules tests, audits that fail on a moderate advisory, the hosting build checked on the Hosting emulator, the end-to-end tests in Chromium, and on pull requests a review of changed dependencies |
+| `deploy.yml`       | Push to `main`                                 | Runs CI, then deploys the site to Firebase Hosting. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors                                                                                         |
+| `secrets-scan.yml` | PRs, pushes to `main`, weekly                  | TruffleHog looks for verified credentials in the new commits, and weekly in the whole history                                                                                                                                                      |
+| `codeql.yml`       | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                                                                                                             |
+| `dependabot.yml`   | Weekly                                         | Grouped dependency updates for both pnpm packages, the Android app's Gradle build and GitHub Actions                                                                                                                                               |
 
-Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI is pinned to `firebase-tools@15.34.2`: a devDependency locally, `pnpm dlx` in CI. The whole site is one static export (`pnpm build`, written to `out/`), and a page that stops exporting fails the CI build.
+Actions are pinned to commit SHAs; Dependabot keeps them current. TruffleHog's image is pinned in `secrets-scan.yml` too: raise its `version` with the action. The Firebase CLI is pinned to `firebase-tools@15.35.0`: a devDependency locally, and the same version in `deploy.yml`. The whole site is one static export (`pnpm build`, written to `out/`), and a page that stops exporting fails the CI build. When an end-to-end test fails, the job keeps `playwright-report/` as an artifact for 14 days.
 
 The Cloud Functions in `functions/` are not deployed by CI either. Deploy them by hand from your machine, signed in to the
 Firebase CLI as a project owner: `pnpm deploy:functions`.

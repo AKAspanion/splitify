@@ -2,6 +2,12 @@ overrides:
   effect: ^3.22.4
   tmp: 0.2.7
   '@grpc/grpc-js': ^1.13.6
+  # Advisories with no patched release on the major the dependents ask for. Each override is scoped to the
+  # vulnerable range, so a package on an unaffected major (minimatch 3 or 5) keeps it.
+  'minimatch@>=7.0.0 <11.0.1': ^11.0.1
+  'glob@>=9.0.0 <=14.0.1': ^14.0.2
+  'uuid@<11.1.1': ^11.1.1
+  '@opentelemetry/core@<2.8.0': ^2.8.0
 allowBuilds:
   '@firebase/util': true
   protobufjs: true

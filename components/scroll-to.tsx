@@ -23,10 +23,10 @@ export const ScrollTo = ({
       pos: any = {};
 
     // @ts-ignore
-    (pos.top = cPos.top - pPos.top + elm?.parentNode?.scrollTop),
+    ((pos.top = cPos.top - pPos.top + elm?.parentNode?.scrollTop),
       (pos.right = cPos.right - pPos.right),
       (pos.bottom = cPos.bottom - pPos.bottom),
-      (pos.left = cPos.left - pPos.left);
+      (pos.left = cPos.left - pPos.left));
 
     return pos;
   }
