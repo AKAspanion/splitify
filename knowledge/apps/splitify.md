@@ -98,7 +98,6 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 - `/privacy`: `app/(platform)/privacy/page.tsx`
 - `/profile`: `app/(platform)/profile/page.tsx`
 - `/webauthn/register`: `app/(platform)/(app)/webauthn/register/page.tsx`
-- `/webauthn/test`: `app/(platform)/(app)/webauthn/test/page.tsx`
 
 <!-- GA-GENERATED:END -->
 

@@ -17,7 +17,7 @@
         "lint-fix": null,
         "format-check": "pnpm prettier --check .",
         "test": "pnpm test",
-        "e2e": null
+        "e2e": "pnpm test:e2e"
       }
     },
     "run": {

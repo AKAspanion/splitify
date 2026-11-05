@@ -45,7 +45,7 @@ _102 concepts, so sections other than project/ and apps/ show counts. Follow `kn
 <!-- OKF-KNOWLEDGE-MAP:END -->
 
 <!-- GA-WORKFLOW:START -->
-<!-- ga:rules 0e3ac8647723 -->
+<!-- ga:rules d85997e001c6 -->
 
 ## How work flows here
 
@@ -56,7 +56,7 @@ Use these skills without being asked; the developer shouldn't have to name them.
 - **While building:** `ga:debug` when something fails and the cause isn't obvious.
 - **Where a plan run stands:** `ga.mjs run status` reads each run's ledger: tasks done out of the plan's total, the task in hand and its fix round, the checkpoints, rulings and provisional rulings so far. Run it when the developer asks how far the work has got, rather than piecing it together.
 - **Before saying it's done:** `ga:verify`, then `ga:review` for anything beyond a small change.
-- **Commands:** typecheck `pnpm tsc --noEmit`, lint `pnpm lint`, format-check `pnpm prettier --check .`, test `pnpm test`. This repository has no e2e command. Run these as written. An app's `AGENTS.md` may list its own under Commands.
+- **Commands:** typecheck `pnpm tsc --noEmit`, lint `pnpm lint`, format-check `pnpm prettier --check .`, test `pnpm test`, e2e `pnpm test:e2e`. Run these as written. An app's `AGENTS.md` may list its own under Commands.
 - **Anything the client hands over** (documents, an API collection, a design or a Figma link, their code): `ga:knowledge-import` files it, asks the one question it needs and runs the skill that learns it. For what's already in place, use those directly: `ga:knowledge-from-docs` for `intake/`, and `ga:knowledge-from-code` for an existing codebase with little knowledge, or the client's code copied into this project, keeping their structure and updating the knowledge base that's there. Drafts are reviewed by a person: suggest `/ga:knowledge-review`.
 - **Estimating a new build for a proposal:** suggest `/ga:proposal`, which the developer starts. It grills out every gap in the client's documents and prototype, freezes the workflows, and writes the GeekyAnts estimate, plus the client's own format when they gave one. Never estimate from a template of your own.
 - **Knowledge:** `ga:knowledge-ask` before searching the code, `ga:knowledge-save` for every feature, decision or changed requirement, and `ga:knowledge-check` at the end. The knowledge section below has the rules.
@@ -93,7 +93,7 @@ Set in `.ga/config.json` under `workflow`. `/ga:workflow` asks the developer and
 - The final review uses no extra review agents.
 - Screens are compared with the design at 390 and 1280 pixels wide.
 - A task runs no checks: only the tests it writes, each alone, by name, to watch it fail and then pass. Every check runs once, at the end.
-- Before the work is done, run smoke (`ga.mjs run smoke --since <the branch's base>`: the apps and the routes the branch adds start and answer, and no app's latest compile failed), typecheck (`pnpm tsc --noEmit`) and lint (`pnpm lint`). Run those for what the branch changed: `ga.mjs run checks --since <the branch's base> --only typecheck,lint` gives each command, narrowed to the packages it changed and those that depend on them. Test run only when the developer asks ("run the tests", "run e2e", "run all checks"): `ga.mjs run checks --since <the branch's base> --only <checks>` gives each command, narrowed to what changed. Then `ga:verify`: read the output, don't assume it.
+- Before the work is done, run smoke (`ga.mjs run smoke --since <the branch's base>`: the apps and the routes the branch adds start and answer, and no app's latest compile failed), typecheck (`pnpm tsc --noEmit`) and lint (`pnpm lint`). Run those for what the branch changed: `ga.mjs run checks --since <the branch's base> --only typecheck,lint` gives each command, narrowed to the packages it changed and those that depend on them. Test and e2e run only when the developer asks ("run the tests", "run e2e", "run all checks"): `ga.mjs run checks --since <the branch's base> --only <checks>` gives each command, narrowed to what changed. Then `ga:verify`: read the output, don't assume it.
 - Commit at the end of each step: each spec, each approved design, each task. In a plan run the implementer commits its task, and the task is complete then. Stage the step's files by name, never `git add -A`, with the knowledge that describes them in the same commit.
 - Commit messages are plain sentences.
 - Build on a branch named `feat/<topic>`.
