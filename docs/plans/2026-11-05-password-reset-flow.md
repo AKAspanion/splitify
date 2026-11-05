@@ -270,6 +270,50 @@ git add lib/offline/sw-routing.js lib/offline/sw-routing.test.ts lib/ads/ads-all
 git commit -m "Keep Firebase's one-time codes out of the service worker's cache and away from the ad script on /auth/action/."
 ```
 
+### Task 4: A privacy policy link on the sign-in and sign-up screens
+
+Added on 2026-11-05 at the developer's request during the run.
+
+**Files:**
+- Modify: `app/(platform)/(auth)/sign-in/sign-in-form.tsx`
+- Modify: `app/(platform)/(auth)/sign-up/sign-up-form.tsx`
+
+**Interfaces:**
+- Consumes: the existing `/privacy/` page (`app/(platform)/privacy/page.hosting.tsx`) and `next/link`.
+- Produces: nothing other tasks use.
+
+The link is a plain "Privacy policy" link, the last line of each form, in the same small muted style as the links
+above it (`text-muted-foreground underline-offset-4 hover:underline`). It doesn't say the person agrees to anything:
+a consent line ("By creating an account, you agree to…") is the developer's decision, and none is recorded.
+
+**Spec:** none
+
+**Tags:** `screen`, `security`
+
+**Knowledge:** none of its own. The end-of-plan knowledge job writes the fact into the sign-in feature concept beside
+Task 2's change to it: the sign-in and sign-up screens link to the privacy policy at `/privacy/`.
+
+**Acceptance:**
+- The sign-in screen's last line is a "Privacy policy" link to `/privacy/`, below "New to Splitify? Sign up".
+- The sign-up screen's last line is a "Privacy policy" link to `/privacy/`, below "Already have an account? Sign in".
+- The link opens in the same tab, carries no `next` query, and works offline the way the other links do (it is a
+  plain link, never disabled).
+- `pnpm build` passes, and `out/sign-in/index.html` and `out/sign-up/index.html` each contain `href="/privacy/"`.
+
+- [ ] **Step 1: Add the link to both forms**
+
+- [ ] **Step 2: Build and check both pages carry the link**
+
+Run: `pnpm build`
+Expected: the build passes, and `grep -c 'href="/privacy/"' out/sign-in/index.html out/sign-up/index.html` counts at least 1 in each
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx"
+git commit -m "Link the privacy policy from the sign-in and sign-up screens."
+```
+
 ## After the merge (the developer, outside the code)
 
 Firebase console → Authentication → Templates → any template → edit the action URL to
