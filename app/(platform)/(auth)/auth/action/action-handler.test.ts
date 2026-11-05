@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/firebase/auth", () => ({
   readPasswordResetEmail: vi.fn(),
@@ -61,5 +61,34 @@ describe("openActionLink", () => {
       "/auth/action/",
     );
     expect(win.location.replace).not.toHaveBeenCalled();
+  });
+});
+
+describe("readActionLinkOnce", () => {
+  // A fresh copy of the module is a fresh document: what it read lives at module scope.
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("gives the same link to a handler mounted again after the address bar was cleaned", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
+    const win = fakeWindow("?mode=verifyEmail&oobCode=v1");
+    // The address bar is cleaned as the first mount reads it, as the browser would.
+    win.history.replaceState.mockImplementation(() => {
+      win.location.search = "";
+    });
+
+    const first = readActionLinkOnce(win);
+    // Signed in, the providers remount the page once auth is restored.
+    const second = readActionLinkOnce(win);
+
+    expect(first).toEqual({ kind: "verify-email", code: "v1" });
+    expect(second).toEqual(first);
+    expect(win.history.replaceState).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads a reload's clean address bar as incomplete", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
+    expect(readActionLinkOnce(fakeWindow(""))).toEqual({ kind: "incomplete" });
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/container/header";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,6 +30,20 @@ export function openActionLink(win: ActionWindow): ActionLink {
   return link;
 }
 
+/** The link this document opened with. A module lives as long as the document, so a reload starts it again. */
+let openedLink: ActionLink | undefined;
+
+/**
+ * Opens the link the first time a handler mounts in this document, and gives every later mount the same link. A
+ * handler can mount more than once in a load: signed in, the providers remount the page once auth is restored
+ * (`QueryProvider` is keyed by the person), and Strict Mode runs effects twice. Each later mount would otherwise find
+ * the address bar already clean and call the link incomplete.
+ */
+export function readActionLinkOnce(win: ActionWindow): ActionLink {
+  openedLink ??= openActionLink(win);
+  return openedLink;
+}
+
 function titleFor(link: ActionLink | null): string {
   if (link?.kind === "reset-password") return "Choose a new password";
   if (link?.kind === "verify-email") return "Verify your email";
@@ -37,14 +51,11 @@ function titleFor(link: ActionLink | null): string {
 }
 
 export function ActionHandler() {
-  const opened = useRef<ActionLink | null>(null);
   const [link, setLink] = useState<ActionLink | null>(null);
 
-  // The page is prerendered, so the link is read on mount, once: Strict Mode's second run would find the address bar
-  // already clean. The link is kept in state, so later renders don't need the URL.
+  // The page is prerendered, so the link is read on mount, once per document (see readActionLinkOnce).
   useEffect(() => {
-    opened.current ??= openActionLink(window);
-    setLink(opened.current);
+    setLink(readActionLinkOnce(window));
   }, []);
 
   return (
