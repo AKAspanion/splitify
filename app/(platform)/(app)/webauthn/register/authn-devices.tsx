@@ -5,7 +5,12 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Fingerprint } from "lucide-react";
 import { callFunction } from "@/lib/functions/call";
 
-const AuthnDevices = () => {
+type AuthnDevicesProps = {
+  /** Changes when the devices changed: the list loads them again. */
+  version?: number;
+};
+
+const AuthnDevices = ({ version = 0 }: AuthnDevicesProps) => {
   const [devicesCount, setDevicesCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -21,7 +26,7 @@ const AuthnDevices = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [version]);
 
   if (devicesCount === null) return null;
 

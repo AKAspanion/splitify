@@ -1,16 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { callFunction } from "@/lib/functions/call";
 import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const AuthnActions = () => {
-  const router = useRouter();
+type AuthnActionsProps = {
+  /** Called after the person's devices changed, so the list can load again. */
+  onChange: () => void;
+};
+
+const failure = (error: unknown) =>
+  error instanceof Error ? error.message : "Oh no, something went wrong!";
+
+const AuthnActions = ({ onChange }: AuthnActionsProps) => {
   const [registerLoading, setRegisterLoading] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
@@ -18,26 +25,25 @@ const AuthnActions = () => {
   const register = async () => {
     try {
       setRegisterLoading(true);
-      const resp = await fetch("/api/webauthn/generate-registration-options");
+      const resp = await callFunction(
+        "/api/webauthn/generate-registration-options",
+      );
+      const { data } = await resp.json();
 
       let attResp;
       try {
-        const { data } = await resp.json();
-
         attResp = await startRegistration({ optionsJSON: data });
       } catch (e) {
-        setRegisterLoading(false);
         const error = e as Error;
         if (error.name === "InvalidStateError") {
           toast.error("You have already registred this device");
         } else {
           toast.error(error.message);
         }
-
-        throw error;
+        return;
       }
 
-      const verificationResp = await fetch(
+      const verificationResp = await callFunction(
         "/api/webauthn/verify-registration",
         {
           method: "POST",
@@ -46,40 +52,39 @@ const AuthnActions = () => {
         },
       );
 
-      const { data: verificationJSON, message } = await verificationResp.json();
+      const { data: verificationJSON } = await verificationResp.json();
 
       if (verificationJSON && verificationJSON.verified) {
         toast.success("Authenticator registered!");
       } else {
-        toast.error(message || "Oh no, something went wrong!");
+        toast.error("Oh no, something went wrong!");
       }
-      router.refresh();
-      setRegisterLoading(false);
-      sessionStorage.setItem("verified", "false");
+      onChange();
     } catch (e) {
+      toast.error(failure(e));
+    } finally {
       setRegisterLoading(false);
       sessionStorage.setItem("verified", "false");
-      toast.error("Oh no, something went wrong!");
     }
   };
 
   const verify = async () => {
     try {
       setVerifyLoading(true);
-      const resp = await fetch("/api/webauthn/generate-authentication-options");
+      const resp = await callFunction(
+        "/api/webauthn/generate-authentication-options",
+      );
+      const { data } = await resp.json();
 
       let asseResp;
       try {
-        const { data } = await resp.json();
-
         asseResp = await startAuthentication({ optionsJSON: data });
       } catch (e) {
-        setVerifyLoading(false);
-        const error = e as Error;
-        throw new Error(error.message);
+        toast.error((e as Error).message);
+        return;
       }
 
-      const verificationResp = await fetch(
+      const verificationResp = await callFunction(
         "/api/webauthn/verify-authentication",
         {
           method: "POST",
@@ -88,38 +93,32 @@ const AuthnActions = () => {
         },
       );
 
-      const { data: verificationJSON, message } = await verificationResp.json();
+      const { data: verificationJSON } = await verificationResp.json();
 
       if (verificationJSON && verificationJSON.verified) {
         toast.success("Authentication successfull!");
       } else {
-        toast.error(message || "Oh no, something went wrong!");
+        toast.error("Oh no, something went wrong!");
       }
-      router.refresh();
-      sessionStorage.setItem("verified", "false");
-      setVerifyLoading(false);
     } catch (e) {
+      toast.error(failure(e));
+    } finally {
       setVerifyLoading(false);
       sessionStorage.setItem("verified", "false");
-      toast.error("Oh no, something went wrong!");
     }
   };
 
   const remove = async () => {
     try {
       setRemoveLoading(true);
-      await fetch("/api/webauthn/devices/remove", {
-        method: "POST",
-      });
+      await callFunction("/api/webauthn/devices/remove", { method: "POST" });
       toast.success("Authentication removed");
-
+      onChange();
+    } catch (e) {
+      toast.error(failure(e));
+    } finally {
       setRemoveLoading(false);
       sessionStorage.setItem("verified", "false");
-      router.refresh();
-    } catch (error) {
-      setRemoveLoading(false);
-      sessionStorage.setItem("verified", "false");
-      toast.error("Oh no, something went wrong!");
     }
   };
 

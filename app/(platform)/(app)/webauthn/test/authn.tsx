@@ -6,6 +6,8 @@ import {
   startRegistration,
 } from "@simplewebauthn/browser";
 
+import { callFunction } from "@/lib/functions/call";
+
 import "./authn.css";
 
 export const Authn = () => {
@@ -33,7 +35,9 @@ export const Authn = () => {
     reset();
     setReqDebug("");
 
-    const resp = await fetch("/api/webauthn/generate-registration-options");
+    const resp = await callFunction(
+      "/api/webauthn/generate-registration-options",
+    );
 
     let attResp;
     try {
@@ -67,13 +71,16 @@ export const Authn = () => {
       throw error;
     }
 
-    const verificationResp = await fetch("/api/webauthn/verify-registration", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const verificationResp = await callFunction(
+      "/api/webauthn/verify-registration",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(attResp),
       },
-      body: JSON.stringify(attResp),
-    });
+    );
 
     const { data: verificationJSON } = await verificationResp.json();
     printDebug(
@@ -97,7 +104,9 @@ export const Authn = () => {
     reset();
     setAuthDebug("");
 
-    const resp = await fetch("/api/webauthn/generate-authentication-options");
+    const resp = await callFunction(
+      "/api/webauthn/generate-authentication-options",
+    );
 
     let asseResp;
     try {
@@ -122,7 +131,7 @@ export const Authn = () => {
       throw new Error(error.message);
     }
 
-    const verificationResp = await fetch(
+    const verificationResp = await callFunction(
       "/api/webauthn/verify-authentication",
       {
         method: "POST",
@@ -152,7 +161,7 @@ export const Authn = () => {
   };
 
   const setup = async () => {
-    fetch("/api/webauthn/generate-authentication-options")
+    callFunction("/api/webauthn/generate-authentication-options")
       .then((resp) => resp.json())
       .then(({ data }) => {
         console.log("Authentication Options (Autofill)", data);
@@ -169,7 +178,7 @@ export const Authn = () => {
               JSON.stringify(asseResp, null, 2),
             );
 
-            const verificationResp = await fetch(
+            const verificationResp = await callFunction(
               "/api/webauthn/verify-authentication",
               {
                 method: "POST",
@@ -200,6 +209,9 @@ export const Authn = () => {
           .catch((err) => {
             console.error("(Autofill)", err);
           });
+      })
+      .catch((err) => {
+        console.error("(Autofill)", err);
       });
   };
 

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { callFunction } from "@/lib/functions/call";
 
 const publicRoutes = ["/webauthn", "/profile", "/sign-in", "/sign-out"];
 
@@ -34,7 +35,7 @@ export const Biometric = () => {
     }
 
     setLoading(true);
-    const deviceResp = await fetch("/api/webauthn/devices");
+    const deviceResp = await callFunction("/api/webauthn/devices");
     const { data } = await deviceResp.json();
 
     if (data && data?.length < 1) {
@@ -46,7 +47,9 @@ export const Biometric = () => {
 
     setOpen(true);
 
-    const resp = await fetch("/api/webauthn/generate-authentication-options");
+    const resp = await callFunction(
+      "/api/webauthn/generate-authentication-options",
+    );
 
     let asseResp;
     try {
@@ -59,7 +62,7 @@ export const Biometric = () => {
       throw new Error(error.message);
     }
 
-    const verificationResp = await fetch(
+    const verificationResp = await callFunction(
       "/api/webauthn/verify-authentication",
       {
         method: "POST",
@@ -91,10 +94,10 @@ export const Biometric = () => {
 
   useEffect(() => {
     if (
-      (user?.uid,
+      user?.uid &&
       pathname &&
-        prevPath !== pathname &&
-        !publicRoutes.some((r) => pathname.includes(r)))
+      prevPath !== pathname &&
+      !publicRoutes.some((r) => pathname.includes(r))
     ) {
       prevPath = pathname;
       onVerify();
