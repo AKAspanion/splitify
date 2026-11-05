@@ -69,6 +69,12 @@ async function world(): Promise<World> {
 
 beforeEach(async () => {
   await resetDatabase();
+  // Other test files leave Auth users with these emails and other ids behind, which would clash with ours.
+  for (const email of ["alice@example.test", "bob@example.test"])
+    await auth()
+      .getUserByEmail(email)
+      .then((u) => auth().deleteUser(u.uid))
+      .catch(() => undefined);
   for (const uid of [ALICE, BOB])
     await auth()
       .deleteUser(uid)
