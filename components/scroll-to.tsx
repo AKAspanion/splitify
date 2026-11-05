@@ -37,18 +37,15 @@ export const ScrollTo = ({
     duration: number,
     onDone?: () => void,
   ) {
-    var start = element.scrollTop,
-      change = to - start,
-      startTime = performance.now(),
-      val,
-      now,
-      elapsed,
-      t;
+    const start = element.scrollTop;
+    const change = to - start;
+    // Read the clock only inside the animation callback: the first frame is the start.
+    let startTime: number | undefined;
 
     function animateScroll() {
-      now = performance.now();
-      elapsed = (now - startTime) / 1000;
-      t = elapsed / duration;
+      const now = performance.now();
+      startTime ??= now;
+      const t = (now - startTime) / 1000 / duration;
 
       element.scrollTop = start + change * easeInOutQuad(t);
 
@@ -56,7 +53,7 @@ export const ScrollTo = ({
       else onDone && onDone();
     }
 
-    animateScroll();
+    window.requestAnimationFrame(animateScroll);
   }
 
   function easeInOutQuad(t: number) {

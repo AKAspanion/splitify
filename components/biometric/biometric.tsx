@@ -25,17 +25,11 @@ export const Biometric = () => {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
 
-  const begin = async () => {
-    const verified = sessionStorage.getItem("verified") === "true";
+  const isVerified = () => sessionStorage.getItem("verified") === "true";
 
-    if (verified) {
-      setOpen(false);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    const deviceResp = await callFunction("/api/webauthn/devices");
+  // Once the account's devices are known: asks for a passkey when it has one. It runs as the devices request's
+  // callback, so a path change can start verification from an effect without setting state synchronously there.
+  const verifyWithDevices = async (deviceResp: Response) => {
     const { data } = await deviceResp.json();
 
     if (data && data?.length < 1) {
@@ -45,6 +39,7 @@ export const Biometric = () => {
       return;
     }
 
+    setLoading(true);
     setOpen(true);
 
     const resp = await callFunction(
@@ -83,13 +78,25 @@ export const Biometric = () => {
     }
   };
 
+  const onVerifyFailed = () => {
+    setLoading(false);
+    sessionStorage.setItem("verified", "false");
+  };
+
+  const verify = () =>
+    callFunction("/api/webauthn/devices")
+      .then(verifyWithDevices)
+      .catch(onVerifyFailed);
+
+  // The Verify button: shows it's working at once, while the devices are fetched.
   const onVerify = async () => {
-    try {
-      await begin();
-    } catch (error) {
+    if (isVerified()) {
+      setOpen(false);
       setLoading(false);
-      sessionStorage.setItem("verified", "false");
+      return;
     }
+    setLoading(true);
+    await verify();
   };
 
   useEffect(() => {
@@ -100,7 +107,8 @@ export const Biometric = () => {
       !publicRoutes.some((r) => pathname.includes(r))
     ) {
       prevPath = pathname;
-      onVerify();
+      // Already verified this session: the dialog is closed and idle, so there is nothing to change.
+      if (!isVerified()) void verify();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, pathname]);

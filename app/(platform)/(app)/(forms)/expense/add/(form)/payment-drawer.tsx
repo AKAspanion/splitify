@@ -79,7 +79,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
 
   return (
     <Drawer>
-      <DrawerTrigger disabled={disabled}>
+      <DrawerTrigger asChild>
         <Button
           type="button"
           disabled={disabled}
@@ -107,7 +107,7 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
         <DrawerHeader>
           <DrawerTitle className="px-4 flex gap-4 items-center justify-between">
             <div className="flex items-center gap-4">
-              <DrawerClose>
+              <DrawerClose asChild>
                 <Button type="button" variant="outline" size="icon">
                   <ArrowLeftIcon />
                 </Button>
@@ -152,8 +152,10 @@ export const PaymentDrawer = (props: PaymentDrawerProps) => {
             </div>
           </div>
           <div className="flex items-center justify-end mt-6">
-            <DrawerClose>
-              <Button variant={"outline"}>Done</Button>
+            <DrawerClose asChild>
+              <Button type="button" variant={"outline"}>
+                Done
+              </Button>
             </DrawerClose>
           </div>
         </div>

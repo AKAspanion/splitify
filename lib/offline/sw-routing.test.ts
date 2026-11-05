@@ -56,6 +56,8 @@ describe("fallbackPage", () => {
     ["/", "/index.html"],
     ["/no-such-page/", "/404.html"],
     ["/groups/a/b/c/d/", "/404.html"],
+    // A page that was removed: the build no longer has it to fall back to.
+    ["/webauthn/test/", "/404.html"],
   ])("%s gives %s", (p, expected) => expect(fallbackPage(p)).toBe(expected));
 });
 
