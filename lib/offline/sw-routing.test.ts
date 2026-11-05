@@ -110,3 +110,13 @@ describe("fallbackPage against the repository", () => {
     }
   });
 });
+
+describe("the checked-in public/sw-routing.js", () => {
+  // The dev worker reads it; the build copies this file over it in `out/`. A copy behind this one serves the dev
+  // worker old rules.
+  it("is the same file as lib/offline/sw-routing.js", () => {
+    expect(readFileSync("public/sw-routing.js", "utf8")).toBe(
+      readFileSync("lib/offline/sw-routing.js", "utf8"),
+    );
+  });
+});
