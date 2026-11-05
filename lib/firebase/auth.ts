@@ -1,5 +1,7 @@
 import { upsertMe } from "@dataconnect/app";
 import {
+  applyActionCode,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   getRedirectResult,
   GoogleAuthProvider,
@@ -10,6 +12,7 @@ import {
   signInWithRedirect,
   signOut as firebaseSignOut,
   updateProfile,
+  verifyPasswordResetCode,
   type User,
 } from "firebase/auth";
 import { clearSavedCache } from "../offline/persist";
@@ -142,6 +145,36 @@ export async function signUpWithEmail(
 
 export async function sendPasswordReset(email: string): Promise<void> {
   await sendPasswordResetEmail(getFirebaseAuth(), email.trim());
+}
+
+/** The email a reset code belongs to. Rejects with Firebase's error (expired, invalid, disabled user). */
+export async function readPasswordResetEmail(code: string): Promise<string> {
+  return await verifyPasswordResetCode(getFirebaseAuth(), code);
+}
+
+/** Sets the new password with the reset code. Rejects with Firebase's error. */
+export async function resetPassword(
+  code: string,
+  newPassword: string,
+): Promise<void> {
+  await confirmPasswordReset(getFirebaseAuth(), code, newPassword);
+}
+
+/**
+ * Applies a verify-email code; when someone is signed in on this browser, reloads them and refreshes their token so
+ * the banner clears. Rejects with Firebase's error when the code isn't applied. Once it is, the code is spent, so a
+ * failed reload is logged and not thrown: the person's email is verified, and the next reload shows it.
+ */
+export async function verifyEmailWithCode(code: string): Promise<void> {
+  await applyActionCode(getFirebaseAuth(), code);
+  try {
+    await reloadEmailVerified();
+  } catch (error) {
+    console.warn(
+      "Verify email: the code was applied but reloading the signed-in person failed",
+      error instanceof Error ? error.name : typeof error,
+    );
+  }
 }
 
 /**

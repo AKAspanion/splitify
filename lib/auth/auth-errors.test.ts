@@ -45,6 +45,10 @@ describe("authErrorMessage", () => {
       "auth/cancelled-popup-request",
       "Google sign-in was closed before it finished.",
     ],
+    ["auth/expired-action-code", "This link has expired or was already used."],
+    ["auth/invalid-action-code", "This link has expired or was already used."],
+    ["auth/weak-password", "Use at least 8 characters."],
+    ["auth/user-disabled", "This account is turned off."],
   ])("maps %s", (code, message) => {
     expect(authErrorMessage(withCode(code))).toBe(message);
   });
