@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { useAuth } from "@/hooks/use-auth";
 import { appVersion } from "@/lib/offline/version";
+import { registerQueuedWrites } from "@/lib/offline/queued-writes";
 import { CACHE_MAX_AGE_MS, createPersister } from "@/lib/offline/persist";
 
 // Signed out, nothing is saved or restored.
@@ -24,17 +25,19 @@ const NO_PERSISTER: Persister = {
 function QueryProvider({ children }: { children: React.ReactNode }) {
   // One client for the page's life: a client made on every render (the theme resolves after the first one)
   // leaves each query watching the old cache, so an invalidation after a write would reach nobody.
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          // Offline, a query answers from the cache (restored from IndexedDB) rather than waiting on the network.
-          queries: { refetchOnWindowFocus: false, networkMode: "offlineFirst" },
-          // A write made offline pauses, and resumes once the cache is restored and the device is online.
-          mutations: { networkMode: "online" },
-        },
-      }),
-  );
+  const [queryClient] = useState(() => {
+    const client = new QueryClient({
+      defaultOptions: {
+        // Offline, a query answers from the cache (restored from IndexedDB) rather than waiting on the network.
+        queries: { refetchOnWindowFocus: false, networkMode: "offlineFirst" },
+        // A write made offline pauses, and resumes once the cache is restored and the device is online.
+        mutations: { networkMode: "online" },
+      },
+    });
+    // Before the cache is restored, so a write paused before a reload finds its send by key.
+    registerQueuedWrites(client);
+    return client;
+  });
   const { status, user } = useAuth();
   const uid = user?.uid ?? null;
   const persister = useMemo(

@@ -19,11 +19,10 @@ import {
 import type { User } from "@/types/shared";
 import { dc, FRESH, queryKeys } from "./client";
 import {
-  createExpense,
-  createSettlement,
-  type CreateExpenseVars,
-  type CreateSettlementVars,
-} from "./expense-writes";
+  CREATE_EXPENSE_KEY,
+  CREATE_SETTLEMENT_KEY,
+} from "@/lib/offline/queued-writes";
+import type { CreateExpenseVars, CreateSettlementVars } from "./expense-writes";
 import { fixedNum } from "@/utils/validate";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { toLedgerExpenses } from "./ledger";
@@ -250,29 +249,38 @@ function useInvalidate() {
     );
 }
 
-export function useCreateExpense(): UseMutationResult<
-  { id: string },
-  Error,
-  ExpenseInput
-> {
-  const invalidate = useInvalidate();
-  return useMutation({
-    mutationFn: (input: ExpenseInput) => createExpense(prepareExpense(input)),
-    onSuccess: (_data, input) => invalidate("CreateExpense", input.groupId),
+/** A mutation whose variables are made from the form's input, with every id, when it is sent. */
+type QueuedMutation<Input> = Omit<
+  UseMutationResult<{ id: string }, Error, never>,
+  "mutate" | "mutateAsync"
+> & {
+  mutate: (input: Input) => void;
+  mutateAsync: (input: Input) => Promise<{ id: string }>;
+};
+
+// The send, the optimistic row, the rollback and the refresh are registered by key in lib/offline/queued-writes.ts,
+// so a write made offline can be resumed after a reload. Its variables hold every id, made here once.
+function useQueuedWrite<Input, Vars>(
+  key: readonly unknown[],
+  prepare: (input: Input) => Vars,
+): QueuedMutation<Input> {
+  const mutation = useMutation<{ id: string }, Error, Vars>({
+    mutationKey: key,
   });
+  const { mutate, mutateAsync } = mutation;
+  return {
+    ...mutation,
+    mutate: (input) => mutate(prepare(input)),
+    mutateAsync: (input) => mutateAsync(prepare(input)),
+  } as QueuedMutation<Input>;
 }
 
-export function useCreateSettlement(): UseMutationResult<
-  { id: string },
-  Error,
-  SettlementInput
-> {
-  const invalidate = useInvalidate();
-  return useMutation({
-    mutationFn: (input: SettlementInput) =>
-      createSettlement(prepareSettlement(input)),
-    onSuccess: (_data, input) => invalidate("CreateSettlement", input.groupId),
-  });
+export function useCreateExpense(): QueuedMutation<ExpenseInput> {
+  return useQueuedWrite(CREATE_EXPENSE_KEY, prepareExpense);
+}
+
+export function useCreateSettlement(): QueuedMutation<SettlementInput> {
+  return useQueuedWrite(CREATE_SETTLEMENT_KEY, prepareSettlement);
 }
 
 export function useUpdateExpense(): UseMutationResult<

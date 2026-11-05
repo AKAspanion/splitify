@@ -19,6 +19,7 @@ const NOT_A_MEMBER = "Only members of this group can be added to an expense";
 
 let writes: typeof import("./expense-writes");
 let errors: typeof import("./errors");
+let queued: typeof import("../offline/queued-writes");
 let signInApp: (email: string) => Promise<void>;
 let alice: TestUser;
 let bob: TestUser;
@@ -61,6 +62,7 @@ beforeAll(async () => {
   carol = await signInTestUser("carol");
   writes = await import("./expense-writes");
   errors = await import("./errors");
+  queued = await import("../offline/queued-writes");
   const { signInWithEmailAndPassword } = await import("firebase/auth");
   signInApp = async (email) => {
     await signInWithEmailAndPassword(getFirebaseAuth(), email, PASSWORD);
@@ -88,6 +90,47 @@ describe("createExpense", () => {
     expect(failure).toBeInstanceOf(Error);
     expect(errors.toUserMessage(failure)).toBe(NOT_A_MEMBER);
     expect(await expenseCount()).toBe(0);
+  });
+});
+
+describe("a write sent twice", () => {
+  const settlement = () => ({
+    id: uuid(),
+    groupId: G,
+    amount: 50,
+    fromUserId: alice.uid,
+    toUserId: bob.uid,
+    paymentId: uuid(),
+    splitId: uuid(),
+    activityId: uuid(),
+  });
+
+  it("answers an expense's own id with the duplicate-id error, and writes it once", async () => {
+    const vars = expenseVars([alice.uid, bob.uid]);
+    await writes.createExpense(vars);
+    const failure = await writes.createExpense(vars).catch((e: unknown) => e);
+    expect(failure).toBeInstanceOf(Error);
+    expect(queued.isDuplicateIdError(failure)).toBe(true);
+    expect(await expenseCount()).toBe(1);
+  });
+
+  it("answers a settlement's own id with the duplicate-id error", async () => {
+    const vars = settlement();
+    await writes.createSettlement(vars);
+    const failure = await writes
+      .createSettlement(vars)
+      .catch((e: unknown) => e);
+    expect(queued.isDuplicateIdError(failure)).toBe(true);
+    expect(await expenseCount()).toBe(1);
+  });
+
+  it("does not call a rejection for a non-member a duplicate", async () => {
+    await signInApp(carol.email);
+    const failure = await writes
+      .createExpense(expenseVars([alice.uid]))
+      .catch((e: unknown) => e);
+    expect(errors.toUserMessage(failure)).toBe("Not found");
+    expect(queued.isDuplicateIdError(failure)).toBe(false);
   });
 });
 

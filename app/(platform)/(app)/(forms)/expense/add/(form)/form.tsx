@@ -8,6 +8,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { PaymentDrawer } from "./payment-drawer";
 import { SplitDrawer } from "./split-drawer";
 import { useAuth } from "@/hooks/use-auth";
+import { useOnline } from "@/hooks/use-online";
 import { toUserMessage } from "@/lib/data/errors";
 import {
   normalizeId,
@@ -43,6 +44,7 @@ const FormComp = ({ groups }: FormProps) => {
   const [payment, setPayment] = useState<Record<string, number>>({});
   const [groupId, setGroupId] = useState(normalizeId(paramsGroupId));
 
+  const online = useOnline();
   const create = useCreateExpense();
   const loading = create.isPending;
   const [fieldErrors, setFieldErrors] = useState<ExpenseFieldErrors>();
@@ -102,16 +104,24 @@ const FormComp = ({ groups }: FormProps) => {
     setFieldErrors(errors ?? undefined);
     if (errors || !userId) return;
 
+    const input = {
+      amount: fixedNum(total),
+      description,
+      payments,
+      splits,
+      groupId,
+      category,
+      type: splitType,
+    };
+    if (!online) {
+      // Offline the write waits for the connection, so don't wait for it: it shows in the group as waiting to sync.
+      create.mutate(input);
+      toast.success("Expense saved. It will sync when you're back online.");
+      router.push(`/groups/${groupId}`);
+      return;
+    }
     try {
-      await create.mutateAsync({
-        amount: fixedNum(total),
-        description,
-        payments,
-        splits,
-        groupId,
-        category,
-        type: splitType,
-      });
+      await create.mutateAsync(input);
     } catch {
       return;
     }
