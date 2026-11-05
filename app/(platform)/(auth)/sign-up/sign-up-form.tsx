@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signInWithGoogle, signUpWithEmail } from "@/lib/firebase/auth";
+import {
+  googleRedirectPending,
+  signInWithGoogle,
+  signUpWithEmail,
+} from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
+import { finishGoogleReturn } from "@/lib/auth/google-return";
 import { safeNextPath } from "@/lib/auth/next-path";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
@@ -28,6 +33,24 @@ export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
+  // Back from Google: finish the sign-in (UpsertMe) before going on. Read on mount, since the page is prerendered.
+  useEffect(() => {
+    if (!googleRedirectPending()) return;
+    let active = true;
+    setPending("google");
+    void finishGoogleReturn().then((result) => {
+      if (!active) return;
+      if (result.kind === "signed-in") router.replace(next);
+      else {
+        if (result.kind === "failed") setError(result.message);
+        setPending(null);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [next, router]);
+
   const submit = async () => {
     if (password.length < MIN_PASSWORD_LENGTH) {
       setError("Use at least 8 characters.");
@@ -45,12 +68,12 @@ export function SignUpForm() {
     }
   };
 
+  // The page leaves for Google, so the button stays loading; it comes back here only if the redirect fails to start.
   const google = async () => {
     setPending("google");
     setError(null);
     try {
       await signInWithGoogle();
-      router.replace(next);
     } catch (e) {
       setError(authErrorMessage(e));
       setPending(null);
