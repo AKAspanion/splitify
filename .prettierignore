@@ -42,6 +42,10 @@ packages
 firebase.emulators.json
 firebase.rules-test.json
 
+# Written by `pnpm test:e2e`: Playwright's report and its traces and screenshots
+/playwright-report/
+/test-results/
+
 # Written by tools, not people: the lockfiles, pnpm's workspace settings (pnpm rewrites the file in its own
 # style), the generated SQL Connect SDK and ga's run files
 pnpm-lock.yaml
