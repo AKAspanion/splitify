@@ -51,7 +51,10 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   }, [status, queryClient]);
 
   return (
+    // Keyed by person: the provider restores once and reads its persister once, when it mounts (before sign-in is
+    // known, that is no persister at all), so each person gets a fresh provider with their own.
     <PersistQueryClientProvider
+      key={uid ?? "signed-out"}
       client={queryClient}
       persistOptions={{
         persister,
