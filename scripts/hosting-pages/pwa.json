@@ -1,0 +1,8 @@
+{
+  "pages": ["sw.js", "sw-manifest.js", "sw-routing.js"],
+  "requests": [
+    { "path": "/sw.js", "expectText": "SKIP_WAITING" },
+    { "path": "/sw-manifest.js", "expectText": "__SPLITIFY_SW_MANIFEST__" },
+    { "path": "/sw-routing.js", "expectText": "SplitifySwRouting" }
+  ]
+}

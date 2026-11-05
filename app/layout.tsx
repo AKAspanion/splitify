@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
@@ -28,6 +29,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
+      {/* Sets the version the saved cache and the service worker share, before the app hydrates. */}
+      <Script src="/sw-manifest.js" strategy="beforeInteractive" />
       <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
       <body className={inter.className}>
         <ThemeProvider
