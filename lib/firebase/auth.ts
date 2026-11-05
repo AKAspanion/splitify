@@ -11,6 +11,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
+import { clearSavedCache } from "../offline/persist";
 import { markSignOutIntended } from "../auth-redirect";
 import { unregisterThisDevice } from "../push/register";
 import { getDataConnectClient, getFirebaseAuth } from "./app";
@@ -56,10 +57,15 @@ export async function sendPasswordReset(email: string): Promise<void> {
   await sendPasswordResetEmail(getFirebaseAuth(), email.trim());
 }
 
-/** Signs out this browser only, after removing this device's push token while the sign-in still authorises it. */
+/**
+ * Signs out this browser only: deletes the person's saved cache, then removes this device's push token while the
+ * sign-in still authorises it.
+ */
 export async function signOut(): Promise<void> {
   markSignOutIntended(true);
   try {
+    const uid = getFirebaseAuth().currentUser?.uid;
+    if (uid) await clearSavedCache(uid);
     await unregisterThisDevice();
     await firebaseSignOut(getFirebaseAuth());
   } catch (error) {
