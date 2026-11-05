@@ -10,7 +10,7 @@ generated:
 
 # CI and deploy workflows
 
-The reasons are in [the decision](../decisions/ci-cd-github-actions.md); the one-time console steps are in
+The reasons are in [the decision](../decisions/ci-cd-functions-deployed-by-hand.md); the one-time console steps are in
 [deploy setup](deploy-setup.md). The files in `.github/` hold the exact commands, versions and pinned action SHAs.
 
 ## What runs, and when
@@ -23,7 +23,7 @@ The reasons are in [the decision](../decisions/ci-cd-github-actions.md); the one
   workflows themselves.
 - `.github/dependabot.yml`: weekly grouped minor and patch updates for the root, `functions/` and GitHub Actions;
   major bumps of TypeScript, `@types/node` and Prisma are ignored.
-- `.github/workflows/deploy.yml`: on push to `main`, runs CI, then builds the site and deploys it to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`), then deploys the Cloud Functions. It installs the root dependencies with `--ignore-scripts` for the build, and then runs `yarn dataconnect:generate` itself, as `ci.yml` does: `next build` typechecks the whole project, which imports the generated SQL Connect SDK. Started by hand with
+- `.github/workflows/deploy.yml`: on push to `main`, runs CI, then builds the site and deploys it to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`). It doesn't deploy the Cloud Functions, which a project owner deploys by hand ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). It installs the root dependencies with `--ignore-scripts` for the build, and then runs `yarn dataconnect:generate` itself, as `ci.yml` does: `next build` typechecks the whole project, which imports the generated SQL Connect SDK. Started by hand with
   `deploy_dataconnect` ticked, it also deploys the SQL Connect schema and connectors. It runs one at a time
   (`concurrency: deploy-production`, never cancelled), checks its settings first and fails naming the missing ones, and
   removes the service-account key file in a step that always runs.
@@ -47,6 +47,7 @@ Moderate advisories never fail CI; Dependabot still reports them.
 
 - 2026-11-05: CI and deploy generated the Prisma client and built a public-pages target (`yarn build:hosting`); now they build the one site (`yarn build`) and read no OneSignal variable, because spec 2c removed the server and Prisma.
 - 2026-11-05: the hosting build read no Firebase config; now it reads the five `NEXT_PUBLIC_FIREBASE_*` Variables, because the hosted sign-in and push need them.
+- 2026-11-05: the deploy workflow deployed the Cloud Functions after hosting; now it deploys hosting only, and writes the service-account key only for the SQL Connect deploy. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).
 - 2026-11-05: the deploy job built the public pages without generating the Prisma client and SQL Connect SDK, so its hosting build failed to typecheck; now it generates both first, as CI does.
 - 2026-11-05: CI and deploy covered only the checks and the functions; now they also build, check and deploy the hosting target, because the public pages go to Firebase Hosting.
 

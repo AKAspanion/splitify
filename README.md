@@ -42,15 +42,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## CI and deploy
 
-| Workflow         | When                                           | What                                                                                                                                                                                                       |
-| ---------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`         | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator                                                                                                            |
-| `deploy.yml`     | Push to `main`                                 | Runs CI, then deploys the public pages to Firebase Hosting and the Cloud Functions in `functions/`. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
-| `codeql.yml`     | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                                                                     |
-| `dependabot.yml` | Weekly                                         | Grouped dependency and GitHub Actions updates                                                                                                                                                              |
+| Workflow         | When                                           | What                                                                                                                                                       |
+| ---------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`         | Every pull request, and called by `deploy.yml` | Install, lint, type-check, tests, audits, and the hosting build checked on the Hosting emulator                                                            |
+| `deploy.yml`     | Push to `main`                                 | Runs CI, then deploys the site to Firebase Hosting. Run it by hand with **deploy_dataconnect** ticked to also deploy the SQL Connect schema and connectors |
+| `codeql.yml`     | PRs, pushes, weekly                            | CodeQL security analysis of the code and the workflows                                                                                                     |
+| `dependabot.yml` | Weekly                                         | Grouped dependency and GitHub Actions updates                                                                                                              |
 
 Actions are pinned to commit SHAs; Dependabot keeps them current. The Firebase CLI always runs as
 `npx --yes firebase-tools@15.34.2`. The whole site is one static export (`yarn build`, written to `out/`), and a page that stops exporting fails the CI build.
+
+The Cloud Functions in `functions/` are not deployed by CI either. Deploy them by hand from your machine, signed in to the
+Firebase CLI as a project owner: `yarn deploy:functions`.
 
 `deploy.yml` reads these repository settings (Settings > Secrets and variables > Actions) and fails with a message
 naming what is missing, before anything installs:
@@ -115,7 +118,7 @@ Setup in the Google Cloud console for `splitify-416321`, signed in as the projec
 1. **Service account:** IAM & Admin > Service accounts > create `billing-kill-switch` with the **Project Billing
    Manager** role. That role is all it needs to turn billing off for this project.
 2. **API:** enable the Cloud Billing API (`cloudbilling.googleapis.com`; step 1 above already does).
-3. **Deploy:** `yarn deploy:functions` (or push to `main`). This creates the function and its topic `budget-alerts`.
+3. **Deploy:** `yarn deploy:functions`. This creates the function and its topic `budget-alerts`.
 4. **Let the trigger call the function:** Cloud Run > `billingkillswitch` > Permissions > add principal
    `billing-kill-switch@splitify-416321.iam.gserviceaccount.com` with the **Cloud Run Invoker** role. Pub/Sub
    delivers as that account, and the Firebase CLI only grants invoke rights for HTTP and scheduled functions. Without
