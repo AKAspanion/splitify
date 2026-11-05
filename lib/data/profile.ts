@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getMe } from "@dataconnect/app";
-import { dc, queryKeys } from "./client";
+import { dc, FRESH, queryKeys } from "./client";
 
 export type Me = {
   id: string;
@@ -14,7 +14,7 @@ export function useMe(): UseQueryResult<Me | null, Error> {
   return useQuery({
     queryKey: queryKeys.GetMe(),
     queryFn: async () => {
-      const { data } = await getMe(dc());
+      const { data } = await getMe(dc(), FRESH);
       if (!data.user) return null;
       return {
         id: data.user.id,

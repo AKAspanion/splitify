@@ -31,13 +31,9 @@ import {
 } from "@dataconnect/app";
 import type { Group, User } from "@/generated/prisma/browser";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
-import type { ExecuteQueryOptions } from "firebase/data-connect";
-import { dc, queryKeys } from "./client";
+import { dc, FRESH, queryKeys } from "./client";
 import { escapeSearch } from "./search";
 import { toLedgerExpenses } from "./ledger";
-
-// The SDK's default cache policy would serve the first result forever, even after a write refetches.
-const SERVER_ONLY: ExecuteQueryOptions = { fetchPolicy: "SERVER_ONLY" };
 
 /** How many of a group's expenses one page of `useGroupExpenses` holds. */
 export const EXPENSES_PAGE_SIZE = 10;
@@ -141,7 +137,7 @@ export function useMyGroups(
           search: text || undefined,
           limit,
         },
-        SERVER_ONLY,
+        FRESH,
       );
       return data.groups;
     },
@@ -156,11 +152,7 @@ export function useGroup(
     queryKey: queryKeys.GetGroup({ id: groupId }),
     enabled: groupId !== null,
     queryFn: async () => {
-      const { data } = await getGroup(
-        dc(),
-        { id: groupId as string },
-        SERVER_ONLY,
-      );
+      const { data } = await getGroup(dc(), { id: groupId as string }, FRESH);
       return selectFirstGroup(data);
     },
   });
@@ -178,7 +170,7 @@ export function useGroupMembers(
         {
           groupId: groupId as string,
         },
-        SERVER_ONLY,
+        FRESH,
       );
       return selectMembers(data);
     },
@@ -193,7 +185,7 @@ export function useFriendsToAdd(): UseQueryResult<Member[]> {
   return useQuery({
     queryKey: queryKeys.ListFriends({ for: "add-member", limit: 500 }),
     queryFn: async () => {
-      const { data } = await listFriends(dc(), { limit: 500 }, SERVER_ONLY);
+      const { data } = await listFriends(dc(), { limit: 500 }, FRESH);
       return data.friendships.map((f) => f.friend);
     },
   });
@@ -212,7 +204,7 @@ export function useGroupLedger(
         {
           groupId: groupId as string,
         },
-        SERVER_ONLY,
+        FRESH,
       );
       return selectLedger(result.data);
     },
@@ -238,7 +230,7 @@ export function useGroupExpenses(
           offset: pageParam,
           search: text || undefined,
         },
-        SERVER_ONLY,
+        FRESH,
       );
       return {
         expenses: data.expenses,

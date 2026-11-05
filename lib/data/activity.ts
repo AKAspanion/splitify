@@ -11,7 +11,7 @@ import {
   type ListMyActivityData,
 } from "@dataconnect/app";
 import { activityText } from "@/functions/src/activity-text";
-import { dc, queryKeys } from "./client";
+import { dc, FRESH, queryKeys } from "./client";
 
 export type ActivityItem = {
   id: string;
@@ -70,10 +70,11 @@ export function activityLine(
 }
 
 async function fetchMyPage(offset: number): Promise<ActivityPage> {
-  const { data } = await listMyActivity(dc(), {
-    limit: ACTIVITY_PAGE_SIZE,
-    offset,
-  });
+  const { data } = await listMyActivity(
+    dc(),
+    { limit: ACTIVITY_PAGE_SIZE, offset },
+    FRESH,
+  );
   const items = data.activities.map(toItem);
   return {
     items,
@@ -90,7 +91,7 @@ export async function fetchGroupPage(
     limit: number,
     offset: number,
   ) => Promise<ActivityItem[]> = async (limit, from) => {
-    const { data } = await listMyActivity(dc(), { limit, offset: from });
+    const { data } = await listMyActivity(dc(), { limit, offset: from }, FRESH);
     return data.activities.map(toItem);
   },
 ): Promise<ActivityPage> {
@@ -137,7 +138,11 @@ export function useActivity(
     queryKey: queryKeys.GetActivity({ id: activityId }),
     enabled: activityId !== null,
     queryFn: async () => {
-      const { data } = await getActivity(dc(), { id: activityId as string });
+      const { data } = await getActivity(
+        dc(),
+        { id: activityId as string },
+        FRESH,
+      );
       return data.activity ? toItem(data.activity as Row) : null;
     },
   });

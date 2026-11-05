@@ -17,7 +17,7 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query";
 import type { User } from "@/generated/prisma/browser";
-import { dc, queryKeys } from "./client";
+import { dc, FRESH, queryKeys } from "./client";
 import {
   createExpense,
   createSettlement,
@@ -70,9 +70,6 @@ export function invalidatedByExpenseWrite(
     return [...keys, [...queryKeys.GetExpense({ id: expenseId })]];
   return keys;
 }
-
-// SQL Connect reads the cache first by default and would return the first result forever.
-const SERVER_ONLY = { fetchPolicy: "SERVER_ONLY" } as const;
 
 /** SQL Connect answers UUIDs as 32 hex digits; the address bar may carry the dashed form. */
 export const normalizeId = (id: string): string =>
@@ -197,11 +194,7 @@ export function useExpense(
     queryKey: [...queryKeys.GetExpense({ id: expenseId })],
     enabled: !!expenseId,
     queryFn: async () => {
-      const result = await getExpense(
-        dc(),
-        { id: expenseId as string },
-        SERVER_ONLY,
-      );
+      const result = await getExpense(dc(), { id: expenseId as string }, FRESH);
       return result.data.expense ?? null;
     },
   });
@@ -218,7 +211,7 @@ export function useExpenseGroupMembers(
       const result = await listGroupMembers(
         dc(),
         { groupId: groupId as string },
-        SERVER_ONLY,
+        FRESH,
       );
       return result.data.groupMembers.map((m) => m.user);
     },
@@ -230,7 +223,7 @@ export function useExpenseGroups(): UseQueryResult<MyGroup[]> {
   return useQuery({
     queryKey: [...queryKeys.ListMyGroups({}), "expense"],
     queryFn: async () => {
-      const result = await listMyGroups(dc(), {}, SERVER_ONLY);
+      const result = await listMyGroups(dc(), {}, FRESH);
       return result.data.groups.map((g) => ({
         id: g.id,
         title: g.title,

@@ -24,11 +24,7 @@ import {
   type ListMyGroupsData,
 } from "@dataconnect/app";
 import { z } from "zod";
-import { dc, queryKeys } from "./client";
-
-// The SDK answers a query it has run before from its own copy, which hides a write made since. TanStack Query
-// keeps the cache here, so every read goes to the server.
-const FRESH = { fetchPolicy: "SERVER_ONLY" } as const;
+import { dc, FRESH, queryKeys } from "./client";
 
 export type Friend = NonNullable<GetFriendData["friendship"]>["friend"];
 export type GroupSummary = ListMyGroupsData["groups"][number];
