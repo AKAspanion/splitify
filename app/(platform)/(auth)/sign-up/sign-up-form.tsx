@@ -175,15 +175,23 @@ export function SignUpForm() {
       >
         Continue with Google
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+      <div className="flex flex-col items-center gap-2 text-sm">
+        <p className="text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href={`/sign-in/${query}`}
+            className="text-foreground underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
         <Link
-          href={`/sign-in/${query}`}
-          className="text-foreground underline-offset-4 hover:underline"
+          href="/privacy/"
+          className="text-muted-foreground underline-offset-4 hover:underline"
         >
-          Sign in
+          Privacy policy
         </Link>
-      </p>
+      </div>
     </div>
   );
 }
