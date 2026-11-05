@@ -1,32 +1,30 @@
+"use client";
+
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
 import { Header } from "@/components/container/header";
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import { UISpinner } from "@/components/ui-spinner";
+import { useSearchParams } from "next/navigation";
+import { useExpenseGroups } from "@/lib/data/expenses";
+import ExpenseFormLoading, {
+  ExpenseLoadError,
+} from "@/app/(platform)/(app)/_components/expense-form-loading";
+import Form from "./(form)/form";
 
-const Form = dynamic(() => import("./(form)/form"), {
-  loading: () => <UISpinner />,
-});
+const AddExpense = () => {
+  const searchParams = useSearchParams();
+  const { data: groups, error, isPending, refetch } = useExpenseGroups();
 
-const AddExpense = async ({ searchParams }: ServerSideComponentProp) => {
-  const { userId } = await auth();
-
-  const groups = await db.group.findMany({
-    where: { users: { some: { id: userId || "null" } } },
-    include: { users: true },
-    orderBy: [{ createdAt: "desc" }],
-  });
-
-  const groupdId = searchParams["groupId"] || "";
+  const groupdId = searchParams.get("groupId") || "";
   const backTo = groupdId ? `/groups/${groupdId}` : `/groups`;
 
   return (
     <AutoContainer header={<Header backTo={backTo} title="Add an expense" />}>
-      <Suspense>
+      {error ? (
+        <ExpenseLoadError error={error} onRetry={() => refetch()} />
+      ) : isPending ? (
+        <ExpenseFormLoading add />
+      ) : (
         <Form groups={groups} />
-      </Suspense>
+      )}
     </AutoContainer>
   );
 };

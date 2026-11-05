@@ -7,6 +7,7 @@ import { getOwsKeyword, getVerbKeyword } from "@/utils/validate";
 import { User, UserPayment, UserSplit } from "@/generated/prisma/browser";
 import { useMemo, useState } from "react";
 import { getInitials } from "@/utils/func";
+import { yourShareInExpense } from "@/app/(platform)/(app)/_utils/expense";
 
 const MAX_LIST_COUNT = 2;
 
@@ -49,8 +50,21 @@ const BalanceSummaryList = ({
     [show, summaryList],
   );
 
+  const share = useMemo(
+    () =>
+      userId
+        ? yourShareInExpense(userId, users || [], payments || [], splits || [])
+        : null,
+    [payments, splits, users, userId],
+  );
+
   return !userId ? null : (
     <div className="flex flex-col gap-2">
+      {share ? (
+        <div className={`text-sm font-semibold ${share.color}`}>
+          {share.text}
+        </div>
+      ) : null}
       {summary?.map((s, i) => (
         <div key={i} className="text-xs">
           {s}

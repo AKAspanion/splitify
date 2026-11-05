@@ -1,28 +1,21 @@
-import { UserAvatars } from "@/app/(platform)/(app)/_components/user-avatars";
-import { whoPaidExpense } from "@/app/(platform)/(app)/_utils/expense";
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
+import { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import ExpenseUsersClient from "./expense-users-client";
 
-const ExpenseUsers = async ({
-  expenseId,
-  groupId,
+const ExpenseUsers = ({
+  expense,
+  userId,
   balance,
 }: {
-  expenseId: string;
-  groupId: string;
+  expense: ExpenseWithPaymentWithSplit;
+  userId: string | null;
   balance: React.ReactNode;
 }) => {
-  const payments = await db.userPayment.findMany({
-    where: { expenseId },
-    include: { user: true },
-  });
-
   return (
     <ExpenseUsersClient
-      payments={payments}
-      expenseId={expenseId}
-      groupId={groupId}
+      payments={expense.payments}
+      amount={expense.amount}
+      isSettlement={expense.tag === "SETTLEMENT"}
+      userId={userId}
       balance={balance}
     />
   );

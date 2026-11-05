@@ -2,52 +2,37 @@
 
 import { Header } from "@/components/container/header";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import useExpense from "@/hooks/use-expense";
+import type { ExpenseDetail } from "@/lib/data/expenses";
 import { PencilIcon } from "lucide-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-
-const ExpenseActions = dynamic(() => import("./expense-actions"), {
-  loading: () => (
-    <div className="flex justify-between gap-4">
-      <Skeleton className="w-10 h-10 rounded-md" />
-      <Skeleton className="w-10 h-10 rounded-md" />
-    </div>
-  ),
-});
+import ExpenseActions from "./expense-actions";
 
 const ExpenseHeader = ({
   groupId,
-  expenseId,
+  expense,
 }: {
-  expenseId: string;
   groupId: string;
+  expense: ExpenseDetail;
 }) => {
-  const { expense, loading } = useExpense(expenseId, groupId);
-
-  const backTo = `/groups/${groupId || ""}`;
-  const editLink = `/expense/${expenseId || ""}/edit?groupId=${groupId || ""}`;
-
-  const isSettlement = expense?.tag === "SETTLEMENT";
+  const backTo = `/groups/${groupId}`;
+  const editLink = `/expense/${expense.id}/edit?groupId=${groupId}`;
+  const isSettlement = expense.tag === "SETTLEMENT";
 
   return (
     <Header
       backTo={backTo}
-      title={isSettlement ? "Settlement" : expense?.description}
+      title={isSettlement ? "Settlement" : expense.description}
       actions={
-        expense ? (
-          <>
-            <ExpenseActions expense={expense} />
-            {isSettlement ? null : (
-              <Link href={editLink}>
-                <Button variant={"ghost"} size={"icon"}>
-                  <PencilIcon className="w-5 h-5" />
-                </Button>
-              </Link>
-            )}
-          </>
-        ) : null
+        <>
+          <ExpenseActions expense={expense} />
+          {isSettlement ? null : (
+            <Link href={editLink}>
+              <Button variant={"ghost"} size={"icon"}>
+                <PencilIcon className="w-5 h-5" />
+              </Button>
+            </Link>
+          )}
+        </>
       }
     />
   );

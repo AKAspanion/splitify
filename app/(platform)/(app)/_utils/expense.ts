@@ -41,13 +41,17 @@ export const yourShareInExpense = (
 
   const normalizedAmount = fixedNum(paid - owed);
 
+  if (normalizedAmount === 0) {
+    return { text: `You are settled up`, color: "" };
+  }
+
   return normalizedAmount > 0
     ? {
         text: `You get back ${RUPEE_SYMBOL} ${Math.abs(normalizedAmount)}`,
         color: "text-sparkle",
       }
     : {
-        text: `You owe ${RUPEE_SYMBOL} ${Math.abs(owed)}`,
+        text: `You owe ${RUPEE_SYMBOL} ${Math.abs(normalizedAmount)}`,
         color: "text-destructive",
       };
 };

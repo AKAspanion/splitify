@@ -1,27 +1,35 @@
 "use client";
 
 import { FormInput } from "@/components/form/form-input";
-import { FormSubmit } from "@/components/form/form-submit";
+import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GroupCombobox } from "./group-combobox";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useAction } from "@/hooks/use-action";
-import { createExpense } from "@/actions/create-expense";
 import { PaymentDrawer } from "./payment-drawer";
 import { SplitDrawer } from "./split-drawer";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/use-auth";
+import { toUserMessage } from "@/lib/data/errors";
+import {
+  normalizeId,
+  toUser,
+  useCreateExpense,
+  useExpenseGroupMembers,
+  validateExpense,
+  type ExpenseFieldErrors,
+  type MyGroup,
+} from "@/lib/data/expenses";
 import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@/generated/prisma/browser";
 import { convertToObject, fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
-import { GroupWIthUsers } from "@/types/shared";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 
-type FormProps = { groups: GroupWIthUsers[] };
+type FormProps = { groups: MyGroup[] };
 
 const FormComp = ({ groups }: FormProps) => {
-  const { user } = useUser();
+  const { user } = useAuth();
+  const userId = user?.uid;
   const router = useRouter();
   const searchParams = useSearchParams();
   const paramsGroupId = searchParams.get("groupId") || "";
@@ -33,20 +41,16 @@ const FormComp = ({ groups }: FormProps) => {
   const [category, setCategory] = useState<string>("general");
   const [splitType, setSplitType] = useState<ExpenseType>("EQUAL");
   const [payment, setPayment] = useState<Record<string, number>>({});
-  const [groupId, setGroupId] = useState(paramsGroupId.toString());
+  const [groupId, setGroupId] = useState(normalizeId(paramsGroupId));
 
-  const { loading, execute, fieldErrors } = useAction(createExpense, {
-    onSuccess: ({ expense, userId }) => {
-      toast.success("Expense created successfully");
-      router.push(`/groups/${expense?.groupId || ""}`);
-    },
-    onError: (error, debug) => {
-      console.error(debug);
-      toast.error(error);
-    },
-  });
+  const create = useCreateExpense();
+  const loading = create.isPending;
+  const [fieldErrors, setFieldErrors] = useState<ExpenseFieldErrors>();
 
-  const onSubmit = (formData: FormData) => {
+  // Not a form action: React would clear what was typed when the action ends, and it has to stay on an error.
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const description = formData.get("description") as string;
     const total = parseFloat((formData.get("amount") as string) || "");
 
@@ -60,13 +64,12 @@ const FormComp = ({ groups }: FormProps) => {
         return { amount: fixedNum(value), userId: key };
       });
 
-    let splits: { type: ExpenseType; amount: number; userId: string }[] = [];
+    let splits: { amount: number; percent?: number; userId: string }[] = [];
 
     if (splitType === ExpenseType.EQUAL) {
       const ids = Object.entries(equalSplit).filter(([_, value]) => value);
       const am = total / ids.length;
       splits = ids.map(([userId]) => ({
-        type: ExpenseType.EQUAL,
         amount: fixedNum(am),
         userId,
       }));
@@ -75,7 +78,6 @@ const FormComp = ({ groups }: FormProps) => {
         ([_, value]) => !isNaN(value) && value,
       );
       splits = ids.map(([userId, am]) => ({
-        type: ExpenseType.EXACT,
         amount: fixedNum(am),
         userId,
       }));
@@ -84,38 +86,52 @@ const FormComp = ({ groups }: FormProps) => {
         ([_, value]) => !isNaN(value) && value,
       );
       splits = ids.map(([userId, percent]) => ({
-        type: ExpenseType.PERCENT,
         amount: fixedNum((total * percent) / 100),
         percent: fixedNum(percent),
         userId,
       }));
     }
 
-    if (user?.id) {
-      execute({
+    const errors = validateExpense({
+      description,
+      amount: total,
+      groupId,
+      payments,
+      splits,
+    });
+    setFieldErrors(errors ?? undefined);
+    if (errors || !userId) return;
+
+    try {
+      await create.mutateAsync({
         amount: fixedNum(total),
         description,
         payments,
         splits,
         groupId,
         category,
-        createrId: user?.id,
         type: splitType,
       });
+    } catch {
+      return;
     }
+    toast.success("Expense created successfully");
+    router.push(`/groups/${groupId}`);
   };
 
+  const { data: members } = useExpenseGroupMembers(groupId || null);
+
   const users = useMemo(() => {
-    const gs = groups?.find((g) => g.id === groupId)?.users || [];
+    const gs = (members || []).map(toUser);
     return [
-      ...gs.filter((u) => u?.id === user?.id),
-      ...gs.filter((u) => u?.id !== user?.id),
+      ...gs.filter((u) => u?.id === userId),
+      ...gs.filter((u) => u?.id !== userId),
     ];
-  }, [groups, groupId, user?.id]);
+  }, [members, userId]);
 
   const currUserId = useMemo(() => {
-    return users?.find((u) => u.id === user?.id)?.id;
-  }, [user?.id, users]);
+    return users?.find((u) => u.id === userId)?.id;
+  }, [userId, users]);
 
   const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});
   const [exactSplit, setExactSplit] = useState<Record<string, number>>({});
@@ -168,7 +184,7 @@ const FormComp = ({ groups }: FormProps) => {
   }, [effectUsers]);
 
   return (
-    <form className="flex flex-col gap-4 sm:gap-6" action={onSubmit}>
+    <form className="flex flex-col gap-4 sm:gap-6" onSubmit={onSubmit}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <GroupCombobox
@@ -191,7 +207,6 @@ const FormComp = ({ groups }: FormProps) => {
             setOpen={setCategoryOpen}
             setValue={onCategoryChange}
           />
-          <FormErrors id="group" errors={fieldErrors?.category} />
         </div>
         <FormInput
           id="description"
@@ -199,6 +214,7 @@ const FormComp = ({ groups }: FormProps) => {
           label="Description"
           placeholder="Enter a description"
           errors={fieldErrors?.description}
+          disabled={loading}
         />
         <FormInput
           id="amount"
@@ -208,6 +224,7 @@ const FormComp = ({ groups }: FormProps) => {
           step={0.01}
           placeholder={"0.00"}
           errors={fieldErrors?.amount}
+          disabled={loading}
           onChange={(e) => onTotalChange(e.target.value)}
         />
       </div>
@@ -240,7 +257,15 @@ const FormComp = ({ groups }: FormProps) => {
         <FormErrors id="payments" errors={fieldErrors?.payments} />
         <FormErrors id="splits" errors={fieldErrors?.splits} />
       </div>
-      <FormSubmit>Add</FormSubmit>
+      <FormErrors
+        id="create-expense"
+        errors={create.error ? [toUserMessage(create.error)] : undefined}
+      />
+      <div className="flex justify-end items-center">
+        <Button type="submit" loading={loading} disabled={loading}>
+          Add
+        </Button>
+      </div>
     </form>
   );
 };

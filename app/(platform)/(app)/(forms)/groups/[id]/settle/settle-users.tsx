@@ -1,20 +1,22 @@
-import { db } from "@/lib/db";
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { toUser, type GroupMember } from "@/lib/data/expenses";
 
-const SettleUsers = async ({
+const SettleUsers = ({
   user1Id,
   user2Id,
+  members,
 }: {
   user1Id: string;
   user2Id: string;
+  members: GroupMember[];
 }) => {
-  const users = await db.user.findMany({
-    where: { id: { in: [user1Id, user2Id] } },
-  });
-
-  const user1 = users.find((u) => u.id === user1Id);
-  const user2 = users.find((u) => u.id === user2Id);
+  const found1 = members.find((u) => u.id === user1Id);
+  const found2 = members.find((u) => u.id === user2Id);
+  const user1 = found1 && toUser(found1);
+  const user2 = found2 && toUser(found2);
 
   return user1 && user2 ? (
     <div className="w-full flex flex-col gap-6 items-center justify-between">

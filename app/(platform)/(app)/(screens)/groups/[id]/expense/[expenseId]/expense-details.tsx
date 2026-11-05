@@ -1,97 +1,93 @@
+"use client";
+
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { AutoContainer } from "@/components/container/auto-container";
-import { auth } from "@clerk/nextjs/server";
-import dynamic from "next/dynamic";
+import { Header } from "@/components/container/header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UserAvatarsLoading } from "@/app/(platform)/(app)/_components/user-avatars";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouteIds } from "@/hooks/use-route-ids";
+import {
+  toExpenseView,
+  useExpense,
+  useExpenseGroupMembers,
+} from "@/lib/data/expenses";
+import {
+  ExpenseLoadError,
+  ExpenseNotFound,
+} from "@/app/(platform)/(app)/_components/expense-form-loading";
 import ExpenseHeader from "./expense-header";
 import ExpenseClient from "./expense-client";
+import ExpenseAddedBy from "./expense-added-by";
+import ExpenseUsers from "./expense-users";
+import Balance from "./expense-balance";
 
-const Balance = dynamic(() => import("./expense-balance"), {
-  loading: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-4 w-[120px]" />
-        <Skeleton className="h-4 w-[160px]" />
-        <Skeleton className="h-4 w-[60px]" />
-      </div>
+const ExpenseSkeleton = () => (
+  <div className="flex flex-col gap-6">
+    <Skeleton className="h-7 w-[80px]" />
+    <Skeleton className="h-5 w-[120px]" />
+    <div className="flex flex-col gap-2">
+      <Skeleton className="h-4 w-[120px]" />
+      <Skeleton className="h-4 w-[160px]" />
+      <Skeleton className="h-4 w-[60px]" />
     </div>
-  ),
-});
+  </div>
+);
 
-const ExpenseAddedBy = dynamic(() => import("./expense-added-by"), {
-  loading: () => <Skeleton className="h-5 w-[120px]" />,
-});
+const ExpenseDetails = () => {
+  const { user } = useAuth();
+  const { groupId, expenseId } = useRouteIds();
+  const searchParams = useSearchParams();
+  const showBalance = searchParams.get("balance") === "yes";
 
-const ExpenseUsers = dynamic(() => import("./expense-users"), {
-  loading: () => <UserAvatarsLoading lg />,
-});
+  const expenseQuery = useExpense(expenseId);
+  const membersQuery = useExpenseGroupMembers(groupId);
+  const expense = expenseQuery.data;
+  const members = membersQuery.data;
 
-const ExpenseDetails = async ({
-  params,
-  searchParams,
-}: ServerSideComponentProp) => {
-  const { userId } = await auth();
-  const groupId = params["id"] || "null";
-  const expenseId = params["expenseId"] || "null";
+  const view = useMemo(
+    () => (expense && members ? toExpenseView(expense, members) : null),
+    [expense, members],
+  );
 
-  const showBalance = searchParams["balance"] === "yes";
+  const backTo = `/groups/${groupId || ""}`;
+  const error = expenseQuery.error || membersQuery.error;
 
-  const keyString = `balance=${searchParams?.["balance"]}`;
-
-  return (
-    <AutoContainer
-      header={<ExpenseHeader groupId={groupId} expenseId={expenseId} />}
-    >
+  let body: React.ReactNode;
+  if (!groupId || !expenseId) {
+    body = <ExpenseNotFound />;
+  } else if (error) {
+    body = (
+      <ExpenseLoadError
+        error={error}
+        onRetry={() => {
+          expenseQuery.refetch();
+          membersQuery.refetch();
+        }}
+      />
+    );
+  } else if (expenseQuery.isPending || membersQuery.isPending) {
+    body = <ExpenseSkeleton />;
+  } else if (!expense || !view) {
+    body = <ExpenseNotFound />;
+  } else {
+    body = (
       <div className="flex flex-col gap-6">
-        <ExpenseClient groupId={groupId} expenseId={expenseId} />
-        <ExpenseAddedBy groupId={groupId} expenseId={expenseId} />
-        {/* {isSettlement ? (
-          <>
-            <div className="flex items-center gap-6">
-              <BanknoteIcon className="w-10 h-10 text-green-500" />
-              <div>{expense?.description}</div>
-            </div>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPEE_SYMBOL} {expense?.amount}
-              </div>
-              <ExpenseAddedBy
-                userId={userId}
-                groupId={groupId}
-                expenseId={expenseId}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={""}>
-              <div className="font-bold text-lg">
-                {RUPEE_SYMBOL} {expense?.amount}
-              </div>
-              <ExpenseAddedBy
-                userId={userId}
-                groupId={groupId}
-                expenseId={expenseId}
-              />
-            </div>
-            <ExpenseUsers expenseId={expenseId} amount={expense?.amount} />
-            <Balance
-              key={keyString}
-              userId={userId}
-              groupId={groupId}
-              expenseId={expenseId}
-              balance={showBalance}
-            />
-          </>
-        )} */}
-
+        <ExpenseClient expense={expense} />
+        <ExpenseAddedBy
+          expense={expense}
+          addedById={expense.creator.id}
+          addedByName={expense.creator.name}
+          userId={user?.uid}
+        />
         <ExpenseUsers
-          expenseId={expenseId}
-          groupId={groupId}
+          expense={view.expense}
+          userId={user?.uid ?? null}
           balance={
             <Balance
-              key={keyString}
-              userId={userId}
+              expense={view.expense}
+              users={view.users}
+              userId={user?.uid ?? null}
               groupId={groupId}
               expenseId={expenseId}
               balance={showBalance}
@@ -99,6 +95,20 @@ const ExpenseDetails = async ({
           }
         />
       </div>
+    );
+  }
+
+  return (
+    <AutoContainer
+      header={
+        expense ? (
+          <ExpenseHeader groupId={groupId || ""} expense={expense} />
+        ) : (
+          <Header backTo={backTo} title="Expense details" />
+        )
+      }
+    >
+      {body}
     </AutoContainer>
   );
 };

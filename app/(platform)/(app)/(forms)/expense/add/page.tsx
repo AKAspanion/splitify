@@ -1,14 +1,13 @@
-import dynamic from "next/dynamic";
+"use client";
+
+import { Suspense } from "react";
 import ExpenseFormLoading from "@/app/(platform)/(app)/_components/expense-form-loading";
-import { resolvePageProps } from "@/utils/page";
+import AddExpense from "./add-expense";
 
-const AddExpense = dynamic(() => import("./add-expense"), {
-  loading: () => <ExpenseFormLoading add />,
-});
-
-const ExpenseFormPage = async (pageProps: ServerSidePageProp) => {
-  const { params, searchParams } = await resolvePageProps(pageProps);
-  return <AddExpense params={params} searchParams={searchParams} />;
-};
+const ExpenseFormPage = () => (
+  <Suspense fallback={<ExpenseFormLoading add />}>
+    <AddExpense />
+  </Suspense>
+);
 
 export default ExpenseFormPage;
