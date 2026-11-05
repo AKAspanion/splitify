@@ -36,6 +36,37 @@ describe("activityLine", () => {
     );
   });
 
+  it("says 'You added <name> as a friend' on the adder's own feed", () => {
+    const user = item({
+      type: "USER",
+      amount: null,
+      expenseId: null,
+      groupId: null,
+      actorId: "me",
+      actorName: "Asha Rao",
+      subjectId: "pal",
+      subjectName: "Ravi",
+    });
+    expect(activityLine(user, "me").body).toBe("You added Ravi as a friend");
+    expect(activityLine({ ...user, subjectName: null }, "me").body).toBe(
+      "You added someone as a friend",
+    );
+  });
+
+  it("says '<actor> added you as a friend' for the person who was added", () => {
+    const user = item({
+      type: "USER",
+      amount: null,
+      expenseId: null,
+      groupId: null,
+      actorId: "pal",
+      actorName: "Ravi",
+      subjectId: "me",
+      subjectName: "Asha Rao",
+    });
+    expect(activityLine(user, "me").body).toBe("Ravi added you as a friend");
+  });
+
   it("says 'You were added to' when a MEMBER_PLUS names the viewer", () => {
     const line = activityLine(
       item({

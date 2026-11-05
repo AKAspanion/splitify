@@ -66,6 +66,11 @@ export function activityLine(
     return { ...text, body: `You were added to group "${item.title}"` };
   if (item.subjectId === viewerId && item.type === "MEMBER_MINUS")
     return { ...text, body: `You were removed from group "${item.title}"` };
+  if (item.type === "USER" && item.actorId === viewerId)
+    return {
+      ...text,
+      body: `You added ${item.subjectName ?? "someone"} as a friend`,
+    };
   return text;
 }
 
