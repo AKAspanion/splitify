@@ -1,11 +1,12 @@
 {
   "workflow": {
     "steps": {
-      "spec": "always",
+      "spec": "suggest",
       "plan": "always",
       "tdd": "encouraged",
       "approve": "when-settled"
     }
   },
-  "habitsOffered": "2026-11-04"
+  "habitsOffered": "2026-11-04",
+  "flowAsked": "2026-11-05"
 }

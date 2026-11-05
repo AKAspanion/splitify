@@ -11,7 +11,7 @@ verified: human:ankitp@geekyants.com
 # Cloud Functions
 
 Node 24 functions in `functions/`, built with their own `typescript` and `tsconfig.json` (test files excluded),
-deployed by hand with `yarn deploy:functions` from a project owner's machine, not by the deploy workflow
+deployed by hand with `pnpm deploy:functions` from a project owner's machine, not by the deploy workflow
 ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). `functions/src/index.ts` exports them. All run in
 `asia-south1`.
 

@@ -1,4 +1,4 @@
-// Helpers for tests that run against the Firebase Auth and SQL Connect emulators (`yarn test:rules`).
+// Helpers for tests that run against the Firebase Auth and SQL Connect emulators (`pnpm test:rules`).
 import { connectorConfig } from "@dataconnect/app";
 import { getApp, initializeApp, type FirebaseApp } from "firebase/app";
 import {
@@ -19,17 +19,15 @@ import {
   getApps as getAdminApps,
 } from "firebase-admin/app";
 import { getDataConnect as getAdminDataConnect } from "firebase-admin/data-connect";
+import { AUTH_HOST, DATA_CONNECT_HOST } from "./emulator-ports";
 
 export type TestUser = { uid: string; email: string; dc: DataConnect };
 
 const PROJECT_ID = "demo-splitify";
-const AUTH_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST ?? "127.0.0.1:9099";
-const DATA_CONNECT_HOST =
-  process.env.DATA_CONNECT_EMULATOR_HOST ?? "127.0.0.1:9399";
 const PASSWORD = "test-password-123";
 
-// The admin SDK reads this to talk to the emulator, with no token, so `seed` bypasses `@auth`.
-process.env.DATA_CONNECT_EMULATOR_HOST = DATA_CONNECT_HOST;
+// The admin SDK reads DATA_CONNECT_EMULATOR_HOST (set by `firebase emulators:exec`) to talk to the emulator, with no
+// token, so `seed` bypasses `@auth`.
 
 let instance = 0;
 

@@ -1,0 +1,6 @@
+overrides:
+  'glob@7>minimatch': 3.1.5
+  'readdir-glob>minimatch': 5.1.9
+allowBuilds:
+  '@firebase/util': true
+  protobufjs: true

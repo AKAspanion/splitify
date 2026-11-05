@@ -82,7 +82,7 @@ because the split engine needs `EQUAL` apart from `EXACT`.
 ## Tests
 
 The rules are tested on the Auth and SQL Connect emulators ([run locally](../operations/run-locally.md)), in
-`*.test.ts` beside each `.gql` file, with helpers in `dataconnect/test-utils/emulator.ts` (`resetDatabase` clears `PushToken` before `User`, since a token references its user). The expense writes' emulator test is `lib/data/expense-writes.rules.test.ts`, run only by `yarn test:rules`.
+`*.test.ts` beside each `.gql` file, with helpers in `dataconnect/test-utils/emulator.ts` (`resetDatabase` clears `PushToken` before `User`, since a token references its user). The expense writes' emulator test is `lib/data/expense-writes.rules.test.ts`, run only by `pnpm test:rules`.
 
 ## History
 

@@ -1,12 +1,14 @@
 // Checks the hosting build in out/: which pages exist, then what the Firebase Hosting emulator serves from it.
-// Run after `yarn build`. Exits non-zero on the first failure, with a line naming it.
+// Run after `pnpm build`. Exits non-zero on the first failure, with a line naming it.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PORT = 5050;
+const { host: HOST, port: PORT } = JSON.parse(
+  readFileSync(path.join(root, "firebase.json"), "utf8"),
+).emulators.hosting;
 
 // Every scripts/hosting-pages/*.json is `{ pages: string[], requests: { path, expectText }[] }`: the files
 // `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file.
@@ -34,7 +36,7 @@ function fail(message) {
 
 // Phase 2, run inside the emulator.
 const checkServed = async () => {
-  const base = `http://127.0.0.1:${PORT}`;
+  const base = `http://${HOST}:${PORT}`;
   const get = async (route) => {
     const res = await fetch(base + route);
     return { res, body: await res.text() };
@@ -153,15 +155,18 @@ for (const { name, pages } of readManifests()) {
   }
 }
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.
-spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
+const config = spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
   cwd: root,
   stdio: "inherit",
 });
+if (config.status !== 0) {
+  fail(
+    `scripts/emulator-firebase-config.mjs failed${config.error ? `: ${config.error.message}` : ""}`,
+  );
+}
 const result = spawnSync(
-  "npx",
+  path.join(root, "node_modules", ".bin", "firebase"),
   [
-    "--yes",
-    "firebase-tools@15.34.2",
     "emulators:exec",
     "--config",
     "firebase.emulators.json",

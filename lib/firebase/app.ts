@@ -13,8 +13,9 @@ import {
   type DataConnect,
 } from "firebase/data-connect";
 
-const AUTH_EMULATOR = "http://127.0.0.1:9099";
-const DATA_CONNECT_EMULATOR = { host: "127.0.0.1", port: 9399 };
+import { EMULATOR_HOST, EMULATOR_PORTS } from "@/lib/firebase/emulators";
+
+const AUTH_EMULATOR = `http://${EMULATOR_HOST}:${EMULATOR_PORTS.auth}`;
 
 const shouldUseEmulators = () =>
   process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true";
@@ -58,8 +59,8 @@ export function getDataConnectClient(): DataConnect {
   if (shouldUseEmulators())
     connectDataConnectEmulator(
       client,
-      DATA_CONNECT_EMULATOR.host,
-      DATA_CONNECT_EMULATOR.port,
+      EMULATOR_HOST,
+      EMULATOR_PORTS.dataconnect,
     );
   dataConnect = client;
   return client;

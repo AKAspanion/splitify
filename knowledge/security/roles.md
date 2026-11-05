@@ -24,7 +24,7 @@ its expenses. The rules are written into the operations, so the browser cannot s
 
 - SQL Connect operations in `dataconnect/app/people.gql`, `dataconnect/app/groups.gql` and the expense operations check
   membership or ownership in the same transaction as the write ([where each rule lives](../data/sql-connect.md)). The
-  rule tests under `dataconnect/` run on the emulators with `yarn test:rules`.
+  rule tests under `dataconnect/` run on the emulators with `pnpm test:rules`.
 - The `reports` function answers members of the group only, and a group that does not exist and one the caller is not in
   answer the same ([reports](../features/reports.md)).
 - The `webauthn` function reads and writes only the caller's own devices, and `deleteMyAccount` acts only on the caller.

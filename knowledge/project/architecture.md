@@ -28,6 +28,7 @@ export (`output: "export"`) that Firebase Hosting serves, and the browser talks 
   contacts, send pushes and cut billing. The browser calls the HTTP functions with `callFunction`
   (`lib/functions/call.ts`), which sends the Firebase ID token, and each checks it with the guard
   (`functions/src/http/guard.ts`). See [Cloud Functions](../apps/functions.md) and [auth](../security/auth.md).
+  In `next dev` there is no Hosting, so `next.config.mjs` rewrites those two paths to the Functions emulator instead ([run locally](../operations/run-locally.md)).
 - **Balances** are computed in memory on each render by the split engine in `lib/splitify/`, called from
   `app/(platform)/(app)/_utils/calculation.ts`. Nothing about balances is stored. See
   [split types](../domain/split-types.md) and [debt simplification](../domain/debt-simplification.md).
@@ -54,6 +55,7 @@ User rows are created on first sign-in by the `UpsertMe` mutation, and offline c
 
 ## History
 
+- 2026-11-05: the `/api/` rewrites existed only in Hosting; now `next dev` has its own dev-only rewrites to the Functions emulator, because local development runs on the emulators.
 - 2026-11-05: pushes and activity were sent by `/api/push-notification` routes the browser called after each action; now each action writes its activity and sends its pushes itself, because the security fixes removed those routes. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 - 2026-11-05: added the hosting build, because the public pages are served from Firebase Hosting first.
 - 2026-11-05: was a Next.js server (server actions, `/api` route handlers, Prisma over MySQL, Clerk, OneSignal); now one static build served by Firebase Hosting, with SQL Connect and Cloud Functions behind it, because spec 2c removed the server. See [static build on Firebase Hosting](../decisions/static-build-on-firebase-hosting.md).

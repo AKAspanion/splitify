@@ -41,7 +41,7 @@ which posts `SKIP_WAITING` and reloads once the new worker controls the page.
 
 ## Testing and limits
 
-- The worker only works in the exported build, not in `next dev`. Check it with `yarn build` and the Hosting emulator ([run locally](run-locally.md)).
+- The worker only works in the exported build, not in `next dev`. Check it with `pnpm build` and the Hosting emulator ([run locally](run-locally.md)).
 - `scripts/hosting-pages/pwa.json` lists the three files the Hosting check expects (/sw.js, /sw-manifest.js and /sw-routing.js).
 - `lib/offline/sw-navigation.test.ts` runs `public/sw.js` in a Node `vm` context with fake `self`, `caches` and `fetch`, because a worker's `self` can't be imported; this is the pattern for testing the worker's timing.
 - Provisional, for the developer to confirm: the manifest global's name, the classic script, and caching pages by path and file URL.

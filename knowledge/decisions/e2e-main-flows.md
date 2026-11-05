@@ -14,7 +14,7 @@ verified: human:ankitp@geekyants.com
 
 How changes should be tested was open ([question](../questions/testing-approach.md)): unit tests of the split engine,
 tests of the server actions, end-to-end tests of the main flows, or none. Since then, Vitest unit tests have been
-added beside the actions and routes they cover (`vitest.config.mts`, run by `yarn test`).
+added beside the actions and routes they cover (`vitest.config.mts`, run by `pnpm test`).
 
 ## Decision
 
