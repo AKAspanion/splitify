@@ -25,6 +25,11 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
 - Deploy the Cloud Functions by hand, `pnpm deploy:functions`, signed in to the Firebase CLI as a project owner: the
   CLI grants Google Cloud's service agents the roles a functions deploy needs, which `github-deploy@` can't
   ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)).
+- When a function's trigger type changes (an HTTPS function becoming an event trigger, or back), delete the
+  deployed one first with `firebase functions:delete <name> --region asia-south1`, then deploy: Firebase refuses to
+  change the type in place. On 2026-11-05 the three push senders were HTTPS functions in `splitify-416321` and the
+  code's `onMutationExecuted` triggers, and were deleted and recreated this way. Deploy SQL Connect before the
+  functions, so a trigger's connector exists.
 - Set up the budget kill switch: its `billing-kill-switch@` account, the Cloud Run Invoker grant for the trigger, and
   the budget's Pub/Sub connection ([decision](../decisions/budget-kill-switch.md), [functions](../apps/functions.md)).
 
@@ -39,6 +44,7 @@ functions may now be spare, and the first deploy may still fail on a missing per
 
 ## History
 
+- 2026-11-05: added deleting a function before a deploy changes its trigger type, because the push senders' deploy was refused until the HTTPS versions were deleted.
 - 2026-11-05: added the `SESSION_PASSWORD` secret step and dropped the Prisma remark, because the webauthn function needs the secret and Prisma is removed.
 - 2026-11-05: added the five Firebase web Variables and the manual SQL Connect deploy the `PushToken` table needs, because sign-in and push read them.
 - 2026-11-05: the functions deployed from the deploy workflow; now a project owner deploys them by hand, because the CI deploy couldn't grant the service agents' IAM roles. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).

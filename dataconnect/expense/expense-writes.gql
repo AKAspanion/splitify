@@ -9,7 +9,9 @@ mutation CreateExpense(
   $category: String
   $type: ExpenseType!
   $payments: [UserPayment_Data!]!
+    @allow(fields: "id expenseId userId amount", maxCount: 50)
   $splits: [UserSplit_Data!]!
+    @allow(fields: "id expenseId userId amount percent", maxCount: 50)
   $activityId: UUID!
 )
 @auth(

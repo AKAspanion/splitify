@@ -46,6 +46,10 @@ In `dataconnect/dataconnect.yaml`, one folder each:
   expression states what signed-in means (a token that isn't anonymous) and then the limits.
 - Membership is checked in the same `@transaction` as the write, with `@check` on a `query @redact`.
 - An optional variable in an expression is guarded with `!has(vars.x) || ...`.
+- Every `*_Data` variable carries `@allow(fields: "...", maxCount: N)`, naming exactly the fields the client sends:
+  the SQL Connect deploy refuses an operation without it, as an unbypassable `INSECURE` requirement (the local
+  emulator doesn't). `CreateExpense` allows `id expenseId userId amount` on `$payments` and adds `percent` on
+  `$splits`, each with `maxCount: 50`, the same cap its `@auth` expression sets.
 - Who may do what is [group member permissions](../decisions/group-member-permissions.md); [roles](../security/roles.md)
   says which files enforce each rule.
 
@@ -86,6 +90,7 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 
 ## History
 
+- 2026-11-05: `_Data` variables had no field allowlist; now each carries `@allow`, because the SQL Connect deploy refused `CreateExpense` without it.
 - 2026-11-05: did not record the repeated-id error; now it does, because the offline queue depends on its shape.
 - 2026-11-05: said the Prisma schema was what the running app still used; now this is the only schema, because spec 2c removed Prisma.
 - 2026-11-05: had the core of the data layer; now a hook file per area and the `FRESH` fetch policy, because spec 2b moved the screens onto it.

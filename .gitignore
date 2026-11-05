@@ -60,3 +60,6 @@ firebase.rules-test.json
 
 # Functions emulator's generated SESSION_PASSWORD
 /functions/.secret.local
+
+# the live project's function params, kept off git
+functions/.env.splitify-416321
