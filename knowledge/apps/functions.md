@@ -11,7 +11,8 @@ generated:
 # Cloud Functions
 
 Node 24 functions in `functions/`, built with their own `typescript` and `tsconfig.json` (test files excluded),
-deployed by [the deploy workflow](../operations/ci-cd.md). `functions/src/index.ts` exports them. All run in
+deployed by hand with `yarn deploy:functions` from a project owner's machine, not by the deploy workflow
+([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). `functions/src/index.ts` exports them. All run in
 `asia-south1`.
 
 ## Functions
@@ -61,6 +62,7 @@ token from `Authorization: Bearer` with the admin SDK, then reads the JSON body 
 
 ## History
 
+- 2026-11-05: the deploy workflow deployed the functions; now a project owner deploys them by hand. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).
 - 2026-11-05: had the merge, the push senders and the kill switch; now also `reports`, `webauthn` and `deleteMyAccount`, because spec 2c moved the server's work into functions. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: had the merge and the kill switch; now also the three push senders, because pushes moved to FCM.
 
