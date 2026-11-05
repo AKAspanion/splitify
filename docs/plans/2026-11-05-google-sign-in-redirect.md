@@ -1,5 +1,7 @@
 # Google Sign-in by Redirect Implementation Plan
 
+**Status:** complete, commits 3576ae9..215dc89, 2026-11-05; record: `2026-11-05-google-sign-in-redirect.record.md`
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -77,21 +79,21 @@ The marker is the `sessionStorage` key `splitify:google-redirect`: per tab, and 
 - Given no `sessionStorage` (Node), when `googleRedirectPending()` is called, then it returns `false` without throwing.
 - Given `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` unset, when `getFirebaseApp()` builds the app, then its `authDomain` is `splitify.spanion.in`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case in `lib/firebase/google-redirect.test.ts`, mocking `firebase/auth` and `@dataconnect/app` with `vi.mock`, and `sessionStorage` with `vi.stubGlobal`. Export the three functions with their real signatures first, so the tests fail on behaviour.
+- [x] **Step 1: Write the failing tests** for each Acceptance case in `lib/firebase/google-redirect.test.ts`, mocking `firebase/auth` and `@dataconnect/app` with `vi.mock`, and `sessionStorage` with `vi.stubGlobal`. Export the three functions with their real signatures first, so the tests fail on behaviour.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm exec vitest run lib/firebase/google-redirect.test.ts`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces in `lib/firebase/auth.ts`, change the `authDomain` fallback in `lib/firebase/app.ts` and the value in `.env.sample` to `splitify.spanion.in`, until the tests pass.
+- [x] **Step 3: Write the minimal implementation** to the Interfaces in `lib/firebase/auth.ts`, change the `authDomain` fallback in `lib/firebase/app.ts` and the value in `.env.sample` to `splitify.spanion.in`, until the tests pass.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm exec vitest run lib/firebase/google-redirect.test.ts lib/firebase/app.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/firebase/auth.ts lib/firebase/app.ts .env.sample lib/firebase/google-redirect.test.ts
@@ -135,21 +137,21 @@ Each form, on mount, sets `pending` to `"google"` when `googleRedirectPending()`
 - Given `completeGoogleSignIn` rejects with `auth/network-request-failed`, when `finishGoogleReturn()` runs, then it resolves `{ kind: "failed", message: "Couldn't reach Splitify. Check your connection." }`.
 - Given the sign-in page at `/sign-in?next=//evil.example` loads back from Google signed in, when the form navigates, then it goes to `/groups` (manual check: `safeNextPath` already has its own tests).
 
-- [ ] **Step 1: Write the failing tests** for the first four Acceptance cases in `lib/auth/google-return.test.ts`, mocking `@/lib/firebase/auth`. Create `lib/auth/google-return.ts` exporting `finishGoogleReturn` with its real signature first.
+- [x] **Step 1: Write the failing tests** for the first four Acceptance cases in `lib/auth/google-return.test.ts`, mocking `@/lib/firebase/auth`. Create `lib/auth/google-return.ts` exporting `finishGoogleReturn` with its real signature first.
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm exec vitest run lib/auth/google-return.test.ts`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Write the minimal implementation** of `finishGoogleReturn`, then wire both forms to it as the Interfaces describe.
+- [x] **Step 3: Write the minimal implementation** of `finishGoogleReturn`, then wire both forms to it as the Interfaces describe.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm exec vitest run lib/auth/google-return.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/auth/google-return.ts lib/auth/google-return.test.ts "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx"
