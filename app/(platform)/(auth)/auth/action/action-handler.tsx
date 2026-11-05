@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Header } from "@/components/container/header";
 import { buttonVariants } from "@/components/ui/button";
@@ -36,8 +36,8 @@ let openedLink: ActionLink | undefined;
 /**
  * Opens the link the first time a handler mounts in this document, and gives every later mount the same link. A
  * handler can mount more than once in a load: signed in, the providers remount the page once auth is restored
- * (`QueryProvider` is keyed by the person), and Strict Mode runs effects twice. Each later mount would otherwise find
- * the address bar already clean and call the link incomplete.
+ * (`QueryProvider` is keyed by the person), and Strict Mode renders twice. Each later mount would otherwise find the
+ * address bar already clean and call the link incomplete. The same link each time, so React sees no change.
  */
 export function readActionLinkOnce(win: ActionWindow): ActionLink {
   openedLink ??= openActionLink(win);
@@ -50,13 +50,17 @@ function titleFor(link: ActionLink | null): string {
   return "Email link";
 }
 
-export function ActionHandler() {
-  const [link, setLink] = useState<ActionLink | null>(null);
+/** The link never changes once read, so there is nothing to subscribe to. */
+const noSubscription = () => () => {};
 
-  // The page is prerendered, so the link is read on mount, once per document (see readActionLinkOnce).
-  useEffect(() => {
-    setLink(readActionLinkOnce(window));
-  }, []);
+export function ActionHandler() {
+  // The page is prerendered, so while prerendering and hydrating there is no link yet; then React reads the
+  // document's link, once per document (readActionLinkOnce), and every later mount gets the same one at once.
+  const link = useSyncExternalStore<ActionLink | null>(
+    noSubscription,
+    () => readActionLinkOnce(window),
+    () => null,
+  );
 
   return (
     <>
