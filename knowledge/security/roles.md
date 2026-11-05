@@ -2,10 +2,10 @@
 type: Security
 title: Roles
 description: There are no roles: any member of a group may act on it. SQL Connect's rules and the functions' membership checks enforce it.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Roles

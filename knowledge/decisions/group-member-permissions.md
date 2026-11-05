@@ -2,10 +2,10 @@
 type: Decision
 title: Any group member may change the group and its expenses; contacts only by their friends
 description: Every member of a group may edit or delete it, change its members, and edit or delete its expenses; non-members can neither read nor change it. A contact is edited only by someone who has them as a friend, and a Clerk user by nobody else.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T11:30:54Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Any group member may change the group and its expenses; contacts only by their friends

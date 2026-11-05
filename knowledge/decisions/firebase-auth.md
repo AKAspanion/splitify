@@ -2,10 +2,10 @@
 type: Decision
 title: Sign people in with Firebase Auth, by Google or email and password
 description: Firebase Auth replaces Clerk; people sign in with Google or with email and password, a user's row is written from their verified token, and a contact becomes a signed-up user only once that email is verified.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:30:02Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Sign people in with Firebase Auth, by Google or email and password

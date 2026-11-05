@@ -2,10 +2,10 @@
 type: Security
 title: Authentication
 description: Firebase Auth signs people in; the browser guards the signed-in screens, SQL Connect rules and each Cloud Function's ID-token guard check every call; a WebAuthn check can add a lock.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Authentication

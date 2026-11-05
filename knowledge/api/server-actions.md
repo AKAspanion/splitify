@@ -2,10 +2,10 @@
 type: API Contract
 title: Server actions (removed)
 description: The Next.js server actions are gone; every write is a SQL Connect mutation run from a lib/data/ hook.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Server actions (removed)

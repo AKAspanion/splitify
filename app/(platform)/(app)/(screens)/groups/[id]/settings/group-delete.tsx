@@ -1,6 +1,7 @@
 "use client";
 import useConfirm from "@/components/confirm/useConfirm";
 import { ListItem } from "@/components/list-item";
+import { OnlineOnly } from "@/components/offline/online-only";
 import Spinner from "@/components/ui/spinner";
 import { toUserMessage } from "@/lib/data/errors";
 import { useDeleteGroup } from "@/lib/data/groups";
@@ -40,13 +41,22 @@ const GroupDelete = ({ id }: { id?: string }) => {
       <ListItem title="Deleting group" icon={<Spinner />} />
     </div>
   ) : (
-    <div
-      className="text-red-500 cursor-pointer"
-      role="button"
-      onClick={handleDelete}
-    >
-      <ListItem title="Delete group" icon={<TrashIcon width={20} />} />
-    </div>
+    <OnlineOnly>
+      {(offline) => (
+        <div
+          className={
+            offline
+              ? "text-red-500 opacity-50 cursor-not-allowed"
+              : "text-red-500 cursor-pointer"
+          }
+          role="button"
+          aria-disabled={offline}
+          onClick={offline ? undefined : handleDelete}
+        >
+          <ListItem title="Delete group" icon={<TrashIcon width={20} />} />
+        </div>
+      )}
+    </OnlineOnly>
   );
 };
 

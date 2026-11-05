@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { signInWithGoogle, signUpWithEmail } from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
 import { safeNextPath } from "@/lib/auth/next-path";
+import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
+import { useOnline } from "@/hooks/use-online";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -17,6 +19,7 @@ export function SignUpForm() {
   const searchParams = useSearchParams();
   const rawNext = searchParams.get("next");
   const next = safeNextPath(rawNext);
+  const online = useOnline();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -123,17 +126,18 @@ export function SignUpForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={pending !== null}
+          disabled={pending !== null || !online}
           loading={pending === "email"}
         >
           Create account
         </Button>
+        <OfflineSignInNote />
       </form>
       <Button
         type="button"
         variant="outline"
         className="w-full"
-        disabled={pending !== null}
+        disabled={pending !== null || !online}
         loading={pending === "google"}
         onClick={() => void google()}
       >

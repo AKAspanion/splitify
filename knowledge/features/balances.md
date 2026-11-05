@@ -2,10 +2,10 @@
 type: Feature
 title: Balances and totals
 description: Show who owes whom in a group, simplified to the fewest payments, and how much the group and the caller have spent.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Balances and totals

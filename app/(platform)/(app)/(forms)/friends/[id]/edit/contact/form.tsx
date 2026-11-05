@@ -2,6 +2,7 @@
 
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -75,10 +76,18 @@ const Form = ({
           errors={errors.email ? [errors.email] : undefined}
         />
       </div>
-      <div className="flex justify-end items-center">
-        <Button type="submit" loading={isPending} disabled={isPending}>
-          Update
-        </Button>
+      <div className="flex flex-col items-end">
+        <OnlineOnly>
+          {(offline) => (
+            <Button
+              type="submit"
+              loading={isPending}
+              disabled={isPending || offline}
+            >
+              Update
+            </Button>
+          )}
+        </OnlineOnly>
       </div>
     </form>
   );

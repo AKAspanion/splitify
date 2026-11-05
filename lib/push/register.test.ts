@@ -1,4 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const firebaseMessaging = vi.hoisted(() => ({
+  getMessaging: vi.fn(() => "messaging"),
+  getToken: vi.fn().mockResolvedValue("tok-default"),
+}));
+vi.mock("firebase/messaging", () => firebaseMessaging);
+vi.mock("firebase/app", () => ({
+  initializeApp: vi.fn(() => "app"),
+  getApps: vi.fn(() => []),
+}));
 import {
   listenForIosToken,
   registerWebPush,
@@ -93,6 +103,47 @@ describe("registerWebPush", () => {
     await expect(registerWebPush(deps)).resolves.toBe("unsupported");
     expect(console.error).toHaveBeenCalledTimes(1);
     expect(storage.getItem(KEY)).toBeNull();
+  });
+});
+
+describe("registerWebPush with the real worker registration", () => {
+  const registration = { scope: "/" };
+  const register = vi.fn();
+  beforeEach(() => {
+    register.mockReset().mockResolvedValue(registration);
+    firebaseMessaging.getToken.mockClear();
+    vi.stubGlobal("Notification", function Notification() {});
+    vi.stubGlobal("navigator", { serviceWorker: { register } });
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_API_KEY", "key-1");
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "proj-1");
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_APP_ID", "1:42:web:abc");
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_VAPID_KEY", "vapid-1");
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("registers /sw.js with the config query and gives that registration to getToken", async () => {
+    const { deps } = makeDeps();
+    const real = { ...deps, getToken: undefined } as Partial<PushDeps>;
+    delete real.getToken;
+    await expect(registerWebPush(real)).resolves.toBe("registered");
+    expect(register).toHaveBeenCalledTimes(1);
+    const url = new URL(register.mock.calls[0][0], "https://x.test");
+    expect(url.pathname).toBe("/sw.js");
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      apiKey: "key-1",
+      projectId: "proj-1",
+      appId: "1:42:web:abc",
+    });
+    expect(firebaseMessaging.getToken).toHaveBeenCalledWith(
+      "messaging",
+      expect.objectContaining({
+        serviceWorkerRegistration: registration,
+        vapidKey: "vapid-1",
+      }),
+    );
   });
 });
 

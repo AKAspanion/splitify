@@ -2,10 +2,10 @@
 type: Decision
 title: Upgrade every dependency to its latest version at once
 description: All packages, including the framework majors (Next, React, Clerk, Prisma, Tailwind, ESLint), move to their latest release on one branch; a package not yet compatible with the rest stays on its newest compatible release.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T08:43:05Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Upgrade every dependency to its latest version at once

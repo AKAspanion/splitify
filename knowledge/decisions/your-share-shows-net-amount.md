@@ -2,10 +2,10 @@
 type: Decision
 title: A person's share of an expense shows the same net amount everywhere
 description: The "You owe" line on an expense shows owed minus paid, the same net figure as "You get back" and the group's balances, not the whole split amount.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T16:00:40Z
+verified: human:ankitp@geekyants.com
 ---
 
 # A person's share of an expense shows the same net amount everywhere

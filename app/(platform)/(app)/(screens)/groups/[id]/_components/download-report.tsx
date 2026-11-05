@@ -12,6 +12,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { callFunction } from "@/lib/functions/call";
 import { downloadBlob } from "@/utils/dom";
+import { OFFLINE_NEEDS_CONNECTION } from "@/components/offline/online-only";
+import { useOnline } from "@/hooks/use-online";
 
 type ReportFormat = "excel" | "csv" | "text";
 
@@ -37,6 +39,7 @@ const fileNameOf = (response: Response): string | undefined => {
 
 export const DownloadReport = ({ groupId }: { groupId: string }) => {
   const [loading, setLoading] = useState(false);
+  const online = useOnline();
 
   const download = async (format: ReportFormat, label: string) => {
     setLoading(true);
@@ -60,13 +63,18 @@ export const DownloadReport = ({ groupId }: { groupId: string }) => {
   };
 
   return (
-    <div className="flex w-10 h-10 items-center justify-center">
+    <div className="relative flex w-10 h-10 items-center justify-center">
       {loading ? (
         <Spinner />
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Download report">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Download report"
+              disabled={!online}
+            >
               <DownloadIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -81,6 +89,14 @@ export const DownloadReport = ({ groupId }: { groupId: string }) => {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      )}
+      {!online && (
+        <p
+          role="status"
+          className="absolute right-0 top-full z-10 mt-1 w-max max-w-[14rem] rounded-md border bg-popover px-2 py-1 text-xs text-muted-foreground shadow-sm"
+        >
+          {OFFLINE_NEEDS_CONNECTION}
+        </p>
       )}
     </div>
   );

@@ -8,12 +8,10 @@ import { AutoContainer } from "@/components/container/auto-container";
 import { Header } from "@/components/container/header";
 import { urlEncode } from "@/utils/func";
 import { Search } from "@/app/(platform)/(app)/_components/search";
-import { useMyGroups } from "@/lib/data/groups";
+import { MY_GROUPS_LIMIT, useMyGroups } from "@/lib/data/groups";
 import GroupCreate from "./group-create";
 import Groups from "./groups";
 
-// The most groups one read brings back; a person with more sees the newest of them.
-const GROUPS_LIMIT = 200;
 // Groups listed until "Show all".
 const GROUPS_PREVIEW = 6;
 
@@ -26,7 +24,7 @@ const GroupList = () => {
 
   const { data, isLoading, error, refetch } = useMyGroups(
     searchText,
-    GROUPS_LIMIT,
+    MY_GROUPS_LIMIT,
   );
   const groups = show ? data : data?.slice(0, GROUPS_PREVIEW);
 

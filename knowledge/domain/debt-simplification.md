@@ -2,10 +2,10 @@
 type: Business Rule
 title: Debt simplification
 description: A group's balances are reduced to the fewest payments with a greedy minimum-cash-flow pass: the biggest debtor pays the biggest creditor, repeatedly.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Debt simplification

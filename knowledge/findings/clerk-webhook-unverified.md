@@ -5,6 +5,7 @@ description: POST /api/webhook/clerk trusted any request body, so anyone could c
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Fixed: the Clerk webhook wasn't verified

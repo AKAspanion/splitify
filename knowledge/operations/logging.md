@@ -2,10 +2,10 @@
 type: Runbook
 title: Logging
 description: Cloud Functions write structured logs to Cloud Logging; the browser logs to its console; there is no Log table or logging switch.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Logging

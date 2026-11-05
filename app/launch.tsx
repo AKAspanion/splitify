@@ -1,7 +1,12 @@
 "use client";
 
 import { onUserChanged } from "@/lib/firebase/auth";
-import { listenForIosToken, registerWebPush } from "@/lib/push/register";
+import { UpdateToast } from "@/components/offline/update-toast";
+import {
+  listenForIosToken,
+  registerAppWorker,
+  registerWebPush,
+} from "@/lib/push/register";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -12,6 +17,16 @@ export const Launch = () => {
   const isHome = pathname === "" || pathname === "/";
 
   useEffect(() => onUserChanged((user) => setUid(user?.uid ?? null)), []);
+
+  // The one service worker (offline shell and push) is registered for everyone, signed in or not.
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    registerAppWorker().catch((error) =>
+      console.error(
+        `[sw] registration failed: ${error instanceof Error ? error.name : "unknown"}`,
+      ),
+    );
+  }, []);
 
   // Someone signed in: take the iOS wrapper's token, and re-register this browser's when it already has permission.
   // The permission prompt itself is never raised here.
@@ -33,5 +48,5 @@ export const Launch = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
-  return null;
+  return <UpdateToast />;
 };

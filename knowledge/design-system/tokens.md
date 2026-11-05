@@ -2,10 +2,10 @@
 type: Design Tokens
 title: Design tokens
 description: shadcn's zinc theme as HSL CSS variables in app/globals.css, mapped to Tailwind colours, plus a green 'sparkle' accent; light and dark by class.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Design tokens

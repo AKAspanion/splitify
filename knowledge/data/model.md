@@ -2,10 +2,10 @@
 type: Data Model
 title: Data model
 description: The entities of the SQL Connect schema: users, groups, expenses with their payments and splits, activity, devices, push tokens and feedback.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Data model

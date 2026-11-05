@@ -5,6 +5,7 @@ description: updateExpense only changes the description; amounts, payers and spl
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Should editing an expense change more than its description?

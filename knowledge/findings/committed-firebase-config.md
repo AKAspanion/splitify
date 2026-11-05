@@ -5,6 +5,7 @@ description: packages/ios/src/Splitify/GoogleService-Info.plist, which holds the
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Firebase config for iOS is committed

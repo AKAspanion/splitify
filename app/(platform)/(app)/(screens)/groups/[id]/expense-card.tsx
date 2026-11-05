@@ -10,7 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ExpenseDate } from "./expense-date";
 
 type ExpenseCardProps = {
-  expense: GroupExpense;
+  /** `pending` marks one made offline that has not reached the server yet. */
+  expense: GroupExpense & { pending?: boolean };
   groupId: string;
 };
 
@@ -28,40 +29,50 @@ export const ExpenseCard = (props: ExpenseCardProps) => {
 
   const createDate = expense?.createdAt ?? "";
 
-  return expense ? (
-    <Link href={`/groups/${groupId}/expense/${expense.id}`}>
-      <ListItem
-        icon={
-          <div className="rounded-full w-10 h-10 flex items-center justify-center bg-foreground/10">
-            <ExpenseIcon
-              className={cn("w-5 h-5", {
-                "text-green-500": expense?.tag === "SETTLEMENT",
-                "text-blue-500": expense?.tag !== "SETTLEMENT",
-              })}
-            />
-          </div>
-        }
-        title={expense.description}
-        subtitle={
-          <WhoPaid
-            groupId={groupId}
-            expenseId={expense.id}
-            amount={expense.amount}
+  if (!expense) return null;
+
+  const item = (
+    <ListItem
+      icon={
+        <div className="rounded-full w-10 h-10 flex items-center justify-center bg-foreground/10">
+          <ExpenseIcon
+            className={cn("w-5 h-5", {
+              "text-green-500": expense?.tag === "SETTLEMENT",
+              "text-blue-500": expense?.tag !== "SETTLEMENT",
+            })}
           />
-        }
-        actions={
-          <div className="text-[10px] min-h-[18px] text-right flex flex-col gap-0.5">
-            <div className="truncate capitalize">
-              <ExpenseDate date={createDate} />
-            </div>
-            {isSettlement ? null : (
-              <YourShare expenseId={expense.id} groupId={groupId} />
-            )}
+        </div>
+      }
+      title={expense.description}
+      subtitle={
+        <WhoPaid
+          groupId={groupId}
+          expenseId={expense.id}
+          amount={expense.amount}
+        />
+      }
+      actions={
+        <div className="text-[10px] min-h-[18px] text-right flex flex-col gap-0.5">
+          <div className="truncate capitalize">
+            <ExpenseDate date={createDate} />
           </div>
-        }
-      />
-    </Link>
-  ) : null;
+          {expense.pending ? (
+            <div className="text-amber-600">Waiting to sync</div>
+          ) : null}
+          {isSettlement ? null : (
+            <YourShare expenseId={expense.id} groupId={groupId} />
+          )}
+        </div>
+      }
+    />
+  );
+
+  // A row waiting to sync is not on the server yet, so there is no expense to open.
+  return expense.pending ? (
+    <div>{item}</div>
+  ) : (
+    <Link href={`/groups/${groupId}/expense/${expense.id}`}>{item}</Link>
+  );
 };
 
 export const ExpenseCardLoader = () => {

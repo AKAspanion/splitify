@@ -2,10 +2,10 @@
 type: Feature
 title: Activity feed
 description: A paged list of what happened in the caller's groups: expenses, settlements, members and group changes.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Activity feed

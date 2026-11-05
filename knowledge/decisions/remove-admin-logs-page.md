@@ -2,10 +2,10 @@
 type: Decision
 title: Delete the /logs admin page instead of adding an admin role
 description: The /logs page, which showed every Log row to any signed-in user, is removed; the app keeps no admin role, and logs are read in Cloud Logging.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T11:30:54Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Delete the /logs admin page instead of adding an admin role

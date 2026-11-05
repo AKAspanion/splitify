@@ -2,10 +2,10 @@
 type: Integration
 title: OneSignal (removed)
 description: OneSignal is removed; pushes go through Firebase Cloud Messaging, sent by Cloud Functions.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # OneSignal (removed)

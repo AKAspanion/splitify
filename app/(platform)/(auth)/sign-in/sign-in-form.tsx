@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { signInWithEmail, signInWithGoogle } from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
 import { safeNextPath } from "@/lib/auth/next-path";
+import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
+import { useOnline } from "@/hooks/use-online";
 
 export function SignInForm() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export function SignInForm() {
   const rawNext = searchParams.get("next");
   const next = safeNextPath(rawNext);
   const { status } = useAuth();
+  const online = useOnline();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,17 +87,18 @@ export function SignInForm() {
         <Button
           type="submit"
           className="w-full"
-          disabled={pending !== null}
+          disabled={pending !== null || !online}
           loading={pending === "email"}
         >
           Sign in
         </Button>
+        <OfflineSignInNote />
       </form>
       <Button
         type="button"
         variant="outline"
         className="w-full"
-        disabled={pending !== null}
+        disabled={pending !== null || !online}
         loading={pending === "google"}
         onClick={() => void run("google", signInWithGoogle)}
       >

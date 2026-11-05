@@ -2,10 +2,10 @@
 type: Decision
 title: Keep splitify.spanion.in as the apps' domain
 description: The Android TWA and the iOS wrapper keep opening splitify.spanion.in; when its DNS record went missing, the record was restored at the spanion.in DNS provider rather than the apps moving to a new host.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:17:32Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Keep splitify.spanion.in as the apps' domain

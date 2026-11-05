@@ -3,6 +3,7 @@
 import { FormInput } from "@/components/form/form-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { GROUP_CATEGORY_ICONS, GROUP_TYPES, GroupType } from "@/constants/ui";
 import { toUserMessage } from "@/lib/data/errors";
 import { useUpdateGroup } from "@/lib/data/groups";
@@ -112,10 +113,18 @@ const Form = ({
           </div>
         </div>
       </div>
-      <div className="flex justify-end items-center">
-        <Button type="submit" loading={isPending} disabled={isPending}>
-          Update
-        </Button>
+      <div className="flex flex-col items-end">
+        <OnlineOnly>
+          {(offline) => (
+            <Button
+              type="submit"
+              loading={isPending}
+              disabled={isPending || offline}
+            >
+              Update
+            </Button>
+          )}
+        </OnlineOnly>
       </div>
     </form>
   );

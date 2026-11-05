@@ -5,6 +5,7 @@ description: When a contact signed up, Clerk's webhook kept the spuser_ id on th
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Fixed: a contact who signed up kept the contact's id

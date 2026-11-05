@@ -2,11 +2,11 @@
 type: Data Model
 title: SQL Connect schema and connectors
 description: The tables, keys and three connectors of the SQL Connect database, and the rules every operation's access check follows.
-status: draft
 work_item: tmp-sql-connect-foundation
 generated:
   by: agent:after-finish
   at: 2026-11-04T17:00:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # SQL Connect schema and connectors
@@ -58,6 +58,12 @@ In `dataconnect/dataconnect.yaml`, one folder each:
 - `ListMyGroups.search` is a case-insensitive regular expression capped at 100 characters: callers escape it.
 - `limit` on `ListGroupExpenses` and `ListMyActivity` is not capped.
 
+## A repeated id
+
+Creating an expense with an id that exists is answered with a `DataConnectError` of code `"partial-error"`, whose
+message holds `ALREADY_EXISTS` and `expense_pkey`, and also the text "Not found (aborted)". The offline queue treats
+it as success, because it means an earlier try arrived ([decision](../decisions/queue-offline-writes.md); `isDuplicateIdError` in `lib/offline/queued-writes.ts`).
+
 ## The client data layer
 
 `lib/data/` is what screens call instead of the generated SDK directly: `client.ts` (`dc()` and `queryKeys`, an
@@ -80,6 +86,7 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 
 ## History
 
+- 2026-11-05: did not record the repeated-id error; now it does, because the offline queue depends on its shape.
 - 2026-11-05: said the Prisma schema was what the running app still used; now this is the only schema, because spec 2c removed Prisma.
 - 2026-11-05: had the core of the data layer; now a hook file per area and the `FRESH` fetch policy, because spec 2b moved the screens onto it.
 - 2026-11-05: had nine tables and no client layer; now also `PushToken`, `DeleteGroup`'s title and `lib/data/`, because spec 2a added push through FCM and the data layer's core.
@@ -108,3 +115,4 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 - `lib/data/profile.ts`
 - `lib/data/ledger.ts`
 - `dataconnect/app/expenses.gql`
+- `lib/offline/queued-writes.ts`

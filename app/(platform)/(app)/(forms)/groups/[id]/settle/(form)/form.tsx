@@ -4,6 +4,7 @@ import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
 import { RUPEE_SYMBOL } from "@/constants/ui";
 import { toUserMessage } from "@/lib/data/errors";
+import { useOnline } from "@/hooks/use-online";
 import { useCreateSettlement } from "@/lib/data/expenses";
 import { fixedNum } from "@/utils/validate";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ type FormProps = {
 
 const Form = ({ amount, groupId, user1Id, user2Id }: FormProps) => {
   const router = useRouter();
+  const online = useOnline();
   const settle = useCreateSettlement();
   const [total, setTotal] = useState(amount);
   const [amountError, setAmountError] = useState<string[] | undefined>();
@@ -36,13 +38,21 @@ const Form = ({ amount, groupId, user1Id, user2Id }: FormProps) => {
       return;
     }
     setAmountError(undefined);
+    const input = {
+      amount: owes,
+      groupId,
+      fromUserId: user1Id,
+      toUserId: user2Id,
+    };
+    if (!online) {
+      // Offline the write waits for the connection, so don't wait for it: it shows in the group as waiting to sync.
+      settle.mutate(input);
+      toast.success("Settlement saved. It will sync when you're back online.");
+      router.push(`/groups/${groupId}`);
+      return;
+    }
     try {
-      await settle.mutateAsync({
-        amount: owes,
-        groupId,
-        fromUserId: user1Id,
-        toUserId: user2Id,
-      });
+      await settle.mutateAsync(input);
     } catch {
       return;
     }

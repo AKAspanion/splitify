@@ -5,6 +5,7 @@ description: Any signed-in person could update or delete any group or expense, a
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Fixed: writes didn't check who may change what

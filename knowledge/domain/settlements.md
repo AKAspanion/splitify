@@ -2,10 +2,10 @@
 type: Business Rule
 title: Settlements
 description: Paying someone back is stored as an EXACT expense tagged SETTLEMENT: the payer pays the full amount and the payee owes it, so it cancels their debt.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Settlements

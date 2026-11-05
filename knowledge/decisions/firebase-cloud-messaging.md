@@ -2,10 +2,10 @@
 type: Decision
 title: Send push notifications with Firebase Cloud Messaging
 description: Pushes move from OneSignal to Firebase Cloud Messaging; each browser and the iOS app register an FCM token on the signed-in person's account, and a Cloud Function triggered by each change sends the push built from its activity.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T19:00:12Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Send push notifications with Firebase Cloud Messaging
@@ -34,14 +34,16 @@ Messaging and hands its token to the page as a `push-token` event (`packages/ios
 - No third-party push service or key: FCM needs only the project's Web Push certificate (a public VAPID key) in the
   browser.
 - The iOS app's Firebase config must be this project's (`splitify-416321`), or its tokens can't be sent to.
-- The browser's push service worker and spec 4's offline service worker must share one registration.
+- The browser's push and the offline cache share one service worker, `public/sw.js`: it imports the FCM worker code inside a try/catch, so a failure there doesn't stop the offline cache ([service worker](../operations/service-worker.md)).
 
 ## History
 
+- 2026-11-05: said the push worker and the offline worker must share a registration; now they are one worker, `public/sw.js`, because the offline feature was built.
 - 2026-11-05: wrote the paths of files that spec 2c removed (lib/onesignal.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
 
 ## Sources
 
 - lib/onesignal.ts
+- `public/sw.js`
 - `app/launch.tsx`
 - `packages/ios/src/Splitify/PushNotifications.swift`

@@ -2,10 +2,10 @@
 type: Runbook
 title: CI and deploy workflows
 description: What the GitHub Actions workflows check on pull requests and deploy on push to main, and which repository settings the deploy reads.
-status: draft
 generated:
   by: claude-code/claude-sonnet-5-5
   at: 2026-11-04T18:30:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # CI and deploy workflows

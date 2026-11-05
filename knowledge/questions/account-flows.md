@@ -5,6 +5,7 @@ description: With Firebase Auth as the sign-in, "sign out of all devices" doesn'
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:45:00Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Should people be able to sign out of all their devices?

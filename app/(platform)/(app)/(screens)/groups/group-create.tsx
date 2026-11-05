@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NoData } from "@/components/no-data";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { UserRoundPlusIcon } from "lucide-react";
 
 export default function GroupCreate({
@@ -40,14 +41,25 @@ export default function GroupCreate({
 }
 
 const CreateButton = () => {
+  const button = (disabled: boolean) => (
+    <Button type="button" variant={"outline"} disabled={disabled}>
+      <div className="flex gap-4 items-center">
+        <div>Create a group</div>
+        <UserRoundPlusIcon />
+      </div>
+    </Button>
+  );
   return (
-    <Link href="/groups/add">
-      <Button type="button" variant={"outline"}>
-        <div className="flex gap-4 items-center">
-          <div>Create a group</div>
-          <UserRoundPlusIcon />
-        </div>
-      </Button>
-    </Link>
+    <div className="flex flex-col items-center">
+      <OnlineOnly>
+        {(offline) =>
+          offline ? (
+            button(true)
+          ) : (
+            <Link href="/groups/add">{button(false)}</Link>
+          )
+        }
+      </OnlineOnly>
+    </div>
   );
 };

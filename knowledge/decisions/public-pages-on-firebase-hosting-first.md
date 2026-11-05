@@ -2,10 +2,10 @@
 type: Decision
 title: Serve the public pages from Firebase Hosting before the app moves
 description: Until the signed-in app runs on SQL Connect, a hosting-only static build serves the landing page, /privacy and /delete-account from Firebase Hosting on splitify.spanion.in, and every other route shows a "coming back soon" page.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T18:38:07Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Serve the public pages from Firebase Hosting before the app moves

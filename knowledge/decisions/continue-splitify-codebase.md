@@ -2,10 +2,10 @@
 type: Decision
 title: Continue the Splitify codebase in place
 description: This repository's own Next.js code is built on where it is, keeping its structure; it is not rewritten. Its data layer moves from Prisma to SQL Connect.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:13:13Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Continue the Splitify codebase in place

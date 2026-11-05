@@ -3,6 +3,7 @@
 import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
+import { OnlineOnly } from "@/components/offline/online-only";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -53,14 +54,18 @@ const Form = ({ id, description, groupId }: FormProps) => {
         id="update-expense"
         errors={update.error ? [toUserMessage(update.error)] : undefined}
       />
-      <div className="flex justify-end items-center">
-        <Button
-          type="submit"
-          loading={update.isPending}
-          disabled={update.isPending}
-        >
-          Update
-        </Button>
+      <div className="flex flex-col items-end">
+        <OnlineOnly>
+          {(offline) => (
+            <Button
+              type="submit"
+              loading={update.isPending}
+              disabled={update.isPending || offline}
+            >
+              Update
+            </Button>
+          )}
+        </OnlineOnly>
       </div>
     </form>
   );

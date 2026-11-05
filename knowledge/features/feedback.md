@@ -2,10 +2,10 @@
 type: Feature
 title: Feedback
 description: A signed-in person can send one piece of feedback, a title and a description.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Feedback

@@ -35,6 +35,9 @@ import { dc, FRESH, queryKeys } from "./client";
 import { escapeSearch } from "./search";
 import { toLedgerExpenses } from "./ledger";
 
+/** The most groups one read of the caller's groups brings back; a person with more sees the newest of them. */
+export const MY_GROUPS_LIMIT = 200;
+
 /** How many of a group's expenses one page of `useGroupExpenses` holds. */
 export const EXPENSES_PAGE_SIZE = 10;
 

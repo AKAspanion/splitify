@@ -2,10 +2,10 @@
 type: Business Rule
 title: Contact identity
 description: When someone signs up with Clerk using an email that belongs to an existing contact, Clerk's webhook marks that contact as from Clerk instead of creating a new user.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Contact identity

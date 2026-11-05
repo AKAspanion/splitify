@@ -5,6 +5,7 @@ description: Any signed-in person could push any text to any user, and forge act
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Fixed: push-notification routes were an open relay

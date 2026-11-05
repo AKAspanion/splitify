@@ -2,10 +2,11 @@
 type: Decision
 title: Server actions record activity and send notifications themselves
 description: Each server action writes its activity entry and sends its push notifications on the server after its change succeeds; the /api/push-notification routes and the browser's NotificationService calls are removed.
-status: draft
+status: superseded
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T11:52:00Z
+superseded_by: decisions/activity-in-mutations-pushes-from-triggers
 ---
 
 # Server actions record activity and send notifications themselves

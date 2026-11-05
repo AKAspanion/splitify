@@ -2,10 +2,10 @@
 type: Feature
 title: Friends and contacts
 description: Find a signed-up person by email and add them as a friend, or add someone who hasn't signed up as an offline contact.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Friends and contacts
@@ -40,8 +40,13 @@ plus a random id made in the browser (`contactId`), as the connector requires.
 - `UpdateContact` changes a name and email only on a contact (not signed up) that is the caller's friend, which closes
   [missing authorization on writes](../findings/missing-authorization-on-writes.md).
 
+## Offline
+
+Adding friends and contacts is online-only ([decision](../decisions/offline-first-scope.md)).
+
 ## History
 
+- 2026-11-05: had nothing about offline; now adding is disabled offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: described the server actions' rules (a self-friend refusal, an `updateContact` that changed any user); now the SQL Connect operations' rules, because spec 2c removed the actions.
 - 2026-11-05: used server actions; now `lib/data/people.ts`, because spec 2b moved the screens onto SQL Connect.
 

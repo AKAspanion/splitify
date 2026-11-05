@@ -14,7 +14,7 @@ const TOKEN_KEY = "splitify.pushToken";
 const IOS_ERROR_DETAIL = "ERROR GET TOKEN";
 /** The same limit `RegisterMyPushToken` enforces. */
 const MAX_TOKEN_LENGTH = 4096;
-const WORKER_PATH = "/firebase-messaging-sw.js";
+const WORKER_PATH = "/sw.js";
 const PUSH_APP_NAME = "splitify-push";
 
 /** Logs the cause class only: never the token, and never an upstream message. */
@@ -62,18 +62,24 @@ function getMessagingApp(): FirebaseApp {
   return initializeApp(messagingConfig(), PUSH_APP_NAME);
 }
 
-async function defaultGetToken(): Promise<string | null> {
-  const { getMessaging, getToken } = await import("firebase/messaging");
+/**
+ * Registers the app's one service worker (offline shell and push). The worker cannot read the bundle's environment:
+ * it takes the public web config from its own URL, and every caller must register that same URL, or each would
+ * replace the other's worker.
+ */
+export function registerAppWorker(): Promise<ServiceWorkerRegistration> {
   const { apiKey, projectId, appId } = messagingConfig();
-  // The worker cannot read the bundle's environment: it takes the public web config from its own URL.
   const query = new URLSearchParams({
     apiKey: apiKey ?? "",
     projectId: projectId ?? "",
     appId: appId ?? "",
   });
-  const serviceWorkerRegistration = await navigator.serviceWorker.register(
-    `${WORKER_PATH}?${query.toString()}`,
-  );
+  return navigator.serviceWorker.register(`${WORKER_PATH}?${query.toString()}`);
+}
+
+async function defaultGetToken(): Promise<string | null> {
+  const { getMessaging, getToken } = await import("firebase/messaging");
+  const serviceWorkerRegistration = await registerAppWorker();
   return (
     (await getToken(getMessaging(getMessagingApp()), {
       vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,

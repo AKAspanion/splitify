@@ -2,10 +2,10 @@
 type: Feature
 title: Reports
 description: Download a group's expenses as an Excel workbook, a CSV or a text file from the group screen, for the group's members only.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Reports
@@ -27,8 +27,13 @@ the `reports` Cloud Function ([reports API](../api/generate.md)) and saved by th
 - A group with no expenses gets "No expenses found" (`404`).
 - The CSV is a real CSV with a header line (the old csv route sent a workbook), and the file name is sanitised.
 
+## Offline
+
+Download report is online-only, disabled offline in the header popover ([decision](../decisions/offline-first-scope.md)).
+
 ## History
 
+- 2026-11-05: had nothing about offline; now Download report is disabled offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: was hidden on the hosted site, with Excel and text only; now back, with a real CSV, member-only access and a title on the text file, because spec 2c built the `reports` function. See [reports API](../api/generate.md).
 - 2026-11-05: always shown; now hidden on the hosted site, because the report routes needed a server that spec 2c moves to Cloud Functions.
 

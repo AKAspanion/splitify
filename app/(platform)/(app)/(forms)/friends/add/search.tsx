@@ -2,6 +2,8 @@
 
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
+import { OFFLINE_NEEDS_CONNECTION } from "@/components/offline/online-only";
+import { useOnline } from "@/hooks/use-online";
 import Spinner from "@/components/ui/spinner";
 import { UserCard } from "@/app/(platform)/(app)/_components/user-card";
 import Link from "next/link";
@@ -29,6 +31,7 @@ const Search = ({
   mail?: string;
 }) => {
   const { user } = useAuth();
+  const online = useOnline();
   const [mail, setMail] = useState(mailProp || "");
   // The email that is searched: set when the form is sent, or from the link's `email`.
   const [submitted, setSubmitted] = useState(mailProp || "");
@@ -80,11 +83,20 @@ const Search = ({
               value={mail}
             />
             <div className="flex justify-end items-center">
-              <Button type="submit" loading={searching} disabled={searching}>
+              <Button
+                type="submit"
+                loading={searching}
+                disabled={searching || !online}
+              >
                 Find
               </Button>
             </div>
           </div>
+          {!online && (
+            <p role="status" className="text-xs text-muted-foreground mt-1">
+              {OFFLINE_NEEDS_CONNECTION}
+            </p>
+          )}
         </form>
         {searching ? (
           <div className="p-16 flex items-center justify-center">

@@ -2,10 +2,10 @@
 type: Integration
 title: Vercel Analytics and Speed Insights (removed)
 description: Vercel analytics is removed: the app is served by Firebase Hosting, which has no Vercel insights endpoint.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Vercel Analytics and Speed Insights (removed)

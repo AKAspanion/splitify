@@ -3,7 +3,6 @@
 import {
   deleteExpense,
   getExpense,
-  listGroupMembers,
   listMyGroups,
   updateExpense,
   type GetExpenseData,
@@ -19,14 +18,14 @@ import {
 import type { User } from "@/types/shared";
 import { dc, FRESH, queryKeys } from "./client";
 import {
-  createExpense,
-  createSettlement,
-  type CreateExpenseVars,
-  type CreateSettlementVars,
-} from "./expense-writes";
+  CREATE_EXPENSE_KEY,
+  CREATE_SETTLEMENT_KEY,
+} from "@/lib/offline/queued-writes";
+import type { CreateExpenseVars, CreateSettlementVars } from "./expense-writes";
 import { fixedNum } from "@/utils/validate";
 import type { ExpenseWithPaymentWithSplit } from "@/types/shared";
 import { toLedgerExpenses } from "./ledger";
+import { MY_GROUPS_LIMIT, useGroupMembers } from "./groups";
 
 export type ExpenseDetail = NonNullable<GetExpenseData["expense"]>;
 export type GroupMember = ListGroupMembersData["groupMembers"][number]["user"];
@@ -200,36 +199,33 @@ export function useExpense(
   });
 }
 
-/** The people in a group, as the expense screens use them. */
+/**
+ * The people in a group, as the expense screens use them. It is the group screen's own query (same key), so a group
+ * seen once is in the saved cache and the add and settle forms open offline.
+ */
 export function useExpenseGroupMembers(
   groupId: string | null,
 ): UseQueryResult<GroupMember[]> {
-  return useQuery({
-    queryKey: [...queryKeys.ListGroupMembers({ groupId }), "expense"],
-    enabled: !!groupId,
-    queryFn: async () => {
-      const result = await listGroupMembers(
-        dc(),
-        { groupId: groupId as string },
-        FRESH,
-      );
-      return result.data.groupMembers.map((m) => m.user);
-    },
-  });
+  return useGroupMembers(groupId);
 }
 
-/** The groups the caller is in, for the group picker of the add form. */
+/**
+ * The groups the caller is in, for the group picker of the add form. Same key as the groups list, for the reason
+ * above.
+ */
 export function useExpenseGroups(): UseQueryResult<MyGroup[]> {
   return useQuery({
-    queryKey: [...queryKeys.ListMyGroups({}), "expense"],
+    queryKey: queryKeys.ListMyGroups({ search: "", limit: MY_GROUPS_LIMIT }),
     queryFn: async () => {
-      const result = await listMyGroups(dc(), {}, FRESH);
-      return result.data.groups.map((g) => ({
-        id: g.id,
-        title: g.title,
-        type: g.type ?? null,
-      }));
+      const { data } = await listMyGroups(
+        dc(),
+        { limit: MY_GROUPS_LIMIT },
+        FRESH,
+      );
+      return data.groups;
     },
+    select: (groups) =>
+      groups.map((g) => ({ id: g.id, title: g.title, type: g.type ?? null })),
   });
 }
 
@@ -250,29 +246,38 @@ function useInvalidate() {
     );
 }
 
-export function useCreateExpense(): UseMutationResult<
-  { id: string },
-  Error,
-  ExpenseInput
-> {
-  const invalidate = useInvalidate();
-  return useMutation({
-    mutationFn: (input: ExpenseInput) => createExpense(prepareExpense(input)),
-    onSuccess: (_data, input) => invalidate("CreateExpense", input.groupId),
+/** A mutation whose variables are made from the form's input, with every id, when it is sent. */
+type QueuedMutation<Input> = Omit<
+  UseMutationResult<{ id: string }, Error, never>,
+  "mutate" | "mutateAsync"
+> & {
+  mutate: (input: Input) => void;
+  mutateAsync: (input: Input) => Promise<{ id: string }>;
+};
+
+// The send, the optimistic row, the rollback and the refresh are registered by key in lib/offline/queued-writes.ts,
+// so a write made offline can be resumed after a reload. Its variables hold every id, made here once.
+function useQueuedWrite<Input, Vars>(
+  key: readonly unknown[],
+  prepare: (input: Input) => Vars,
+): QueuedMutation<Input> {
+  const mutation = useMutation<{ id: string }, Error, Vars>({
+    mutationKey: key,
   });
+  const { mutate, mutateAsync } = mutation;
+  return {
+    ...mutation,
+    mutate: (input) => mutate(prepare(input)),
+    mutateAsync: (input) => mutateAsync(prepare(input)),
+  } as QueuedMutation<Input>;
 }
 
-export function useCreateSettlement(): UseMutationResult<
-  { id: string },
-  Error,
-  SettlementInput
-> {
-  const invalidate = useInvalidate();
-  return useMutation({
-    mutationFn: (input: SettlementInput) =>
-      createSettlement(prepareSettlement(input)),
-    onSuccess: (_data, input) => invalidate("CreateSettlement", input.groupId),
-  });
+export function useCreateExpense(): QueuedMutation<ExpenseInput> {
+  return useQueuedWrite(CREATE_EXPENSE_KEY, prepareExpense);
+}
+
+export function useCreateSettlement(): QueuedMutation<SettlementInput> {
+  return useQueuedWrite(CREATE_SETTLEMENT_KEY, prepareSettlement);
 }
 
 export function useUpdateExpense(): UseMutationResult<

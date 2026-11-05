@@ -2,10 +2,10 @@
 type: Architecture
 title: Architecture
 description: One static Next.js build on Firebase Hosting; the browser talks to SQL Connect and, for reports, passkeys and account deletion, to Cloud Functions.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Architecture

@@ -2,10 +2,10 @@
 type: API Contract
 title: Reports API
 description: The reports Cloud Function: one POST route that turns a group's expenses into an Excel workbook, a CSV or a text file, for the group's members only.
-status: draft
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
+verified: human:ankitp@geekyants.com
 ---
 
 # Reports API
