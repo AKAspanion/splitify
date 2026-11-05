@@ -21,6 +21,7 @@ function loadWorker(opts: {
   const self = {
     location: { origin: "http://app.test", href: "http://app.test/sw.js" },
     addEventListener: (type: string, fn: Listener) => (listeners[type] = fn),
+    skipWaiting: vi.fn(async () => undefined),
     SplitifySwRouting: routing,
     __SPLITIFY_SW_MANIFEST__: { version: "t", files: [] },
   };
@@ -58,7 +59,9 @@ function loadWorker(opts: {
     });
     return answer;
   };
-  return { respond, sandbox };
+  const message = (event: { origin: string; data: unknown }) =>
+    listeners.message(event);
+  return { respond, message, sandbox, self };
 }
 
 const navigation = {
@@ -113,5 +116,27 @@ describe("worker navigation", () => {
       cached,
     });
     expect(await respond(navigation)).toBe(cached);
+  });
+});
+
+describe("worker messages", () => {
+  const never = () => new Promise<Response>(() => undefined);
+
+  it("takes over when its own site asks it to", () => {
+    const { message, self } = loadWorker({ fetch: never });
+    message({ origin: "http://app.test", data: { type: "SKIP_WAITING" } });
+    expect(self.skipWaiting).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores the same request from another origin", () => {
+    const { message, self } = loadWorker({ fetch: never });
+    message({ origin: "https://evil.test", data: { type: "SKIP_WAITING" } });
+    expect(self.skipWaiting).not.toHaveBeenCalled();
+  });
+
+  it("ignores any other message", () => {
+    const { message, self } = loadWorker({ fetch: never });
+    message({ origin: "http://app.test", data: { type: "SOMETHING_ELSE" } });
+    expect(self.skipWaiting).not.toHaveBeenCalled();
   });
 });

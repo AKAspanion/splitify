@@ -76,6 +76,8 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("message", (event) => {
+  // Only a page of this site may tell the worker to take over.
+  if (event.origin !== self.location.origin) return;
   if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
