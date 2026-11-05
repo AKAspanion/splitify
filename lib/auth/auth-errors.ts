@@ -17,6 +17,8 @@ const MESSAGES: Record<string, string> = {
   "auth/operation-not-supported-in-this-environment": NO_GOOGLE,
   // The site's domain isn't in Firebase Auth's authorized domains.
   "auth/unauthorized-domain": NO_GOOGLE,
+  // No sessionStorage (blocked, or a private mode that refuses it): the redirect couldn't finish.
+  "auth/web-storage-unsupported": NO_GOOGLE,
   "auth/popup-closed-by-user": GOOGLE_CLOSED,
   "auth/cancelled-popup-request": GOOGLE_CLOSED,
 };

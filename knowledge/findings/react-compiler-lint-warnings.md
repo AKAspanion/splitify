@@ -1,14 +1,14 @@
 ---
 type: Finding
-title: React Compiler lint rules flag four components
-description: eslint-plugin-react-hooks 7 flags a synchronous setState inside an effect in three components and an impure call during render in scroll-to; the rules are set to warn until the code is changed.
+title: React Compiler lint rules flag six components
+description: eslint-plugin-react-hooks 7 flags a synchronous setState inside an effect in five components and an impure call during render in scroll-to; the rules are set to warn until the code is changed.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T09:20:00Z
 verified: human:ankitp@geekyants.com
 ---
 
-# React Compiler lint rules flag four components
+# React Compiler lint rules flag six components
 
 ## Finding
 
@@ -25,6 +25,8 @@ which changes behaviour, so `eslint.config.mjs` sets both rules to `warn` instea
 - `app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx`: an effect resets the equal split when `users` changes.
 - `app/(platform)/profile/notification-action.tsx`: an effect reads notification-permission state on mount.
 - `components/biometric/biometric.tsx`: an effect starts verification when the path changes.
+- `app/(platform)/(auth)/sign-in/sign-in-form.tsx:43` and `sign-up/sign-up-form.tsx:40`: the forms' mount effects set
+  `pending` to finish a Google redirect (the marker is read on mount because the page is prerendered).
 - `components/scroll-to.tsx`: `scrollTo` calls `performance.now()`.
 
 ## Status
@@ -38,3 +40,5 @@ Open. When each is fixed, set the rule in `eslint.config.mjs` back to the preset
 - `app/(platform)/profile/notification-action.tsx`
 - `components/biometric/biometric.tsx`
 - `components/scroll-to.tsx`
+- `app/(platform)/(auth)/sign-in/sign-in-form.tsx`
+- `app/(platform)/(auth)/sign-up/sign-up-form.tsx`

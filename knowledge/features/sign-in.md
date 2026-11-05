@@ -30,20 +30,26 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
   failures (network, too many attempts) show their error.
 - After email sign-up the person can use the app at once; the screen tells them to check their inbox to verify
   ([decision](../decisions/firebase-auth.md)).
-- Google sign-in being blocked (popup blocked, unsupported environment, or the site's domain missing from Firebase
-  Auth's authorized domains) says to use email and password instead; a popup closed before it finished says so.
-- Google sign-in needs `popupRedirectResolver: browserPopupRedirectResolver` in the browser's Auth
+- Google sign-in is a redirect, not a popup: `signInWithGoogle` (`lib/firebase/auth.ts`) sets a marker in this tab's
+  sessionStorage, `splitify:google-redirect`, then calls `signInWithRedirect`; the page leaves for Google and loads
+  back. The marker is how a form, whose page is prerendered, knows on mount that a redirect is coming back.
+- Both forms finish a returning redirect when they load: `finishGoogleReturn` (`lib/auth/google-return.ts`) calls
+  `completeGoogleSignIn`, which reads the redirect result and runs `UpsertMe` before anything navigates. The form
+  goes to `next` only after that; a failure shows its error in the form and never rejects past it.
+- A Google sign-in whose `UpsertMe` fails signs the person out of Firebase Auth, so nobody stays signed in without a
+  User row.
+- A page the browser restores from its back/forward cache after the person left for Google (they pressed Back)
+  clears the marker and frees the buttons (`whenRestoredAfterGoogle`).
+- Without sessionStorage Firebase can't finish a redirect, so the person is told Google sign-in isn't available here
+  (`auth/web-storage-unsupported`); a blocked or unauthorized domain says to use email and password instead.
+- Google sign-in still needs `popupRedirectResolver: browserPopupRedirectResolver` in the browser's Auth
   (`authOptions` in `lib/firebase/app.ts`): Auth is built with `initializeAuth`, which, unlike `getAuth`, adds no
-  resolver, and without one `signInWithPopup` throws `auth/argument-error` before opening anything.
-- The hosted domain, `splitify.spanion.in`, must be one of Firebase Auth's authorized domains, or Google's popup
-  refuses it ([deploy setup](../operations/deploy-setup.md)).
+  resolver, and `signInWithRedirect` and `getRedirectResult` need one as `signInWithPopup` did.
+- The auth domain is `splitify.spanion.in`, the site's own host, so the redirect's handler and Firebase's auth iframe
+  run on the site's origin; it must be one of Firebase Auth's authorized domains, and the OAuth client needs its
+  redirect URI ([deploy setup](../operations/deploy-setup.md)).
 - Someone already signed in who opens a form is sent on to `next`; a sign-in in flight finishes writing the person's
   row (`UpsertMe`) first.
-
-## Open edges
-
-- If `UpsertMe` fails after Firebase sign-in succeeds, the form shows the error, but the signed-in state still
-  redirects to `next`.
 
 ## Offline
 
@@ -51,6 +57,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-05: Google sign-in was a popup and a failed `UpsertMe` left the person signed in; now it is a redirect finished by the forms on load, `UpsertMe` runs before navigation, a failure signs the person out, and a bfcache restore frees the buttons, because popups fail in in-app browsers and on mobile Safari. The "Open edges" note about `UpsertMe` failing is gone.
 - 2026-11-05: Google sign-in failed on the hosted site with "Something went wrong" (no popup resolver, and the domain wasn't authorized); now Auth gets the resolver, the domain is authorized, and popup failures have their own messages.
 - 2026-11-05: had nothing about offline; now the screens are disabled offline and sign-out deletes the cache, because the offline feature was built. See [offline](offline.md).
 
@@ -61,6 +68,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 - `app/(platform)/(auth)/forgot-password/forgot-password-form.tsx`
 - `lib/auth/auth-errors.ts`
 - `lib/auth/next-path.ts`
+- `lib/auth/google-return.ts`
 - `lib/firebase/auth.ts`
 - `lib/firebase/app.ts`
 - `components/offline/offline-sign-in-note.tsx`

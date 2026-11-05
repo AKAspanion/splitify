@@ -7,8 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
-import { signInWithEmail, signInWithGoogle } from "@/lib/firebase/auth";
+import {
+  googleRedirectPending,
+  signInWithEmail,
+  signInWithGoogle,
+} from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
+import {
+  finishGoogleReturn,
+  whenRestoredAfterGoogle,
+} from "@/lib/auth/google-return";
 import { safeNextPath } from "@/lib/auth/next-path";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
@@ -31,12 +39,48 @@ export function SignInForm() {
     if (status === "signed-in" && !pending) router.replace(next);
   }, [status, pending, next, router]);
 
-  const run = async (kind: "email" | "google", action: () => Promise<void>) => {
-    setPending(kind);
+  // Back from Google: finish the sign-in (UpsertMe) before going on. Read on mount, since the page is prerendered.
+  useEffect(() => {
+    if (!googleRedirectPending()) return;
+    let active = true;
+    setPending("google");
+    void finishGoogleReturn().then((result) => {
+      if (!active) return;
+      if (result.kind === "signed-in") router.replace(next);
+      else {
+        if (result.kind === "failed") setError(result.message);
+        setPending(null);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [next, router]);
+
+  // Back from Google's page without signing in, the browser may restore this page as it was left: button loading.
+  useEffect(() => {
+    if (pending !== "google") return;
+    return whenRestoredAfterGoogle(() => setPending(null));
+  }, [pending]);
+
+  const signInEmail = async () => {
+    setPending("email");
     setError(null);
     try {
-      await action();
+      await signInWithEmail(email, password);
       router.replace(next);
+    } catch (e) {
+      setError(authErrorMessage(e));
+      setPending(null);
+    }
+  };
+
+  // The page leaves for Google, so the button stays loading; it comes back here only if the redirect fails to start.
+  const google = async () => {
+    setPending("google");
+    setError(null);
+    try {
+      await signInWithGoogle();
     } catch (e) {
       setError(authErrorMessage(e));
       setPending(null);
@@ -51,7 +95,7 @@ export function SignInForm() {
         className="space-y-4"
         onSubmit={(event) => {
           event.preventDefault();
-          void run("email", () => signInWithEmail(email, password));
+          void signInEmail();
         }}
       >
         <div className="space-y-2">
@@ -100,7 +144,7 @@ export function SignInForm() {
         className="w-full"
         disabled={pending !== null || !online}
         loading={pending === "google"}
-        onClick={() => void run("google", signInWithGoogle)}
+        onClick={() => void google()}
       >
         Continue with Google
       </Button>

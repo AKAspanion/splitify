@@ -18,10 +18,14 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
 - Enable the Google Cloud APIs, create the `github-deploy@` service account with its roles, put its key in the
   `FIREBASE_SERVICE_ACCOUNT` secret and set `FIREBASE_PROJECT_ID`.
 - Add Firebase Hosting Admin to `github-deploy@` for the hosting deploy, connect the custom domain `splitify.spanion.in` in the Firebase console (DNS records at the domain's provider, replacing any old record; the certificate can take hours), and add it to Authentication's Authorized domains ([decision](../decisions/public-pages-on-firebase-hosting-first.md)). The optional Variables for the hosting build are listed in the README, and the five `NEXT_PUBLIC_FIREBASE_*` Variables (API key, auth domain, project id, app id and the push VAPID key) are set in the repository: the build and CI read them, falling back to demo values in CI. `.env.sample` still lacks `NEXT_PUBLIC_FIREBASE_VAPID_KEY`, which the developer adds.
+- Google sign-in is a redirect through the site's own host, so the auth domain is `splitify.spanion.in` (the
+  `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` repository Variable). In the Google Cloud OAuth client Firebase uses, add the
+  redirect URI `https://splitify.spanion.in/__/auth/handler` and the JavaScript origin `https://splitify.spanion.in`;
+  without them Google refuses the redirect ([sign-in](../features/sign-in.md)).
 - Brand Firebase Auth's emails with Firebase's own settings, not a mail service of ours, chosen on 2026-11-05: its
   templates can't hold a logo, and only the password-reset message can be edited. The verify email's sender name is
   `Splitify`, set through the Identity Toolkit admin API. The rest is console-only, because the API refuses edits to
-  the verify template and the action URL (`EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`): the project's public-facing name,
+  the verify template and the action URL (an "email template update not allowed" error): the project's public-facing name,
   which fills `%APP_NAME%` in the subject and sign-off; the action URL
   `https://splitify.spanion.in/__/auth/action`, which Hosting serves on the custom domain; and the custom sender
   domain, verified by DNS records at the domain's provider (up to 24 hours).
@@ -51,6 +55,7 @@ functions may now be spare, and the first deploy may still fail on a missing per
 
 ## History
 
+- 2026-11-05: had no OAuth steps for Google sign-in; now the auth domain is `splitify.spanion.in` with its redirect URI and JavaScript origin on the OAuth client, because sign-in became a redirect.
 - 2026-11-05: Auth's emails went out as "project-1033465318943" from the firebaseapp.com domain; now the setup brands them through Firebase's settings, because the developer chose that over sending our own email.
 - 2026-11-05: added deleting a function before a deploy changes its trigger type, because the push senders' deploy was refused until the HTTPS versions were deleted.
 - 2026-11-05: added the `SESSION_PASSWORD` secret step and dropped the Prisma remark, because the webauthn function needs the secret and Prisma is removed.

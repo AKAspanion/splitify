@@ -16,7 +16,9 @@ The browser build reads `NEXT_PUBLIC_*` keys, copied from `.env.sample` into `.e
 or secret on the functions, never a file in the repository. The groups:
 
 - **Firebase (browser):** `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`,
-  `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`, read by `lib/firebase/app.ts`;
+  `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`, read by `lib/firebase/app.ts`
+  (the auth domain is `splitify.spanion.in` in production, so Google's redirect runs on the site's own host;
+  `.env.sample` still holds the old value until the developer changes it, since agents may not edit `.env` files);
   `NEXT_PUBLIC_FIREBASE_VAPID_KEY`, the public Web Push key `lib/push/register.ts` reads (missing from `.env.sample`
   until the developer adds it); and `NEXT_PUBLIC_USE_FIREBASE_EMULATORS`, which points the browser at `127.0.0.1` on the Auth, SQL
   Connect and Functions emulator ports in `firebase.json` ([run locally](run-locally.md)); `pnpm dev` sets it, so local development needs no `.env`.
@@ -36,6 +38,7 @@ those services and lib/logger.ts are removed ([Clerk](../integrations/clerk.md),
 
 ## History
 
+- 2026-11-05: `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` carried no stated value; now it is `splitify.spanion.in` in production, because Google sign-in became a redirect on the site's own host. See [sign-in](../features/sign-in.md).
 - 2026-11-05: `NEXT_PUBLIC_USE_FIREBASE_EMULATORS` was set by hand in `.env`; now `pnpm dev` sets it with demo Firebase keys and the ports come from `firebase.json`, because local development moved onto the emulators.
 - 2026-11-05: listed the Clerk, MySQL, OneSignal, UploadThing and logging keys and their readers; now only the Firebase, function and site keys, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
 
