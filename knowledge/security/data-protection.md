@@ -41,8 +41,17 @@ verified: human:ankitp@geekyants.com
   `splitify.spanion.in`); Hosting sends no CSP or `X-Frame-Options` on `/__/auth/iframe`, so the site-wide `DENY` and
   `frame-ancestors 'none'` stay. `lib/security/csp.test.ts` pins the `frame-src` list.
 - `.claude/settings.json` stops Claude reading `.env` files.
+- Firebase's one-time reset and verify codes reach `/auth/action/` in the URL ([sign in](../features/sign-in.md)), so
+  the code is kept out of three places: the service worker bypasses `/auth/action` and anything under it
+  (`lib/offline/sw-routing.js`, mirrored in `public/sw-routing.js` and held equal by a test, see
+  [service worker](../operations/service-worker.md)); AdSense never loads in a document whose first page was
+  `/auth/action` (`lib/ads/ads-allowed.ts`, `app/adsense.tsx`); and Hosting sends that page `Cache-Control: no-store`
+  and `Referrer-Policy: strict-origin` (`firebase.json`). It is `strict-origin`, not `no-referrer`, so a
+  referrer-restricted API key still accepts the page's Firebase calls while the path and the code never leave.
 
 ## History
+
+- 2026-11-05: had nothing about one-time email codes; now the service worker, AdSense and Hosting's headers keep `/auth/action/` codes out of the cache, ad scripts and referrers, because reset and verify emails now link to that page.
 
 - 2026-11-05: `frame-src` framed only Firebase's `firebaseapp.com` host and Google; now it also allows `'self'`, because Google sign-in became a redirect and Firebase's auth iframe runs on the site's own origin. See [sign-in](../features/sign-in.md).
 - 2026-11-05: was Clerk sessions, `AuthnDevice.data` and the `Log` table over MySQL; now ID-token checks, `AuthnDevice.devices` through the admin connector, Cloud Logging and the Hosting security headers, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
@@ -50,6 +59,10 @@ verified: human:ankitp@geekyants.com
 ## Sources
 
 - `firebase.json`
+- `lib/offline/sw-routing.js`
+- `public/sw-routing.js`
+- `lib/ads/ads-allowed.ts`
+- `app/adsense.tsx`
 - `lib/security/csp.test.ts`
 - `functions/src/webauthn/index.ts`
 - `functions/src/http/guard.ts`

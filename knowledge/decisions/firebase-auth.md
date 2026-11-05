@@ -43,6 +43,7 @@ switch, with Google and email-and-password sign-in.
 
 ## History
 
+- 2026-11-05: password reset is still Firebase's reset email; its link now ends on the app's own page, `/auth/action/`, rather than Firebase's. See [sign in](../features/sign-in.md).
 - 2026-11-05: wrote the paths of files that spec 2c removed (app/api/webhook/clerk/route.ts, proxy.ts) as plain text, so verify no longer expects them; the decision itself is unchanged.
 - 2026-11-05: what an unverified email-and-password account could do was unset; now it can use the app with a banner asking it to verify, because the developer chose that over blocking it.
 
