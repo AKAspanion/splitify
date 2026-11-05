@@ -153,12 +153,18 @@ for (const { name, pages } of readManifests()) {
   }
 }
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.
+spawnSync("node", ["scripts/emulator-firebase-config.mjs"], {
+  cwd: root,
+  stdio: "inherit",
+});
 const result = spawnSync(
   "npx",
   [
     "--yes",
     "firebase-tools@15.34.2",
     "emulators:exec",
+    "--config",
+    "firebase.emulators.json",
     "--only",
     "hosting",
     "--project",
