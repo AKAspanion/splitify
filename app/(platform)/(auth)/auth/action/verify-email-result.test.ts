@@ -132,3 +132,30 @@ describe("one document's verify calls", () => {
     expect(verifyEmailWithCode).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("the verify page's states", () => {
+  async function render(name: "failed" | "verified") {
+    const { createElement } = await import("react");
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { VerifyFailed, VerifyVerified } =
+      await import("./verify-email-result");
+    return renderToStaticMarkup(
+      name === "failed"
+        ? createElement(VerifyFailed, { message: "Nope.", onRetry: () => {} })
+        : createElement(VerifyVerified),
+    );
+  }
+
+  it("offers Try again and an outline Go home link to / when it failed", async () => {
+    const html = await render("failed");
+    expect(html).toContain("Try again");
+    expect(html).toMatch(
+      /<a [^>]*border-input[^>]*href="\/"[^>]*>Go home<\/a>/,
+    );
+  });
+
+  it("keeps Continue linking to /groups/ once verified", async () => {
+    const html = await render("verified");
+    expect(html).toMatch(/<a [^>]*href="\/groups\/?"[^>]*>Continue<\/a>/);
+  });
+});

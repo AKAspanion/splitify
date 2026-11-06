@@ -6,6 +6,7 @@ vi.mock("@/lib/firebase/auth", () => ({
   verifyEmailWithCode: vi.fn(),
 }));
 
+import type { ActionLink } from "@/lib/auth/action-link";
 import { openActionLink } from "./action-handler";
 
 /** A window at /auth/action/ with the given query string; records where the address bar and the browser go. */
@@ -90,5 +91,29 @@ describe("readActionLinkOnce", () => {
   it("reads a reload's clean address bar as incomplete", async () => {
     const { readActionLinkOnce } = await import("./action-handler");
     expect(readActionLinkOnce(fakeWindow(""))).toEqual({ kind: "incomplete" });
+  });
+});
+
+describe("the action page's links", () => {
+  async function render(link: ActionLink | "prerender") {
+    const { createElement } = await import("react");
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { ActionBody, ActionHandler } = await import("./action-handler");
+    return renderToStaticMarkup(
+      link === "prerender"
+        ? createElement(ActionHandler)
+        : createElement(ActionBody, { link }),
+    );
+  }
+
+  it("has a back link to the home page in the header", async () => {
+    expect(await render("prerender")).toContain('<a href="/">');
+  });
+
+  it("keeps Back to sign in on an incomplete link", async () => {
+    const html = await render({ kind: "incomplete" });
+    expect(html).toMatch(
+      /<a [^>]*href="\/sign-in\/?"[^>]*>Back to sign in<\/a>/,
+    );
   });
 });

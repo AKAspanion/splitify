@@ -113,6 +113,53 @@ export function resetLinkPhase(
   );
 }
 
+function GoHomeLink() {
+  return (
+    <Link
+      href="/"
+      className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+    >
+      Go home
+    </Link>
+  );
+}
+
+/** The link couldn't be checked: the message, Try again, and a way out. */
+export function ResetFailed({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <p role="alert" className="text-sm text-destructive dark:text-red-400">
+        {message}
+      </p>
+      <Button type="button" className="w-full" onClick={onRetry}>
+        Try again
+      </Button>
+      <GoHomeLink />
+    </div>
+  );
+}
+
+/** The password is changed: Sign in, and a way out. */
+export function ResetSaved() {
+  return (
+    <div className="space-y-4">
+      <p role="status" className="text-sm">
+        Your password is changed. Sign in with your new password.
+      </p>
+      <Link href="/sign-in/" className={cn(buttonVariants(), "w-full")}>
+        Sign in
+      </Link>
+      <GoHomeLink />
+    </div>
+  );
+}
+
 type Phase = { kind: "checking" } | ResetLinkCheck | SaveResult;
 
 export function ResetPasswordForm({ code }: { code: string }) {
@@ -189,36 +236,17 @@ export function ResetPasswordForm({ code }: { code: string }) {
 
   if (phase.kind === "failed") {
     return (
-      <div className="space-y-4">
-        <p role="alert" className="text-sm text-destructive dark:text-red-400">
-          {phase.message}
-        </p>
-        <Button
-          type="button"
-          className="w-full"
-          onClick={() => {
-            setPhase({ kind: "checking" });
-            setAttempt((n) => n + 1);
-          }}
-        >
-          Try again
-        </Button>
-      </div>
+      <ResetFailed
+        message={phase.message}
+        onRetry={() => {
+          setPhase({ kind: "checking" });
+          setAttempt((n) => n + 1);
+        }}
+      />
     );
   }
 
-  if (phase.kind === "saved") {
-    return (
-      <div className="space-y-4">
-        <p role="status" className="text-sm">
-          Your password is changed. Sign in with your new password.
-        </p>
-        <Link href="/sign-in/" className={cn(buttonVariants(), "w-full")}>
-          Sign in
-        </Link>
-      </div>
-    );
-  }
+  if (phase.kind === "saved") return <ResetSaved />;
 
   return (
     <form

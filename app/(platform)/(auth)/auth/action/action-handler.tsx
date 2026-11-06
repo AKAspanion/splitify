@@ -65,7 +65,7 @@ export function ActionHandler() {
   return (
     <>
       <div className="p-6 w-full">
-        <Header title={titleFor(link)} />
+        <Header title={titleFor(link)} backTo="/" />
       </div>
       <div className="flex w-full justify-center px-6 pb-12">
         <div className="w-full max-w-sm space-y-6">
@@ -76,7 +76,7 @@ export function ActionHandler() {
   );
 }
 
-function ActionBody({ link }: { link: ActionLink | null }) {
+export function ActionBody({ link }: { link: ActionLink | null }) {
   if (link?.kind === "reset-password")
     return <ResetPasswordForm code={link.code} />;
   if (link?.kind === "verify-email")

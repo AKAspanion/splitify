@@ -97,18 +97,7 @@ export function VerifyEmailResult({ code }: { code: string }) {
     );
   }
 
-  if (result.kind === "verified") {
-    return (
-      <div className="space-y-4">
-        <p role="status" className="text-sm">
-          Your email is verified.
-        </p>
-        <Link href="/groups/" className={cn(buttonVariants(), "w-full")}>
-          Continue
-        </Link>
-      </div>
-    );
-  }
+  if (result.kind === "verified") return <VerifyVerified />;
 
   if (result.kind === "maybe-done") {
     return (
@@ -137,21 +126,53 @@ export function VerifyEmailResult({ code }: { code: string }) {
   }
 
   return (
+    <VerifyFailed
+      message={result.message}
+      onRetry={() => {
+        void retryVerifyLink(code);
+        setResult(null);
+        setAttempt((n) => n + 1);
+      }}
+    />
+  );
+}
+
+/** Applying the link failed: the message, Try again, and a way out. */
+export function VerifyFailed({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
     <div className="space-y-4">
       <p role="alert" className="text-sm text-destructive dark:text-red-400">
-        {result.message}
+        {message}
       </p>
-      <Button
-        type="button"
-        className="w-full"
-        onClick={() => {
-          void retryVerifyLink(code);
-          setResult(null);
-          setAttempt((n) => n + 1);
-        }}
-      >
+      <Button type="button" className="w-full" onClick={onRetry}>
         Try again
       </Button>
+      <Link
+        href="/"
+        className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+      >
+        Go home
+      </Link>
+    </div>
+  );
+}
+
+/** The email is verified: Continue into the app. */
+export function VerifyVerified() {
+  return (
+    <div className="space-y-4">
+      <p role="status" className="text-sm">
+        Your email is verified.
+      </p>
+      <Link href="/groups/" className={cn(buttonVariants(), "w-full")}>
+        Continue
+      </Link>
     </div>
   );
 }

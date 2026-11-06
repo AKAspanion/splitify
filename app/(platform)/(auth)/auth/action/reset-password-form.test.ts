@@ -204,3 +204,32 @@ describe("one document's reset link", () => {
     expect(resetPassword).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("the reset page's states", () => {
+  async function render(name: "failed" | "saved") {
+    const { createElement } = await import("react");
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { ResetFailed, ResetSaved } = await import("./reset-password-form");
+    return renderToStaticMarkup(
+      name === "failed"
+        ? createElement(ResetFailed, { message: "Nope.", onRetry: () => {} })
+        : createElement(ResetSaved),
+    );
+  }
+
+  it("offers Try again and an outline Go home link to / when it failed", async () => {
+    const html = await render("failed");
+    expect(html).toContain("Try again");
+    expect(html).toMatch(
+      /<a [^>]*border-input[^>]*href="\/"[^>]*>Go home<\/a>/,
+    );
+  });
+
+  it("offers Sign in and an outline Go home link to / once saved", async () => {
+    const html = await render("saved");
+    expect(html).toMatch(/<a [^>]*href="\/sign-in\/?"[^>]*>Sign in<\/a>/);
+    expect(html).toMatch(
+      /<a [^>]*border-input[^>]*href="\/"[^>]*>Go home<\/a>/,
+    );
+  });
+});
