@@ -1,5 +1,7 @@
 # Cache Restore Without Remount Implementation Plan
 
+**Status:** complete, commits df264f5..eaea848, 2026-11-06. Record: [2026-11-06-cache-restore-without-remount.record.md](2026-11-06-cache-restore-without-remount.record.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -119,23 +121,23 @@ export function followPersonCache(
   email. You can start using Splitify now." and Continue. The form's DOM node is the same before and after submit.
   Sign-in still goes to `/groups/`. A signed-in reload of `/groups/` shows the groups, with no second mount.
 
-- [ ] **Step 1: Write the failing tests** for each unit Acceptance case in `lib/offline/restore-cache.test.ts`, with an in-memory fake `Persister` and a real `QueryClient` (Node has no IndexedDB, and none is needed)
+- [x] **Step 1: Write the failing tests** for each unit Acceptance case in `lib/offline/restore-cache.test.ts`, with an in-memory fake `Persister` and a real `QueryClient` (Node has no IndexedDB, and none is needed)
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/offline/restore-cache.test.ts`
 Expected: FAIL on the assertions. Create `lib/offline/restore-cache.ts` with its real export first
 
-- [ ] **Step 3: Write `followPersonCache`** over `persistQueryClientRestore` and `persistQueryClientSubscribe`
+- [x] **Step 3: Write `followPersonCache`** over `persistQueryClientRestore` and `persistQueryClientSubscribe`
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/offline/restore-cache.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Rewrite `QueryProvider`** in `components/providers.tsx` to the Interfaces: no `key`, `IsRestoringProvider`, the uid effect
+- [x] **Step 5: Rewrite `QueryProvider`** in `components/providers.tsx` to the Interfaces: no `key`, `IsRestoringProvider`, the uid effect
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/offline/restore-cache.ts lib/offline/restore-cache.test.ts components/providers.tsx
