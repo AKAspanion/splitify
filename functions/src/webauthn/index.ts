@@ -376,6 +376,6 @@ export async function handleWebauthn(req: Request, res: Response) {
 }
 
 export const webauthn = onRequest(
-  { region: REGION, secrets: [SESSION_PASSWORD] },
+  { region: REGION, invoker: "public", secrets: [SESSION_PASSWORD] },
   handleWebauthn,
 );

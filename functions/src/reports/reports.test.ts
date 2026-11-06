@@ -129,6 +129,10 @@ const call = async (
 };
 
 describe("reports", () => {
+  it("declares a public invoker so every deploy keeps it callable", () => {
+    expect(reports.__endpoint.httpsTrigger?.invoker).toEqual(["public"]);
+  });
+
   it("gives a member an .xlsx workbook laid out like the old route's", async () => {
     const a = await call({ groupId: G, format: "excel" });
     expect(a.status).toBe(200);

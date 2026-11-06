@@ -17,7 +17,7 @@ import {
   type TestUser,
 } from "../../../dataconnect/test-utils/emulator";
 import * as logger from "firebase-functions/logger";
-import { handleWebauthn } from "./index";
+import { handleWebauthn, webauthn } from "./index";
 
 vi.mock("firebase-functions/logger", () => ({
   error: vi.fn(),
@@ -271,6 +271,10 @@ const authenticate = async (
 };
 
 describe("webauthn function", () => {
+  it("declares a public invoker so every deploy keeps it callable", () => {
+    expect(webauthn.__endpoint.httpsTrigger?.invoker).toEqual(["public"]);
+  });
+
   it("registers a device for the token's uid, ignoring a user id in the body", async () => {
     const browser = new Browser(aliceToken);
     const device = new Authenticator();

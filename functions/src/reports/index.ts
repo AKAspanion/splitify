@@ -54,7 +54,7 @@ type Ledger = {
  * `POST /api/reports/expenses` with `{ groupId, format }`: the group's expenses as a workbook, a CSV or a text
  * file, for the group's members only. A group that does not exist and a group the caller is not in answer the same.
  */
-export const reports = onRequest({ region: REGION }, async (req, res) => {
+export const reports = onRequest({ region: REGION, invoker: "public" }, async (req, res) => {
   const caller = await guard(req, res);
   if (!caller) return;
 
