@@ -150,6 +150,14 @@ android {
         release {
             minifyEnabled true
         }
+        debug {
+            // `./gradlew installDebug -PtwaDevUrl=http://localhost:2140` opens a local dev server instead of the
+            // deployed site (forward the port with `adb reverse`). Release builds ignore it.
+            def twaDevUrl = project.findProperty('twaDevUrl')
+            if (twaDevUrl) {
+                resValue "string", "launchUrl", twaDevUrl + twaManifest.launchUrl
+            }
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

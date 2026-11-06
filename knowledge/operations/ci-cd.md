@@ -26,7 +26,8 @@ The reasons are in [the decision](../decisions/ci-cd-functions-deployed-by-hand.
 - `.github/workflows/codeql.yml`: CodeQL on pull requests, on pushes to `main` and weekly, for the code and for the
   workflows themselves.
 - `.github/dependabot.yml`: weekly grouped minor and patch updates for the root, `functions/`, the Android Gradle
-  wrapper and GitHub Actions; major bumps of TypeScript and `@types/node` are ignored.
+  wrapper and GitHub Actions; major bumps of TypeScript and `@types/node` are ignored, and so is Gradle `>= 9.6`
+  while the Android app is on AGP 8 ([finding](../findings/gradle-9-8-broke-android-build.md)).
 - `.github/workflows/deploy.yml`: on push to `main`, runs CI (all its jobs, e2e included, gate the deploy), then builds the site and deploys it to Firebase Hosting (`FirebaseExtended/action-hosting-deploy`, channel `live`). It doesn't deploy the Cloud Functions, which a project owner deploys by hand ([decision](../decisions/ci-cd-functions-deployed-by-hand.md)). It installs the root dependencies with `--ignore-scripts` for the build, and then runs `pnpm dataconnect:generate` itself, as `ci.yml` does: `next build` typechecks the whole project, which imports the generated SQL Connect SDK. Started by hand with
   `deploy_dataconnect` ticked, it also deploys the SQL Connect schema and connectors. It runs one at a time
   (`concurrency: deploy-production`, never cancelled), checks its settings first and fails naming the missing ones, and
@@ -50,6 +51,7 @@ by scoped `overrides` in `pnpm-workspace.yaml` ([debt](../risks/debt.md)). The d
 
 ## History
 
+- 2026-11-06: Dependabot could bump the Gradle wrapper to any version; now it ignores Gradle `>= 9.6`, because 9.8.2 broke the AGP 8 build. See [finding](../findings/gradle-9-8-broke-android-build.md).
 - 2026-11-06: pull requests ran lint, types, unit and rules tests and audits at high or critical, with Dependabot ignoring Prisma and skipping Gradle; now they also run the format check, e2e tests, a dependency review and a TruffleHog scan, audits fail on moderate and above including dev dependencies, `firebase-tools` is pinned, and the deploy waits for all of it, because the repository modernisation hardened the pipeline. See [the plan](../../docs/plans/2026-11-05-repo-modernization.md).
 - 2026-11-05: CI installed with yarn 1 and read the audit exit bitmask for high and critical; now it installs with pnpm and audits with `pnpm audit --prod --audit-level high`, because the repository moved to pnpm. See [run locally](run-locally.md).
 - 2026-11-05: CI and deploy generated the Prisma client and built a public-pages target (`yarn build:hosting`); now they build the one site (`yarn build`) and read no OneSignal variable, because spec 2c removed the server and Prisma.
