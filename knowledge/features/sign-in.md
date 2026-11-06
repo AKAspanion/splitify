@@ -58,9 +58,9 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
 - Firebase's reset and verify emails open the app's own page `/auth/action/`
   (`app/(platform)/(auth)/auth/action/`); `parseActionLink` (`lib/auth/action-link.ts`) reads the link. The page reads
   it once per page load and cleans the address bar. It keeps the link, the verify call and the password save at module
-  scope, so a remount (the query provider's key flip when auth restores, see
-  [the remount finding](../findings/query-provider-remounts-pages-at-auth-restore.md)) never spends the one-time code
-  twice. Never link to `/auth/action/` with a code from inside the app: the code would reach scripts and the cache
+  scope, so a remount never spends the one-time code twice. The query provider's old key flip, which remounted every
+  page when auth restored, is gone ([fixed](../findings/query-provider-remounts-pages-at-auth-restore.md)); the guards
+  stay as a safeguard. Never link to `/auth/action/` with a code from inside the app: the code would reach scripts and the cache
   ([data protection](../security/data-protection.md)).
 - Reset: the page shows the person's email and asks for a new password of at least 8 characters ("Use at least 8
   characters."). Success reads "Your password is changed. Sign in with your new password." A spent, expired or
@@ -88,6 +88,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-06: said the query provider's key flip remounted pages and the action page's guards were for that; now the provider has no key and the guards are only a safeguard, because sign-in no longer remounts the page.
 - 2026-11-06: a failed sign-out after a failed `UpsertMe` left the person signed in and sent on; now the saved sign-in is cleared and the form stays with its error, because of [the finding](../findings/google-sign-in-signout-failure-keeps-session.md).
 - 2026-11-05: a reset email's link opened Firebase's own `/__/auth/action` page and the screens had no privacy link; now the emails open the app's `/auth/action/` page, which resets the password and verifies the email, and the sign-in and sign-up screens link to the privacy page, because the developer wanted the reset flow finished in the app.
 - 2026-11-05: Google sign-in was a popup and a failed `UpsertMe` left the person signed in; now it is a redirect finished by the forms on load, `UpsertMe` runs before navigation, a failure signs the person out, and a bfcache restore frees the buttons, because popups fail in in-app browsers and on mobile Safari. The "Open edges" note about `UpsertMe` failing is gone.

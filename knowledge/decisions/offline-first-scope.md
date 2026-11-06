@@ -32,8 +32,12 @@ saves itself.
   (`splitify-cache-<uid>`), so one person's data never shows for another. It is kept `CACHE_MAX_AGE_MS = 604800000`
   (7 days), is discarded when the app version changes (the buster is `appVersion()`), and is deleted on sign-out.
   Queries run `offlineFirst`, and `syncOnlineState` tells react-query at startup whether the page opened offline, so
-  saved data stays on screen instead of giving way to a load error. The provider is keyed by uid because the saved
-  cache is read only when it mounts. Code: `lib/offline/persist.ts`, `lib/offline/online-state.ts`, `components/providers.tsx`.
+  saved data stays on screen instead of giving way to a load error. The provider has no key: it follows the
+  signed-in person's saved cache without remounting the page (`followPersonCache`, `lib/offline/restore-cache.ts`).
+  On a direct switch from one person to another it renders nothing under the provider for one commit, until the first
+  person's queries are cleared (`nextFollowed`, `afterClear`), so the second never sees the first's data and the
+  first's saved entry is never overwritten by the clear. Code: `lib/offline/persist.ts`, `lib/offline/online-state.ts`,
+  `lib/offline/restore-cache.ts`, `components/providers.tsx`.
 - **Shell:** one service worker caches the app shell ([service worker](../operations/service-worker.md)).
 - **Queued writes:** [queue offline writes with mutation defaults](queue-offline-writes.md).
 - **Online-only actions:** `components/offline/online-only.tsx` disables each one while offline with "You're offline.
@@ -54,6 +58,7 @@ saves itself.
 
 ## History
 
+- 2026-11-06: the provider was keyed by uid because the saved cache is read only when it mounts; now it follows the person's cache without a key, because the key remounted every page when sign-in finished. See [the fixed finding](../findings/query-provider-remounts-pages-at-auth-restore.md).
 - 2026-11-05: said only what works offline; now also how it is built, because the offline feature was built. See [offline](../features/offline.md).
 
 ## Sources

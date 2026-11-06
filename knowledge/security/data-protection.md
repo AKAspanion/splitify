@@ -49,12 +49,13 @@ verified: human:ankitp@geekyants.com
   the code is kept out of three places: the service worker bypasses `/auth/action` and anything under it
   (`lib/offline/sw-routing.js`, mirrored in `public/sw-routing.js` and held equal by a test, see
   [service worker](../operations/service-worker.md)); AdSense never loads in a document whose first page was
-  `/auth/action` (`lib/ads/ads-allowed.ts`, `app/adsense.tsx`); and Hosting sends that page `Cache-Control: no-store`
+  `/auth/action` (`app/adsense.tsx`; the rest of its rule is in [AdSense](../integrations/google-adsense.md)); and Hosting sends that page `Cache-Control: no-store`
   and `Referrer-Policy: strict-origin` (`firebase.json`). It is `strict-origin`, not `no-referrer`, so a
   referrer-restricted API key still accepts the page's Firebase calls while the path and the code never leave.
 
 ## History
 
+- 2026-11-06: described the AdSense exclusion for `/auth/action` as the only ad rule; now it points to the AdSense integration for the rest (public pages, signed-out only), because main's rule was merged in. See [decision](../decisions/adsense-on-public-pages-only.md).
 - 2026-11-06: sent no HSTS header, trusted a back link as given and called the iOS config an open finding; now Hosting sends HSTS, back links are checked and the config is untracked, because the repository-modernization run fixed each.
 - 2026-11-05: had nothing about one-time email codes; now the service worker, AdSense and Hosting's headers keep `/auth/action/` codes out of the cache, ad scripts and referrers, because reset and verify emails now link to that page.
 - 2026-11-05: `frame-src` framed only Firebase's `firebaseapp.com` host and Google; now it also allows `'self'`, because Google sign-in became a redirect and Firebase's auth iframe runs on the site's own origin. See [sign-in](../features/sign-in.md).

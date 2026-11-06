@@ -1,31 +1,34 @@
 ---
 type: Finding
-title: After email sign-up the page stayed on an empty sign-up form
-description: In the dev server, a sign-up created the account and signed the person in, yet the screen stayed on an empty sign-up form; not checked on main, so it is unconfirmed that this branch caused it.
+title: "Fixed: after email sign-up the page stayed on an empty sign-up form"
+description: The keyed query provider remounted the sign-up form when sign-in finished, which dropped its created state and left an empty form; fixed by following the saved cache without a key.
 generated:
   by: agent:after-finish
   at: 2026-11-05T19:30:00Z
 ---
 
-# After email sign-up the page stayed on an empty sign-up form
+# Fixed: after email sign-up the page stayed on an empty sign-up form
 
 ## Finding
 
-During the walk-through in the dev server, an email sign-up created the account and signed the person in, but the page
-stayed on an empty sign-up form rather than going on to `next` or `/groups` ([sign in](../features/sign-in.md)). It
-was seen before and after the fix wave. It has not been checked on `main`, so it is unconfirmed whether `main` has it
-or this branch introduced it; the branch doesn't change the sign-up form's own redirect logic beyond a privacy link.
+After an email sign-up the account was created and the person signed in, but the page stayed on an empty sign-up form
+instead of showing the confirmation ([sign in](../features/sign-in.md)). The cause was `QueryProvider` keyed by uid:
+when sign-in finished the key changed and the sign-up form remounted, dropping its "created" state. It was on `main`
+too, since b8ceee0. See [the remount finding](query-provider-remounts-pages-at-auth-restore.md).
 
 ## Evidence
 
 - Ledger: "Final review: minor (deferred): after email sign-up the page stayed on an empty sign-up form though the
-  account was created and signed in (seen in the dev server, before and after the fix wave; not checked on main)".
-- No review file raised it; it comes from the controller's walk-through.
+  account was created and signed in".
+- Fixed by 259fe40 and the commits after it. Confirmed in the browser: the form mounts once and the confirmation shows.
 
 ## Status
 
-Open. Unconfirmed on `main`.
+Fixed. The provider has no key, so sign-in no longer remounts the page
+([decision](../decisions/offline-first-scope.md)).
 
 ## Sources
 
 - `app/(platform)/(auth)/sign-up/sign-up-form.tsx`
+- `components/providers.tsx`
+- `lib/offline/restore-cache.ts`
