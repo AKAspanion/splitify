@@ -48,11 +48,16 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {closable ? (
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <Button variant={"ghost"} size={"icon"}>
+        // One button: Radix's Close lends its behaviour to the Button rather than wrapping it in a second button.
+        <DialogPrimitive.Close asChild>
+          <Button
+            variant={"ghost"}
+            size={"icon"}
+            className="absolute right-4 top-4 opacity-70 hover:opacity-100 data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+          >
             <X />
+            <span className="sr-only">Close</span>
           </Button>
-          <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       ) : null}
     </DialogPrimitive.Content>

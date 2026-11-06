@@ -25,9 +25,14 @@ export type ActionWindow = {
  */
 export function openActionLink(win: ActionWindow): ActionLink {
   const link = parseActionLink(win.location.search);
+  leaveActionLink(win, link);
+  return link;
+}
+
+/** Takes the one-time code out of the address bar and the history, and sends a Firebase-handled link on. */
+function leaveActionLink(win: ActionWindow, link: ActionLink) {
   win.history.replaceState(null, "", ACTION_PATH);
   if (link.kind === "firebase") win.location.replace(link.forwardTo);
-  return link;
 }
 
 /** The link this document opened with. A module lives as long as the document, so a reload starts it again. */
@@ -35,12 +40,20 @@ let openedLink: ActionLink | undefined;
 
 /**
  * Opens the link the first time a handler mounts in this document, and gives every later mount the same link. A
- * handler can mount more than once in a load: signed in, the providers remount the page once auth is restored
- * (`QueryProvider` is keyed by the person), and Strict Mode renders twice. Each later mount would otherwise find the
+ * handler can mount more than once in a load: Strict Mode renders twice, and a remount would otherwise find the
  * address bar already clean and call the link incomplete. The same link each time, so React sees no change.
+ *
+ * It is read during a render (`useSyncExternalStore`'s snapshot), so the address bar is cleaned in a microtask
+ * queued here, not here: Next's history patch updates the Router, which React refuses while another component
+ * renders. A microtask runs as soon as the render's synchronous work ends, before any other task, so the code is
+ * still gone before the page paints, and is queued whether or not the render commits.
  */
 export function readActionLinkOnce(win: ActionWindow): ActionLink {
-  openedLink ??= openActionLink(win);
+  if (openedLink === undefined) {
+    const link = parseActionLink(win.location.search);
+    openedLink = link;
+    queueMicrotask(() => leaveActionLink(win, link));
+  }
   return openedLink;
 }
 
