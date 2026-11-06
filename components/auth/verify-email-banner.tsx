@@ -3,21 +3,40 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { toUserMessage } from "@/lib/data/errors";
 import {
-  reloadEmailVerified,
-  sendVerificationEmail,
-} from "@/lib/firebase/auth";
+  isVerifyBannerSnoozed,
+  readVerifyBannerDismissal,
+  writeVerifyBannerDismissal,
+} from "@/lib/auth/verify-banner-dismissal";
+import { toUserMessage } from "@/lib/data/errors";
+import { sendVerificationEmail } from "@/lib/firebase/auth";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
-/** Shown while the signed-in person's email is unverified: resend the email, or reload to check. */
-export function VerifyEmailBanner() {
+/**
+ * Shown while the signed-in person's email is unverified, with Resend email. `dismissable` (Groups) adds Dismiss, which
+ * hides it for 7 days; without it (Profile) it always shows. It clears on the next token refresh or sign-in once the
+ * email is verified.
+ */
+export function VerifyEmailBanner({
+  dismissable = false,
+}: {
+  dismissable?: boolean;
+}) {
   const { status, user } = useAuth();
-  const [verified, setVerified] = useState(false);
+  if (status !== "signed-in" || !user || user.emailVerified) return null;
+  // Keyed on the person, so another person signing in on this device reads their own dismissal.
+  return <Banner key={user.uid} uid={user.uid} dismissable={dismissable} />;
+}
+
+function Banner({ uid, dismissable }: { uid: string; dismissable: boolean }) {
+  const [snoozed, setSnoozed] = useState(
+    () =>
+      dismissable &&
+      isVerifyBannerSnoozed(readVerifyBannerDismissal(uid), new Date()),
+  );
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,8 +45,7 @@ export function VerifyEmailBanner() {
     return () => clearTimeout(timer);
   }, [cooldown]);
 
-  if (status !== "signed-in" || !user || user.emailVerified || verified)
-    return null;
+  if (snoozed) return null;
 
   const resend = async () => {
     setError(null);
@@ -42,17 +60,9 @@ export function VerifyEmailBanner() {
     }
   };
 
-  const check = async () => {
-    setError(null);
-    setChecking(true);
-    try {
-      if (await reloadEmailVerified()) setVerified(true);
-      else setError("Not verified yet. Open the link in the email first.");
-    } catch (e) {
-      setError(toUserMessage(e));
-    } finally {
-      setChecking(false);
-    }
+  const dismiss = () => {
+    writeVerifyBannerDismissal(uid, new Date());
+    setSnoozed(true);
   };
 
   return (
@@ -74,9 +84,11 @@ export function VerifyEmailBanner() {
           >
             Resend email
           </Button>
-          <Button size="sm" onClick={check} disabled={checking}>
-            I&apos;ve verified
-          </Button>
+          {dismissable ? (
+            <Button size="sm" onClick={dismiss}>
+              Dismiss
+            </Button>
+          ) : null}
         </div>
       </div>
       {sent && cooldown > 0 ? (
