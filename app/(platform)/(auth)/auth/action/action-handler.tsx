@@ -20,19 +20,16 @@ export type ActionWindow = {
 };
 
 /**
- * Reads the email link, takes it out of the address bar at once so the one-time code doesn't stay in the URL or the
- * history, and sends the modes Firebase finishes on to Firebase's own handler.
+ * Takes the one-time code out of the address bar and the history, and sends a Firebase-handled link on. The forward
+ * doesn't depend on the cleanup: if `replaceState` throws, the link still goes to Firebase, which replaces this page
+ * and its URL anyway, and the error is still reported.
  */
-export function openActionLink(win: ActionWindow): ActionLink {
-  const link = parseActionLink(win.location.search);
-  leaveActionLink(win, link);
-  return link;
-}
-
-/** Takes the one-time code out of the address bar and the history, and sends a Firebase-handled link on. */
 function leaveActionLink(win: ActionWindow, link: ActionLink) {
-  win.history.replaceState(null, "", ACTION_PATH);
-  if (link.kind === "firebase") win.location.replace(link.forwardTo);
+  try {
+    win.history.replaceState(null, "", ACTION_PATH);
+  } finally {
+    if (link.kind === "firebase") win.location.replace(link.forwardTo);
+  }
 }
 
 /** The link this document opened with. A module lives as long as the document, so a reload starts it again. */

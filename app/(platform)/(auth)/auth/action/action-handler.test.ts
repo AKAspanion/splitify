@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/firebase/auth", () => ({
   readPasswordResetEmail: vi.fn(),
@@ -7,7 +7,6 @@ vi.mock("@/lib/firebase/auth", () => ({
 }));
 
 import type { ActionLink } from "@/lib/auth/action-link";
-import { openActionLink } from "./action-handler";
 
 /** A window at /auth/action/ with the given query string; records where the address bar and the browser go. */
 function fakeWindow(search: string) {
@@ -20,13 +19,23 @@ function fakeWindow(search: string) {
   };
 }
 
-describe("openActionLink", () => {
-  it("reads a reset link and takes its code out of the address bar", () => {
+describe("readActionLinkOnce", () => {
+  // A fresh copy of the module is a fresh document: what it read lives at module scope.
+  beforeEach(() => {
+    vi.resetModules();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("reads a reset link and takes its code out of the address bar", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
     const win = fakeWindow("?mode=resetPassword&oobCode=abc&apiKey=k");
-    expect(openActionLink(win)).toEqual({
+
+    expect(readActionLinkOnce(win)).toEqual({
       kind: "reset-password",
       code: "abc",
     });
+    await afterRender();
+
     expect(win.history.replaceState).toHaveBeenCalledWith(
       null,
       "",
@@ -35,9 +44,16 @@ describe("openActionLink", () => {
     expect(win.location.replace).not.toHaveBeenCalled();
   });
 
-  it("reads a verify-email link and cleans the address bar", () => {
+  it("reads a verify-email link and cleans the address bar", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
     const win = fakeWindow("?mode=verifyEmail&oobCode=v1");
-    expect(openActionLink(win)).toEqual({ kind: "verify-email", code: "v1" });
+
+    expect(readActionLinkOnce(win)).toEqual({
+      kind: "verify-email",
+      code: "v1",
+    });
+    await afterRender();
+
     expect(win.history.replaceState).toHaveBeenCalledWith(
       null,
       "",
@@ -45,17 +61,25 @@ describe("openActionLink", () => {
     );
   });
 
-  it("sends a recoverEmail link on to Firebase's handler with its own query string", () => {
+  it("sends a recoverEmail link on to Firebase's handler with its own query string", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
     const win = fakeWindow("?mode=recoverEmail&oobCode=x&apiKey=k");
-    expect(openActionLink(win).kind).toBe("firebase");
+
+    expect(readActionLinkOnce(win).kind).toBe("firebase");
+    await afterRender();
+
     expect(win.location.replace).toHaveBeenCalledWith(
       "/__/auth/action?mode=recoverEmail&oobCode=x&apiKey=k",
     );
   });
 
-  it("cleans the address bar for an incomplete link too", () => {
+  it("cleans the address bar for an incomplete link too", async () => {
+    const { readActionLinkOnce } = await import("./action-handler");
     const win = fakeWindow("?mode=resetPassword");
-    expect(openActionLink(win)).toEqual({ kind: "incomplete" });
+
+    expect(readActionLinkOnce(win)).toEqual({ kind: "incomplete" });
+    await afterRender();
+
     expect(win.history.replaceState).toHaveBeenCalledWith(
       null,
       "",
@@ -63,12 +87,26 @@ describe("openActionLink", () => {
     );
     expect(win.location.replace).not.toHaveBeenCalled();
   });
-});
 
-describe("readActionLinkOnce", () => {
-  // A fresh copy of the module is a fresh document: what it read lives at module scope.
-  beforeEach(() => {
-    vi.resetModules();
+  it("still forwards a Firebase-handled link once when cleaning the address bar throws", async () => {
+    // Runs the queued cleanup by hand, so its error is caught here rather than reported as uncaught.
+    const queued: (() => void)[] = [];
+    vi.stubGlobal("queueMicrotask", (task: () => void) => queued.push(task));
+    const { readActionLinkOnce } = await import("./action-handler");
+    const win = fakeWindow("?mode=recoverEmail&oobCode=x&apiKey=k");
+    win.history.replaceState.mockImplementation(() => {
+      throw new Error("history blocked");
+    });
+
+    expect(readActionLinkOnce(win).kind).toBe("firebase");
+    readActionLinkOnce(win);
+    expect(queued).toHaveLength(1);
+    expect(() => queued[0]()).toThrow("history blocked");
+
+    expect(win.location.replace).toHaveBeenCalledTimes(1);
+    expect(win.location.replace).toHaveBeenCalledWith(
+      "/__/auth/action?mode=recoverEmail&oobCode=x&apiKey=k",
+    );
   });
 
   it("gives the same link to a handler mounted again after the address bar was cleaned", async () => {

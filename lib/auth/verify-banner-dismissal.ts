@@ -9,18 +9,21 @@ export function verifyBannerKey(uid: string): string {
 }
 
 /**
- * Whether a stored dismissal still hides the banner: it does for less than 7 days either side of `now` (a clock moved
- * back leaves a date in the future, which only hides it while it is under 7 days ahead). Nothing stored, or text that
- * isn't a date, never hides it.
+ * Whether a stored dismissal still hides the banner: only while `0 <= now - dismissed < 7 days`. A dismissal dated in
+ * the future (the clock was moved back, or the value was edited) is invalid and shows the banner, so no value hides it
+ * for more than 7 days from now. Only a value exactly as `writeVerifyBannerDismissal` writes it counts: nothing stored,
+ * or any other text, even one `Date.parse` reads, never hides it.
  */
 export function isVerifyBannerSnoozed(
   stored: string | null,
   now: Date,
 ): boolean {
   if (!stored) return false;
-  const dismissedAt = Date.parse(stored);
-  if (Number.isNaN(dismissedAt)) return false;
-  return Math.abs(now.getTime() - dismissedAt) < SNOOZE_MS;
+  const dismissedAt = new Date(stored);
+  if (Number.isNaN(dismissedAt.getTime())) return false;
+  if (dismissedAt.toISOString() !== stored) return false;
+  const age = now.getTime() - dismissedAt.getTime();
+  return age >= 0 && age < SNOOZE_MS;
 }
 
 /** The stored dismissal for this person, or null when none is stored or storage is blocked. */

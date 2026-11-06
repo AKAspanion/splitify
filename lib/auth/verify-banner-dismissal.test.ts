@@ -7,7 +7,8 @@ import {
 } from "./verify-banner-dismissal";
 
 const NOW = new Date("2026-11-06T12:00:00.000Z");
-const HOUR = 60 * 60 * 1000;
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const iso = (offsetMs: number) =>
   new Date(NOW.getTime() + offsetMs).toISOString();
@@ -30,6 +31,14 @@ describe("isVerifyBannerSnoozed", () => {
     expect(isVerifyBannerSnoozed(null, NOW)).toBe(false);
   });
 
+  it("is true for a dismissal made just now", () => {
+    expect(isVerifyBannerSnoozed(iso(0), NOW)).toBe(true);
+  });
+
+  it("is true for a dismissal 1 minute ago", () => {
+    expect(isVerifyBannerSnoozed(iso(-MINUTE), NOW)).toBe(true);
+  });
+
   it("is true for a dismissal 6 days 23 hours ago", () => {
     expect(isVerifyBannerSnoozed(iso(-(6 * DAY + 23 * HOUR)), NOW)).toBe(true);
   });
@@ -44,9 +53,16 @@ describe("isVerifyBannerSnoozed", () => {
     expect(isVerifyBannerSnoozed("", NOW)).toBe(false);
   });
 
-  it("is true for a date in the future under 7 days ahead, false from 7 days ahead", () => {
-    expect(isVerifyBannerSnoozed(iso(3 * DAY), NOW)).toBe(true);
-    expect(isVerifyBannerSnoozed(iso(7 * DAY), NOW)).toBe(false);
+  it("is false for a date that isn't what a dismissal writes, even one inside the 7 days", () => {
+    expect(isVerifyBannerSnoozed("Nov 5 2026", NOW)).toBe(false);
+    expect(isVerifyBannerSnoozed("2026-11-05", NOW)).toBe(false);
+    expect(isVerifyBannerSnoozed("1730800000000", NOW)).toBe(false);
+    expect(isVerifyBannerSnoozed(String(NOW.getTime() - DAY), NOW)).toBe(false);
+  });
+
+  it("is false for any dismissal dated in the future", () => {
+    expect(isVerifyBannerSnoozed(iso(MINUTE), NOW)).toBe(false);
+    expect(isVerifyBannerSnoozed(iso(3 * DAY), NOW)).toBe(false);
     expect(isVerifyBannerSnoozed(iso(7 * DAY + HOUR), NOW)).toBe(false);
   });
 });
