@@ -1,11 +1,31 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
-import { getAuth } from "firebase/auth";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { initializeApp } from "firebase/app";
+import {
+  connectAuthEmulator,
+  createUserWithEmailAndPassword,
+  getAuth,
+  inMemoryPersistence,
+  initializeAuth,
+} from "firebase/auth";
+import {
+  getApps as getAdminApps,
+  initializeApp as initializeAdminApp,
+} from "firebase-admin/app";
+import {
+  AuthErrorCode,
+  BaseAuth,
+  FirebaseAuthError,
+  getAuth as getAdminAuth,
+  type DecodedIdToken,
+} from "firebase-admin/auth";
+import * as logger from "firebase-functions/logger";
 import type { Request } from "firebase-functions/v2/https";
 import type { Response } from "express";
 import {
   signInTestUser,
   type TestUser,
 } from "../../../dataconnect/test-utils/emulator";
+import { AUTH_HOST } from "../../../dataconnect/test-utils/emulator-ports";
 import { guard, MAX_BODY_BYTES } from "./guard";
 
 vi.mock("firebase-functions/logger", () => ({
@@ -22,6 +42,41 @@ beforeAll(async () => {
   const user = getAuth(alice.dc.app).currentUser;
   token = await user!.getIdToken();
 });
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+const PROJECT_ID = "demo-splitify";
+let freshCount = 0;
+
+/** A new Auth emulator user of its own, signed in, so revoking, deleting or disabling it touches no other test. */
+const freshUser = async (): Promise<{ uid: string; token: string }> => {
+  const n = freshCount++;
+  const app = initializeApp(
+    { apiKey: "demo-api-key", projectId: PROJECT_ID },
+    `guard-fresh-${n}`,
+  );
+  const auth = initializeAuth(app, { persistence: inMemoryPersistence });
+  connectAuthEmulator(auth, `http://${AUTH_HOST}`, { disableWarnings: true });
+  const credential = await createUserWithEmailAndPassword(
+    auth,
+    `guard-${Date.now()}-${n}@example.test`,
+    "test-password-123",
+  );
+  return {
+    uid: credential.user.uid,
+    token: await credential.user.getIdToken(),
+  };
+};
+
+const adminAuth = () => {
+  const name = "guard-test-admin";
+  const app =
+    getAdminApps().find((a) => a.name === name) ??
+    initializeAdminApp({ projectId: PROJECT_ID }, name);
+  return getAdminAuth(app);
+};
 
 type Answer = { status?: number; body?: unknown };
 
@@ -164,5 +219,82 @@ describe("guard", () => {
     const { result, answer } = await run({ ...bearer(), ...json }, "{nope");
     expect(result).toBeNull();
     expect(answer.status).toBe(400);
+  });
+});
+
+describe("guard and revoked sign-ins", () => {
+  const expectRefusedAndLogged = (
+    outcome: Awaited<ReturnType<typeof run>>,
+    leaked: string,
+  ) => {
+    expect(outcome.result).toBeNull();
+    expect(outcome.answer).toEqual({ status: 401, body: SIGN_IN });
+    expect(outcome.reads.count).toBe(0);
+    // The cause's class, and nothing else: no code, message or token.
+    expect(logger.warn).toHaveBeenCalledWith("guard: sign-in refused", {
+      cause: "FirebaseAuthError",
+    });
+    expect(JSON.stringify(vi.mocked(logger.warn).mock.calls)).not.toContain(
+      leaked,
+    );
+  };
+
+  it("checks revocation when it verifies a valid token, and returns the uid and body as before", async () => {
+    const verify = vi.spyOn(BaseAuth.prototype, "verifyIdToken");
+    const { result, answer } = await run(
+      { ...bearer(), ...json },
+      JSON.stringify({ groupId: "g1" }),
+    );
+    expect(verify).toHaveBeenCalledWith(token, true);
+    expect(answer).toEqual({});
+    expect(result).toEqual({ uid: alice.uid, body: { groupId: "g1" } });
+  });
+
+  // Production's admin SDK checks revocation only when asked to (the emulator's always does, so these stand in for
+  // it): the token's signature is still good, and only the revocation lookup refuses it.
+  it.each([
+    ["token revoked", AuthErrorCode.ID_TOKEN_REVOKED],
+    ["user deleted", AuthErrorCode.USER_NOT_FOUND],
+    ["user disabled", AuthErrorCode.USER_DISABLED],
+  ])(
+    "answers 401 when only the revocation check refuses the token (%s)",
+    async (_name, code) => {
+      vi.spyOn(BaseAuth.prototype, "verifyIdToken").mockImplementation(
+        async (_token: string, checkRevoked?: boolean) => {
+          if (checkRevoked)
+            throw new FirebaseAuthError({ code, message: `token ${code}` });
+          return { uid: "still-signed-in" } as DecodedIdToken;
+        },
+      );
+      vi.mocked(logger.warn).mockClear();
+      const outcome = await run({ ...bearer(), ...json }, '{"a":1}');
+      expectRefusedAndLogged(outcome, token);
+    },
+  );
+
+  it("answers 401 for a token issued before the user's refresh tokens were revoked", async () => {
+    const user = await freshUser();
+    // Revocation counts in whole seconds after the token's auth_time, so let one pass.
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+    await adminAuth().revokeRefreshTokens(user.uid);
+    vi.mocked(logger.warn).mockClear();
+    const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
+    expectRefusedAndLogged(outcome, user.token);
+  });
+
+  it("answers 401 for a token whose user was deleted", async () => {
+    const user = await freshUser();
+    await adminAuth().deleteUser(user.uid);
+    vi.mocked(logger.warn).mockClear();
+    const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
+    expectRefusedAndLogged(outcome, user.token);
+  });
+
+  it("answers 401 for a token whose user was disabled", async () => {
+    const user = await freshUser();
+    await adminAuth().updateUser(user.uid, { disabled: true });
+    vi.mocked(logger.warn).mockClear();
+    const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
+    expectRefusedAndLogged(outcome, user.token);
   });
 });

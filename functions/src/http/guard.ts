@@ -29,7 +29,7 @@ const bearerToken = (req: Request): string | null => {
 
 /**
  * The first thing every function the browser calls runs: it checks the Firebase ID token from `Authorization:
- * Bearer <token>` with the admin SDK, then reads the body (JSON only, at most `maxBytes`). It answers a refusal
+ * Bearer <token>` with the admin SDK, revocation included, then reads the body (JSON only, at most `maxBytes`). It answers a refusal
  * itself, `401`, `413`, `415` or `400`, and returns null; otherwise the caller's uid and the parsed body, which
  * is `undefined` when the request has none. The token is checked before the body is touched.
  */
@@ -44,7 +44,9 @@ export async function guard(
   let uid: string;
   try {
     if (!token) throw new Error("no bearer token");
-    uid = (await getAuth(adminApp()).verifyIdToken(token)).uid;
+    // checkRevoked: a token issued before its refresh tokens were revoked (deleteMyAccount does), or whose user was
+    // deleted or disabled, is refused, at the cost of one Auth lookup per request.
+    uid = (await getAuth(adminApp()).verifyIdToken(token, true)).uid;
   } catch (error) {
     logger.warn("guard: sign-in refused", { cause: causeClass(error) });
     res.status(401).json({ message: "Sign in again to continue." });
