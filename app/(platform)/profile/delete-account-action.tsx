@@ -15,7 +15,7 @@ import {
 } from "firebase/functions";
 import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteAccountDialog } from "./delete-account-dialog";
 import {
@@ -47,6 +47,14 @@ export default function DeleteAccountAction() {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  // One delete per confirmation. The dialog stays mounted for its exit animation, so its Delete account button can
+  // confirm again while a delete is in flight; a ref, unlike `deleting`, is current before the next render.
+  const inFlight = useRef(false);
+
+  const stopDeleting = () => {
+    inFlight.current = false;
+    setDeleting(false);
+  };
 
   // The function wants a recent sign-in. Signed out first, so the sign-in screen shows its form rather than going
   // straight on to `next`; it then brings the person back here to finish.
@@ -55,13 +63,15 @@ export default function DeleteAccountAction() {
       await signOut({ toSignIn: true });
     } catch (error) {
       toast.error(toUserMessage(error));
-      setDeleting(false);
+      stopDeleting();
       return;
     }
     router.replace(SIGN_IN_AGAIN_PATH);
   };
 
   const handleDelete = async () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setConfirming(false);
     setDeleting(true);
     try {
@@ -70,7 +80,7 @@ export default function DeleteAccountAction() {
       const failure = deleteAccountFailure(error);
       toast.error(failure.message);
       if (failure.signInAgain) await signInAgain();
-      else setDeleting(false);
+      else stopDeleting();
       return;
     }
     // The Auth user is gone, so this browser's sign-in is too: clear it locally, then leave by a full page load.
