@@ -7,14 +7,11 @@ import {
   registerAppWorker,
   registerWebPush,
 } from "@/lib/push/register";
-import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export const Launch = () => {
   const { user } = useAuth();
   const uid = user?.uid ?? null;
-  const pathname = usePathname();
-  const isHome = pathname === "" || pathname === "/";
 
   // The one service worker (offline shell and push) is registered for everyone, signed in or not.
   // The worker only works in the exported build, not in next dev (see knowledge/operations/service-worker.md).
@@ -44,15 +41,6 @@ export const Launch = () => {
     )
       void registerWebPush();
     return stopListening;
-  }, [uid]);
-
-  // Someone signed in on the landing page goes to the app by a full page load, never a client navigation: the landing
-  // page may have loaded the ad script, which would carry over (knowledge/decisions/adsense-on-public-pages-only.md).
-  useEffect(() => {
-    if (uid && isHome) {
-      window.location.replace("/groups/");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   return <UpdateToast />;

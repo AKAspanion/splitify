@@ -19,6 +19,7 @@ import {
 import { safeNextPath } from "@/lib/auth/next-path";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
+import { AuthCard } from "../_components/auth-card";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -94,7 +95,7 @@ export function SignUpForm() {
 
   if (created) {
     return (
-      <div className="w-full max-w-sm space-y-6">
+      <AuthCard subtitle="Create your account">
         <p role="status" className="text-sm text-muted-foreground">
           Check your inbox to verify your email. You can start using Splitify
           now.
@@ -102,14 +103,35 @@ export function SignUpForm() {
         <Button className="w-full" onClick={() => router.replace(next)}>
           Continue
         </Button>
-      </div>
+      </AuthCard>
     );
   }
 
   const query = rawNext ? `?next=${encodeURIComponent(next)}` : "";
 
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <AuthCard
+      subtitle="Create your account"
+      footer={
+        <>
+          <p className="text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              href={`/sign-in/${query}`}
+              className="text-foreground underline-offset-4 hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+          <Link
+            href="/privacy/"
+            className="text-muted-foreground underline-offset-4 hover:underline"
+          >
+            Privacy policy
+          </Link>
+        </>
+      }
+    >
       <form
         className="space-y-4"
         onSubmit={(event) => {
@@ -164,10 +186,15 @@ export function SignUpForm() {
           disabled={pending !== null || !online}
           loading={pending === "email"}
         >
-          Create account
+          Sign up
         </Button>
         <OfflineSignInNote />
       </form>
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="h-px flex-1 bg-border" />
+        or
+        <div className="h-px flex-1 bg-border" />
+      </div>
       <Button
         type="button"
         variant="outline"
@@ -178,23 +205,6 @@ export function SignUpForm() {
       >
         Continue with Google
       </Button>
-      <div className="flex flex-col items-center gap-2 text-sm">
-        <p className="text-muted-foreground">
-          Already have an account?{" "}
-          <Link
-            href={`/sign-in/${query}`}
-            className="text-foreground underline-offset-4 hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
-        <Link
-          href="/privacy/"
-          className="text-muted-foreground underline-offset-4 hover:underline"
-        >
-          Privacy policy
-        </Link>
-      </div>
-    </div>
+    </AuthCard>
   );
 }
