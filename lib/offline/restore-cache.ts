@@ -23,6 +23,52 @@ export function switchesPerson(
   return lastSignedIn !== null && uid !== null && lastSignedIn !== uid;
 }
 
+/** What the query provider knows about the person whose saved cache it follows. */
+export type Followed = {
+  /** The signed-in person, null when signed out or before sign-in is known. */
+  uid: string | null;
+  /** Whether that person's restore has settled. */
+  restored: boolean;
+  /** The last person signed in, forgotten at sign-out (which clears the cache itself). */
+  lastSignedIn: string | null;
+  /** Whether the cache may still hold the previous person's queries, so nothing under the provider may render. */
+  hiding: boolean;
+};
+
+/**
+ * The provider's state for this render's auth state: unchanged (the same object) when neither the person nor
+ * `lastSignedIn` moved, otherwise reset, hiding when the person switched straight from someone else.
+ */
+export function nextFollowed(
+  followed: Followed,
+  uid: string | null,
+  status: string,
+): Followed {
+  const lastSignedIn =
+    uid ?? (status === "signed-out" ? null : followed.lastSignedIn);
+  if (followed.uid === uid && followed.lastSignedIn === lastSignedIn)
+    return followed;
+  const samePerson = followed.uid === uid;
+  return {
+    uid,
+    restored: samePerson && followed.restored,
+    lastSignedIn,
+    hiding: samePerson
+      ? followed.hiding
+      : switchesPerson(followed.lastSignedIn, uid),
+  };
+}
+
+/**
+ * Once the previous person's queries are cleared, the hide ends for `uid`, whether or not their restore has settled:
+ * the children render with restoring true and their queries wait, so the page stays usable however long it takes.
+ */
+export function afterClear(followed: Followed, uid: string): Followed {
+  return followed.uid === uid && followed.hiding
+    ? { ...followed, hiding: false }
+    : followed;
+}
+
 /** Logs the cause class only: the saved cache is personal data, and an IndexedDB message may quote it. */
 function logFailure(what: string, error: unknown): void {
   console.error(

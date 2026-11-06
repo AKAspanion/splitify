@@ -3,7 +3,7 @@
 import { AppProgressBar } from "next-nprogress-bar";
 import { AuthProvider } from "./auth/auth-provider";
 import ConfirmProvider from "./confirm/ConfirmContext";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   IsRestoringProvider,
   QueryClient,
@@ -14,7 +14,12 @@ import { appVersion } from "@/lib/offline/version";
 import { registerQueuedWrites } from "@/lib/offline/queued-writes";
 import { syncOnlineState } from "@/lib/offline/online-state";
 import { CACHE_MAX_AGE_MS, createPersister } from "@/lib/offline/persist";
-import { followPersonCache, switchesPerson } from "@/lib/offline/restore-cache";
+import {
+  afterClear,
+  followPersonCache,
+  nextFollowed,
+  type Followed,
+} from "@/lib/offline/restore-cache";
 
 /**
  * The query client, saved to IndexedDB for the signed-in person only. Sits under `AuthProvider`.
@@ -41,50 +46,45 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   const { status, user } = useAuth();
   const uid = user?.uid ?? null;
 
-  // Whose restore has settled, and who was last signed in. Reset during render when either changes, so the first
-  // render for a new person already says it is restoring, and queries wait for that person's saved cache.
-  // `lastSignedIn` forgets the person at sign-out, which clears the cache itself: signing up after signing out is not
-  // a switch, so the sign-up form stays mounted.
-  const [followed, setFollowed] = useState({
+  // Whose restore has settled, who was last signed in, and whether the cache may still hold someone else's queries.
+  // Reset during render when the person changes, so the first render for a new person already says it is restoring,
+  // and queries wait for that person's saved cache (`nextFollowed` has the rules).
+  const [followed, setFollowed] = useState<Followed>({
     uid,
     restored: false,
     lastSignedIn: uid,
-    switched: false,
+    hiding: false,
   });
-  const lastSignedIn =
-    uid ?? (status === "signed-out" ? null : followed.lastSignedIn);
-  if (followed.uid !== uid || followed.lastSignedIn !== lastSignedIn) {
-    const samePerson = followed.uid === uid;
-    setFollowed({
-      uid,
-      restored: samePerson && followed.restored,
-      lastSignedIn,
-      switched: samePerson
-        ? followed.switched
-        : switchesPerson(followed.lastSignedIn, uid),
-    });
-  }
+  const next = nextFollowed(followed, uid, status);
+  if (next !== followed) setFollowed(next);
   // Signed out, or before sign-in is known, nothing is restored, so nothing is waited for.
   const restoring =
     uid !== null && !(followed.uid === uid && followed.restored);
-  // Straight from person A to person B, the cache still holds A's queries until the follow effect clears it, and a
-  // paused query hands its cached data to the render. So nothing under this provider renders until B's restore
-  // settles. The clear can't move into render: A's save subscription is live until the effect's cleanup, and a clear
-  // before then would save an empty cache over A's, queued offline writes included.
-  const hidePrevious = restoring && followed.uid === uid && followed.switched;
+  // Straight from person A to person B, the cache still holds A's queries, and a paused query hands its cached data to
+  // the render, so nothing under this provider renders until the clear below has run: one commit, never as long as
+  // B's restore. The clear can't move into render: A's save subscription is live until the follow effect's cleanup,
+  // and a clear before then would save an empty cache over A's, queued offline writes included.
+  const hiding = followed.uid === uid && followed.hiding;
 
   // Signed out, the in-memory cache of the person who was here is dropped too.
   useEffect(() => {
     if (status === "signed-out") queryClient.clear();
   }, [status, queryClient]);
 
-  // The person last followed. On a switch straight from one person to another, the clear runs here, after the cleanup
-  // has stopped saving under the first person, and before the second one's restore.
-  const lastUid = useRef<string | null>(null);
+  // A switch straight from one person to another: React has run every cleanup of this commit first, so A's follow has
+  // stopped saving, and A's queries can go. The children then render with restoring true, so they wait for B's
+  // restore, and the shell stays usable however long IndexedDB takes. B's restore hydrates only after its read
+  // resolves, so this clear never removes B's data.
+  useEffect(() => {
+    if (!hiding || !uid) return;
+    queryClient.clear();
+    // Ends a hide this effect owns, after the external clear: no render can do it, since rendering must not clear.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFollowed((current) => afterClear(current, uid));
+  }, [hiding, uid, queryClient]);
+
   useEffect(() => {
     if (!uid) return;
-    if (switchesPerson(lastUid.current, uid)) queryClient.clear();
-    lastUid.current = uid;
     // The stop function is the cleanup: once the person changes, nothing more is saved under them, and a restore
     // of theirs still running is dropped.
     return followPersonCache(
@@ -106,7 +106,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <IsRestoringProvider value={restoring}>
-        {hidePrevious ? null : children}
+        {hiding ? null : children}
       </IsRestoringProvider>
     </QueryClientProvider>
   );

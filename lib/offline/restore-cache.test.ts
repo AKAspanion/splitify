@@ -4,7 +4,13 @@ import type {
   Persister,
 } from "@tanstack/react-query-persist-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { followPersonCache, switchesPerson } from "./restore-cache";
+import {
+  afterClear,
+  followPersonCache,
+  nextFollowed,
+  switchesPerson,
+  type Followed,
+} from "./restore-cache";
 
 const MAX_AGE = 60_000;
 const BUSTER = "v1";
@@ -254,5 +260,89 @@ describe("switchesPerson", () => {
     ["signed out to signed out", null, null, false],
   ])("%s", (_, lastSignedIn, uid, expected) => {
     expect(switchesPerson(lastSignedIn, uid)).toBe(expected);
+  });
+});
+
+describe("nextFollowed", () => {
+  type Step = [uid: string | null, status: string];
+  const start: Followed = {
+    uid: null,
+    restored: false,
+    lastSignedIn: null,
+    hiding: false,
+  };
+  /** Applies each auth state in turn, as successive renders would, settling A's restore once it is followed. */
+  function run(steps: Step[]): Followed {
+    return steps.reduce((followed, [uid, status]) => {
+      const next = nextFollowed(followed, uid, status);
+      return next.uid === "a" ? { ...next, restored: true } : next;
+    }, start);
+  }
+
+  it("signing in from nobody hides nothing, so the sign-up form stays mounted", () => {
+    const followed = nextFollowed(start, "a", "signed-in");
+    expect(followed).toEqual({
+      uid: "a",
+      restored: false,
+      lastSignedIn: "a",
+      hiding: false,
+    });
+  });
+
+  it("a switch straight from A to B hides the children and waits for B's restore", () => {
+    const followed = run([
+      [null, "loading"],
+      ["a", "signed-in"],
+      ["b", "signed-in"],
+    ]);
+    expect(followed).toEqual({
+      uid: "b",
+      restored: false,
+      lastSignedIn: "b",
+      hiding: true,
+    });
+  });
+
+  it("A, then signed out, then B is not a switch: sign-out cleared the cache, and sign-up keeps its form", () => {
+    const followed = run([
+      ["a", "signed-in"],
+      [null, "signed-out"],
+      ["b", "signed-in"],
+    ]);
+    expect(followed.hiding).toBe(false);
+    expect(followed.lastSignedIn).toBe("b");
+  });
+
+  it("A, then no user while auth reloads, then B is still a switch", () => {
+    const followed = run([
+      ["a", "signed-in"],
+      [null, "loading"],
+      ["b", "signed-in"],
+    ]);
+    expect(followed.hiding).toBe(true);
+  });
+
+  it("the same person again (a token refresh) changes nothing", () => {
+    const followed = run([["a", "signed-in"]]);
+    expect(nextFollowed(followed, "a", "signed-in")).toBe(followed);
+  });
+});
+
+describe("afterClear", () => {
+  const hidingB: Followed = {
+    uid: "b",
+    restored: false,
+    lastSignedIn: "b",
+    hiding: true,
+  };
+
+  it("ends the hide for the person whose switch cleared the cache, before their restore settles", () => {
+    expect(afterClear(hidingB, "b")).toEqual({ ...hidingB, hiding: false });
+  });
+
+  it("leaves a newer person's hide alone, and answers the same state when nothing is hidden", () => {
+    expect(afterClear(hidingB, "a")).toBe(hidingB);
+    const shown = { ...hidingB, hiding: false };
+    expect(afterClear(shown, "b")).toBe(shown);
   });
 });
