@@ -123,12 +123,12 @@ export function SignUpForm() {
               Sign in
             </Link>
           </p>
-          <Link
+          <a
             href="/privacy/"
             className="text-muted-foreground underline-offset-4 hover:underline"
           >
             Privacy policy
-          </Link>
+          </a>
         </>
       }
     >

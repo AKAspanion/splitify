@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { OnlineOnly } from "@/components/offline/online-only";
-import { markSignOutIntended } from "@/lib/auth-redirect";
+import { leaveForSignIn, markSignOutIntended } from "@/lib/auth-redirect";
 import { toUserMessage } from "@/lib/data/errors";
 import { signOut } from "@/lib/firebase/auth";
 import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
@@ -73,14 +73,14 @@ export default function DeleteAccountAction() {
       else setDeleting(false);
       return;
     }
-    // The Auth user is gone, so this browser's sign-in is too: leave home first, then clear it locally.
+    // The Auth user is gone, so this browser's sign-in is too: clear it locally, then leave by a full page load.
     markSignOutIntended(true);
-    router.push("/");
     try {
       await firebaseSignOut(getFirebaseAuth());
     } catch {
       // The account is already deleted; the stale local session ends on the next token refresh.
     }
+    leaveForSignIn();
   };
 
   return (

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { useMe } from "@/lib/data/profile";
+import { leaveForSignIn } from "@/lib/auth-redirect";
 import { signOut } from "@/lib/firebase/auth";
 import { toUserMessage } from "@/lib/data/errors";
 import {
@@ -28,9 +29,9 @@ const ProfilePage = () => {
   const handleSignout = async () => {
     setSigningOut(true);
     try {
-      // Leave first: once the person is signed out, the guard around this page sends them to sign in instead.
-      router.push("/");
+      // Signed out first, then a full page load to sign in: no signed-in screen is left to show.
       await signOut();
+      leaveForSignIn();
     } catch (error) {
       toast.error(toUserMessage(error));
       setSigningOut(false);

@@ -18,20 +18,30 @@ type HeaderProps = {
   backTo?: string;
   title: React.ReactNode;
   actions?: React.ReactNode;
+  /**
+   * Makes the back link a plain anchor. A public page that loaded the ad script leaves by a full page load, so the
+   * script can't follow into the app (knowledge/decisions/adsense-on-public-pages-only.md).
+   */
+  fullPageLoad?: boolean;
 };
 
 export const Header = (props: HeaderProps) => {
-  const { backTo, actions, title } = props;
+  const { backTo, actions, title, fullPageLoad = false } = props;
+  const back = backTo ? (
+    <Button variant="ghost" size="icon">
+      <ArrowLeftIcon />
+    </Button>
+  ) : null;
   return (
     <div className="flex w-full gap-6 justify-between items-center">
       <div className="flex gap-4 items-center">
         {backTo ? (
           // Many pages pass a `back` query value through: anything but a same-site path goes to the groups.
-          <Link href={safeNextPath(backTo)}>
-            <Button variant="ghost" size="icon">
-              <ArrowLeftIcon />
-            </Button>
-          </Link>
+          fullPageLoad ? (
+            <a href={safeNextPath(backTo)}>{back}</a>
+          ) : (
+            <Link href={safeNextPath(backTo)}>{back}</Link>
+          )
         ) : null}
         <div className="font-semibold text-lg line-clamp-1">{title}</div>
       </div>

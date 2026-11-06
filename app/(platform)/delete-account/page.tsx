@@ -22,7 +22,7 @@ const DeleteAccountPage = () => {
       {/* A public page, so it loads the ads (knowledge/decisions/adsense-on-public-pages-only.md). */}
       <Adsense />
       <div className="p-6 w-full">
-        <Header backTo="/" title="Delete your account" />
+        <Header backTo="/" fullPageLoad title="Delete your account" />
       </div>
       <article className="w-full max-w-2xl space-y-6 px-6 pb-12 text-sm leading-relaxed">
         <Section title="In the app">

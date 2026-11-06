@@ -5,8 +5,20 @@ vi.mock("@/app/adsense", () => ({
   default: () => <div data-testid="adsense" />,
 }));
 vi.mock("@/components/container/header", () => ({
-  Header: ({ backTo, title }: { backTo: string; title: string }) => (
-    <a data-testid="back" href={backTo}>
+  Header: ({
+    backTo,
+    title,
+    fullPageLoad,
+  }: {
+    backTo: string;
+    title: string;
+    fullPageLoad?: boolean;
+  }) => (
+    <a
+      data-testid="back"
+      data-full-page-load={fullPageLoad ? "true" : "false"}
+      href={backTo}
+    >
       {title}
     </a>
   ),
@@ -23,8 +35,10 @@ describe("privacy page", () => {
     expect(privacy).toContain("Effective date: 6 November 2026");
   });
 
-  it("goes back to /", () => {
-    expect(privacy).toContain('data-testid="back" href="/"');
+  it("goes back to / by a full page load, so the ad script never follows into the app", () => {
+    expect(privacy).toContain(
+      'data-testid="back" data-full-page-load="true" href="/"',
+    );
   });
 
   it("has an Advertising section with the AdSense wording and links", () => {
@@ -72,6 +86,9 @@ describe("privacy page", () => {
 describe("delete-account page", () => {
   it("mounts Adsense and keeps plain anchors", () => {
     expect(deleteAccount).toContain('data-testid="adsense"');
+    expect(deleteAccount).toContain(
+      'data-testid="back" data-full-page-load="true" href="/"',
+    );
     expect(deleteAccount).toContain('<a class="underline" href="/privacy">');
     expect(deleteAccount).toContain("Your account is deleted straight");
   });

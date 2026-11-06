@@ -1,9 +1,8 @@
 import Image from "next/image";
-import { DarkModeToggle } from "@/components/theme/dark-mode-toggle";
 
 /**
  * The one centred card every sign-in screen sits in: the mark over the app's name, a muted subtitle, the screen's
- * actions (`children`), small footer links and the dark-mode toggle at the foot.
+ * actions (`children`) and small footer links. It follows the theme the root ThemeProvider picks.
  */
 export function AuthCard(props: {
   subtitle: string;
@@ -32,9 +31,6 @@ export function AuthCard(props: {
             {footer}
           </div>
         ) : null}
-        <div className="flex justify-center">
-          <DarkModeToggle />
-        </div>
       </div>
     </main>
   );

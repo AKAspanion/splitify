@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthContext, type AuthState } from "@/hooks/use-auth";
 
 // A server render runs no effects, so useEffect runs its callback at once: the redirect is an effect.
@@ -11,7 +11,11 @@ vi.mock("react", async (importOriginal) => ({
 }));
 
 const replace = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace }) }));
+// A full page load: the ad script a public page loaded must not follow into the app, so the router is never used.
+const routerReplace = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: routerReplace }),
+}));
 
 import { HomeRedirect } from "./home-redirect";
 
@@ -31,7 +35,12 @@ function render(auth: AuthState): string {
 }
 
 describe("HomeRedirect", () => {
-  beforeEach(() => replace.mockReset());
+  beforeEach(() => {
+    replace.mockReset();
+    routerReplace.mockReset();
+    vi.stubGlobal("window", { location: { replace } });
+  });
+  afterEach(() => vi.unstubAllGlobals());
 
   it("shows a Loading status and navigates nowhere while auth loads", () => {
     const html = render(LOADING);
@@ -40,13 +49,15 @@ describe("HomeRedirect", () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it("replaces the route with /groups/ for a signed-in person", () => {
+  it("leaves for /groups/ by a full page load for a signed-in person", () => {
     render(SIGNED_IN);
+    expect(routerReplace).not.toHaveBeenCalled();
     expect(replace).toHaveBeenCalledExactlyOnceWith("/groups/");
   });
 
-  it("replaces the route with /sign-in/ for a signed-out person", () => {
+  it("leaves for /sign-in/ by a full page load for a signed-out person", () => {
     render(SIGNED_OUT);
+    expect(routerReplace).not.toHaveBeenCalled();
     expect(replace).toHaveBeenCalledExactlyOnceWith("/sign-in/");
   });
 });
