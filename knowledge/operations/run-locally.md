@@ -33,6 +33,10 @@ verified: human:ankitp@geekyants.com
 5. To run the whole site as it is served, see "Checking the static build" below. `pnpm ngrok` (`scripts.ngrok`) forwards
    `127.0.0.1:2140` on the reserved domain in `NGROK_DOMAIN`, and refuses to start without it.
 
+If the Functions emulator fails with "Cannot determine backend specification. Timeout after 10000" the functions are
+not loaded: the CLI gave the discovery step 10 seconds and the machine was busy. Starting with
+`FUNCTIONS_DISCOVERY_TIMEOUT=60` (seconds) loaded them. It was seen once, on 2026-11-06, and not tracked further.
+
 Local work runs on `demo-splitify`, so nothing local can reach production ([decision](../decisions/local-development-on-the-demo-project.md));
 every local port is in the 2140 series ([decision](../decisions/local-ports-2140-series.md)).
 
@@ -79,6 +83,7 @@ Hosting rewrites, and `deleteMyAccount` through the callable.
 
 ## History
 
+- 2026-11-06: said nothing about the Functions emulator timing out at start; now it names `FUNCTIONS_DISCOVERY_TIMEOUT=60`, because the emulator failed to load the functions on a busy machine.
 - 2026-11-06: `pnpm ngrok` had a fixed domain, there was no e2e command and the hosting check only listed pages that must exist; now ngrok reads `NGROK_DOMAIN`, `pnpm test:e2e` runs Playwright on the emulators and a manifest can list absent pages, because the repository-modernization run changed each.
 - 2026-11-05: the package manager was yarn 1, the dev server needed a `.env` and ran on Next's default port against hand-started emulators, and the CLI ran through `npx`; now pnpm 11, `pnpm dev` starts everything on `demo-splitify` in the 2140 series with the local `firebase-tools`, and the rule tests have their own ports, because local development moves onto the emulators. See [the demo project decision](../decisions/local-development-on-the-demo-project.md).
 - 2026-11-05: the build wrote only the static site; now `postbuild` also writes the service worker's file list into `out/`, and the worker works only in that build, not `next dev`, because of offline support. See [service worker](service-worker.md).

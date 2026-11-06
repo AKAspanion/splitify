@@ -16,7 +16,7 @@ There is no application server. The Next.js app at the repository root (`next.co
 export (`output: "export"`) that Firebase Hosting serves, and the browser talks to Google services directly
 ([static build decision](../decisions/static-build-on-firebase-hosting.md)):
 
-- **Pages** live in `app/`, in route groups: `app/(landing)` (public home page), `app/(platform)` (the signed-in
+- **Pages** live in `app/`, in the route group `app/(platform)` (`/` redirects by sign-in state; the signed-in
   app, plus the sign-in screens and `/privacy`). Only `*.hosting.tsx` files are routes. See
   [the web app](../apps/splitify.md).
 - **Data** is [SQL Connect](../data/sql-connect.md) (Cloud SQL Postgres) and Firebase Auth. Screens read and write
@@ -55,6 +55,7 @@ User rows are created on first sign-in by the `UpsertMe` mutation, and offline c
 
 ## History
 
+- 2026-11-06: pages included a landing route group; now `/` is a redirect inside `app/(platform)`, because the landing page was removed. See [the decision](../decisions/remove-landing-page.md).
 - 2026-11-05: the `/api/` rewrites existed only in Hosting; now `next dev` has its own dev-only rewrites to the Functions emulator, because local development runs on the emulators.
 - 2026-11-05: pushes and activity were sent by `/api/push-notification` routes the browser called after each action; now each action writes its activity and sends its pushes itself, because the security fixes removed those routes. See [activity and notifications in actions](../decisions/activity-and-notifications-in-actions.md).
 - 2026-11-05: added the hosting build, because the public pages are served from Firebase Hosting first.

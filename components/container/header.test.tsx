@@ -9,7 +9,11 @@ vi.mock("next/link", () => ({
   }: {
     href: string;
     children: React.ReactNode;
-  }) => <a href={href}>{children}</a>,
+  }) => (
+    <a data-next-link="" href={href}>
+      {children}
+    </a>
+  ),
 }));
 
 import { backHref, Header } from "./header";
@@ -51,5 +55,20 @@ describe("Header", () => {
     );
 
     expect(html).toContain('href="/friends/f1/"');
+  });
+
+  it("uses a client-side link by default", () => {
+    const html = renderToStaticMarkup(<Header title="T" backTo="/" />);
+
+    expect(html).toContain("data-next-link");
+  });
+
+  it("with fullPageLoad, the back link is a plain anchor, not a client-side link", () => {
+    const html = renderToStaticMarkup(
+      <Header title="T" backTo="/" fullPageLoad />,
+    );
+
+    expect(html).toContain('<a href="/">');
+    expect(html).not.toContain("data-next-link");
   });
 });

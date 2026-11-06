@@ -70,9 +70,20 @@ overrides it with `maxInstances: 1`.
 Every HTTP function the browser calls runs `guard` (`functions/src/http/guard.ts`) first: it verifies the Firebase ID
 token from `Authorization: Bearer` with the admin SDK, then reads the JSON body (at most 65536 bytes), and answers
 `401`, `413`, `415` or `400` itself. The callable gets its caller from Firebase. The browser side is
-`lib/functions/call.ts` ([auth](../security/auth.md)). Logs carry an error's class, never its message.
+`lib/functions/call.ts` ([auth](../security/auth.md)). Logs carry an error's class, never its message. The guard
+doesn't ask Auth whether the token was revoked, so a token from before an account deletion still passes for up to an
+hour ([finding](../findings/guard-accepts-revoked-id-tokens.md)).
+
+## Who may invoke them
+
+Cloud Run answers 403 before any code runs unless the service lets `allUsers` invoke it, so the two HTTP functions
+declare `invoker: "public"` (`reports`, `webauthn`) and every deploy sets it; the guard above is what actually checks
+the caller. The callable `deleteMyAccount` gets the Cloud Run Invoker role (roles/run.invoker) only when it is created, so a lost binding is
+restored by hand ([deploy setup](../operations/deploy-setup.md)).
 
 ## History
+
+- 2026-11-06: the HTTP functions relied on Cloud Run's default policy and production answered 403 before any code ran; now `reports` and `webauthn` declare `invoker: "public"` and the callable's binding is restored by hand if lost, because the services had empty IAM policies. See [deploy setup](../operations/deploy-setup.md).
 
 - 2026-11-06: functions had no instance cap and `deleteMyAccount` took any sign-in; now every function is capped at 10 instances and deleting needs a sign-in from the last 5 minutes, because the security review found both gaps.
 - 2026-11-05: the deploy workflow deployed the functions; now a project owner deploys them by hand. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).

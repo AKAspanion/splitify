@@ -1,19 +1,20 @@
 import { Suspense } from "react";
-import { Header } from "@/components/container/header";
+import { AuthCard } from "../_components/auth-card";
 import { SignInForm } from "./sign-in-form";
 
 const SignInPage = () => {
+  // The form reads the query, so it renders in the browser only; the card around it (same subtitle as the form's) is in
+  // the prerendered page.
   return (
-    <div className="flex flex-col items-center">
-      <div className="p-6 w-full">
-        <Header backTo="/" title="Sign in" />
-      </div>
-      <div className="flex w-full justify-center px-6 pb-12">
-        <Suspense>
-          <SignInForm />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense
+      fallback={
+        <AuthCard subtitle="Sign in to split expenses with friends">
+          {null}
+        </AuthCard>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 };
 

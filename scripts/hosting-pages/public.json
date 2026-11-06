@@ -12,7 +12,7 @@
   "requests": [
     {
       "path": "/",
-      "expectText": "Splitting Expenses"
+      "expectText": "Splitify"
     },
     {
       "path": "/privacy",
@@ -28,7 +28,7 @@
     },
     {
       "path": "/sign-up",
-      "expectText": "Sign up"
+      "expectText": "Create your account"
     },
     {
       "path": "/forgot-password",

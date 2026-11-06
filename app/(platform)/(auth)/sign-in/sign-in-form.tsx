@@ -20,6 +20,7 @@ import {
 import { safeNextPath } from "@/lib/auth/next-path";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
+import { AuthCard } from "../_components/auth-card";
 
 export function SignInForm() {
   const router = useRouter();
@@ -37,6 +38,8 @@ export function SignInForm() {
     googleRedirectPending() ? "google" : null,
   );
   const [error, setError] = useState<string | null>(null);
+  // The email fields open behind a button, so the card first offers only the two ways in.
+  const [showEmail, setShowEmail] = useState(false);
 
   // Someone already signed in has no use for the form. A sign-in in flight finishes (UpsertMe) before it navigates.
   // After a failed Google sign-in the form stays, with its error: Auth may still report the user it couldn't sign out.
@@ -94,54 +97,28 @@ export function SignInForm() {
   const query = rawNext ? `?next=${encodeURIComponent(next)}` : "";
 
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <form
-        className="space-y-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void signInEmail();
-        }}
-      >
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error ? (
-          <p
-            role="alert"
-            className="text-sm text-destructive dark:text-red-400"
-          >
-            {error}
+    <AuthCard
+      subtitle="Sign in to split expenses with friends"
+      footer={
+        <>
+          <p className="text-muted-foreground">
+            New to Splitify?{" "}
+            <Link
+              href={`/sign-up/${query}`}
+              className="text-foreground underline-offset-4 hover:underline"
+            >
+              Sign up
+            </Link>
           </p>
-        ) : null}
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={pending !== null || !online}
-          loading={pending === "email"}
-        >
-          Sign in
-        </Button>
-        <OfflineSignInNote />
-      </form>
+          <a
+            href="/privacy/"
+            className="text-muted-foreground underline-offset-4 hover:underline"
+          >
+            Privacy policy
+          </a>
+        </>
+      }
+    >
       <Button
         type="button"
         variant="outline"
@@ -152,29 +129,70 @@ export function SignInForm() {
       >
         Continue with Google
       </Button>
-      <div className="flex flex-col items-center gap-2 text-sm">
-        <Link
-          href="/forgot-password/"
-          className="text-muted-foreground underline-offset-4 hover:underline"
+      {showEmail ? (
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void signInEmail();
+          }}
         >
-          Forgot your password?
-        </Link>
-        <p className="text-muted-foreground">
-          New to Splitify?{" "}
-          <Link
-            href={`/sign-up/${query}`}
-            className="text-foreground underline-offset-4 hover:underline"
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              autoFocus
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={pending !== null || !online}
+            loading={pending === "email"}
           >
-            Sign up
-          </Link>
-        </p>
-        <Link
-          href="/privacy/"
-          className="text-muted-foreground underline-offset-4 hover:underline"
+            Sign in
+          </Button>
+          <p className="text-center text-sm">
+            <Link
+              href="/forgot-password/"
+              className="text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Forgot your password?
+            </Link>
+          </p>
+        </form>
+      ) : (
+        <Button
+          type="button"
+          className="w-full"
+          disabled={pending !== null || !online}
+          onClick={() => setShowEmail(true)}
         >
-          Privacy policy
-        </Link>
-      </div>
-    </div>
+          Sign in with email
+        </Button>
+      )}
+      {error ? (
+        <p role="alert" className="text-sm text-destructive dark:text-red-400">
+          {error}
+        </p>
+      ) : null}
+      <OfflineSignInNote />
+    </AuthCard>
   );
 }

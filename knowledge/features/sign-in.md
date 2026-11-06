@@ -15,8 +15,17 @@ verified: human:ankitp@geekyants.com
 On the hosted site a person signs in with email and password or with Google, signs up the same ways, or asks for a
 password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `forgot-password` (each a
 `page.hosting.tsx` with a client form), built on [Firebase Auth](../decisions/firebase-auth.md) through
-`lib/firebase/auth.ts`. The landing page and navbar show the signed-in or signed-out view from the same auth state
-([web app](../apps/splitify.md)).
+`lib/firebase/auth.ts`. There is no landing page: `/` is `HomeRedirect`, which sends a signed-in person to `/groups/`
+and everyone else to `/sign-in/` ([decision](../decisions/remove-landing-page.md), [web app](../apps/splitify.md)).
+
+## The screens' layout
+
+The three screens are one centred `AuthCard` (`app/(platform)/(auth)/_components/auth-card.tsx`), laid out like
+todo.spanion.in: the mark over "Splitify", a muted subtitle, the actions and small footer links. Google sign-in is
+the first button; the email and password fields open behind a "Sign in with email" button, so the card first offers
+only the two ways in. The card has no theme toggle: the screens follow the system or the saved theme. The sign-in and
+sign-up footers link to "Privacy policy" with a plain anchor, a full page load, because the privacy page loads the ad
+script and the sign-in screens must not run beside it ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
 
 ## Rules
 
@@ -57,8 +66,11 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
 
 - Firebase's reset and verify emails open the app's own page `/auth/action/`
   (`app/(platform)/(auth)/auth/action/`); `parseActionLink` (`lib/auth/action-link.ts`) reads the link. The page reads
-  it once per page load and cleans the address bar. It keeps the link, the verify call and the password save at module
-  scope, so a remount never spends the one-time code twice. The query provider's old key flip, which remounted every
+  it once per document through `readActionLinkOnce` and cleans the address bar in a microtask queued from that read:
+  the cleanup runs outside React's render (Next's history patch updates the Router, which React refuses mid-render)
+  and still before the page paints ([fixed](../findings/action-page-updates-router-during-render.md)). A link Firebase
+  handles itself forwards once even if the cleanup throws. It keeps the link, the verify call and the password save at
+  module scope, so a remount never spends the one-time code twice. The query provider's old key flip, which remounted every
   page when auth restored, is gone ([fixed](../findings/query-provider-remounts-pages-at-auth-restore.md)); the guards
   stay as a safeguard. Never link to `/auth/action/` with a code from inside the app: the code would reach scripts and the cache
   ([data protection](../security/data-protection.md)).
@@ -70,13 +82,21 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
 - Verify: "Your email is verified." with Continue. The banner clears without a reload, because `onUserChanged`
   (`lib/firebase/auth.ts`) is built on `onIdTokenChanged`. `verifyEmailWithCode` resolves when the code applied but the
   reload after it failed, because the code is spent.
+- The header links back to `/`, and the failed and saved states offer "Go home" beside their other action, so no state
+  is a dead end ([fixed](../findings/action-page-header-has-no-back-link.md),
+  [fixed](../findings/action-page-failures-have-no-way-back.md)).
+
+## The verify-email banner
+
+Shown while the signed-in person's email is unverified, with Resend email (a 60-second wait). On Groups it also has
+Dismiss, which hides it for 7 days; on Profile it always shows, with Resend only; no other screen shows it. There is
+no "I've verified" button: once verified, the banner clears on the next token refresh or sign-in. Where it shows and
+why: [the decision](../decisions/verify-banner-placement.md). Provisional: the banner's wording awaits the developer.
 - `recoverEmail`, `verifyAndChangeEmail` and `revertSecondFactorAddition` go on to Firebase's own `/__/auth/action`;
   `continueUrl` is never read.
 - The sign-in and sign-up screens end with a plain "Privacy policy" link to `/privacy/`, with no consent line.
   Provisional: the developer may want consent wording on sign-up.
 - Open edges: [offline note wording](../findings/reset-offline-note-says-sign-in.md),
-  [no way back from errors a retry can't fix](../findings/action-page-failures-have-no-way-back.md),
-  [no back link in the header](../findings/action-page-header-has-no-back-link.md),
   [the biometric lock over the page](../findings/biometric-lock-covers-action-page.md),
   [expired after a lost reply and a remount](../findings/reset-remount-after-lost-reply-says-expired.md),
   [the banner and auth restore](../findings/reload-email-verified-skips-auth-restore.md) and
@@ -88,6 +108,8 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-06: the three screens were separate pages under a landing page and the verify banner sat above every screen with "I've verified"; now they are one centred `AuthCard` with email behind "Sign in with email" and no theme toggle, `/` redirects by sign-in state, and the banner shows on Groups (dismissable for 7 days) and Profile, because the developer asked to remove the landing page and settled where the banner shows. See [the landing decision](../decisions/remove-landing-page.md) and [the banner decision](../decisions/verify-banner-placement.md).
+- 2026-11-06: the action page cleaned the address bar during render and its header and failed states had no way home; now it cleans in a queued microtask, forwards a Firebase link even if the cleanup throws, and offers a back link and Go home, because of the console errors and two deferred Minors. See [the fixed finding](../findings/action-page-updates-router-during-render.md).
 - 2026-11-06: said the query provider's key flip remounted pages and the action page's guards were for that; now the provider has no key and the guards are only a safeguard, because sign-in no longer remounts the page.
 - 2026-11-06: a failed sign-out after a failed `UpsertMe` left the person signed in and sent on; now the saved sign-in is cleared and the form stays with its error, because of [the finding](../findings/google-sign-in-signout-failure-keeps-session.md).
 - 2026-11-05: a reset email's link opened Firebase's own `/__/auth/action` page and the screens had no privacy link; now the emails open the app's `/auth/action/` page, which resets the password and verifies the email, and the sign-in and sign-up screens link to the privacy page, because the developer wanted the reset flow finished in the app.
@@ -111,3 +133,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 - `lib/firebase/auth.ts`
 - `lib/firebase/app.ts`
 - `components/offline/offline-sign-in-note.tsx`
+- `app/(platform)/(auth)/_components/auth-card.tsx`
+- `app/(platform)/(auth)/home-redirect.tsx`
+- `components/auth/verify-email-banner.tsx`
+- `lib/auth/verify-banner-dismissal.ts`

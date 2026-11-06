@@ -1,7 +1,7 @@
 ---
 type: Application
 title: Splitify web app
-description: The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the landing page, the signed-in app and the sign-in screens.
+description: The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the signed-in app, the sign-in screens and the privacy and delete-account pages; / redirects by sign-in state.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
@@ -23,11 +23,13 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
 ## Entry points
 
 - `app/layout.tsx`: the root layout. It loads the theme provider and `components/providers.tsx` (Firebase auth state,
-  react-query, the confirm dialog, the progress bar). It no longer loads Google AdSense: the landing layout and the
-  privacy page do (`app/adsense.tsx`, [AdSense](../integrations/google-adsense.md)).
-- `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the one service worker ([service worker](../operations/service-worker.md)) and the device for push
-  ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups/` by a full
-  page load (`window.location.replace`), not a client navigation.
+  react-query, the confirm dialog, the progress bar). It no longer loads Google AdSense: the privacy and delete-account
+  pages do (`app/adsense.tsx`, [AdSense](../integrations/google-adsense.md)).
+- `app/launch.tsx`: runs on every page; it registers the one service worker ([service worker](../operations/service-worker.md)) and, for a signed-in person, the device for push
+  ([notifications](../features/notifications.md)). It no longer redirects anyone: `/` does that itself.
+- `/`: `HomeRedirect` (`app/(platform)/(auth)/home-redirect.tsx`), a spinner that leaves by `window.location.replace`
+  to `/groups/` when signed in and `/sign-in/` when signed out. There is no landing page
+  ([decision](../decisions/remove-landing-page.md)).
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
 - `app/manifest.webmanifest`: the PWA manifest.
@@ -46,11 +48,10 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 404 page for any other path that is not a page, and sets the security headers and the Content-Security-Policy
 ([data protection](../security/data-protection.md)).
 
-- The landing page and navbar read the Firebase Auth state (`useAuth`) and show the signed-in or
-  signed-out view, and the sign-in, sign-up, forgot-password and `/auth/action/` (email links) screens are hosted routes ([sign in](../features/sign-in.md)).
+- The sign-in, sign-up, forgot-password and `/auth/action/` (email links) screens are hosted routes ([sign in](../features/sign-in.md)).
 - The signed-in screens are in this build too. `app/(platform)/(app)/layout.hosting.tsx` is their shell: `RequireAuth`
-  around the navbars, the [verify-email banner](../security/auth.md) (`components/auth/verify-email-banner.tsx`) and the
-  page; `(screens)/layout.hosting.tsx` mounts the Add Expense button, because only `layout.hosting.tsx` files
+  around the navbars and the page (the [verify-email banner](../decisions/verify-banner-placement.md) is no longer in the
+  shell: Groups and Profile mount it); `(screens)/layout.hosting.tsx` mounts the Add Expense button, because only `layout.hosting.tsx` files
   count as layouts, never `layout.tsx`. The navbars read `useAuth` and show initials, since `AuthUser` has no photo.
   Screens read and write through [SQL Connect](../data/sql-connect.md) hooks, not server actions.
 - A route with an id segment is built once, with the placeholder `_` (`generateStaticParams`), and `firebase.json` rewrites
@@ -62,7 +63,9 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
   the pages that must exist in `out/` and the requests that must answer 200 with given text.
 - `components/providers.tsx` has a `PersistQueryClientProvider` with no key that follows the signed-in person's saved cache without remounting the page ([offline](../decisions/offline-first-scope.md)), and makes one `QueryClient` per mount (through `useState`): one made on every render left
   invalidation after a write reaching nobody.
-- A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`).
+- A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`, which then redirects to sign-in) after a sign-out
+  they chose (`lib/auth-redirect.ts`). Profile's Sign out and a finished account deletion skip that and leave for
+  `/sign-in/` by a full page load (`leaveForSignIn`).
 - Known and harmless: on `/privacy` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
   signed-in person, so `callFunction` throws before any request and the lock stays off.
 - `scripts/emulator-firebase-config.mjs` writes `firebase.emulators.json`: `firebase.json` with the Auth, SQL Connect and
@@ -74,7 +77,6 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 
 <!-- GA-GENERATED:screens app -->
 
-- `/`: `app/(landing)/page.tsx`
 - `/activity`: `app/(platform)/(app)/(screens)/activity/page.tsx`
 - `/activity/:id`: `app/(platform)/(app)/(screens)/activity/[id]/page.tsx`
 - `/dashboard`: `app/(platform)/(app)/(screens)/dashboard/page.tsx`
@@ -114,6 +116,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-06: had a landing page, a redirect in `app/launch.tsx` and the verify banner in the signed-in shell; now `/` is `HomeRedirect`, `launch.tsx` redirects nobody and Groups and Profile mount the banner, because the developer removed the landing page and settled where the banner shows. See [the landing decision](../decisions/remove-landing-page.md) and [the banner decision](../decisions/verify-banner-placement.md).
 - 2026-11-06: the query provider was keyed by uid; now it has no key and follows the saved cache, because the key remounted every page when sign-in finished. See [the fixed finding](../findings/query-provider-remounts-pages-at-auth-restore.md).
 - 2026-11-06: the root layout loaded AdSense and the landing page reached the app by client navigation; now the landing layout and privacy page load it and public pages leave by full page loads, because of [the AdSense decision](../decisions/adsense-on-public-pages-only.md).
 - 2026-11-05: the build had no page for Firebase's email links; now it has `/auth/action/`, which the hosting build check requires, because reset and verify emails are finished in the app. See [sign in](../features/sign-in.md).
@@ -129,10 +132,10 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 - `package.json`
 - `next.config.mjs`
-- `app/(landing)/page.hosting.tsx`
+- `app/(platform)/(auth)/home-redirect.tsx`
+- `app/(platform)/(auth)/page.hosting.tsx`
 - `app/layout.tsx`
 - `app/launch.tsx`
-- `app/(landing)/_components/navbar.tsx`
 - `components/auth/auth-provider.tsx`
 - `app/adsense.tsx`
 - `components/providers.tsx`

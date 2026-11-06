@@ -20,7 +20,10 @@ test("signs in, creates a group, adds a contact and an equal expense, and shows 
   const ashaEmail = `asha-${randomUUID()}@example.test`;
 
   await test.step("sign in", async () => {
-    await page.goto("/sign-in/");
+    // "/" redirects to sign-in for someone signed out.
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/sign-in\/$/);
+    await page.getByRole("button", { name: "Sign in with email" }).click();
     await page.getByLabel("Email").fill(testUser.email);
     await page.getByLabel("Password").fill(testUser.password);
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -109,6 +112,7 @@ test("shows the form's error for a wrong password and stays on sign-in", async (
   testUser,
 }) => {
   await page.goto("/sign-in/");
+  await page.getByRole("button", { name: "Sign in with email" }).click();
   await page.getByLabel("Email").fill(testUser.email);
   await page.getByLabel("Password").fill(`${testUser.password}-wrong`);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();

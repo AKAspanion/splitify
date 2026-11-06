@@ -16,3 +16,11 @@ export function signedOutDestination(
 ): string {
   return intended ? "/" : `/sign-in/?next=${encodeURIComponent(pathname)}`;
 }
+
+/**
+ * Leaves for the sign-in screen by a full page load, never the router: after a sign-out or an account deletion the
+ * person must not see a signed-in screen, and a fresh document drops every signed-in screen's state with it.
+ */
+export function leaveForSignIn(): void {
+  window.location.replace("/sign-in/");
+}

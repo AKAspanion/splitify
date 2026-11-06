@@ -24,14 +24,16 @@ proxy ([Clerk](../integrations/clerk.md)).
 - The browser's auth state is `AuthProvider` (`components/auth/auth-provider.tsx`) read through `useAuth`
   (`hooks/use-auth.ts`), with a status of loading, signed in or signed out.
 - `RequireAuth` (`components/auth/require-auth.tsx`) shows a spinner while loading and sends a signed-out person to
-  `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`). It wraps every signed-in
+  `/sign-in/?next=<path>`, or home (`/`, which redirects to sign-in) after a sign-out they chose (`lib/auth-redirect.ts`). It wraps every signed-in
   screen (`app/(platform)/(app)/layout.hosting.tsx`, and the profile). It is a convenience: the data and the functions
   refuse a caller without a valid token themselves.
-- While the person's email is unverified, `VerifyEmailBanner` (`components/auth/verify-email-banner.tsx`) shows above the
-  screens, with Resend email (60-second wait) and "I've verified" (reloads the user). The wording is provisional; the
-  decision names the banner but not its text.
+- While the person's email is unverified, `VerifyEmailBanner` (`components/auth/verify-email-banner.tsx`) shows on
+  Groups (dismissable for 7 days) and always on Profile, with Resend email (60-second wait); it clears on the next token
+  refresh or sign-in once verified ([decision](../decisions/verify-banner-placement.md)). The wording is provisional.
 - The redirect target is checked by `safeNextPath`.
-- Signing out also removes this device's push token ([notifications](../features/notifications.md)).
+- Signing out also removes this device's push token ([notifications](../features/notifications.md)); that call has no
+  deadline ([finding](../findings/sign-out-can-hang-on-push-token-removal.md)). Profile's Sign out and a finished
+  account deletion then leave for `/sign-in/` by a full page load (`leaveForSignIn`).
 - `signOut({ toSignIn: true })` (`lib/firebase/auth.ts`) is for a sign-out the app asks for so the person signs in
   again, as deleting an account with a stale sign-in does: the guard then sends them to `/sign-in/?next=<path>` rather
   than home.
@@ -44,7 +46,10 @@ proxy ([Clerk](../integrations/clerk.md)).
   the Firebase ID token from `Authorization: Bearer` with the admin SDK, then reads a JSON body of at most `65536`
   bytes, and answers `401`, `413`, `415` or `400` itself ([Cloud Functions](../apps/functions.md)). The browser sends
   the token through `callFunction` (`lib/functions/call.ts`), which throws before any request when nobody is signed in
-  and turns a failure into a message a person can read.
+  and turns a failure into a message a person can read. The guard doesn't check revocation, so a token issued before
+  an account deletion works for up to an hour ([finding](../findings/guard-accepts-revoked-id-tokens.md)). The two
+  functions are publicly invokable at Cloud Run (`invoker: "public"`) because this guard is the check
+  ([Cloud Functions](../apps/functions.md)).
 - **The `deleteMyAccount` callable** takes its caller from Firebase's own check (`request.auth`), and refuses an ID
   token whose `auth_time` is more than 5 minutes old, so a left-open session can't delete the account
   ([profile](../features/profile.md)).
@@ -60,6 +65,7 @@ proxy ([Clerk](../integrations/clerk.md)).
 
 ## History
 
+- 2026-11-06: the verify banner sat above every screen with "I've verified" and a sign-out went home; now it shows on Groups (dismissable) and Profile with Resend only, Sign out and a finished deletion leave for `/sign-in/` by a full page load, and the HTTP functions are publicly invokable at Cloud Run with the guard as the check, because of the banner and landing decisions and the production 403s. See [banner](../decisions/verify-banner-placement.md), [landing](../decisions/remove-landing-page.md).
 - 2026-11-06: the account deletion took any signed-in caller and a sign-out always went home; now deleting needs a sign-in from the last 5 minutes and `signOut({ toSignIn: true })` sends the person to sign in, because the security review found a left-open session could delete the account.
 - 2026-11-05: had nothing about the email-link page; now `onUserChanged` is built on `onIdTokenChanged`, so the verify banner clears when a verify link is applied without a reload, and `/auth/action/` finishes reset and verify. See [sign in](../features/sign-in.md).
 - 2026-11-05: was Clerk with `proxy.ts` guarding every route and each route handler checking `auth()`; now Firebase Auth with the guard on each Cloud Function and the rules in SQL Connect, because spec 2c removed the server and Clerk.
@@ -79,7 +85,9 @@ proxy ([Clerk](../integrations/clerk.md)).
 - `lib/auth/next-path.ts`
 - `app/(platform)/(app)/layout.hosting.tsx`
 - `components/auth/verify-email-banner.tsx`
+- `lib/auth/verify-banner-dismissal.ts`
 - `lib/auth-redirect.ts`
+- `lib/push/register.ts`
 - `functions/src/http/guard.ts`
 - `lib/functions/call.ts`
 - `functions/src/webauthn/session.ts`

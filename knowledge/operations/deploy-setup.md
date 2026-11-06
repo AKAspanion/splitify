@@ -21,7 +21,18 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
 - Google sign-in is a redirect through the site's own host, so the auth domain is `splitify.spanion.in` (the
   `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` repository Variable). In the Google Cloud OAuth client Firebase uses, add the
   redirect URI `https://splitify.spanion.in/__/auth/handler` and the JavaScript origin `https://splitify.spanion.in`;
-  without them Google refuses the redirect ([sign-in](../features/sign-in.md)).
+  without them Google refuses the redirect ([sign-in](../features/sign-in.md)). The repository Variable must equal the
+  site's host: on 2026-11-04 it was set to `splitify-416321.firebaseapp.com`, overriding the code's default, so the
+  sign-in handler ran on another origin and browsers that partition third-party storage lost the redirect result and
+  Google sign-in failed. It was set back to `splitify.spanion.in` on 2026-11-06 and the site redeployed; check that the
+  live bundle carries it ([environment](environment.md)).
+- Each Cloud Run service behind a public function needs the Cloud Run Invoker role (roles/run.invoker) for `allUsers`, or Google answers 403
+  before any code runs. On 2026-11-06 the services `deletemyaccount`, `webauthn` and `reports` had empty IAM policies,
+  so account deletion, passkey registration and reports failed in production; the role was granted by hand. The
+  `webauthn` and `reports` `onRequest` functions now declare `invoker: "public"`, so every deploy sets it. The callable
+  `deleteMyAccount` gets it only when the function is created, so if its binding is lost, restore it with
+  `gcloud run services add-iam-policy-binding deletemyaccount --region=asia-south1 --member=allUsers --role=roles/run.invoker`.
+  The functions still check the caller's token themselves ([Cloud Functions](../apps/functions.md)).
 - Brand Firebase Auth's emails with Firebase's own settings, not a mail service of ours, chosen on 2026-11-05: its
   templates can't hold a logo, and only the password-reset message can be edited. The verify email's sender name is
   `Splitify`, set through the Identity Toolkit admin API. The rest is console-only, because the API refuses edits to
@@ -61,6 +72,7 @@ functions may now be spare, and the first deploy may still fail on a missing per
 
 ## History
 
+- 2026-11-06: said nothing about who may invoke the functions or what the auth-domain Variable must be; now it records the the Cloud Run Invoker role (roles/run.invoker) grant (declared in code for `webauthn` and `reports`, by hand for `deleteMyAccount`) and that the Variable must equal `splitify.spanion.in`, because production had empty IAM policies on three services (403 before any code ran) and a Variable pointing at the firebaseapp.com domain broke Google sign-in.
 - 2026-11-05: the action URL was `https://splitify.spanion.in/__/auth/action`; now it is `https://splitify.spanion.in/auth/action/`, the app's own page, with a header check after the deploy, because reset and verify emails are finished in the app. See [sign in](../features/sign-in.md).
 - 2026-11-05: had no OAuth steps for Google sign-in; now the auth domain is `splitify.spanion.in` with its redirect URI and JavaScript origin on the OAuth client, because sign-in became a redirect.
 - 2026-11-05: Auth's emails went out as "project-1033465318943" from the firebaseapp.com domain; now the setup brands them through Firebase's settings, because the developer chose that over sending our own email.
@@ -77,3 +89,6 @@ functions may now be spare, and the first deploy may still fail on a missing per
 - `firebase.json`
 - `scripts/hosting-pages/public.json`
 - `lib/security/csp.test.ts`
+- `functions/src/webauthn/index.ts`
+- `functions/src/reports/index.ts`
+- `lib/firebase/app.ts`

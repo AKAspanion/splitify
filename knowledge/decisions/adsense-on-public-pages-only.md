@@ -8,6 +8,8 @@ generated:
 verified: human:ankitp@geekyants.com
 stated: "The AdSense script runs on the signed-in screens. Load ads only on the public pages (landing, privacy)? — Public pages only (Recommended)"
 stated_via: qa
+superseded_by: decisions/adsense-on-privacy-and-delete-account-pages
+status: superseded
 ---
 
 # Load AdSense only on the public pages

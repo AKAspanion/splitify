@@ -1,19 +1,16 @@
 import { Suspense } from "react";
-import { Header } from "@/components/container/header";
+import { AuthCard } from "../_components/auth-card";
 import { SignUpForm } from "./sign-up-form";
 
 const SignUpPage = () => {
+  // The form reads the query, so it renders in the browser only; the card around it (same subtitle as the form's) is in
+  // the prerendered page.
   return (
-    <div className="flex flex-col items-center">
-      <div className="p-6 w-full">
-        <Header backTo="/" title="Sign up" />
-      </div>
-      <div className="flex w-full justify-center px-6 pb-12">
-        <Suspense>
-          <SignUpForm />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense
+      fallback={<AuthCard subtitle="Create your account">{null}</AuthCard>}
+    >
+      <SignUpForm />
+    </Suspense>
   );
 };
 

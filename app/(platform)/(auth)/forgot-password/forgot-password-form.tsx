@@ -9,6 +9,7 @@ import { sendPasswordReset } from "@/lib/firebase/auth";
 import { authErrorMessage } from "@/lib/auth/auth-errors";
 import { OfflineSignInNote } from "@/components/offline/offline-sign-in-note";
 import { useOnline } from "@/hooks/use-online";
+import { AuthCard } from "../_components/auth-card";
 
 export function ForgotPasswordForm() {
   const online = useOnline();
@@ -34,7 +35,17 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <AuthCard
+      subtitle="Reset your password"
+      footer={
+        <Link
+          href="/sign-in/"
+          className="text-muted-foreground underline-offset-4 hover:underline"
+        >
+          Back to sign in
+        </Link>
+      }
+    >
       <form
         className="space-y-4"
         onSubmit={(event) => {
@@ -76,14 +87,6 @@ export function ForgotPasswordForm() {
         </Button>
         <OfflineSignInNote />
       </form>
-      <p className="text-center text-sm">
-        <Link
-          href="/sign-in/"
-          className="text-muted-foreground underline-offset-4 hover:underline"
-        >
-          Back to sign in
-        </Link>
-      </p>
-    </div>
+    </AuthCard>
   );
 }
