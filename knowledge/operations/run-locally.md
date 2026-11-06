@@ -30,7 +30,8 @@ verified: human:ankitp@geekyants.com
 4. In `next dev` there is no Hosting in front and a static export refuses rewrites, so `next.config.mjs` (a function of
    the phase) drops the export and rewrites `/api/reports/**` and `/api/webauthn/**` to the Functions emulator, built from
    `firebase.json`'s hosting rewrites by `scripts/dev-env.mjs`. Production builds are unchanged.
-5. To run the whole site as it is served, see "Checking the static build" below. `pnpm ngrok` (`scripts.ngrok`) forwards `127.0.0.1:2140`.
+5. To run the whole site as it is served, see "Checking the static build" below. `pnpm ngrok` (`scripts.ngrok`) forwards
+   `127.0.0.1:2140` on the reserved domain in `NGROK_DOMAIN`, and refuses to start without it.
 
 Local work runs on `demo-splitify`, so nothing local can reach production ([decision](../decisions/local-development-on-the-demo-project.md));
 every local port is in the 2140 series ([decision](../decisions/local-ports-2140-series.md)).
@@ -52,6 +53,14 @@ holds the copy equal to it. The Firebase CLI is `firebase-tools`, an exact devDe
 - `pnpm dataconnect:generate` writes the SDKs to `dataconnect/generated/` ([SQL Connect schema](../data/sql-connect.md)).
 - The SQL Connect triggers do not run in the local Functions emulator: [finding](../findings/sql-connect-triggers-not-run-locally.md).
 
+## End-to-end tests
+
+`pnpm test:e2e` (`scripts.test:e2e`, `playwright.config.ts`, specs in `tests/e2e/`) starts `node scripts/dev.mjs`, or
+reuses a running `pnpm dev` locally; CI always starts its own. It needs the `functions/` dependencies installed, Java,
+and Chromium (`pnpm exec playwright install chromium`). The run writes its test users and groups into the local
+`.emulator-data`: [finding](../findings/e2e-writes-into-local-emulator-data.md). CI runs it on every pull request
+([CI and deploy](ci-cd.md), [decision](../decisions/e2e-playwright-main-flow.md)).
+
 ## Checking the static build
 
 `pnpm build` (the same as `pnpm build:hosting`) writes the whole static site to `out/` and needs no database or `.env`
@@ -59,7 +68,8 @@ holds the copy equal to it. The Firebase CLI is `firebase-tools`, an exact devDe
 because `next build` typechecks the whole project. `pnpm check:hosting` (`scripts/check-hosting-build.mjs`) then serves
 `out/` on the Hosting emulator (port in `firebase.json`, project `demo-splitify`) and checks which pages and headers it
 answers with: each area's pages and requests are in a manifest under `scripts/hosting-pages/*.json`, and the id routes
-answer through the rewrites in `firebase.json`.
+answer through the rewrites in `firebase.json`. A manifest may also list `absentPages`, files `out/` must not hold
+(`scripts/hosting-pages/webauthn.json` asserts the deleted WebAuthn test page is gone).
 
 The Hosting CSP blocks calls to the emulators, so local checks use `firebase.emulators.json`, which
 `scripts/emulator-firebase-config.mjs` generates from `firebase.json` with the Auth, SQL Connect and Functions emulators'
@@ -69,6 +79,7 @@ Hosting rewrites, and `deleteMyAccount` through the callable.
 
 ## History
 
+- 2026-11-06: `pnpm ngrok` had a fixed domain, there was no e2e command and the hosting check only listed pages that must exist; now ngrok reads `NGROK_DOMAIN`, `pnpm test:e2e` runs Playwright on the emulators and a manifest can list absent pages, because the repository-modernization run changed each.
 - 2026-11-05: the package manager was yarn 1, the dev server needed a `.env` and ran on Next's default port against hand-started emulators, and the CLI ran through `npx`; now pnpm 11, `pnpm dev` starts everything on `demo-splitify` in the 2140 series with the local `firebase-tools`, and the rule tests have their own ports, because local development moves onto the emulators. See [the demo project decision](../decisions/local-development-on-the-demo-project.md).
 - 2026-11-05: the build wrote only the static site; now `postbuild` also writes the service worker's file list into `out/`, and the worker works only in that build, not `next dev`, because of offline support. See [service worker](service-worker.md).
 - 2026-11-05: needed MySQL in Docker, Clerk, OneSignal and UploadThing keys, a Prisma schema push and a health-check route; now only Node, Java and the Firebase emulators, and the build is the one static site checked with `firebase.emulators.json`, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
@@ -97,5 +108,7 @@ Hosting rewrites, and `deleteMyAccount` through the callable.
 - `.env.sample`
 - `scripts/emulator-firebase-config.mjs`
 - `scripts/check-hosting-build.mjs`
+- `scripts/hosting-pages/webauthn.json`
+- `playwright.config.ts`
 - `next.config.mjs`
 - `firebase.json`

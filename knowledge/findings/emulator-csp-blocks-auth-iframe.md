@@ -1,13 +1,13 @@
 ---
 type: Finding
-title: The Hosting emulator's CSP may block Google sign-in locally
-description: firebase.emulators.json's Content-Security-Policy frame-src has neither 'self' nor the Auth emulator's origin, so Google sign-in through the Hosting emulator is unchecked and may be blocked.
+title: "Fixed: The Hosting emulator's CSP may have blocked Google sign-in locally"
+description: firebase.emulators.json's Content-Security-Policy frame-src had neither 'self' nor the Auth emulator's origin, so Google sign-in through the Hosting emulator may have been blocked; the generator now keeps the first and adds the second.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-05T12:24:26Z
 ---
 
-# The Hosting emulator's CSP may block Google sign-in locally
+# Fixed: The Hosting emulator's CSP may have blocked Google sign-in locally
 
 ## Finding
 
@@ -27,9 +27,11 @@ the emulator is unchecked." Deferred in the run's ledger as a Minor
 
 ## Status
 
-Open.
+Fixed: `scripts/emulator-firebase-config.mjs` copies `firebase.json`'s CSP, whose `frame-src` has `'self'`, and adds the
+Auth emulator's origin to `frame-src` when it generates `firebase.emulators.json`.
 
 ## Sources
 
+- `scripts/emulator-firebase-config.mjs`
 - `firebase.emulators.json`
 - `firebase.json`

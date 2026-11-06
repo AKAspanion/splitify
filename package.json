@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:rules": "node scripts/rules-test-firebase-config.mjs && firebase emulators:exec --config firebase.rules-test.json --only auth,dataconnect --project demo-splitify \"vitest run --config vitest.rules.config.mts\"",
     "dataconnect:generate": "firebase dataconnect:sdk:generate",
     "deploy:functions": "firebase deploy --only functions",
@@ -19,7 +20,7 @@
     "emulators": "firebase emulators:start --only auth,dataconnect,functions,eventarc,pubsub,tasks --project demo-splitify --import .emulator-data --export-on-exit .emulator-data",
     "format": "prettier --write .",
     "postinstall": "pnpm dataconnect:generate",
-    "ngrok": "ngrok http --domain=rational-driving-barnacle.ngrok-free.app 127.0.0.1:2140",
+    "ngrok": "if [ -z \"$NGROK_DOMAIN\" ]; then echo 'NGROK_DOMAIN is required: set it to your reserved ngrok domain, e.g. NGROK_DOMAIN=example.ngrok-free.app pnpm ngrok' >&2; exit 1; fi; ngrok http --domain=\"$NGROK_DOMAIN\" 127.0.0.1:2140",
     "functions:build": "pnpm --dir functions build",
     "functions:install": "pnpm --dir functions install --frozen-lockfile"
   },
@@ -61,6 +62,7 @@
     "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.3.4",
     "@types/node": "^24",
     "@types/react": "^19.3.0",
@@ -70,7 +72,7 @@
     "fake-indexeddb": "^6.2.7",
     "firebase-admin": "^14.5.0",
     "firebase-functions": "^7.4.0",
-    "firebase-tools": "15.34.2",
+    "firebase-tools": "15.35.0",
     "postcss": "^8.5.32",
     "prettier": "^3.9.10",
     "tailwindcss": "^4.3.4",

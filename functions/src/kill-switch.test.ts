@@ -8,9 +8,9 @@ import {
 } from "./kill-switch";
 
 const encode = (value: unknown) =>
-  Buffer.from(
-    value === "not json" ? value : JSON.stringify(value),
-  ).toString("base64");
+  Buffer.from(value === "not json" ? value : JSON.stringify(value)).toString(
+    "base64",
+  );
 
 describe("parseNotification", () => {
   it("returns null for no data", () => {

@@ -9,7 +9,7 @@ mutation CreateGroup(
   $activityId: UUID!
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500) && (!has(vars.type) || vars.type == null || vars.type.size() <= 50)"
 )
 @transaction {
   group_insert(
@@ -35,7 +35,7 @@ mutation UpdateGroup(
   $activityId: UUID!
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.title.size() <= 100 && (!has(vars.description) || vars.description == null || vars.description.size() <= 500) && (!has(vars.type) || vars.type == null || vars.type.size() <= 50)"
 )
 @transaction {
   query @redact {
@@ -126,10 +126,11 @@ mutation AddGroupMember($groupId: UUID!, $userId: String!, $activityId: UUID!)
 }
 
 # search is matched as a case-insensitive POSIX regular expression, since SQL Connect has no case-insensitive
-# substring filter: the caller escapes regex characters in what the person typed.
-query ListMyGroups($search: String, $limit: Int)
+# substring filter: the caller escapes regex characters in what the person typed. At most 200 groups, MY_GROUPS_LIMIT in
+# lib/data/groups.ts: an omitted limit means 200, and a null one is refused, since it would mean no limit.
+query ListMyGroups($search: String, $limit: Int = 200)
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.search) || vars.search == null || vars.search.size() <= 100)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && (!has(vars.limit) || (vars.limit != null && vars.limit >= 0 && vars.limit <= 200)) && (!has(vars.search) || vars.search == null || vars.search.size() <= 100)"
 ) {
   groups(
     where: {

@@ -45,7 +45,7 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
 
   return (
     <Drawer>
-      <DrawerTrigger disabled={disabled}>
+      <DrawerTrigger asChild>
         <Button
           type="button"
           disabled={disabled}
@@ -59,7 +59,7 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle className="px-4 flex gap-4 items-center">
-            <DrawerClose>
+            <DrawerClose asChild>
               <Button type="button" variant="outline" size="icon">
                 <ArrowLeftIcon />
               </Button>
@@ -94,8 +94,10 @@ export const SplitDrawer = (props: SplitDrawerProps) => {
             <PercentSplit {...props} />
           </TabsContent>
           <div className="flex items-center justify-end">
-            <DrawerClose>
-              <Button variant={"outline"}>Done</Button>
+            <DrawerClose asChild>
+              <Button type="button" variant={"outline"}>
+                Done
+              </Button>
             </DrawerClose>
           </div>
         </Tabs>

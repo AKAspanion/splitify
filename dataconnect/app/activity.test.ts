@@ -139,6 +139,35 @@ describe("ListMyActivity and GetActivity", () => {
     expect(carolList.activities).toEqual([]);
   });
 
+  it("refuses a limit of 101 and accepts 100", async () => {
+    await expect(
+      query(alice.dc, "ListMyActivity", { limit: 101, offset: 0 }),
+    ).rejects.toThrow();
+    const { activities } = await query(alice.dc, "ListMyActivity", {
+      limit: 100,
+      offset: 0,
+    });
+    expect(activities).toHaveLength(2);
+  });
+
+  it("refuses a limit below 0 and an offset below 0, and accepts 0 and any offset the pager can reach", async () => {
+    for (const vars of [
+      { limit: -1, offset: 0 },
+      { limit: 10, offset: -1 },
+    ])
+      await expect(query(alice.dc, "ListMyActivity", vars)).rejects.toThrow();
+    const none = await query(alice.dc, "ListMyActivity", {
+      limit: 0,
+      offset: 0,
+    });
+    expect(none.activities).toEqual([]);
+    const far = await query(alice.dc, "ListMyActivity", {
+      limit: 100,
+      offset: 10001,
+    });
+    expect(far.activities).toEqual([]);
+  });
+
   it("refuses both when nobody is signed in", async () => {
     const dc = signedOutConnector(connectorConfig);
     await expect(

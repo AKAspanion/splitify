@@ -26,7 +26,7 @@ or secret on the functions, never a file in the repository. The groups:
   params `AUTHN_RP_ID` and `AUTHN_EXPECTED_ORIGIN`, which must match the host the app is served from and default to the
   production host ([Cloud Functions](../apps/functions.md), [deploy setup](deploy-setup.md)).
 - **Site:** `NEXT_PUBLIC_HOST_URL`, read in `utils/validate.ts` (`getUrlWithHost`), and `NEXT_PUBLIC_GOOGLE_ADSENSE_ID`,
-  read in `app/layout.tsx`.
+  read in `app/adsense.tsx`.
 
 There is no database URL, no Clerk, OneSignal or UploadThing key and no logging switch: the database is SQL Connect, and
 those services and lib/logger.ts are removed ([Clerk](../integrations/clerk.md), [OneSignal](../integrations/onesignal.md),
@@ -38,6 +38,7 @@ those services and lib/logger.ts are removed ([Clerk](../integrations/clerk.md),
 
 ## History
 
+- 2026-11-06: `NEXT_PUBLIC_GOOGLE_ADSENSE_ID` was read in `app/layout.tsx`; now in `app/adsense.tsx`, because the layout no longer passes it. See [AdSense](../integrations/google-adsense.md).
 - 2026-11-05: `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` carried no stated value; now it is `splitify.spanion.in` in production, because Google sign-in became a redirect on the site's own host. See [sign-in](../features/sign-in.md).
 - 2026-11-05: `NEXT_PUBLIC_USE_FIREBASE_EMULATORS` was set by hand in `.env`; now `pnpm dev` sets it with demo Firebase keys and the ports come from `firebase.json`, because local development moved onto the emulators.
 - 2026-11-05: listed the Clerk, MySQL, OneSignal, UploadThing and logging keys and their readers; now only the Firebase, function and site keys, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
@@ -55,5 +56,6 @@ those services and lib/logger.ts are removed ([Clerk](../integrations/clerk.md),
 - `lib/firebase/app.ts`
 - `lib/push/register.ts`
 - `utils/validate.ts`
+- `app/adsense.tsx`
 - `app/layout.tsx`
 - `functions/src/webauthn/index.ts`

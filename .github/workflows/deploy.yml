@@ -23,12 +23,17 @@ concurrency:
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
 
   deploy:
     name: Deploy to Firebase
     needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # The deploy authenticates with the FIREBASE_SERVICE_ACCOUNT key, not the workflow token, which only reads the code.
+    permissions:
+      contents: read
     environment:
       name: production
       # Set the APP_URL variable to change the address shown on deploys.
@@ -87,7 +92,7 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           channelId: live
-          firebaseToolsVersion: 15.34.2
+          firebaseToolsVersion: 15.35.0
       - name: Write service account key
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_dataconnect }}
         env:
@@ -100,7 +105,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
           PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
-        run: pnpm dlx firebase-tools@15.34.2 deploy --only dataconnect --project "$PROJECT_ID" --non-interactive
+        run: pnpm dlx firebase-tools@15.35.0 deploy --only dataconnect --project "$PROJECT_ID" --non-interactive
       - name: Remove service account key
         if: ${{ always() }}
         run: rm -f "$RUNNER_TEMP/sa.json"

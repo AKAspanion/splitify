@@ -1,4 +1,6 @@
 // Cloud Functions for Splitify. Each function is added by the task that needs it.
+// First, so the global options (maxInstances) are set before any function below is defined.
+import "./global-options";
 import { CloudBillingClient } from "@google-cloud/billing";
 import * as logger from "firebase-functions/logger";
 import { projectID } from "firebase-functions/params";

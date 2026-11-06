@@ -4,7 +4,7 @@ import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GroupCombobox } from "./group-combobox";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { PaymentDrawer } from "./payment-drawer";
 import { SplitDrawer } from "./split-drawer";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,12 +21,45 @@ import {
 } from "@/lib/data/expenses";
 import { FormErrors } from "@/components/form/form-errors";
 import { ExpenseType } from "@/lib/splitify/model/expense/expense-type";
-import { convertToObject, fixedNum } from "@/utils/validate";
+import { fixedNum } from "@/utils/validate";
 import { toast } from "sonner";
 import { CategoryCombobox } from "./category-combobox";
 import { RUPEE_SYMBOL } from "@/constants/ui";
+import type { User } from "@/types/shared";
 
 type FormProps = { groups: MyGroup[] };
+
+// The ticks someone changed in the equal split, with the users they were made for (`usersKey`). The split is derived
+// from them while rendering rather than reset in an effect: when the users change, the edits no longer apply.
+export type EqualSplitEdits = {
+  usersKey: string;
+  values: Record<string, boolean>;
+} | null;
+
+// Every user ticked, with the edits laid over it while they were made for these same users.
+export function equalSplitFor(
+  users: User[],
+  usersKey: string,
+  edits: EqualSplitEdits,
+): Record<string, boolean> {
+  const everyone = Object.fromEntries(users.map((u) => [u.id, true]));
+  return edits?.usersKey === usersKey
+    ? { ...everyone, ...edits.values }
+    : everyone;
+}
+
+// The edits after `values` is ticked or unticked for the current users.
+export function withEqualSplitEdit(
+  users: User[],
+  usersKey: string,
+  edits: EqualSplitEdits,
+  values: Record<string, boolean>,
+): EqualSplitEdits {
+  return {
+    usersKey,
+    values: { ...equalSplitFor(users, usersKey, edits), ...values },
+  };
+}
 
 const FormComp = ({ groups }: FormProps) => {
   const { user } = useAuth();
@@ -143,7 +176,9 @@ const FormComp = ({ groups }: FormProps) => {
     return users?.find((u) => u.id === userId)?.id;
   }, [userId, users]);
 
-  const [equalSplit, setEqualSplit] = useState<Record<string, boolean>>({});
+  const usersKey = useMemo(() => JSON.stringify(users), [users]);
+  const [equalSplitEdits, setEqualSplitEdits] = useState<EqualSplitEdits>(null);
+  const equalSplit = equalSplitFor(users, usersKey, equalSplitEdits);
   const [exactSplit, setExactSplit] = useState<Record<string, number>>({});
   const [percentSplit, setPercentSplit] = useState<Record<string, number>>({});
 
@@ -159,7 +194,9 @@ const FormComp = ({ groups }: FormProps) => {
   };
 
   const handleEqualSplitChange = (values: Record<string, boolean>) => {
-    setEqualSplit((p) => ({ ...p, ...values }));
+    setEqualSplitEdits((edits) =>
+      withEqualSplitEdit(users, usersKey, edits, values),
+    );
   };
 
   const handleExactSplitChange = (values: Record<string, number>) => {
@@ -178,20 +215,13 @@ const FormComp = ({ groups }: FormProps) => {
     setGroupId(gid);
     if (currUserId && total) {
       setPayment(() => ({ [currUserId]: total }));
-      setEqualSplit(() => convertToObject(users || [], "id", true));
+      setEqualSplitEdits(null);
     }
   };
 
   const onCategoryChange = (c: string) => {
     setCategory(() => c);
   };
-
-  const effectUsers = useMemo(() => JSON.stringify(users), [users]);
-
-  useEffect(() => {
-    setEqualSplit(() => convertToObject(users || [], "id", true));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectUsers]);
 
   return (
     <form className="flex flex-col gap-4 sm:gap-6" onSubmit={onSubmit}>

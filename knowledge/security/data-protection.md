@@ -29,10 +29,14 @@ verified: human:ankitp@geekyants.com
   caller's own groups and friends ([roles](roles.md)). The functions refuse a call without a valid token.
 - Secrets are Firebase secrets and params, never in the code: `SESSION_PASSWORD` is a function secret
   ([Cloud Functions](../apps/functions.md)). The old hard-coded session password is
-  [fixed](../findings/hardcoded-session-password.md); [the committed Firebase config](../findings/committed-firebase-config.md)
-  is a separate finding.
+  [fixed](../findings/hardcoded-session-password.md). The iOS Firebase config is untracked
+  ([fixed](../findings/committed-firebase-config.md)); its key stays in git history, so it needs restricting to the iOS
+  bundle id in Google Cloud.
+- A back link a page is given in the URL goes through `backHref` and `safeNextPath` (`components/container/header.tsx`,
+  `lib/auth/next-path.ts`), so a `javascript:` or off-site target falls back to the page's own default.
 - Hosting sends the security headers in `firebase.json`: `X-Content-Type-Options`, `X-Frame-Options: DENY`,
-  `Referrer-Policy`, `Permissions-Policy` and a Content-Security-Policy that limits scripts, connections and frames to
+  `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (`max-age=63072000; includeSubDomains`) and a
+  Content-Security-Policy that limits scripts, connections and frames to
   the hosts the pages load (Google, Firebase and AdSense hosts, and the one Cloud Functions host). Provisional: its
   `script-src` and `style-src` allow `'unsafe-inline'`, because Next's static export inlines its hydration scripts and
   styles; the developer accepts it or asks for script hashes later, and production may load more AdSense hosts, so
@@ -44,6 +48,7 @@ verified: human:ankitp@geekyants.com
 
 ## History
 
+- 2026-11-06: sent no HSTS header, trusted a back link as given and called the iOS config an open finding; now Hosting sends HSTS, back links are checked and the config is untracked, because the repository-modernization run fixed each.
 - 2026-11-05: `frame-src` framed only Firebase's `firebaseapp.com` host and Google; now it also allows `'self'`, because Google sign-in became a redirect and Firebase's auth iframe runs on the site's own origin. See [sign-in](../features/sign-in.md).
 - 2026-11-05: was Clerk sessions, `AuthnDevice.data` and the `Log` table over MySQL; now ID-token checks, `AuthnDevice.devices` through the admin connector, Cloud Logging and the Hosting security headers, because spec 2c removed the server. See [decision](../decisions/static-build-on-firebase-hosting.md).
 
@@ -54,4 +59,6 @@ verified: human:ankitp@geekyants.com
 - `functions/src/webauthn/index.ts`
 - `functions/src/http/guard.ts`
 - `dataconnect/schema/schema.gql`
+- `components/container/header.tsx`
+- `lib/auth/next-path.ts`
 - `.claude/settings.json`

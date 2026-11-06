@@ -1,13 +1,13 @@
 ---
 type: Finding
-title: A Google sign-in can stay signed in with no User row if sign-out also fails
-description: When UpsertMe fails after a Google redirect and Firebase Auth's sign-out then fails too, the session stays, and the sign-in form sends the person into the app without their User row.
+title: "Fixed: A Google sign-in could stay signed in with no User row if sign-out also failed"
+description: When UpsertMe failed after a Google redirect and Firebase Auth's sign-out then failed too, the session stayed, and the sign-in form sent the person into the app without their User row.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-05T12:24:26Z
 ---
 
-# A Google sign-in can stay signed in with no User row if sign-out also fails
+# Fixed: A Google sign-in could stay signed in with no User row if sign-out also failed
 
 ## Finding
 
@@ -28,7 +28,9 @@ Minor (`docs/plans/2026-11-05-google-sign-in-redirect.record.md`).
 
 ## Status
 
-Open.
+Fixed: when sign-out fails, `clearSavedSignIn` removes the saved auth records (local and session storage, and
+IndexedDB), so the next load doesn't restore the user, and the sign-in form stays on `/sign-in/` and shows the error.
+Residual: if `signOut` fails before Firebase clears its in-memory user, a token refresh can save the user again.
 
 ## Sources
 

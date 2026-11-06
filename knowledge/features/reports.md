@@ -26,6 +26,10 @@ the `reports` Cloud Function ([reports API](../api/generate.md)) and saved by th
 - Members of the group only: a group that does not exist and one the caller isn't in answer the same `404`.
 - A group with no expenses gets "No expenses found" (`404`).
 - The CSV is a real CSV with a header line (the old csv route sent a workbook), and the file name is sanitised.
+- A cell someone wrote (a description, a title) that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a
+  leading `'` in the CSV and the text file, so a spreadsheet never runs it as a formula
+  (`FORMULA_START` in `functions/src/reports/csv.ts`). The text file quotes its cells as the CSV does, its title
+  included.
 
 ## Offline
 
@@ -33,6 +37,7 @@ Download report is online-only, disabled offline in the header popover ([decisio
 
 ## History
 
+- 2026-11-06: the CSV and text cells were written as typed; now a cell that could run as a formula gets a leading `'` and the text file quotes like the CSV, because the security review found a spreadsheet formula injection.
 - 2026-11-05: had nothing about offline; now Download report is disabled offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: was hidden on the hosted site, with Excel and text only; now back, with a real CSV, member-only access and a title on the text file, because spec 2c built the `reports` function. See [reports API](../api/generate.md).
 - 2026-11-05: always shown; now hidden on the hosted site, because the report routes needed a server that spec 2c moves to Cloud Functions.

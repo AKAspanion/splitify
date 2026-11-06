@@ -16,7 +16,7 @@ let allowedOrigins: [String] = ["splitify.spanion.in"]
 
 // auth origins will open in modal and show toolbar for back into the main origin.
 // These should also appear in Info.plist
-let authOrigins: [String] = ["account.google.com"]
+let authOrigins: [String] = ["accounts.google.com"]
 // allowedOrigins + authOrigins <= 10
 
 let platformCookie = Cookie(name: "app-platform", value: "iOS App Store")

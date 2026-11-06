@@ -39,10 +39,14 @@ three ([reports](../features/reports.md)).
   [missing membership checks on reads](../findings/missing-group-membership-checks-on-reads.md).
 - `500` "Something went wrong" otherwise, with the failing operation and the error's class in Cloud Logging.
 - `Content-Disposition` carries a sanitised file name, so a group title cannot inject headers.
+- In the CSV and the text file a cell someone wrote that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets
+  a leading `'`, so a spreadsheet doesn't run it as a formula; the text file quotes its cells, title included, as the
+  CSV does ([reports](../features/reports.md)).
 - It reads the ledger through the `admin` connector (`IsGroupMember`, `GetGroupLedgerAdmin`).
 
 ## History
 
+- 2026-11-06: the CSV and text cells were written as typed and the text file's cells were not quoted; now a formula-looking cell gets a leading `'` and both formats quote alike, because the security review found a spreadsheet formula injection.
 - 2026-11-05: was three `POST /api/generate/*/expense` routes behind Clerk that checked no membership, with a csv route that sent an xlsx; now one function for members only, with a real csv and a title on the text file, because spec 2c moved the server's work into functions. See [static build decision](../decisions/static-build-on-firebase-hosting.md).
 
 ## Sources

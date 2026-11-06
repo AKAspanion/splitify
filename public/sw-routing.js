@@ -18,7 +18,6 @@ const STATIC_PAGES = new Set([
   "/expense/add/",
   "/feedback/add/",
   "/webauthn/register/",
-  "/webauthn/test/",
   "/sign-in/",
   "/sign-up/",
   "/forgot-password/",

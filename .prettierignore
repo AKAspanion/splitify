@@ -33,10 +33,26 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# sw
+# sw: the worker, and the precache manifest the build writes
 public/sw.js
+public/sw-manifest.js
 
 # packages
 packages
 firebase.emulators.json
 firebase.rules-test.json
+
+# Written by `pnpm test:e2e`: Playwright's report and its traces and screenshots
+/playwright-report/
+/test-results/
+
+# Written by tools, not people: the lockfiles, pnpm's workspace settings (pnpm rewrites the file in its own
+# style), the generated SQL Connect SDK and ga's run files
+pnpm-lock.yaml
+pnpm-workspace.yaml
+/dataconnect/generated/
+/.ga/runs/
+
+# Prose, not code: the knowledge base, specs and plans
+/knowledge/
+/docs/

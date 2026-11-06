@@ -18,8 +18,8 @@ verified: human:ankitp@geekyants.com
   ([split types](../domain/split-types.md)).
 - `Expense.tag` is an `ExpenseTag`: `EXPENSE` for an ordinary expense, `SETTLEMENT` for a payment between two people
   ([settlements](../domain/settlements.md)).
-- `Expense.category` is free text; the form offers `EXPENSE_CATEGORY_TYPES` from `constants/ui.ts`, and
-  `CreateExpense` defaults it to `General`.
+- `Expense.category` is free text of at most 50 characters (`CreateExpense` refuses more); the form offers
+  `EXPENSE_CATEGORY_TYPES` from `constants/ui.ts`, and `CreateExpense` defaults it to `General`.
 - `Expense.creator` is the user who recorded it, and `Expense.group` the group.
 - `UserPayment.amount` is what one user paid towards the expense.
 - `UserSplit.amount` is what one user owes of it; `UserSplit.percent` is kept as well for a percent split.
@@ -32,6 +32,7 @@ verified: human:ankitp@geekyants.com
 
 ## History
 
+- 2026-11-06: the category had no length limit; now `CreateExpense` refuses more than 50 characters, because the security review asked every free-text field to be bounded.
 - 2026-11-05: described the Prisma fields (`createrId`, `settlement`); now the SQL Connect ones (`creator`, `group`), because spec 2c removed Prisma and the actions. See [SQL Connect schema](sql-connect.md).
 
 ## Sources

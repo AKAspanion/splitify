@@ -6,8 +6,12 @@ const CHECK_MESSAGES = [
   "Not found",
   "Only members of this group can be added to an expense",
   "That email is already in use",
+  // UpdateContact's answer to an email change on a contact someone else is also friends with.
+  "This contact is shared with someone else, so you can only change their name",
   "You can only add your friends to a group",
   "That request is too large.",
+  // deleteMyAccount's answer to a sign-in older than 5 minutes (functions/src/account/delete-my-account.ts).
+  "Sign in again to delete your account.",
 ] as const;
 
 const SIGN_IN_AGAIN = "Sign in again to continue.";

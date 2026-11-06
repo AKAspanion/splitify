@@ -6,6 +6,8 @@ generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T15:57:30Z
 verified: human:ankitp@geekyants.com
+superseded_by: decisions/e2e-playwright-main-flow
+status: superseded
 ---
 
 # Changes are tested with end-to-end tests of the main flows

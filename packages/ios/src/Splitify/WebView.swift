@@ -4,6 +4,20 @@ import AuthenticationServices
 import SafariServices
 
 
+/// True when `host` is `origin` itself or, with `subdomains`, one of its subdomains: never a host that merely contains
+/// it, such as `splitify.spanion.in.evil.example`.
+func hostMatches(_ host: String, _ origin: String, subdomains: Bool) -> Bool {
+    let host = host.lowercased()
+    let origin = origin.lowercased()
+    return host == origin || (subdomains && host.hasSuffix("." + origin))
+}
+
+/// True for an https link on the app's own site, the only links the wrapper opens from outside the web view.
+func isAppUrl(_ url: URL) -> Bool {
+    guard url.scheme?.lowercased() == "https", let host = url.host else { return false }
+    return allowedOrigins.contains(where: { hostMatches(host, $0, subdomains: true) })
+}
+
 func createWebView(container: UIView, WKSMH: WKScriptMessageHandler, WKND: WKNavigationDelegate, NSO: NSObject, VC: ViewController) -> WKWebView{
 
     let config = WKWebViewConfiguration()
@@ -119,8 +133,9 @@ extension ViewController: WKUIDelegate, WKDownloadDelegate {
 
         if let requestUrl = navigationAction.request.url{
             if let requestHost = requestUrl.host {
-                // NOTE: Match auth origin first, because host origin may be a subset of auth origin and may therefore always match
-                let matchingAuthOrigin = authOrigins.first(where: { requestHost.range(of: $0) != nil })
+                // Hosts are compared whole, never as substrings: an auth origin exactly, the app's own site with its
+                // subdomains.
+                let matchingAuthOrigin = authOrigins.first(where: { hostMatches(requestHost, $0, subdomains: false) })
                 if (matchingAuthOrigin != nil) {
                     decisionHandler(.allow)
                     if (toolbarView.isHidden) {
@@ -130,7 +145,7 @@ extension ViewController: WKUIDelegate, WKDownloadDelegate {
                     return
                 }
 
-                let matchingHostOrigin = allowedOrigins.first(where: { requestHost.range(of: $0) != nil })
+                let matchingHostOrigin = allowedOrigins.first(where: { hostMatches(requestHost, $0, subdomains: true) })
                 if (matchingHostOrigin != nil) {
                     // Open in main webview
                     decisionHandler(.allow)

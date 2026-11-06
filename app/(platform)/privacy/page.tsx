@@ -1,3 +1,4 @@
+import Adsense from "@/app/adsense";
 import { Header } from "@/components/container/header";
 
 const CONTACT = "panditankit1995@gmail.com";
@@ -18,6 +19,8 @@ const Section = ({
 const PrivacyPage = () => {
   return (
     <div className="flex items-center justify-center flex-col">
+      {/* A public page, so it loads the ads, as the landing page does. */}
+      <Adsense />
       <div className="p-6 w-full">
         <Header backTo="/" title="Privacy Policy" />
       </div>

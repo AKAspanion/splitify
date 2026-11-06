@@ -1,37 +1,42 @@
 ---
 type: Finding
-title: React Compiler lint rules flag six components
-description: eslint-plugin-react-hooks 7 flags a synchronous setState inside an effect in five components and an impure call during render in scroll-to; the rules are set to warn until the code is changed.
+title: "Fixed: React Compiler lint rules flagged six components"
+description: eslint-plugin-react-hooks 7 flagged a synchronous setState inside an effect in five components and an impure call during render in scroll-to; all are rewritten and the rules are back at the preset's level.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T09:20:00Z
 verified: human:ankitp@geekyants.com
 ---
 
-# React Compiler lint rules flag six components
+# Fixed: React Compiler lint rules flagged six components
 
 ## Finding
 
 The dependency upgrade ([decision](../decisions/upgrade-all-dependencies.md)) brought `eslint-plugin-react-hooks` 7,
 whose React Compiler rules `react-hooks/set-state-in-effect` and `react-hooks/purity` are errors in
-`eslint-config-next/core-web-vitals`. The code they flag predates the upgrade. Fixing it means rewriting effects,
-which changes behaviour, so `eslint.config.mjs` sets both rules to `warn` instead.
+`eslint-config-next/core-web-vitals`. The code they flagged predated the upgrade, and `eslint.config.mjs` set both
+rules to `warn` while it stayed.
 
 - `react-hooks/set-state-in-effect`: an effect sets state synchronously, which costs an extra render.
 - `react-hooks/purity`: `performance.now()` is called in a function the rule counts as render.
 
 ## Evidence
 
-- `app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx`: an effect resets the equal split when `users` changes.
-- `app/(platform)/profile/notification-action.tsx`: an effect reads notification-permission state on mount.
-- `components/biometric/biometric.tsx`: an effect starts verification when the path changes.
-- `app/(platform)/(auth)/sign-in/sign-in-form.tsx:43` and `sign-up/sign-up-form.tsx:40`: the forms' mount effects set
-  `pending` to finish a Google redirect (the marker is read on mount because the page is prerendered).
-- `components/scroll-to.tsx`: `scrollTo` calls `performance.now()`.
+Each was flagged in:
+
+- `app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx`: an effect reset the equal split when `users` changed.
+- `app/(platform)/profile/notification-action.tsx`: an effect read notification-permission state on mount.
+- `components/biometric/biometric.tsx`: an effect started verification when the path changed.
+- `app/(platform)/(auth)/sign-in/sign-in-form.tsx` and `sign-up/sign-up-form.tsx`: the forms' mount effects set
+  `pending` to finish a Google redirect.
+- `components/scroll-to.tsx`: `scrollTo` called `performance.now()`.
+- `components/auth/auth-provider.tsx`: set the signed-out state in an effect when Firebase Auth can't start (found
+  later, fixed in eb17663).
 
 ## Status
 
-Open. When each is fixed, set the rule in `eslint.config.mjs` back to the preset's level.
+Fixed. Every component is rewritten and `eslint.config.mjs` no longer overrides either rule, so both are at the
+preset's level.
 
 ## Sources
 
@@ -40,5 +45,6 @@ Open. When each is fixed, set the rule in `eslint.config.mjs` back to the preset
 - `app/(platform)/profile/notification-action.tsx`
 - `components/biometric/biometric.tsx`
 - `components/scroll-to.tsx`
+- `components/auth/auth-provider.tsx`
 - `app/(platform)/(auth)/sign-in/sign-in-form.tsx`
 - `app/(platform)/(auth)/sign-up/sign-up-form.tsx`

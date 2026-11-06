@@ -177,6 +177,54 @@ describe("GetExpense, ListGroupExpenses, GetGroupLedger", () => {
     ).toEqual(["Taxi"]);
     expect(found.total[0].count).toBe(1);
   });
+
+  it("refuses a limit of 101 or a 101-character search, and runs with 100 of each", async () => {
+    const base = { groupId: G, offset: 0 };
+    await expect(
+      query(alice.dc, "ListGroupExpenses", { ...base, limit: 101 }),
+    ).rejects.toThrow();
+    await expect(
+      query(alice.dc, "ListGroupExpenses", {
+        ...base,
+        limit: 10,
+        search: "x".repeat(101),
+      }),
+    ).rejects.toThrow();
+    const ok = await query(alice.dc, "ListGroupExpenses", {
+      ...base,
+      limit: 100,
+      search: "x".repeat(100),
+    });
+    expect(ok.expenses).toEqual([]);
+    const all = await query(alice.dc, "ListGroupExpenses", {
+      ...base,
+      limit: 100,
+    });
+    expect(all.expenses).toHaveLength(1);
+  });
+
+  it("refuses a limit below 0 and an offset below 0, and accepts 0 and any offset the pager can reach", async () => {
+    const base = { groupId: G };
+    for (const vars of [
+      { limit: -1, offset: 0 },
+      { limit: 10, offset: -1 },
+    ])
+      await expect(
+        query(alice.dc, "ListGroupExpenses", { ...base, ...vars }),
+      ).rejects.toThrow();
+    const none = await query(alice.dc, "ListGroupExpenses", {
+      ...base,
+      limit: 0,
+      offset: 0,
+    });
+    expect(none.expenses).toEqual([]);
+    const far = await query(alice.dc, "ListGroupExpenses", {
+      ...base,
+      limit: 100,
+      offset: 10001,
+    });
+    expect(far.expenses).toEqual([]);
+  });
 });
 
 describe("UpdateExpense", () => {

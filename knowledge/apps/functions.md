@@ -34,7 +34,8 @@ workspace is what keeps that lockfile in the uploaded folder ([run locally](../o
   `AUTHN_EXPECTED_ORIGIN`, whose defaults are the production host. See [the WebAuthn API](../api/webauthn.md).
 - `deleteMyAccount` (`functions/src/account/delete-my-account.ts`, `anonymise.ts`): a callable. It deletes the groups
   whose only member is the caller (with their expenses and activity), anonymises the caller's row and removes the data
-  that is theirs alone, then deletes their Firebase Auth user, in that order so a retry after a failure finishes the job
+  that is theirs alone, then deletes their Firebase Auth user, in that order so a retry after a failure finishes the job.
+  It refuses a sign-in older than 5 minutes (`unauthenticated`) and revokes the caller's refresh tokens first
   ([decision](../decisions/anonymise-deleted-accounts.md), [profile](../features/profile.md)).
 - `mergeContactOnSignUp` (`functions/src/merge-contact.ts`): a SQL Connect trigger on the `app` connector's
   `UpsertMe` mutation, in `asia-south1`. It merges a contact into the verified new account through the `admin`
@@ -58,6 +59,12 @@ workspace is what keeps that lockfile in the uploaded folder ([run locally](../o
   actual spend reaches the budget ([decision](../decisions/budget-kill-switch.md)). Its tests cover
   `parseNotification`, `enforceBudget` and the trigger options; the handler body itself has no direct test.
 
+## Instance cap
+
+`functions/src/global-options.ts` calls `setGlobalOptions({ maxInstances: 10 })`, and `index.ts` imports it first, so
+every function is capped at 10 instances and one request flood can't scale the bill without bound. The kill switch
+overrides it with `maxInstances: 1`.
+
 ## The guard
 
 Every HTTP function the browser calls runs `guard` (`functions/src/http/guard.ts`) first: it verifies the Firebase ID
@@ -67,6 +74,7 @@ token from `Authorization: Bearer` with the admin SDK, then reads the JSON body 
 
 ## History
 
+- 2026-11-06: functions had no instance cap and `deleteMyAccount` took any sign-in; now every function is capped at 10 instances and deleting needs a sign-in from the last 5 minutes, because the security review found both gaps.
 - 2026-11-05: the deploy workflow deployed the functions; now a project owner deploys them by hand. See [the decision](../decisions/ci-cd-functions-deployed-by-hand.md).
 - 2026-11-05: had the merge, the push senders and the kill switch; now also `reports`, `webauthn` and `deleteMyAccount`, because spec 2c moved the server's work into functions. See [decision](../decisions/static-build-on-firebase-hosting.md).
 - 2026-11-05: had the merge and the kill switch; now also the three push senders, because pushes moved to FCM.
@@ -74,6 +82,8 @@ token from `Authorization: Bearer` with the admin SDK, then reads the JSON body 
 ## Sources
 
 - `functions/src/index.ts`
+- `functions/src/global-options.ts`
+- `functions/src/account/delete-my-account.ts`
 - `functions/src/merge-contact.ts`
 - `functions/src/kill-switch.ts`
 - `functions/src/push-activity.ts`

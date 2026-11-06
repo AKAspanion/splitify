@@ -189,6 +189,28 @@ describe("CreateGroup", () => {
     expect(data.groups).toHaveLength(2); // Trip and the one that passed
   });
 
+  it("refuses a type over 50 characters and accepts 50", async () => {
+    await expect(
+      run(alice.dc, "CreateGroup", {
+        id: uuid(),
+        title: "ok",
+        type: "t".repeat(51),
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow();
+    const id = uuid();
+    await run(alice.dc, "CreateGroup", {
+      id,
+      title: "ok",
+      type: "t".repeat(50),
+      activityId: uuid(),
+    });
+    const data = (await seed(`query { groups { id } }`)) as {
+      groups: unknown[];
+    };
+    expect(data.groups).toHaveLength(2); // Trip and the one that passed
+  });
+
   it("fails on an existing id and leaves the group as it was", async () => {
     await expect(
       run(carol.dc, "CreateGroup", {
@@ -227,6 +249,32 @@ describe("UpdateGroup", () => {
       actor: { id: bob.uid },
       title: "Renamed",
     });
+  });
+
+  it("refuses a type over 50 characters, leaves the group unchanged, and accepts 50", async () => {
+    await expect(
+      run(bob.dc, "UpdateGroup", {
+        id: G,
+        title: "Renamed",
+        type: "t".repeat(51),
+        activityId: uuid(),
+      }),
+    ).rejects.toThrow();
+    const read = async () =>
+      (
+        (await seed(
+          `query($id: UUID!) { group(key: { id: $id }) { title type } }`,
+          { id: G },
+        )) as { group: { title: string; type: string | null } }
+      ).group;
+    expect(await read()).toEqual({ title: "Trip", type: null });
+    await run(bob.dc, "UpdateGroup", {
+      id: G,
+      title: "Renamed",
+      type: "t".repeat(50),
+      activityId: uuid(),
+    });
+    expect(await read()).toEqual({ title: "Renamed", type: "t".repeat(50) });
   });
 });
 
@@ -364,6 +412,20 @@ describe("ListMyGroups", () => {
     expect(all.groups.map((g) => g.title)).toEqual(["Goa trip", "Home"]);
     const one = await read<GroupsRead>(alice.dc, "ListMyGroups", { limit: 1 });
     expect(one.groups.map((g) => g.title)).toEqual(["Goa trip"]);
+  });
+
+  // 200 is MY_GROUPS_LIMIT in lib/data/groups.ts, the most the app asks for.
+  it("refuses a limit below 0, over 200 or null, and accepts 0 and 200", async () => {
+    for (const limit of [-1, 201, null])
+      await expect(read(alice.dc, "ListMyGroups", { limit })).rejects.toThrow();
+    const none = await read<GroupsRead>(alice.dc, "ListMyGroups", {
+      limit: 0,
+    });
+    expect(none.groups).toEqual([]);
+    const most = await read<GroupsRead>(alice.dc, "ListMyGroups", {
+      limit: 200,
+    });
+    expect(most.groups).toHaveLength(2);
   });
 });
 

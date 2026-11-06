@@ -2,6 +2,7 @@
 
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
+import { backHref } from "@/components/container/header";
 import { OFFLINE_NEEDS_CONNECTION } from "@/components/offline/online-only";
 import { useOnline } from "@/hooks/use-online";
 import Spinner from "@/components/ui/spinner";
@@ -67,7 +68,7 @@ const Search = ({
       <div className="w-full font-semibold text-lg">
         <form onSubmit={onSubmit}>
           <div className="flex items-start gap-4">
-            <Link href={backTo ? backTo : "/friends"}>
+            <Link href={backHref(backTo, "/friends")}>
               <Button type="button" variant={"ghost"} size={"icon"}>
                 <ArrowLeftIcon />
               </Button>

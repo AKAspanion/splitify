@@ -31,19 +31,23 @@ export function SignInForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [pending, setPending] = useState<"email" | "google" | null>(null);
+  // Back from Google, the form starts loading. useSearchParams keeps this form out of the prerendered HTML (it renders
+  // in the browser only), so reading sessionStorage here can't differ from a server render.
+  const [pending, setPending] = useState<"email" | "google" | null>(() =>
+    googleRedirectPending() ? "google" : null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Someone already signed in has no use for the form. A sign-in in flight finishes (UpsertMe) before it navigates.
+  // After a failed Google sign-in the form stays, with its error: Auth may still report the user it couldn't sign out.
   useEffect(() => {
-    if (status === "signed-in" && !pending) router.replace(next);
-  }, [status, pending, next, router]);
+    if (status === "signed-in" && !pending && !error) router.replace(next);
+  }, [status, pending, error, next, router]);
 
-  // Back from Google: finish the sign-in (UpsertMe) before going on. Read on mount, since the page is prerendered.
+  // Back from Google: finish the sign-in (UpsertMe) before going on.
   useEffect(() => {
     if (!googleRedirectPending()) return;
     let active = true;
-    setPending("google");
     void finishGoogleReturn().then((result) => {
       if (!active) return;
       if (result.kind === "signed-in") router.replace(next);
