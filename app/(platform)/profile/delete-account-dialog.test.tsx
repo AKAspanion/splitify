@@ -3,8 +3,7 @@ import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Dialog } from "@/components/ui/dialog";
 import { DELETE_WORD, DeleteAccountDialog } from "./delete-account-dialog";
 
 // There is no DOM here, so the typed text is fed in through useState, and the handlers are read off the elements the
