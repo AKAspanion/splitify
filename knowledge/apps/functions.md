@@ -71,7 +71,7 @@ Every HTTP function the browser calls runs `guard` (`functions/src/http/guard.ts
 token from `Authorization: Bearer` with the admin SDK (`verifyIdToken(token, true)`, so Auth is asked about revocation,
 one lookup per request), then reads the JSON body (at most 65536 bytes), and answers `401`, `413`, `415` or `400`
 itself. A missing token, or a check error whose code is in `REFUSED_SIGN_IN_CODES`, is `401` "Sign in again to
-continue." (logged `guard: sign-in refused`); any other failure of the check (an Auth outage, quota, the network) is
+continue." (logged `guard: sign-in refused`); any other failure of the check (an Auth outage, quota, the network; not a failed fetch of Google's signing keys, which firebase-admin reports as `auth/argument-error` and so reads as a refusal, [accepted](../findings/guard-accepts-revoked-id-tokens.md)) is
 `500` "Something went wrong. Try again." (logged `guard: sign-in check failed`). Both logs carry the error's class and
 code. The callable gets its caller from Firebase, which doesn't check revocation, and neither does SQL Connect
 ([finding](../findings/callable-and-sql-connect-accept-revoked-id-tokens.md)). The browser side is

@@ -31,6 +31,12 @@ network) answers `500` "Something went wrong. Try again." and logs `guard: sign-
 fields. Each guarded request makes one Auth lookup. The Auth emulator always checks revocation, so emulator tests can't
 show that the second argument is missing; a code review has to.
 
+Accepted limit (ruled 2026-11-06): firebase-admin 14.5 reports a failure to fetch Google's signing keys as
+`auth/argument-error` (`KEY_FETCH_ERROR` mapped in `auth/token-verifier.js`), the same code as a bad signature, so the
+guard answers `401` "Sign in again to continue." for it, not `500`. Telling them apart would need the error's message,
+which the guard must not read or log. During a key-endpoint outage people see "Sign in again". The comment above
+`REFUSED_SIGN_IN_CODES` in `guard.ts` still says otherwise (a deferred Minor).
+
 Not covered: the `deleteMyAccount` callable and SQL Connect still accept a revoked token
 ([finding](callable-and-sql-connect-accept-revoked-id-tokens.md)).
 
