@@ -1,5 +1,7 @@
 # Open findings fixes Implementation Plan
 
+**Status:** complete, commits c59de44..7ef9f66, 2026-11-06; record: [2026-11-06-open-findings-fixes.record.md](2026-11-06-open-findings-fixes.record.md)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -50,21 +52,21 @@ None (`run.checkpoints: none`).
 - Given a token whose user was deleted (`auth/user-not-found`) or disabled (`auth/user-disabled`), then the same `401`.
 - Given a valid, unrevoked token, then the guard calls `verifyIdToken` with `checkRevoked` `true` and returns the uid and body as before.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/http/guard.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/http/guard.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm test:rules`
 Expected: FAIL on the `checkRevoked` assertion.
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces
+- [x] **Step 3: Write the minimal implementation** to the Interfaces
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm test:rules`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/http/guard.ts functions/src/http/guard.test.ts
@@ -92,21 +94,21 @@ git commit -m "Refuse revoked ID tokens in the functions' guard."
 - Given the delete fails with another error, then the toast shows its message once, the button is enabled again, and a later confirm calls `deleteMyAccount` again.
 - Given the delete fails because the sign-in is too old, then the person is signed out and sent to `/sign-in/?next=/profile/` once (existing behaviour kept).
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/profile/delete-account-action.test.tsx`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/profile/delete-account-action.test.tsx`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/profile/delete-account-action.test.tsx"`
 Expected: FAIL on the call count.
 
-- [ ] **Step 3: Write the minimal implementation:** a ref set before the call and cleared on failure
+- [x] **Step 3: Write the minimal implementation:** a ref set before the call and cleared on failure
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/profile/delete-account-action.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/profile/delete-account-action.tsx" "app/(platform)/profile/delete-account-action.test.tsx"
@@ -134,21 +136,21 @@ git commit -m "Run an account deletion once per confirmation."
 - Given `localStorage.setItem` throws a `QuotaExceededError`, when the dismissal is written, then nothing throws and it logs `console.warn("[verify-banner] write failed", "QuotaExceededError")`.
 - Given storage works, then nothing is logged.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `lib/auth/verify-banner-dismissal.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `lib/auth/verify-banner-dismissal.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/auth/verify-banner-dismissal.test.ts`
 Expected: FAIL on the log assertions.
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces
+- [x] **Step 3: Write the minimal implementation** to the Interfaces
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/auth/verify-banner-dismissal.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/auth/verify-banner-dismissal.ts lib/auth/verify-banner-dismissal.test.ts
@@ -183,21 +185,21 @@ export const PUSH_REMOVAL_DEADLINE_MS = 5000;
 - Given `remove` rejects, then it logs and removes the stored token (existing behaviour).
 - Given no stored token, then `remove` isn't called.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `lib/push/register.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `lib/push/register.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/push/register.test.ts`
 Expected: FAIL on the never-settling case.
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces
+- [x] **Step 3: Write the minimal implementation** to the Interfaces
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/push/register.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/push/register.ts lib/push/register.test.ts
