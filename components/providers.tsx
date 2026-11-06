@@ -14,7 +14,7 @@ import { appVersion } from "@/lib/offline/version";
 import { registerQueuedWrites } from "@/lib/offline/queued-writes";
 import { syncOnlineState } from "@/lib/offline/online-state";
 import { CACHE_MAX_AGE_MS, createPersister } from "@/lib/offline/persist";
-import { followPersonCache } from "@/lib/offline/restore-cache";
+import { followPersonCache, switchesPerson } from "@/lib/offline/restore-cache";
 
 /**
  * The query client, saved to IndexedDB for the signed-in person only. Sits under `AuthProvider`.
@@ -41,25 +41,49 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   const { status, user } = useAuth();
   const uid = user?.uid ?? null;
 
-  // Whose restore has settled. Reset during render when the person changes, so the first render for a new person
-  // already says it is restoring, and queries wait for that person's saved cache.
-  const [followed, setFollowed] = useState({ uid, restored: false });
-  if (followed.uid !== uid) setFollowed({ uid, restored: false });
+  // Whose restore has settled, and who was last signed in. Reset during render when either changes, so the first
+  // render for a new person already says it is restoring, and queries wait for that person's saved cache.
+  // `lastSignedIn` forgets the person at sign-out, which clears the cache itself: signing up after signing out is not
+  // a switch, so the sign-up form stays mounted.
+  const [followed, setFollowed] = useState({
+    uid,
+    restored: false,
+    lastSignedIn: uid,
+    switched: false,
+  });
+  const lastSignedIn =
+    uid ?? (status === "signed-out" ? null : followed.lastSignedIn);
+  if (followed.uid !== uid || followed.lastSignedIn !== lastSignedIn) {
+    const samePerson = followed.uid === uid;
+    setFollowed({
+      uid,
+      restored: samePerson && followed.restored,
+      lastSignedIn,
+      switched: samePerson
+        ? followed.switched
+        : switchesPerson(followed.lastSignedIn, uid),
+    });
+  }
   // Signed out, or before sign-in is known, nothing is restored, so nothing is waited for.
   const restoring =
     uid !== null && !(followed.uid === uid && followed.restored);
+  // Straight from person A to person B, the cache still holds A's queries until the follow effect clears it, and a
+  // paused query hands its cached data to the render. So nothing under this provider renders until B's restore
+  // settles. The clear can't move into render: A's save subscription is live until the effect's cleanup, and a clear
+  // before then would save an empty cache over A's, queued offline writes included.
+  const hidePrevious = restoring && followed.uid === uid && followed.switched;
 
   // Signed out, the in-memory cache of the person who was here is dropped too.
   useEffect(() => {
     if (status === "signed-out") queryClient.clear();
   }, [status, queryClient]);
 
-  // The person last followed, so a switch straight from one person to another clears the first one's cache.
+  // The person last followed. On a switch straight from one person to another, the clear runs here, after the cleanup
+  // has stopped saving under the first person, and before the second one's restore.
   const lastUid = useRef<string | null>(null);
   useEffect(() => {
     if (!uid) return;
-    if (lastUid.current !== null && lastUid.current !== uid)
-      queryClient.clear();
+    if (switchesPerson(lastUid.current, uid)) queryClient.clear();
     lastUid.current = uid;
     // The stop function is the cleanup: once the person changes, nothing more is saved under them, and a restore
     // of theirs still running is dropped.
@@ -72,7 +96,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
       },
       () => {
         setFollowed((current) =>
-          current.uid === uid ? { uid, restored: true } : current,
+          current.uid === uid ? { ...current, restored: true } : current,
         );
         void queryClient.resumePausedMutations();
       },
@@ -81,7 +105,9 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <IsRestoringProvider value={restoring}>{children}</IsRestoringProvider>
+      <IsRestoringProvider value={restoring}>
+        {hidePrevious ? null : children}
+      </IsRestoringProvider>
     </QueryClientProvider>
   );
 }

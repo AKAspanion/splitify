@@ -4,7 +4,7 @@ import type {
   Persister,
 } from "@tanstack/react-query-persist-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { followPersonCache } from "./restore-cache";
+import { followPersonCache, switchesPerson } from "./restore-cache";
 
 const MAX_AGE = 60_000;
 const BUSTER = "v1";
@@ -242,5 +242,17 @@ describe("followPersonCache", () => {
     expect(client.getQueryData(["group", 2])).toEqual({ name: "B's group" });
     expect(b.persister.persistClient).toHaveBeenCalled();
     expect(a.persister.persistClient).not.toHaveBeenCalled();
+  });
+});
+
+describe("switchesPerson", () => {
+  it.each([
+    ["A to B", "a", "b", true],
+    ["nobody to A (sign-in, sign-up)", null, "a", false],
+    ["A to signed out", "a", null, false],
+    ["A to A", "a", "a", false],
+    ["signed out to signed out", null, null, false],
+  ])("%s", (_, lastSignedIn, uid, expected) => {
+    expect(switchesPerson(lastSignedIn, uid)).toBe(expected);
   });
 });

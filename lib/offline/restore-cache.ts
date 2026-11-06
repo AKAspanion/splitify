@@ -12,6 +12,17 @@ export type CacheOptions = {
   buster: string;
 };
 
+/**
+ * Whether the signed-in person is now someone other than the last person signed in, with no sign-out between (sign-out
+ * clears the cache itself). The cache still holds that last person's queries until it is cleared.
+ */
+export function switchesPerson(
+  lastSignedIn: string | null,
+  uid: string | null,
+): boolean {
+  return lastSignedIn !== null && uid !== null && lastSignedIn !== uid;
+}
+
 /** Logs the cause class only: the saved cache is personal data, and an IndexedDB message may quote it. */
 function logFailure(what: string, error: unknown): void {
   console.error(
