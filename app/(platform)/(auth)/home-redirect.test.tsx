@@ -38,7 +38,10 @@ describe("HomeRedirect", () => {
   beforeEach(() => {
     replace.mockReset();
     routerReplace.mockReset();
-    vi.stubGlobal("window", { location: { replace } });
+    // next/image, in the loading state's logo, reads the page's URL.
+    vi.stubGlobal("window", {
+      location: { replace, href: "http://localhost/" },
+    });
   });
   afterEach(() => vi.unstubAllGlobals());
 
@@ -46,6 +49,8 @@ describe("HomeRedirect", () => {
     const html = render(LOADING);
     expect(html).toContain('role="status"');
     expect(html).toContain("Loading");
+    expect(html).toContain("logo.svg");
+    expect(html).not.toContain("animate-spin");
     expect(replace).not.toHaveBeenCalled();
   });
 

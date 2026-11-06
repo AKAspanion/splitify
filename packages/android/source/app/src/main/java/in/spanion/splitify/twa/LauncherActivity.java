@@ -42,6 +42,16 @@ public class LauncherActivity
         }
     }
 
+    // The splash hands over to the browser by starting it and finishing this activity. androidbrowserhelper turns
+    // the window animation off with overridePendingTransition(0, 0), but only after finish(), which Android 17 ignores:
+    // the splash shrank into a dimmed card while the browser window scaled in. Called before finish(), it holds.
+    @SuppressWarnings("deprecation") // overrideActivityTransition (API 34) covers only this activity's own open and close.
+    @Override
+    public void finish() {
+        overridePendingTransition(0, 0);
+        super.finish();
+    }
+
     @Override
     protected Uri getLaunchingUrl() {
         // Get the original launch Url.

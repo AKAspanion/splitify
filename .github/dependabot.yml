@@ -40,6 +40,10 @@ updates:
     groups:
       android-minor-patch:
         update-types: [minor, patch]
+    ignore:
+      # AGP 8.x uses a Gradle internal API removed in Gradle 9.6, so 9.8.2 broke the build. Lift with the move to AGP 9.
+      - dependency-name: gradle-wrapper
+        versions: [">= 9.6"]
 
   - package-ecosystem: github-actions
     directory: /

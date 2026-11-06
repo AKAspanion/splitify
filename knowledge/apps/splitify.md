@@ -27,7 +27,7 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
   pages do (`app/adsense.tsx`, [AdSense](../integrations/google-adsense.md)).
 - `app/launch.tsx`: runs on every page; it registers the one service worker ([service worker](../operations/service-worker.md)) and, for a signed-in person, the device for push
   ([notifications](../features/notifications.md)). It no longer redirects anyone: `/` does that itself.
-- `/`: `HomeRedirect` (`app/(platform)/(auth)/home-redirect.tsx`), a spinner that leaves by `window.location.replace`
+- `/`: `HomeRedirect` (`app/(platform)/(auth)/home-redirect.tsx`), the logo loading state (`AppLoading`) that leaves by `window.location.replace`
   to `/groups/` when signed in and `/sign-in/` when signed out. There is no landing page
   ([decision](../decisions/remove-landing-page.md)).
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
@@ -116,6 +116,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-06: `/` showed a spinner while loading; now it shows the logo (`AppLoading`), because the developer asked for the logo instead. See [decision](../decisions/logo-as-loading-state.md).
 - 2026-11-06: had a landing page, a redirect in `app/launch.tsx` and the verify banner in the signed-in shell; now `/` is `HomeRedirect`, `launch.tsx` redirects nobody and Groups and Profile mount the banner, because the developer removed the landing page and settled where the banner shows. See [the landing decision](../decisions/remove-landing-page.md) and [the banner decision](../decisions/verify-banner-placement.md).
 - 2026-11-06: the query provider was keyed by uid; now it has no key and follows the saved cache, because the key remounted every page when sign-in finished. See [the fixed finding](../findings/query-provider-remounts-pages-at-auth-restore.md).
 - 2026-11-06: the root layout loaded AdSense and the landing page reached the app by client navigation; now the landing layout and privacy page load it and public pages leave by full page loads, because of [the AdSense decision](../decisions/adsense-on-public-pages-only.md).
@@ -130,6 +131,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## Sources
 
+- `components/app-loading.tsx`
 - `package.json`
 - `next.config.mjs`
 - `app/(platform)/(auth)/home-redirect.tsx`
