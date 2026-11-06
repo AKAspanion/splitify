@@ -11,6 +11,7 @@ vi.mock("firebase/app", () => ({
 }));
 import {
   listenForIosToken,
+  PUSH_REMOVAL_DEADLINE_MS,
   registerWebPush,
   unregisterThisDevice,
   type PushDeps,
@@ -207,7 +208,10 @@ describe("unregisterThisDevice", () => {
   beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
 
   it("removes the stored token and clears the key", async () => {
     const { deps, storage, mocks } = makeDeps();
@@ -217,6 +221,37 @@ describe("unregisterThisDevice", () => {
     expect(storage.getItem(KEY)).toBeNull();
   });
 
+  it("gives up after the deadline when remove never settles, logs a TimeoutError and clears the key", async () => {
+    vi.useFakeTimers();
+    const { deps, storage } = makeDeps({
+      remove: vi.fn(() => new Promise<void>(() => {})),
+    });
+    storage.setItem(KEY, "tok-1");
+    let settled = false;
+    void unregisterThisDevice(deps).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(PUSH_REMOVAL_DEADLINE_MS - 1);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(settled).toBe(true);
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenCalledWith(
+      "[push] token removal failed: TimeoutError",
+    );
+    expect(storage.getItem(KEY)).toBeNull();
+  });
+
+  it("resolves at once when remove answers in time, logs nothing and leaves no timer behind", async () => {
+    vi.useFakeTimers();
+    const { deps, storage } = makeDeps();
+    storage.setItem(KEY, "tok-1");
+    await unregisterThisDevice(deps);
+    expect(storage.getItem(KEY)).toBeNull();
+    expect(console.error).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it("does nothing with no stored token", async () => {
     const { deps, mocks } = makeDeps();
     await unregisterThisDevice(deps);
@@ -224,12 +259,18 @@ describe("unregisterThisDevice", () => {
   });
 
   it("still clears the key and resolves when remove rejects", async () => {
+    vi.useFakeTimers();
     const { deps, storage } = makeDeps({
       remove: vi.fn().mockRejectedValue(new Error("offline tok-1")),
     });
     storage.setItem(KEY, "tok-1");
     await expect(unregisterThisDevice(deps)).resolves.toBeUndefined();
     expect(storage.getItem(KEY)).toBeNull();
+    expect(console.error).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenCalledWith(
+      "[push] token removal failed: Error",
+    );
+    expect(vi.getTimerCount()).toBe(0);
     expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain(
       "tok-1",
     );

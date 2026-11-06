@@ -16,6 +16,8 @@ const IOS_ERROR_DETAIL = "ERROR GET TOKEN";
 const MAX_TOKEN_LENGTH = 4096;
 const WORKER_PATH = "/sw.js";
 const PUSH_APP_NAME = "splitify-push";
+/** How long sign-out waits for this device's token removal before it gives up and goes on. */
+export const PUSH_REMOVAL_DEADLINE_MS = 5000;
 
 /** Logs the cause class only: never the token, and never an upstream message. */
 function logFailure(what: string, error: unknown): void {
@@ -32,6 +34,19 @@ function browserStorage(): PushDeps["storage"] {
     // Blocked site data.
     return noop;
   }
+}
+
+/** Settles as `work` does, or rejects with a `TimeoutError` after `ms`; the timer is cleared either way. */
+function withDeadline<T>(work: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      const error = new Error(`no answer within ${ms} ms`);
+      error.name = "TimeoutError";
+      reject(error);
+    }, ms);
+  });
+  return Promise.race([work, deadline]).finally(() => clearTimeout(timer));
 }
 
 /** Storage can throw (private windows, blocked data): a push token is never worth failing over. */
@@ -159,7 +174,10 @@ export function listenForIosToken(deps?: Partial<PushDeps>): () => void {
   return () => window.removeEventListener("push-token", onToken);
 }
 
-/** Removes this device's token from the account, for sign-out. Never rejects: sign-out goes on whatever happens. */
+/**
+ * Removes this device's token from the account, for sign-out. Never rejects, and gives up after
+ * `PUSH_REMOVAL_DEADLINE_MS`: sign-out goes on whatever happens, and the stored token is dropped either way.
+ */
 export async function unregisterThisDevice(
   deps?: Partial<PushDeps>,
 ): Promise<void> {
@@ -167,7 +185,7 @@ export async function unregisterThisDevice(
   const token = safely(() => d.storage.getItem(TOKEN_KEY), null);
   if (!token) return;
   try {
-    await d.remove(token);
+    await withDeadline(d.remove(token), PUSH_REMOVAL_DEADLINE_MS);
   } catch (error) {
     logFailure("token removal", error);
   }
