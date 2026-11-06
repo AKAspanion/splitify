@@ -34,3 +34,5 @@ which flows count as main. The repository-modernization work of 2026-11-05 settl
 
 - `.github/workflows/ci.yml`
 - `package.json`
+- `playwright.config.ts`
+- `tests/e2e/main-flow.spec.ts`

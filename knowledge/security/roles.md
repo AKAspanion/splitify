@@ -28,7 +28,14 @@ its expenses. The rules are written into the operations, so the browser cannot s
 - The `reports` function answers members of the group only, and a group that does not exist and one the caller is not in
   answer the same ([reports](../features/reports.md)).
 - The `webauthn` function reads and writes only the caller's own devices, and `deleteMyAccount` acts only on the caller.
-- Searching by email returns another user only on an exact match (`dataconnect/app/people.gql`).
+- Searching by email returns another user only on an exact match, and only someone the caller can add: a signed-up user
+  or the caller's own friend. `AddFriend` refuses another person's offline contact, and `UpdateContact` changes a
+  contact's email only for its sole friend (a name by any friend)
+  ([decision](../decisions/contact-email-only-by-sole-friend.md); `dataconnect/app/people.gql`).
+- Every list is bounded in the operation, so one request can't ask for unbounded work: `ListGroupExpenses` and
+  `ListMyActivity` take a limit of 0 to 100 and an offset of 0 or more; `ListMyGroups` defaults to 200 and allows 0 to
+  200, `ListFriends` defaults to 500 and allows 0 to 500, and neither accepts a null limit; a search is at most 100
+  characters, and an expense's type and category at most 50 (`dataconnect/app/*.gql`).
 - There is no admin page: the logs page was removed ([decision](../decisions/remove-admin-logs-page.md)).
 
 The findings that once listed what any signed-in person could do, all fixed by these rules:
@@ -39,6 +46,7 @@ The findings that once listed what any signed-in person could do, all fixed by t
 
 ## History
 
+- 2026-11-06: said search returns another user on an exact match and listed no bounds; now search hides other people's offline contacts, a contact's email changes only by its sole friend and every list is bounded, because the repository-modernization run hardened the rules.
 - 2026-11-05: listed what the server's actions and routes let any signed-in person do; now says SQL Connect's rules and the functions enforce member-only access, because spec 2c removed those actions and routes.
 - 2026-11-04: added where SQL Connect enforces the rules; dropped the push relay and admin page from what the code allows, because both routes were removed ([decision](../decisions/remove-admin-logs-page.md)).
 

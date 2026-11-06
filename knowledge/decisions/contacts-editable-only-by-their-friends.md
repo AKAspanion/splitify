@@ -8,6 +8,8 @@ generated:
 verified: human:ankitp@geekyants.com
 stated: "Security audit, High: any group-mate can befriend a contact someone else created, change its email to their own, and the merge moves the contact's groups to them. How should the fix close it? (Block both: AddFriend refuses a contact unless you're already its friend, UpdateContact refuses an email in use) — Block both (Recommended)"
 stated_via: qa
+superseded_by: decisions/contact-email-only-by-sole-friend
+status: superseded
 ---
 
 # Only a contact's existing friends may befriend or edit it, and no contact may take an email in use

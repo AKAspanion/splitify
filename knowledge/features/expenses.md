@@ -51,6 +51,7 @@ seen. Delete and edit are online-only ([offline](offline.md)).
 
 ## History
 
+- 2026-11-06: an effect reset the equal split to everyone ticked when the group's members changed, and the payment drawer put a button inside a button; now the split is derived while rendering from the ticks the person changed (`equalSplitFor` in `form.tsx`) and the drawer's trigger is the button, because the React Compiler lint rules forbid the effect. One edge differs: [stale unticks](../findings/expense-form-restores-stale-unticks.md). The category is at most 50 characters ([expense data](../data/expense.md)).
 - 2026-11-05: had no offline behaviour; now adding queues offline, because the offline feature was built. See [decision](../decisions/queue-offline-writes.md).
 - 2026-11-05: the creator came from the form and any signed-in user could change any expense, through server actions; now the creator is the caller and only members can, in SQL Connect, because spec 2c removed the actions.
 - 2026-11-05: planned for the running app; now the screens use it, because spec 2b moved them onto SQL Connect.

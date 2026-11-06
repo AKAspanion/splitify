@@ -34,4 +34,6 @@ script.
 
 - `app/layout.tsx`
 - `app/adsense.tsx`
+- `app/launch.tsx`
+- `app/(landing)/_components/navbar.tsx`
 - `firebase.json`

@@ -16,12 +16,14 @@ chose Cloud Logging, and the server code that logged is removed.
 - Cloud Functions log with `firebase-functions/logger`, read in Cloud Logging for the Firebase project. A line carries
   the operation and the error's class, never its message, a token, a request body or personal data
   ([Cloud Functions](../apps/functions.md)). The guard logs a refused sign-in by class only.
-- `app/global-error.tsx` logs the error to the browser console and shows its message with a retry button. Browser errors are
-  collected nowhere else.
+- `app/global-error.tsx` shows "Something went wrong.", the error's `digest` as a reference and a retry button, and never
+  the error's message, which can carry internals; Next already logs a caught error to the browser console. Browser
+  errors are collected nowhere else.
 - There is no admin page for logs ([decision](../decisions/remove-admin-logs-page.md)).
 
 ## History
 
+- 2026-11-06: the global error page showed the error's message; now only a fixed line and the digest, because the message can carry internals.
 - 2026-11-05: was `APILogger` writing to the console or the `Log` table, with Prisma query logging and a logs page; now Cloud Logging only, because spec 2c removed the server code that logged. See [decision](../decisions/cloud-logging.md).
 
 ## Sources
