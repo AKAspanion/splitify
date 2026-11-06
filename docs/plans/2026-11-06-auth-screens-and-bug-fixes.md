@@ -1,5 +1,7 @@
 # Auth screens and bug fixes Implementation Plan
 
+**Status:** complete, commits ac12f19..f12e060, 2026-11-06; record: [2026-11-06-auth-screens-and-bug-fixes.record.md](2026-11-06-auth-screens-and-bug-fixes.record.md)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -56,21 +58,21 @@ None (`run.checkpoints: none`).
 - Given the `webauthn` export, when its endpoint is read, then `httpsTrigger.invoker` is `["public"]`.
 - Given the `reports` export, when its endpoint is read, then `httpsTrigger.invoker` is `["public"]`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/webauthn/webauthn.test.ts` and `functions/src/reports/reports.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `functions/src/webauthn/webauthn.test.ts` and `functions/src/reports/reports.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `cd functions && pnpm vitest run src/webauthn/webauthn.test.ts src/reports/reports.test.ts -t invoker`
 Expected: FAIL, `invoker` undefined.
 
-- [ ] **Step 3: Write the minimal implementation:** add `invoker: "public"` to both `onRequest` option objects
+- [x] **Step 3: Write the minimal implementation:** add `invoker: "public"` to both `onRequest` option objects
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `cd functions && pnpm vitest run src/webauthn/webauthn.test.ts src/reports/reports.test.ts -t invoker`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add functions/src/webauthn/index.ts functions/src/reports/index.ts functions/src/webauthn/webauthn.test.ts functions/src/reports/reports.test.ts
@@ -116,21 +118,21 @@ export function DeleteAccountDialog(props: {
 - Given the person confirms and `deleteMyAccount` fails with another error, then the toast shows its message and the Profile "Delete account" button is enabled again (existing behaviour kept).
 - Given `components/ui/dialog.tsx`, then its content class list holds no `slide-in-from-left` or `slide-out-to-left` class.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/profile/delete-account-dialog.test.tsx`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/profile/delete-account-dialog.test.tsx`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/profile/delete-account-dialog.test.tsx"`
 Expected: FAIL on the assertions, with the component exported with its real signature first.
 
-- [ ] **Step 3: Write the minimal implementation:** the dialog, the class change in `dialog.tsx`, and `delete-account-action.tsx` opening `DeleteAccountDialog` instead of `getConfirmation`
+- [x] **Step 3: Write the minimal implementation:** the dialog, the class change in `dialog.tsx`, and `delete-account-action.tsx` opening `DeleteAccountDialog` instead of `getConfirmation`
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/profile/delete-account-dialog.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add components/ui/dialog.tsx "app/(platform)/profile/delete-account-dialog.tsx" "app/(platform)/profile/delete-account-dialog.test.tsx" "app/(platform)/profile/delete-account-action.tsx"
@@ -164,21 +166,21 @@ git commit -m "Ask for DELETE before deleting an account, and open dialogs from 
 - Given the verify `verified` state, then "Continue" still links to `/groups/`.
 - Given the `incomplete` link, then "Back to sign in" still links to `/sign-in/`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in the three test files above
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in the three test files above
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/(auth)/auth/action/"`
 Expected: FAIL on the new link assertions.
 
-- [ ] **Step 3: Write the minimal implementation** of the header link and the "Go home" links
+- [x] **Step 3: Write the minimal implementation** of the header link and the "Go home" links
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/(auth)/auth/action/"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(auth)/auth/action/action-handler.tsx" "app/(platform)/(auth)/auth/action/reset-password-form.tsx" "app/(platform)/(auth)/auth/action/verify-email-result.tsx" "app/(platform)/(auth)/auth/action/action-handler.test.ts" "app/(platform)/(auth)/auth/action/reset-password-form.test.ts" "app/(platform)/(auth)/auth/action/verify-email-result.test.ts"
@@ -241,26 +243,26 @@ Layout, like todo.spanion.in in Splitify's own tokens: a full-height page, a cen
 - e2e: `tests/e2e/main-flow.spec.ts` opens `/`, lands on `/sign-in/`, presses "Sign in with email", signs in, and the rest of the flow passes; the wrong-password test presses "Sign in with email" first.
 - The hosting check expects `/` to serve `index.html` without the text "Splitting Expenses" (now `expectText` "Splitify").
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/(auth)/home-redirect.test.tsx` and `tests/e2e/main-flow.spec.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/(auth)/home-redirect.test.tsx` and `tests/e2e/main-flow.spec.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/(auth)/home-redirect.test.tsx"`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Write the minimal implementation:** remove the landing route group, add `/` and `AuthCard`, rework the three screens, update `launch.tsx` and `public.json`
+- [x] **Step 3: Write the minimal implementation:** remove the landing route group, add `/` and `AuthCard`, rework the three screens, update `launch.tsx` and `public.json`
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/(auth)/home-redirect.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Run the e2e flow**
+- [x] **Step 5: Run the e2e flow**
 
 Run: `pnpm test:e2e tests/e2e/main-flow.spec.ts`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git rm "app/(landing)/page.tsx" "app/(landing)/page.hosting.tsx" "app/(landing)/layout.tsx" "app/(landing)/layout.hosting.tsx" "app/(landing)/_components/navbar.tsx" "app/(landing)/_components/navbar.test.tsx" "app/(landing)/_components/footer.tsx"
@@ -293,21 +295,21 @@ git commit -m "Replace the landing page with a redirect and lay out sign-in, sig
 - The delete-account page mounts `Adsense`, and its links out stay plain anchors.
 - The privacy page's back link goes to `/`.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/privacy/page.test.tsx`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/privacy/page.test.tsx`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/privacy/page.test.tsx"`
 Expected: FAIL on the new copy.
 
-- [ ] **Step 3: Write the minimal implementation** of the policy text and the delete-account page's `Adsense`
+- [x] **Step 3: Write the minimal implementation** of the policy text and the delete-account page's `Adsense`
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/privacy/page.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/privacy/page.tsx" "app/(platform)/privacy/page.test.tsx" "app/(platform)/delete-account/page.tsx"

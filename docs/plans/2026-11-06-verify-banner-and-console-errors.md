@@ -1,5 +1,7 @@
 # Verify-email banner and two console errors Implementation Plan
 
+**Status:** complete, commits 12be27b..46f5116, 2026-11-06; record: [2026-11-06-verify-banner-and-console-errors.record.md](2026-11-06-verify-banner-and-console-errors.record.md)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -78,21 +80,21 @@ export function VerifyEmailBanner(props: { dismissable?: boolean }): JSX.Element
 - Given Resend email fails, then its error shows under the banner and Resend is enabled again (existing behaviour kept).
 - e2e: `tests/e2e/verify-banner.spec.ts` signs in an unverified test user, sees the banner on `/groups/`, presses Dismiss, reloads and sees none, then opens `/profile/` and sees the banner with no Dismiss.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `lib/auth/verify-banner-dismissal.test.ts`, `components/auth/verify-email-banner.test.tsx` and `tests/e2e/verify-banner.spec.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `lib/auth/verify-banner-dismissal.test.ts`, `components/auth/verify-email-banner.test.tsx` and `tests/e2e/verify-banner.spec.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/auth/verify-banner-dismissal.test.ts components/auth/verify-email-banner.test.tsx`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Write the minimal implementation:** the dismissal module, the banner's `dismissable` prop and Dismiss button, the banner out of the layout and into Groups (`dismissable`) and Profile
+- [x] **Step 3: Write the minimal implementation:** the dismissal module, the banner's `dismissable` prop and Dismiss button, the banner out of the layout and into Groups (`dismissable`) and Profile
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/auth/verify-banner-dismissal.test.ts components/auth/verify-email-banner.test.tsx`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/auth/verify-banner-dismissal.ts lib/auth/verify-banner-dismissal.test.ts components/auth/verify-email-banner.tsx components/auth/verify-email-banner.test.tsx "app/(platform)/(app)/layout.hosting.tsx" "app/(platform)/(app)/(screens)/groups/page.tsx" "app/(platform)/profile/page.tsx" tests/e2e/verify-banner.spec.ts
@@ -124,21 +126,21 @@ git commit -m "Show the verify-email banner on Groups until dismissed for 7 days
 - Given an email link, when the page renders, then `history.replaceState` is not called during the render, and has been called with `/auth/action/` before the next animation frame.
 - Given the link is `firebase`-kind, then `location.replace` to its `forwardTo` still happens once.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `components/ui/dialog.test.tsx` and `app/(platform)/(auth)/auth/action/action-handler.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `components/ui/dialog.test.tsx` and `app/(platform)/(auth)/auth/action/action-handler.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run components/ui/dialog.test.tsx "app/(platform)/(auth)/auth/action/action-handler.test.ts"`
 Expected: FAIL on the assertions.
 
-- [ ] **Step 3: Write the minimal implementation** to the Interfaces
+- [x] **Step 3: Write the minimal implementation** to the Interfaces
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run components/ui/dialog.test.tsx "app/(platform)/(auth)/auth/action/action-handler.test.ts"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add components/ui/dialog.tsx components/ui/dialog.test.tsx "app/(platform)/(auth)/auth/action/action-handler.tsx" "app/(platform)/(auth)/auth/action/action-handler.test.ts"
