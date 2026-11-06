@@ -1,10 +1,10 @@
 # The activity feed and the caller's feedback. The feed shows activity in groups the caller is a member of, and
 # activity where the caller is the actor or the subject.
 
-# A page of at most 100, and at most 10000 rows in: the app asks for pages of ACTIVITY_PAGE_SIZE (lib/data/activity.ts).
+# A page of at most 100, from any offset: the app asks for pages of ACTIVITY_PAGE_SIZE (lib/data/activity.ts).
 query ListMyActivity($limit: Int!, $offset: Int!)
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.limit >= 0 && vars.limit <= 100 && vars.offset >= 0 && vars.offset <= 10000"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.limit >= 0 && vars.limit <= 100 && vars.offset >= 0"
 ) {
   activities(
     where: {

@@ -58,7 +58,7 @@ query ListGroupExpenses(
   $search: String
 )
 @auth(
-  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.limit >= 0 && vars.limit <= 100 && vars.offset >= 0 && vars.offset <= 10000 && (!has(vars.search) || vars.search == null || vars.search.size() <= 100)"
+  expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.limit >= 0 && vars.limit <= 100 && vars.offset >= 0 && (!has(vars.search) || vars.search == null || vars.search.size() <= 100)"
 ) {
   expenses(
     where: {

@@ -203,12 +203,11 @@ describe("GetExpense, ListGroupExpenses, GetGroupLedger", () => {
     expect(all.expenses).toHaveLength(1);
   });
 
-  it("refuses a limit below 0 and an offset below 0 or over 10000, and accepts 0 and the bounds", async () => {
+  it("refuses a limit below 0 and an offset below 0, and accepts 0 and any offset the pager can reach", async () => {
     const base = { groupId: G };
     for (const vars of [
       { limit: -1, offset: 0 },
       { limit: 10, offset: -1 },
-      { limit: 10, offset: 10001 },
     ])
       await expect(
         query(alice.dc, "ListGroupExpenses", { ...base, ...vars }),
@@ -222,7 +221,7 @@ describe("GetExpense, ListGroupExpenses, GetGroupLedger", () => {
     const far = await query(alice.dc, "ListGroupExpenses", {
       ...base,
       limit: 100,
-      offset: 10000,
+      offset: 10001,
     });
     expect(far.expenses).toEqual([]);
   });

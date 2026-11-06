@@ -150,11 +150,10 @@ describe("ListMyActivity and GetActivity", () => {
     expect(activities).toHaveLength(2);
   });
 
-  it("refuses a limit below 0 and an offset below 0 or over 10000, and accepts 0 and the bounds", async () => {
+  it("refuses a limit below 0 and an offset below 0, and accepts 0 and any offset the pager can reach", async () => {
     for (const vars of [
       { limit: -1, offset: 0 },
       { limit: 10, offset: -1 },
-      { limit: 10, offset: 10001 },
     ])
       await expect(query(alice.dc, "ListMyActivity", vars)).rejects.toThrow();
     const none = await query(alice.dc, "ListMyActivity", {
@@ -164,7 +163,7 @@ describe("ListMyActivity and GetActivity", () => {
     expect(none.activities).toEqual([]);
     const far = await query(alice.dc, "ListMyActivity", {
       limit: 100,
-      offset: 10000,
+      offset: 10001,
     });
     expect(far.activities).toEqual([]);
   });
