@@ -19,13 +19,13 @@ const Section = ({
 const PrivacyPage = () => {
   return (
     <div className="flex items-center justify-center flex-col">
-      {/* A public page, so it loads the ads, as the landing page does. */}
+      {/* A public page, so it loads the ads (knowledge/decisions/adsense-on-public-pages-only.md). */}
       <Adsense />
       <div className="p-6 w-full">
         <Header backTo="/" title="Privacy Policy" />
       </div>
       <article className="w-full max-w-2xl space-y-6 px-6 pb-12 text-sm leading-relaxed">
-        <p className="text-muted-foreground">Effective date: 4 November 2026</p>
+        <p className="text-muted-foreground">Effective date: 6 November 2026</p>
 
         <Section title="Who we are">
           <p>
@@ -47,28 +47,68 @@ const PrivacyPage = () => {
               A passkey&apos;s public key, when you turn on biometric lock.
             </li>
             <li>A push subscription id, when you allow notifications.</li>
-            <li>Page views and performance measurements.</li>
+            <li>
+              Cookies and device identifiers that Google uses to show ads on the
+              public pages.
+            </li>
           </ul>
         </Section>
 
         <Section title="Why we use it">
           <p>
-            We use it to run the app, to send the notifications you allow, and
-            to understand how the app is used and how well it performs. We do
-            not sell your data.
+            We use it to run the app and to send the notifications you allow. We
+            do not sell your data.
           </p>
         </Section>
 
         <Section title="Who handles it for us">
           <ul className="list-disc space-y-1 pl-5">
-            <li>Clerk handles accounts and sign-in.</li>
+            <li>Firebase Authentication handles accounts and sign-in.</li>
             <li>
-              Vercel provides hosting, analytics and performance measurement.
+              Firebase SQL Connect, on Cloud SQL, stores your groups, expenses
+              and profile.
             </li>
-            <li>OneSignal sends push notifications.</li>
-            <li>UploadThing stores image uploads.</li>
-            <li>Google AdSense may show ads and use cookies to do so.</li>
+            <li>Cloud Functions run reports, passkeys and account deletion.</li>
+            <li>Firebase Hosting serves the web app.</li>
+            <li>Firebase Cloud Messaging sends push notifications.</li>
+            <li>Google AdSense shows ads on the public pages.</li>
           </ul>
+        </Section>
+
+        <Section title="Advertising">
+          <p>
+            Splitify shows ads from Google AdSense on its public pages, never
+            inside the signed-in app. Google and its partners use cookies to
+            show ads based on your visits to this and other sites.
+          </p>
+          <p>
+            You can turn off personalised ads at{" "}
+            <a
+              className="underline"
+              href="https://adssettings.google.com"
+              rel="noopener noreferrer"
+            >
+              Google&apos;s Ads Settings
+            </a>
+            , or opt out of third-party vendors&apos; cookies at{" "}
+            <a
+              className="underline"
+              href="https://www.aboutads.info"
+              rel="noopener noreferrer"
+            >
+              aboutads.info
+            </a>
+            .
+          </p>
+          <p>
+            <a
+              className="underline"
+              href="https://policies.google.com/technologies/partner-sites"
+              rel="noopener noreferrer"
+            >
+              How Google uses information from sites that use its services
+            </a>
+          </p>
         </Section>
 
         <Section title="What other members can see">
