@@ -47,7 +47,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 ([data protection](../security/data-protection.md)).
 
 - The landing page and navbar read the Firebase Auth state (`useAuth`) and show the signed-in or
-  signed-out view, and the sign-in, sign-up and forgot-password screens are hosted routes ([sign in](../features/sign-in.md)).
+  signed-out view, and the sign-in, sign-up, forgot-password and `/auth/action/` (email links) screens are hosted routes ([sign in](../features/sign-in.md)).
 - The signed-in screens are in this build too. `app/(platform)/(app)/layout.hosting.tsx` is their shell: `RequireAuth`
   around the navbars, the [verify-email banner](../security/auth.md) (`components/auth/verify-email-banner.tsx`) and the
   page; `(screens)/layout.hosting.tsx` mounts the Add Expense button, because only `layout.hosting.tsx` files
@@ -60,7 +60,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
   `generateStaticParams` re-exported next to a `"use client"` default.
 - `pnpm check:hosting` (`scripts/check-hosting-build.mjs`) reads one manifest per area from `scripts/hosting-pages/*.json`:
   the pages that must exist in `out/` and the requests that must answer 200 with given text.
-- `components/providers.tsx` keys a `PersistQueryClientProvider` by the signed-in uid, because the saved cache is read only at mount ([offline](../features/offline.md)), and makes one `QueryClient` per mount (through `useState`): one made on every render left
+- `components/providers.tsx` has a `PersistQueryClientProvider` with no key that follows the signed-in person's saved cache without remounting the page ([offline](../decisions/offline-first-scope.md)), and makes one `QueryClient` per mount (through `useState`): one made on every render left
   invalidation after a write reaching nobody.
 - A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`) after a sign-out they chose (`lib/auth-redirect.ts`).
 - Known and harmless: on `/privacy` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
@@ -114,7 +114,9 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-06: the query provider was keyed by uid; now it has no key and follows the saved cache, because the key remounted every page when sign-in finished. See [the fixed finding](../findings/query-provider-remounts-pages-at-auth-restore.md).
 - 2026-11-06: the root layout loaded AdSense and the landing page reached the app by client navigation; now the landing layout and privacy page load it and public pages leave by full page loads, because of [the AdSense decision](../decisions/adsense-on-public-pages-only.md).
+- 2026-11-05: the build had no page for Firebase's email links; now it has `/auth/action/`, which the hosting build check requires, because reset and verify emails are finished in the app. See [sign in](../features/sign-in.md).
 - 2026-11-05: `next.config.mjs` always built the static export; now in `next dev` only it drops the export and rewrites `/api/reports/**` and `/api/webauthn/**` to the Functions emulator, because the dev server has no Hosting in front. See [run locally](../operations/run-locally.md).
 - 2026-11-05: had no offline support; now a saved cache, a service worker and queued writes, because spec 4 was built. See [offline](../features/offline.md).
 - 2026-11-05: was a Next.js server with a separate hosting build target, a coming-soon page and a Clerk stub; now one static build with a 404 page, and `firebase.emulators.json` generated for local checks, because spec 2c removed the server, Clerk, OneSignal, UploadThing and Vercel analytics. See [decision](../decisions/static-build-on-firebase-hosting.md).

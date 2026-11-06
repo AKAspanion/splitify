@@ -168,6 +168,12 @@ export function SignInForm() {
             Sign up
           </Link>
         </p>
+        <Link
+          href="/privacy/"
+          className="text-muted-foreground underline-offset-4 hover:underline"
+        >
+          Privacy policy
+        </Link>
       </div>
     </div>
   );

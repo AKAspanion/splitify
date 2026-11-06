@@ -66,4 +66,39 @@ describe("Adsense", () => {
     vi.stubEnv("NEXT_PUBLIC_GOOGLE_ADSENSE_ID", "1234");
     expect(render(SIGNED_OUT)).toBe("");
   });
+
+  // A document that first loaded an email link keeps its one-time code in the navigation entry after a client-side
+  // navigation, so a public page reached that way never loads the script.
+  describe("in a document that first loaded a page by its path", () => {
+    async function renderFirstLoadedAt(path: string): Promise<string> {
+      vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("NEXT_PUBLIC_GOOGLE_ADSENSE_ID", "1234");
+      vi.stubGlobal("window", { location: { pathname: path } });
+      vi.resetModules();
+      const { default: Fresh } = await import("./adsense");
+      const { AuthContext: FreshAuth } = await import("@/hooks/use-auth");
+      return renderToStaticMarkup(
+        <FreshAuth.Provider value={SIGNED_OUT}>
+          <Fresh />
+        </FreshAuth.Provider>,
+      );
+    }
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it.each(["/auth/action/", "/auth/action"])(
+      "loads nothing when the document first loaded %s",
+      async (path) => {
+        expect(await renderFirstLoadedAt(path)).toBe("");
+      },
+    );
+
+    it("loads the script when the document first loaded the landing page", async () => {
+      expect(await renderFirstLoadedAt("/")).toContain(
+        "adsbygoogle.js?client=ca-pub-1234",
+      );
+    });
+  });
 });

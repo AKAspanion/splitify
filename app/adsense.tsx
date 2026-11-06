@@ -2,6 +2,15 @@
 
 import Script from "next/script";
 import { useAuth } from "@/hooks/use-auth";
+import { adsAllowedOn } from "@/lib/ads/ads-allowed";
+
+/**
+ * The page this document first loaded, read once when the module loads in the browser; null while prerendering. A
+ * document that arrived on `/auth/action/` keeps that URL, one-time code and all, in its navigation entry
+ * (`performance`) after a client-side navigation away, so it never gets the ad script, wherever it goes.
+ */
+const FIRST_PATH =
+  typeof window === "undefined" ? null : window.location.pathname;
 
 /**
  * Google AdSense's script, in production builds that have a publisher id. Rendered by the public pages only, the
@@ -17,6 +26,7 @@ const Adsense = () => {
   const pId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID;
   if (process.env.NODE_ENV !== "production" || !pId) return null;
   if (status !== "signed-out") return null;
+  if (FIRST_PATH !== null && !adsAllowedOn(FIRST_PATH)) return null;
 
   return (
     <Script

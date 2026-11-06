@@ -30,6 +30,9 @@ reads the same global, so the saved data cache is discarded when the app version
 - Pages: network first. If the network says nothing for 3 seconds (`NAVIGATION_TIMEOUT_MS = 3000`), the cached page
   answers; failing that, the placeholder page of the id route.
 - `/api` and cross-origin requests are never cached.
+- `/auth/action` and anything under it is bypassed (never cached), like Firebase's reserved paths, because its URL
+  carries a one-time code ([data protection](../security/data-protection.md)). `public/sw-routing.js`, which `next dev`
+  serves, mirrors `lib/offline/sw-routing.js`, and a test holds the two equal.
 - The routing choices are in `lib/offline/sw-routing.js`, a classic UMD script copied to `out/`, because
   `importScripts` cannot load an ES module. Pages are precached by their path and under their file URL, because
   Hosting redirects `index.html` URLs.
@@ -46,9 +49,14 @@ which posts `SKIP_WAITING` and reloads once the new worker controls the page.
 - `lib/offline/sw-navigation.test.ts` runs `public/sw.js` in a Node `vm` context with fake `self`, `caches` and `fetch`, because a worker's `self` can't be imported; this is the pattern for testing the worker's timing.
 - Provisional, for the developer to confirm: the manifest global's name, the classic script, and caching pages by path and file URL.
 
+## History
+
+- 2026-11-05: `/auth/action` was cached like any page; now it is bypassed, because its URL carries a one-time code. See [sign in](../features/sign-in.md).
+
 ## Sources
 
 - `public/sw.js`
+- `public/sw-routing.js`
 - `lib/offline/sw-routing.js`
 - `lib/offline/sw-navigation.test.ts`
 - `lib/offline/version.ts`

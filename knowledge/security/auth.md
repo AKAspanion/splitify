@@ -61,6 +61,7 @@ proxy ([Clerk](../integrations/clerk.md)).
 ## History
 
 - 2026-11-06: the account deletion took any signed-in caller and a sign-out always went home; now deleting needs a sign-in from the last 5 minutes and `signOut({ toSignIn: true })` sends the person to sign in, because the security review found a left-open session could delete the account.
+- 2026-11-05: had nothing about the email-link page; now `onUserChanged` is built on `onIdTokenChanged`, so the verify banner clears when a verify link is applied without a reload, and `/auth/action/` finishes reset and verify. See [sign in](../features/sign-in.md).
 - 2026-11-05: was Clerk with `proxy.ts` guarding every route and each route handler checking `auth()`; now Firebase Auth with the guard on each Cloud Function and the rules in SQL Connect, because spec 2c removed the server and Clerk.
 - 2026-11-05: the guard was unused; now it wraps the signed-in screens, with the verify-email banner and a home landing after sign-out, because spec 2b moved them to the hosting build.
 - 2026-11-05: the Firebase Auth section said built but unused; now says the hosted sign-in screens, the auth state and the guard use it, because spec 2a added them.

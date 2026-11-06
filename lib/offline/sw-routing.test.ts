@@ -33,6 +33,22 @@ describe("cacheStrategy", () => {
     expect(cacheStrategy(u, ORIGIN)).toBe("bypass"),
   );
 
+  // Firebase's email links carry a one-time code in the query: the worker never caches the page they open.
+  it.each([
+    "/auth/action/",
+    "/auth/action",
+    "/auth/action/?mode=resetPassword&oobCode=abc",
+    "/auth/action?mode=verifyEmail&oobCode=x",
+    "/auth/action/index.html?mode=resetPassword&oobCode=abc",
+  ])("never touches the action page %s", (p) =>
+    expect(cacheStrategy(at(p), ORIGIN)).toBe("bypass"),
+  );
+
+  it.each(["/auth/", "/auth/actions/", "/auth/actionx", "/sign-in/"])(
+    "still tries the network first for %s, beside the action page",
+    (p) => expect(cacheStrategy(at(p), ORIGIN)).toBe("network-first-page"),
+  );
+
   it("treats a cross-origin static file as bypass", () => {
     expect(
       cacheStrategy("https://www.gstatic.com/firebasejs/x.js", ORIGIN),
@@ -94,5 +110,15 @@ describe("fallbackPage against the repository", () => {
       const route = "/" + segments.map((s) => s + "/").join("");
       expect(fallbackPage(route), route).not.toBe("/404.html");
     }
+  });
+});
+
+describe("the checked-in public/sw-routing.js", () => {
+  // The dev worker reads it; the build copies this file over it in `out/`. A copy behind this one serves the dev
+  // worker old rules.
+  it("is the same file as lib/offline/sw-routing.js", () => {
+    expect(readFileSync("public/sw-routing.js", "utf8")).toBe(
+      readFileSync("lib/offline/sw-routing.js", "utf8"),
+    );
   });
 });

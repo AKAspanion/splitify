@@ -30,6 +30,21 @@ function sitewideCsp(file = "firebase.json"): string {
   return sitewideHeader(file, "Content-Security-Policy");
 }
 
+/**
+ * The headers Hosting sends for a block's source, as Hosting merges them: every matching block in order, a later block
+ * replacing an earlier one's header of the same key. Only `**` and the given source are taken as matching.
+ */
+function headersFor(source: string): Record<string, string> {
+  const rules: HeaderRule[] = JSON.parse(readFileSync("firebase.json", "utf8"))
+    .hosting.headers;
+  const out: Record<string, string> = {};
+  for (const rule of rules) {
+    if (rule.source !== "**" && rule.source !== source) continue;
+    for (const { key, value } of rule.headers) out[key] = value;
+  }
+  return out;
+}
+
 /** One directive's sources, split the way a browser splits them: on whitespace. */
 function directiveSources(csp: string, name: string): string[] {
   const directive = csp
@@ -65,6 +80,32 @@ describe("firebase.json's sitewide Content-Security-Policy", () => {
       expect(source).toMatch(/^https:\/\//);
       expect(source.indexOf("https://", 1)).toBe(-1);
     }
+  });
+});
+
+describe("firebase.json's headers for the email action page", () => {
+  // `/auth/action`, `/auth/action/` and anything under it, but not `/auth/actions/`.
+  const headers = headersFor("/auth/action{,/**}");
+
+  it("keeps the page, whose URL carries a one-time code, out of every cache", () => {
+    expect(headers["Cache-Control"]).toBe("no-store");
+  });
+
+  // Its Firebase calls still carry the origin, which a browser API key restricted by HTTP referrer needs; the path and
+  // query, and so the code, never leave.
+  it("sends only the site's origin as the referrer", () => {
+    expect(headers["Referrer-Policy"]).toBe("strict-origin");
+  });
+
+  it("keeps the sitewide Content-Security-Policy", () => {
+    expect(headers["Content-Security-Policy"]).toBe(sitewideCsp());
+  });
+
+  // The action page's block names its own headers only, so the sitewide HSTS still reaches it.
+  it("keeps the sitewide Strict-Transport-Security", () => {
+    expect(headers["Strict-Transport-Security"]).toBe(
+      sitewideHeader("firebase.json", "Strict-Transport-Security"),
+    );
   });
 });
 

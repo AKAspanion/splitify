@@ -180,6 +180,19 @@
         ]
       },
       {
+        "source": "/auth/action{,/**}",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin"
+          }
+        ]
+      },
+      {
         "source": "/.well-known/assetlinks.json",
         "headers": [
           {

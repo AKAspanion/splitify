@@ -42,13 +42,19 @@ const REWRITES = [
   destination,
 }));
 
+/**
+ * The app's page for Firebase's email action links (`ACTION_PATH` in lib/auth/action-link.ts, which this plain script
+ * can't import). Its URL carries a one-time code, so the worker never caches it, nor anything under it.
+ */
+const ACTION_PAGE = "/auth/action";
+
 const STATIC_FILE =
   /\.(?:js|css|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf)$/i;
 
 /**
  * How the worker answers a request: `precache-first` for the build's static files, `network-first-page` for pages
  * (and the version manifest) with the cache as the offline fallback, `bypass` for everything it must never touch:
- * the API, the worker itself, Firebase's reserved paths and any other origin.
+ * the API, the worker itself, Firebase's reserved paths, the email action page and any other origin.
  */
 function cacheStrategy(url, origin) {
   let parsed;
@@ -61,6 +67,8 @@ function cacheStrategy(url, origin) {
   const path = parsed.pathname;
   if (path === "/api" || path.startsWith("/api/")) return "bypass";
   if (path.startsWith("/__/") || path.startsWith("/.well-known/"))
+    return "bypass";
+  if (path === ACTION_PAGE || path.startsWith(ACTION_PAGE + "/"))
     return "bypass";
   if (path === "/sw.js") return "bypass";
   if (path.startsWith("/_next/static/") || path.startsWith("/images/"))

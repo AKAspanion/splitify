@@ -26,9 +26,15 @@ what is uncertain, and does not copy them. [The workflows](ci-cd.md) read what t
   templates can't hold a logo, and only the password-reset message can be edited. The verify email's sender name is
   `Splitify`, set through the Identity Toolkit admin API. The rest is console-only, because the API refuses edits to
   the verify template and the action URL (an "email template update not allowed" error): the project's public-facing name,
-  which fills `%APP_NAME%` in the subject and sign-off; the action URL
-  `https://splitify.spanion.in/__/auth/action`, which Hosting serves on the custom domain; and the custom sender
+  which fills `%APP_NAME%` in the subject and sign-off; the action URL; and the custom sender
   domain, verified by DNS records at the domain's provider (up to 24 hours).
+- After the password-reset flow ships, change the action URL in the Firebase console (Authentication → Templates → any
+  template) from `https://splitify.spanion.in/__/auth/action` to `https://splitify.spanion.in/auth/action/`. It covers
+  every template, and the API refuses it. After the deploy, run `curl -I https://splitify.spanion.in/auth/action/` and
+  confirm `Cache-Control: no-store` and `Referrer-Policy: strict-origin` (`lib/security/csp.test.ts` matches header
+  sources by exact string, so it can't prove the `firebase.json` glob on production Hosting). Then open one
+  `recoverEmail` link end to end to confirm Firebase's handler doesn't send it back to `/auth/action/`.
+  `scripts/hosting-pages/public.json` requires the built auth/action page ([sign in](../features/sign-in.md)).
 - Set the function secret `SESSION_PASSWORD` in the Firebase project (a random value of at least 32 characters, never the old hard-coded one) before the first deploy of the `webauthn` function; without it the function answers 500. The README doesn't list this step yet ([Cloud Functions](../apps/functions.md)).
 - Run the SQL Connect deploy by hand again (`deploy_dataconnect` ticked) after any schema change: the `PushToken` table is new and nothing deploys it otherwise.
 - Run the first SQL Connect deploy by hand from a machine signed in with `firebase login`, because only the
@@ -55,6 +61,7 @@ functions may now be spare, and the first deploy may still fail on a missing per
 
 ## History
 
+- 2026-11-05: the action URL was `https://splitify.spanion.in/__/auth/action`; now it is `https://splitify.spanion.in/auth/action/`, the app's own page, with a header check after the deploy, because reset and verify emails are finished in the app. See [sign in](../features/sign-in.md).
 - 2026-11-05: had no OAuth steps for Google sign-in; now the auth domain is `splitify.spanion.in` with its redirect URI and JavaScript origin on the OAuth client, because sign-in became a redirect.
 - 2026-11-05: Auth's emails went out as "project-1033465318943" from the firebaseapp.com domain; now the setup brands them through Firebase's settings, because the developer chose that over sending our own email.
 - 2026-11-05: added deleting a function before a deploy changes its trigger type, because the push senders' deploy was refused until the HTTPS versions were deleted.
@@ -68,3 +75,5 @@ functions may now be spare, and the first deploy may still fail on a missing per
 - `README.md`
 - `.github/workflows/deploy.yml`
 - `firebase.json`
+- `scripts/hosting-pages/public.json`
+- `lib/security/csp.test.ts`
