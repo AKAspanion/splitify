@@ -26,20 +26,30 @@ export function isVerifyBannerSnoozed(
   return age >= 0 && age < SNOOZE_MS;
 }
 
-/** The stored dismissal for this person, or null when none is stored or storage is blocked. */
+/** Logs the cause class only (`SecurityError`, `QuotaExceededError`, else the thrown value's type), never its message. */
+function logStorageFailure(what: "read" | "write", error: unknown): void {
+  console.warn(
+    `[verify-banner] ${what} failed`,
+    error instanceof Error ? error.name : typeof error,
+  );
+}
+
+/** The stored dismissal for this person, or null when none is stored or storage is blocked (logged). */
 export function readVerifyBannerDismissal(uid: string): string | null {
   try {
     return localStorage.getItem(verifyBannerKey(uid));
-  } catch {
+  } catch (error) {
+    logStorageFailure("read", error);
     return null;
   }
 }
 
-/** Stores `now` as this person's dismissal; does nothing when storage is blocked or full. */
+/** Stores `now` as this person's dismissal; when storage is blocked or full it logs and does nothing else. */
 export function writeVerifyBannerDismissal(uid: string, now: Date): void {
   try {
     localStorage.setItem(verifyBannerKey(uid), now.toISOString());
-  } catch {
+  } catch (error) {
     // Storage is blocked or full: the banner hides for this visit only and shows again next time.
+    logStorageFailure("write", error);
   }
 }

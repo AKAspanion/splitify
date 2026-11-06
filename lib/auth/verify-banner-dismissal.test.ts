@@ -102,3 +102,58 @@ describe("the stored dismissal", () => {
     expect(() => writeVerifyBannerDismissal("u1", NOW)).not.toThrow();
   });
 });
+
+describe("storage failures are logged by class", () => {
+  it("logs a blocked read as its error class, without the message", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubStorage({
+      getItem: () => {
+        throw new DOMException("secret detail", "SecurityError");
+      },
+    });
+    expect(readVerifyBannerDismissal("u1")).toBeNull();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith(
+      "[verify-banner] read failed",
+      "SecurityError",
+    );
+    warn.mockRestore();
+  });
+
+  it("logs a full write as its error class and does not throw", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubStorage({
+      setItem: () => {
+        throw new DOMException("secret detail", "QuotaExceededError");
+      },
+    });
+    expect(() => writeVerifyBannerDismissal("u1", NOW)).not.toThrow();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith(
+      "[verify-banner] write failed",
+      "QuotaExceededError",
+    );
+    warn.mockRestore();
+  });
+
+  it("logs the type of a thrown non-error", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubStorage({
+      getItem: () => {
+        throw "blocked";
+      },
+    });
+    readVerifyBannerDismissal("u1");
+    expect(warn).toHaveBeenCalledWith("[verify-banner] read failed", "string");
+    warn.mockRestore();
+  });
+
+  it("logs nothing when storage works", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubStorage();
+    writeVerifyBannerDismissal("u1", NOW);
+    readVerifyBannerDismissal("u1");
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
