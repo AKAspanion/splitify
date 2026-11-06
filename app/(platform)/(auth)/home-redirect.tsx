@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Spinner from "@/components/ui/spinner";
+import { AppLoading } from "@/components/app-loading";
 import { useAuth } from "@/hooks/use-auth";
 
 /**
@@ -17,13 +17,5 @@ export function HomeRedirect() {
     else if (status === "signed-out") window.location.replace("/sign-in/");
   }, [status]);
 
-  return (
-    <div
-      role="status"
-      className="flex min-h-dvh items-center justify-center text-muted-foreground"
-    >
-      <Spinner />
-      <span className="sr-only">Loading</span>
-    </div>
-  );
+  return <AppLoading />;
 }

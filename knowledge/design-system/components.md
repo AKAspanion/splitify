@@ -24,16 +24,24 @@ verified: human:ankitp@geekyants.com
   second button in it, which had nested two buttons.
 - **Other shared pieces:** `components/no-data.tsx`, `components/list-item.tsx`, `components/logo.tsx`,
   `components/ui-spinner.tsx`, `components/theme/dark-mode-toggle.tsx`.
+- **Full-page loading:** `components/app-loading.tsx`, the logo centred while sign-in state loads
+  ([decision](../decisions/logo-as-loading-state.md)); spinners stay for waits inside a page. It is drawn at `188` px
+  so its glyph (about 80% of `public/images/logo.svg`) matches the Android splash's glyph, about 150dp tall: measured
+  on a phone, the two are the same size to within 2px. A gentle pulse, none under reduced motion, says it is still
+  loading. The size and the pulse were chosen while building, not asked for.
 - **App-level pieces:** cards, navigation bars, skeletons and the add-expense button in
   `app/(platform)/(app)/_components/`.
 
 ## History
 
+- 2026-11-06: the full-page wait was a spinner; now it is the logo, `components/app-loading.tsx`, because the developer asked for the logo instead. See [decision](../decisions/logo-as-loading-state.md).
 - 2026-11-06: dialogs slid in from the top-left and their close control was a button inside a button; now they open from the centre with fade and zoom and the close control is one button, and `Header` can render its back link as a plain anchor (`fullPageLoad`), because of the auth-screens and console-error plans. See [the AdSense decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 - 2026-11-06: the header's back link followed any `back` value; now it follows only a same-site path, and `Logo` can render a plain anchor (`fullPageLoad`), because of the security review and [the AdSense decision](../decisions/adsense-on-public-pages-only.md).
 
 ## Sources
 
+- `components/app-loading.tsx`
+- `public/images/logo.svg`
 - `components.json`
 - `components/ui/drawer.tsx`
 - `components/ui/sonner.tsx`
