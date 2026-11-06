@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { Auth, getAuth } from "firebase-admin/auth";
+import * as logger from "firebase-functions/logger";
 import {
   resetDatabase,
   seed,
@@ -35,11 +36,20 @@ const auth = () =>
       initializeApp({ projectId: "demo-splitify" }, "test-delete-auth"),
   );
 
-// `onCall` functions expose their handler as `run`, which takes the request the runtime would build.
-const call = (uid?: string) =>
+const nowSeconds = () => Math.floor(Date.now() / 1000);
+
+// `onCall` functions expose their handler as `run`, which takes the request the runtime would build. The ID token
+// says when the person last signed in (`auth_time`, in seconds): just now unless a test says otherwise.
+const call = (uid?: string, token: { auth_time?: unknown } = {}) =>
   deleteMyAccount.run({
     data: undefined,
-    auth: uid ? { uid, token: {} as never, rawToken: "" } : undefined,
+    auth: uid
+      ? {
+          uid,
+          token: { auth_time: nowSeconds(), ...token } as never,
+          rawToken: "",
+        }
+      : undefined,
     rawRequest: {} as never,
     acceptsStreaming: false,
   });
@@ -250,6 +260,58 @@ describe("deleteMyAccount", () => {
   it("finishes for a caller whose Auth user is already gone", async () => {
     await auth().deleteUser(ALICE);
     await expect(call(ALICE)).resolves.toEqual({ ok: true });
+  });
+
+  it("revokes the caller's refresh tokens when it deletes the account", async () => {
+    const revoke = vi.spyOn(Auth.prototype, "revokeRefreshTokens");
+    await expect(call(ALICE)).resolves.toEqual({ ok: true });
+    expect(revoke).toHaveBeenCalledWith(ALICE);
+  });
+
+  it("stops before deleting anything when revoking the tokens fails, and logs only the cause class", async () => {
+    vi.spyOn(Auth.prototype, "revokeRefreshTokens").mockRejectedValueOnce(
+      Object.assign(new Error("boom alice@example.test"), {
+        code: "auth/internal-error",
+      }),
+    );
+    const before = await world();
+    const error = await call(ALICE).catch((e: unknown) => e);
+    expect(error).toMatchObject({ code: "internal" });
+    expect((error as Error).message).not.toContain("alice@example.test");
+    expect(await world()).toEqual(before);
+    await expect(auth().getUser(ALICE)).resolves.toBeTruthy();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      "deleteMyAccount failed",
+      { operation: "revokeRefreshTokens", cause: "Error:auth/internal-error" },
+    );
+  });
+
+  it.each([
+    ["a sign-in 301 seconds ago", { auth_time: nowSeconds() - 301 }],
+    ["no sign-in time", { auth_time: undefined }],
+    ["a sign-in time that is not a number", { auth_time: "0" }],
+  ])(
+    "answers 401 to %s, asking for a fresh sign-in, and deletes nothing",
+    async (_name, token) => {
+      const before = await world();
+      const revoke = vi.spyOn(Auth.prototype, "revokeRefreshTokens");
+      const error = await call(ALICE, token).catch((e: unknown) => e);
+      expect(error).toMatchObject({
+        code: "unauthenticated",
+        message: "Sign in again to delete your account.",
+        httpErrorCode: { status: 401 },
+      });
+      expect(await world()).toEqual(before);
+      await expect(auth().getUser(ALICE)).resolves.toBeTruthy();
+      expect(revoke).not.toHaveBeenCalled();
+    },
+  );
+
+  // Not exactly 300: the function reads the clock a moment after the test does.
+  it("accepts a sign-in a little under five minutes ago", async () => {
+    await expect(
+      call(ALICE, { auth_time: nowSeconds() - 290 }),
+    ).resolves.toEqual({ ok: true });
   });
 
   it("refuses an unauthenticated call and changes nothing", async () => {

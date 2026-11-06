@@ -11,16 +11,6 @@ const baseConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "img.clerk.com",
-        port: "",
-      },
-      {
-        protocol: "https",
-        hostname: "images.clerk.dev",
-        port: "",
-      },
-      {
-        protocol: "https",
         hostname: "www.gravatar.com",
         port: "",
       },

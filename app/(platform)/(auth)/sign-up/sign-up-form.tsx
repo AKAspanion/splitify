@@ -32,15 +32,18 @@ export function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [pending, setPending] = useState<"email" | "google" | null>(null);
+  // Back from Google, the form starts loading. useSearchParams keeps this form out of the prerendered HTML (it renders
+  // in the browser only), so reading sessionStorage here can't differ from a server render.
+  const [pending, setPending] = useState<"email" | "google" | null>(() =>
+    googleRedirectPending() ? "google" : null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
-  // Back from Google: finish the sign-in (UpsertMe) before going on. Read on mount, since the page is prerendered.
+  // Back from Google: finish the sign-in (UpsertMe) before going on.
   useEffect(() => {
     if (!googleRedirectPending()) return;
     let active = true;
-    setPending("google");
     void finishGoogleReturn().then((result) => {
       if (!active) return;
       if (result.kind === "signed-in") router.replace(next);

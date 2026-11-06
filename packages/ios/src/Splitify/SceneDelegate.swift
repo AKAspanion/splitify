@@ -15,41 +15,45 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // See if our app is being launched via universal link.
         // If so, store that link so we can navigate to it once our webView is initialized.
+        // Only a link on the app's own site (isAppUrl) is kept; any other is ignored and the app opens at rootUrl.
         for userActivity in connectionOptions.userActivities {
-            if let universalLink = userActivity.webpageURL {
+            if let universalLink = userActivity.webpageURL, isAppUrl(universalLink) {
                 SceneDelegate.universalLinkToLaunch = universalLink;
                 break
             }
         }
 
         // See if we were launched via shortcut
-        if let shortcutUrl = connectionOptions.shortcutItem?.type {            
-            SceneDelegate.shortcutLinkToLaunch = URL.init(string: shortcutUrl)
+        if let shortcutType = connectionOptions.shortcutItem?.type,
+           let shortcutUrl = URL(string: shortcutType), isAppUrl(shortcutUrl) {
+            SceneDelegate.shortcutLinkToLaunch = shortcutUrl
         }
-        
+
         // See if we were launched via scheme URL
-        if let schemeUrl = connectionOptions.urlContexts.first?.url {
-            // Convert scheme://url to a https://url
-            var comps = URLComponents(url: schemeUrl, resolvingAgainstBaseURL: false)
-            comps?.scheme = "https"
-            
-            if let url = comps?.url {
-                SceneDelegate.universalLinkToLaunch = url;
-            }
+        if let schemeUrl = connectionOptions.urlContexts.first?.url,
+           let url = SceneDelegate.httpsUrl(fromScheme: schemeUrl), isAppUrl(url) {
+            SceneDelegate.universalLinkToLaunch = url;
         }
     }
-    
+
+    /// scheme://host/path as https://host/path.
+    static func httpsUrl(fromScheme schemeUrl: URL) -> URL? {
+        var comps = URLComponents(url: schemeUrl, resolvingAgainstBaseURL: false)
+        comps?.scheme = "https"
+        return comps?.url
+    }
+
+    /// Loads a link from outside the web view, as a request: the URL is never put into JavaScript. A link that isn't
+    /// on the app's own site is ignored.
+    func open(_ url: URL) {
+        guard isAppUrl(url) else { return }
+        Splitify.webView.load(URLRequest(url: url))
+    }
+
     // This function is called when our app is already running and the user clicks a custom scheme URL
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        if let scheme = URLContexts.first?.url {
-            // Convert scheme://url to a https://url and navigate to it
-            var comps = URLComponents(url: scheme, resolvingAgainstBaseURL: false)
-            comps?.scheme = "https"
-
-            if let url = comps?.url {
-                // Handle it inside our web view in a SPA-friendly way.
-                Splitify.webView.evaluateJavaScript("location.href = '\(url)'")
-            }
+        if let schemeUrl = URLContexts.first?.url, let url = SceneDelegate.httpsUrl(fromScheme: schemeUrl) {
+            open(url)
         }
     }
 
@@ -65,16 +69,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
 
-        // Handle it inside our web view in a SPA-friendly way.
-        Splitify.webView.evaluateJavaScript("location.href = '\(universalLink)'")
+        open(universalLink)
     }
 
     // This function is called if our app is already loaded and the user activates the app via shortcut
     func windowScene(_ windowScene: UIWindowScene,
                      performActionFor shortcutItem: UIApplicationShortcutItem,
                      completionHandler: @escaping (Bool) -> Void) {
-        if let shortcutUrl = URL.init(string: shortcutItem.type) {
-            Splitify.webView.evaluateJavaScript("location.href = '\(shortcutUrl)'");
+        if let shortcutUrl = URL(string: shortcutItem.type) {
+            open(shortcutUrl)
+            completionHandler(isAppUrl(shortcutUrl))
+        } else {
+            completionHandler(false)
         }
     }
 

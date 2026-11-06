@@ -22,10 +22,12 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
 
 ## Entry points
 
-- `app/layout.tsx`: the root layout. It loads Google AdSense (`app/adsense.tsx`), the theme provider and
-  `components/providers.tsx` (Firebase auth state, react-query, the confirm dialog, the progress bar).
+- `app/layout.tsx`: the root layout. It loads the theme provider and `components/providers.tsx` (Firebase auth state,
+  react-query, the confirm dialog, the progress bar). It no longer loads Google AdSense: the landing layout and the
+  privacy page do (`app/adsense.tsx`, [AdSense](../integrations/google-adsense.md)).
 - `app/launch.tsx`: runs on every page for a signed-in person (Firebase Auth); it registers the one service worker ([service worker](../operations/service-worker.md)) and the device for push
-  ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups`.
+  ([notifications](../features/notifications.md)) and sends the person from the landing page to `/groups/` by a full
+  page load (`window.location.replace`), not a client navigation.
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
 - `app/manifest.webmanifest`: the PWA manifest.
@@ -98,7 +100,6 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 - `/privacy`: `app/(platform)/privacy/page.tsx`
 - `/profile`: `app/(platform)/profile/page.tsx`
 - `/webauthn/register`: `app/(platform)/(app)/webauthn/register/page.tsx`
-- `/webauthn/test`: `app/(platform)/(app)/webauthn/test/page.tsx`
 
 <!-- GA-GENERATED:END -->
 
@@ -113,6 +114,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-06: the root layout loaded AdSense and the landing page reached the app by client navigation; now the landing layout and privacy page load it and public pages leave by full page loads, because of [the AdSense decision](../decisions/adsense-on-public-pages-only.md).
 - 2026-11-05: the build had no page for Firebase's email links; now it has `/auth/action/`, which the hosting build check requires, because reset and verify emails are finished in the app. See [sign in](../features/sign-in.md).
 - 2026-11-05: `next.config.mjs` always built the static export; now in `next dev` only it drops the export and rewrites `/api/reports/**` and `/api/webauthn/**` to the Functions emulator, because the dev server has no Hosting in front. See [run locally](../operations/run-locally.md).
 - 2026-11-05: had no offline support; now a saved cache, a service worker and queued writes, because spec 4 was built. See [offline](../features/offline.md).

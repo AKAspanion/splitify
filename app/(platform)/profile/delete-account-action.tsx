@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { OnlineOnly } from "@/components/offline/online-only";
 import { markSignOutIntended } from "@/lib/auth-redirect";
 import { toUserMessage } from "@/lib/data/errors";
+import { signOut } from "@/lib/firebase/auth";
 import { getFirebaseApp, getFirebaseAuth } from "@/lib/firebase/app";
 import { EMULATOR_HOST, EMULATOR_PORTS } from "@/lib/firebase/emulators";
 import { signOut as firebaseSignOut } from "firebase/auth";
@@ -17,6 +18,10 @@ import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  deleteAccountFailure,
+  SIGN_IN_AGAIN_PATH,
+} from "./delete-account-failure";
 
 const REGION = "asia-south1";
 
@@ -43,6 +48,19 @@ export default function DeleteAccountAction() {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
+  // The function wants a recent sign-in. Signed out first, so the sign-in screen shows its form rather than going
+  // straight on to `next`; it then brings the person back here to finish.
+  const signInAgain = async () => {
+    try {
+      await signOut({ toSignIn: true });
+    } catch (error) {
+      toast.error(toUserMessage(error));
+      setDeleting(false);
+      return;
+    }
+    router.replace(SIGN_IN_AGAIN_PATH);
+  };
+
   const handleDelete = async () => {
     const confirmed = await getConfirmation({
       title: "Delete your account?",
@@ -55,8 +73,10 @@ export default function DeleteAccountAction() {
     try {
       await deleteMyAccount();
     } catch (error) {
-      toast.error(toUserMessage(error));
-      setDeleting(false);
+      const failure = deleteAccountFailure(error);
+      toast.error(failure.message);
+      if (failure.signInAgain) await signInAgain();
+      else setDeleting(false);
       return;
     }
     // The Auth user is gone, so this browser's sign-in is too: leave home first, then clear it locally.

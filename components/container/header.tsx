@@ -1,6 +1,18 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ArrowLeftIcon } from "lucide-react";
+import { safeNextPath } from "@/lib/auth/next-path";
+
+/**
+ * A link's `back` query value when it is a same-site path, else `fallback`: an off-site, protocol-relative or
+ * `javascript:` URL is dropped. safeNextPath returns a path it accepts unchanged.
+ */
+export function backHref(
+  back: string | null | undefined,
+  fallback: string,
+): string {
+  return back && safeNextPath(back) === back ? back : fallback;
+}
 
 type HeaderProps = {
   backTo?: string;
@@ -14,7 +26,8 @@ export const Header = (props: HeaderProps) => {
     <div className="flex w-full gap-6 justify-between items-center">
       <div className="flex gap-4 items-center">
         {backTo ? (
-          <Link href={backTo}>
+          // Many pages pass a `back` query value through: anything but a same-site path goes to the groups.
+          <Link href={safeNextPath(backTo)}>
             <Button variant="ghost" size="icon">
               <ArrowLeftIcon />
             </Button>

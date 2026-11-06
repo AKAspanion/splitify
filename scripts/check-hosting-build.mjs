@@ -11,7 +11,8 @@ const { host: HOST, port: PORT } = JSON.parse(
 ).emulators.hosting;
 
 // Every scripts/hosting-pages/*.json is `{ pages: string[], requests: { path, expectText }[] }`: the files
-// `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file.
+// `out/` must hold and what the emulator must answer with 200 and that text. Each slice adds its own file. An optional
+// `absentPages: string[]` lists files `out/` must not hold, such as a page that was removed.
 const manifestDir = path.join(root, "scripts", "hosting-pages");
 const readManifests = () =>
   readdirSync(manifestDir)
@@ -25,6 +26,12 @@ const readManifests = () =>
         fail(
           `scripts/hosting-pages/${name} needs "pages" and "requests" lists`,
         );
+      }
+      if (
+        manifest.absentPages !== undefined &&
+        !Array.isArray(manifest.absentPages)
+      ) {
+        fail(`scripts/hosting-pages/${name}: "absentPages" must be a list`);
       }
       return { name, ...manifest };
     });
@@ -148,10 +155,14 @@ if (process.argv[2] === "--served") {
 }
 
 // Phase 1: what out/ holds.
-for (const { name, pages } of readManifests()) {
+for (const { name, pages, absentPages = [] } of readManifests()) {
   for (const file of pages) {
     if (!existsSync(path.join(root, "out", file)))
       fail(`${name}: out/${file} is missing`);
+  }
+  for (const file of absentPages) {
+    if (existsSync(path.join(root, "out", file)))
+      fail(`${name}: out/${file} should not be built`);
   }
 }
 // Phase 2: serve out/ with the Hosting emulator and check it from inside.

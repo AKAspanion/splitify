@@ -1,7 +1,7 @@
 {
-  "pages": ["webauthn/register/index.html", "webauthn/test/index.html"],
+  "pages": ["webauthn/register/index.html"],
+  "absentPages": ["webauthn/test/index.html"],
   "requests": [
-    { "path": "/webauthn/register/", "expectText": "Biometric Authentication" },
-    { "path": "/webauthn/test/", "expectText": "Biometric test" }
+    { "path": "/webauthn/register/", "expectText": "Biometric Authentication" }
   ]
 }

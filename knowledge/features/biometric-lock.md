@@ -29,10 +29,12 @@ verified: human:ankitp@geekyants.com
 - The lock runs in the browser and hides the screen; it does not stop requests. The data and functions still trust the
   Firebase ID token alone ([auth](../security/auth.md)); the `webauthn` function only holds the person's devices in
   `AuthnDevice.devices`.
-- `app/(platform)/(app)/webauthn/test/page.tsx` is a test page left in the app ([debt](../risks/debt.md)).
+- The hard-coded test page that once shipped under `webauthn/test/` is gone, and the hosting check asserts it stays
+  absent ([run locally](../operations/run-locally.md)).
 
 ## History
 
+- 2026-11-06: a test page for the lock shipped in the app; now it is deleted, and the lock's path-change effect no longer sets state synchronously, because the repository-modernization run removed the page and fixed the React Compiler lint warning. See [finding](../findings/react-compiler-lint-warnings.md).
 - 2026-11-05: its calls went to route handlers behind Clerk; now they go to the `webauthn` Cloud Function through `callFunction`, because spec 2c removed the server. See [WebAuthn API](../api/webauthn.md).
 
 ## Sources
@@ -44,4 +46,3 @@ verified: human:ankitp@geekyants.com
 - `app/(platform)/(app)/webauthn/register/authn-devices.tsx`
 - `app/(platform)/(app)/webauthn/register/authn-actions.tsx`
 - `lib/functions/call.ts`
-- `app/(platform)/(app)/webauthn/test/page.tsx`

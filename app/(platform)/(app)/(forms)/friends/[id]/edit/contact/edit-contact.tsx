@@ -1,7 +1,7 @@
 "use client";
 
 import { AutoContainer } from "@/components/container/auto-container";
-import { Header } from "@/components/container/header";
+import { backHref, Header } from "@/components/container/header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoData } from "@/components/no-data";
@@ -15,11 +15,14 @@ import Form from "./form";
 const FriendsEditContact = () => {
   const { friendId } = useRouteIds();
   const searchParams = useSearchParams();
-  const backTo = searchParams.get("back");
 
   const { data: friend, isPending, error, refetch } = useFriend(friendId);
 
-  const to = backTo || `/friends/${friendId || ""}`;
+  // Where the back link and a save go: the link's `back` only when it is a same-site path.
+  const to = backHref(
+    searchParams.get("back"),
+    friendId ? `/friends/${friendId}/` : "/friends/",
+  );
   const header = <Header title="Update contact" backTo={to} />;
 
   // Only a contact (someone who hasn't signed up) can be edited: anyone else is shown as missing.

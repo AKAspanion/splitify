@@ -230,6 +230,18 @@ describe("CreateExpense", () => {
     expect((await counts()).expenses).toBe(1);
   });
 
+  it("refuses a category of 51 characters and accepts 50", async () => {
+    await expect(
+      createExpense(aliceExpense, expenseVars({ category: "c".repeat(51) })),
+    ).rejects.toThrow();
+    expect(await counts()).toEqual(NOTHING);
+    await createExpense(
+      aliceExpense,
+      expenseVars({ category: "c".repeat(50) }),
+    );
+    expect((await counts()).expenses).toBe(1);
+  });
+
   it("refuses 51 splits and accepts 50", async () => {
     const many = (n: number) =>
       Array.from({ length: n }, () => ({ userId: bob.uid, amount: 1 }));

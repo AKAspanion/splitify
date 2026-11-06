@@ -7,7 +7,6 @@ import Script from "next/script";
 import { Suspense } from "react";
 import { Launch } from "./launch";
 import { ThemeProvider } from "@/components/theme/provider";
-import Adsense from "./adsense";
 
 import "./globals.css";
 
@@ -32,7 +31,6 @@ export default function RootLayout({
       <head>
         {/* Sets the version the saved cache and the service worker share, before the app hydrates. */}
         <Script src="/sw-manifest.js" strategy="beforeInteractive" />
-        <Adsense pId={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID} />
       </head>
       <body className={inter.className}>
         <ThemeProvider

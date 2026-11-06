@@ -188,6 +188,48 @@ describe("reports", () => {
     expect(lines).toContain('"Taxi, airport",30,,EQUAL');
   });
 
+  it("writes a description a spreadsheet would run as a formula with a leading quote", async () => {
+    await seed(
+      `mutation { userSplit_deleteMany(all: true) userPayment_deleteMany(all: true) expense_deleteMany(all: true) }`,
+    );
+    const descriptions = [
+      '=HYPERLINK("http://x")',
+      "+1",
+      "-1",
+      "@SUM(A1)",
+      "\tTab",
+      "\rReturn",
+      "Dinner",
+    ];
+    for (const [i, description] of descriptions.entries()) {
+      await seed(
+        `mutation($g: UUID!, $e: UUID!, $desc: String!, $at: Timestamp!) {
+          expense_insert(data: { id: $e, groupId: $g, amount: 10, description: $desc, type: EQUAL, tag: EXPENSE, creatorId: "${alice.uid}", createdAt: $at })
+        }`,
+        {
+          g: G,
+          e: `66666666-6666-4666-8666-66666666666${i}`,
+          desc: description,
+          // Oldest first, so the report (newest first) lists them in reverse.
+          at: new Date(Date.UTC(2026, 0, 1, 0, i)).toISOString(),
+        },
+      );
+    }
+    const a = await call({ groupId: G, format: "csv" });
+    expect(a.status).toBe(200);
+    const body = a.sent as string;
+    for (const line of [
+      `"'=HYPERLINK(""http://x"")",10,,EQUAL`,
+      "'+1,10,,EQUAL",
+      "'-1,10,,EQUAL",
+      "'@SUM(A1),10,,EQUAL",
+      "'\tTab,10,,EQUAL",
+      `"'\rReturn",10,,EQUAL`,
+      "Dinner,10,,EQUAL",
+    ])
+      expect(body.split("\n")).toContain(line);
+  });
+
   it("gives a member a text file that starts with the group's title", async () => {
     const a = await call({ groupId: G, format: "text" });
     expect(a.status).toBe(200);
@@ -195,6 +237,22 @@ describe("reports", () => {
     const lines = (a.sent as string).split("\n");
     expect(lines[0]).toBe("Goa trip");
     expect(lines[1]).toBe("Description,Amount,Category,Type");
+  });
+
+  it("escapes the text file's cells as the CSV does, title included", async () => {
+    await seed(
+      `mutation($g: UUID!) {
+        group_update(key: { id: $g }, data: { title: "=cmd" })
+        expense_update(key: { id: "${E(1)}" }, data: { description: "=HYPERLINK(\\"http://x\\")", category: "@SUM(A1)" })
+      }`,
+      { g: G },
+    );
+    const a = await call({ groupId: G, format: "text" });
+    expect(a.status).toBe(200);
+    const lines = (a.sent as string).split("\n");
+    expect(lines[0]).toBe("'=cmd");
+    expect(lines).toContain(`"'=HYPERLINK(""http://x"")",90,'@SUM(A1),EQUAL`);
+    expect(lines).toContain('"Taxi, airport",30,,EQUAL');
   });
 
   it("keeps a hostile group title out of the file name header", async () => {

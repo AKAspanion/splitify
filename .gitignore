@@ -5,6 +5,9 @@
 
 # testing
 /coverage
+# Playwright's report and its traces and screenshots, written by `pnpm test:e2e`
+/playwright-report/
+/test-results/
 
 # next.js
 /.next
@@ -38,7 +41,6 @@ next-env.d.ts
 public/sw.js
 
 #db
-mysql-db
 # prisma client, written by prisma generate
 /generated/prisma
 

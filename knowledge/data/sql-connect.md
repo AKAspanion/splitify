@@ -60,7 +60,10 @@ In `dataconnect/dataconnect.yaml`, one folder each:
 - A nullable single read is `x(first: { where })`; there is no `*_count` root field, so counts are `_count` inside a
   list.
 - `ListMyGroups.search` is a case-insensitive regular expression capped at 100 characters: callers escape it.
-- `limit` on `ListGroupExpenses` and `ListMyActivity` is not capped.
+- Every list is bounded in its `@auth` expression, so no request can ask for unbounded work: `limit` is 0 to 100 on
+  `ListGroupExpenses` and `ListMyActivity` (with `offset` 0 or more), 0 to 200 on `ListMyGroups` and 0 to 500 on
+  `ListFriends`; a null limit is refused on the last two, and an omitted one means 200 and 500
+  ([roles](../security/roles.md)).
 
 ## A repeated id
 
@@ -72,7 +75,8 @@ it as success, because it means an earlier try arrived ([decision](../decisions/
 
 `lib/data/` is what screens call instead of the generated SDK directly: `client.ts` (`dc()` and `queryKeys`, an
 explicit list of the app's queries, kept in step with the `.gql` files by a test), `errors.ts` (`toUserMessage`, the
-people-facing text for a failure), `search.ts` (`escapeSearch`, for `ListMyGroups.search`'s regular expression) and
+people-facing text for a failure), `search.ts` (`escapeSearch`, for `ListMyGroups.search`'s regular expression: it escapes first and then cuts at 100
+characters, so the escaped text always fits the server's `size() <= 100` bound, and never cuts inside an escape) and
 `expense-writes.ts` (`createExpense` and `createSettlement`, typed wrappers over `mutationRef` that add `expenseId`
 to each payment and split row themselves).
 
@@ -90,6 +94,7 @@ The rules are tested on the Auth and SQL Connect emulators ([run locally](../ope
 
 ## History
 
+- 2026-11-06: `escapeSearch` cut the text before escaping, so a search full of special characters could pass the server's bound; now it escapes first and then cuts, because the final review found the server refused it. Lists are now bounded in each operation ([roles](../security/roles.md)).
 - 2026-11-05: `_Data` variables had no field allowlist; now each carries `@allow`, because the SQL Connect deploy refused `CreateExpense` without it.
 - 2026-11-05: did not record the repeated-id error; now it does, because the offline queue depends on its shape.
 - 2026-11-05: said the Prisma schema was what the running app still used; now this is the only schema, because spec 2c removed Prisma.

@@ -14,8 +14,6 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: "@types/node"
         update-types: [version-update:semver-major]
-      - dependency-name: prisma
-        update-types: [version-update:semver-major]
 
   - package-ecosystem: npm
     directory: /functions
@@ -31,6 +29,17 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: "@types/node"
         update-types: [version-update:semver-major]
+
+  # The Android app's Trusted Web Activity wrapper.
+  - package-ecosystem: gradle
+    directory: /packages/android/source
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      android-minor-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /

@@ -35,10 +35,16 @@ plus a random id made in the browser (`contactId`), as the connector requires.
 
 ## Rules
 
-- Search matches the email exactly (`SearchUserByEmail` in `dataconnect/app/people.gql`).
+- Search matches the email exactly (`SearchUserByEmail` in `dataconnect/app/people.gql`), and returns only someone the
+  caller can add: a signed-up user, or a contact the caller is already friends with. Another person's offline contact
+  isn't returned, and `AddFriend` refuses it too.
 - How a contact becomes a real user when they sign up is in [contact identity](../domain/contact-identity.md).
-- `UpdateContact` changes a name and email only on a contact (not signed up) that is the caller's friend, which closes
-  [missing authorization on writes](../findings/missing-authorization-on-writes.md).
+- `UpdateContact` works only on a contact (not signed up) that is the caller's friend, which closes
+  [missing authorization on writes](../findings/missing-authorization-on-writes.md). Any friend may change the name;
+  the email changes only when the caller is the contact's sole friend, and never to one another user has
+  ([decision](../decisions/contact-email-only-by-sole-friend.md)). The limits it leaves:
+  [a pre-fix contact with two friends](../findings/two-friend-contact-cannot-be-re-emailed.md) and
+  [a creator who deletes their account](../findings/second-friend-becomes-sole-friend-on-creator-deletion.md).
 
 ## Offline
 
@@ -46,6 +52,7 @@ Adding friends and contacts is online-only ([decision](../decisions/offline-firs
 
 ## History
 
+- 2026-11-06: any friend could change a contact's name and email, and search returned another person's offline contact; now the email changes only by the contact's sole friend and search hides it, because the final review found a takeover path through legacy second friends. See [the decision](../decisions/contact-email-only-by-sole-friend.md).
 - 2026-11-05: had nothing about offline; now adding is disabled offline, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: described the server actions' rules (a self-friend refusal, an `updateContact` that changed any user); now the SQL Connect operations' rules, because spec 2c removed the actions.
 - 2026-11-05: used server actions; now `lib/data/people.ts`, because spec 2b moved the screens onto SQL Connect.

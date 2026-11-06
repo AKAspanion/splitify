@@ -37,7 +37,9 @@ password reset. The screens are `app/(platform)/(auth)/sign-in`, `sign-up` and `
   `completeGoogleSignIn`, which reads the redirect result and runs `UpsertMe` before anything navigates. The form
   goes to `next` only after that; a failure shows its error in the form and never rejects past it.
 - A Google sign-in whose `UpsertMe` fails signs the person out of Firebase Auth, so nobody stays signed in without a
-  User row.
+  User row. If that sign-out fails too, `clearSavedSignIn` removes the saved auth records, and the form stays on
+  `/sign-in/` with the error instead of going on to `next` ([finding](../findings/google-sign-in-signout-failure-keeps-session.md)).
+  The forms read the redirect marker when they first render, so the Google button is already loading on return.
 - A page the browser restores from its back/forward cache after the person left for Google (they pressed Back)
   clears the marker and frees the buttons (`whenRestoredAfterGoogle`).
 - Without sessionStorage Firebase can't finish a redirect, so the person is told Google sign-in isn't available here
@@ -86,6 +88,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-06: a failed sign-out after a failed `UpsertMe` left the person signed in and sent on; now the saved sign-in is cleared and the form stays with its error, because of [the finding](../findings/google-sign-in-signout-failure-keeps-session.md).
 - 2026-11-05: a reset email's link opened Firebase's own `/__/auth/action` page and the screens had no privacy link; now the emails open the app's `/auth/action/` page, which resets the password and verifies the email, and the sign-in and sign-up screens link to the privacy page, because the developer wanted the reset flow finished in the app.
 - 2026-11-05: Google sign-in was a popup and a failed `UpsertMe` left the person signed in; now it is a redirect finished by the forms on load, `UpsertMe` runs before navigation, a failure signs the person out, and a bfcache restore frees the buttons, because popups fail in in-app browsers and on mobile Safari. The "Open edges" note about `UpsertMe` failing is gone.
 - 2026-11-05: Google sign-in failed on the hosted site with "Something went wrong" (no popup resolver, and the domain wasn't authorized); now Auth gets the resolver, the domain is authorized, and popup failures have their own messages.

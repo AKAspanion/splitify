@@ -6,6 +6,7 @@ describe("toUserMessage", () => {
     "Not found",
     "Only members of this group can be added to an expense",
     "That email is already in use",
+    "This contact is shared with someone else, so you can only change their name",
     "You can only add your friends to a group",
     "That request is too large.",
   ])("passes the check message %j through unchanged", (text) => {
@@ -14,6 +15,15 @@ describe("toUserMessage", () => {
     expect(
       toUserMessage({ code: "other", message: `mutation failed: ${text} (x)` }),
     ).toBe(text);
+  });
+
+  it("passes deleteMyAccount's fresh sign-in message through, as the Functions SDK raises it", () => {
+    expect(
+      toUserMessage({
+        code: "functions/unauthenticated",
+        message: "Sign in again to delete your account.",
+      }),
+    ).toBe("Sign in again to delete your account.");
   });
 
   it("answers an unauthenticated error with the sign-in line", () => {

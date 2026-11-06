@@ -51,13 +51,17 @@ verified: human:ankitp@geekyants.com
   (`lib/data/expenses.test.ts`, `functions/src/http/guard.test.ts`), run by `pnpm test`.
 - A service worker file can't be imported, so `lib/offline/sw-navigation.test.ts` runs `public/sw.js` in a Node `vm` context with fake globals; follow it for worker code ([service worker](../operations/service-worker.md)). Tests that touch IndexedDB use `fake-indexeddb` (`lib/firebase/auth.test.ts`).
 - SQL Connect rule tests sit beside their `.gql` file under `dataconnect/` and run on the emulators with `pnpm test:rules`, not in `pnpm test` ([run locally](../operations/run-locally.md)).
-- Changes are to be tested end to end through the main flows: [decision](../decisions/e2e-main-flows.md).
+- End-to-end tests are Playwright specs in `tests/e2e/*.spec.ts`, run by `pnpm test:e2e` against the emulators
+  (`playwright.config.ts`); Vitest excludes them. Changes are tested through the main flows:
+  [decision](../decisions/e2e-main-flows.md), [the runner](../decisions/e2e-playwright-main-flow.md).
 
 ## Lint and format
 
-- ESLint, configured in `./eslint.config.mjs` (Next's core-web-vitals rules, with two React Compiler rules set to
-  warn: [finding](../findings/react-compiler-lint-warnings.md)), run by `eslint .` (Next 16 removed `next lint`).
-- Prettier, configured in `./.prettierrc`, ignoring what `./.prettierignore` lists.
+- ESLint, configured in `./eslint.config.mjs` (Next's core-web-vitals rules at the preset's level; the React Compiler
+  rules were once set to warn, [finding](../findings/react-compiler-lint-warnings.md)), run by `eslint .` (Next 16
+  removed `next lint`).
+- Prettier, configured in `./.prettierrc`, ignoring what `./.prettierignore` lists: prose (`knowledge/`, `docs/`),
+  lockfiles, `pnpm-workspace.yaml` and generated files. The check is `pnpm prettier --check .`, and CI runs it.
 
 ## Git
 
@@ -71,10 +75,11 @@ verified: human:ankitp@geekyants.com
 - The package manager is pnpm (`packageManager` in `package.json`); `functions/` is its own pnpm package with its own lockfile.
 - Type-check, lint and format-check commands are in the policy: `checks.commands.typecheck`,
   `checks.commands.lint`, `checks.commands.format-check`. Tests run with `pnpm test`
-  (`checks.commands.test`); there is no e2e command yet (`checks.commands.e2e`).
+  (`checks.commands.test`) and end-to-end tests with `pnpm test:e2e` (`checks.commands.e2e`).
 
 ## History
 
+- 2026-11-06: ESLint had two React Compiler rules at warn, Prettier was not in CI and there was no e2e command; now the rules are at the preset's level, the format check runs in CI over everything but prose and generated files, and e2e is `pnpm test:e2e`, because the repository-modernization run fixed the warnings and added Playwright. See [the runner](../decisions/e2e-playwright-main-flow.md).
 - 2026-11-05: the package manager was yarn and the commands `yarn test` and `yarn test:rules`; now pnpm, because the repository moved to pnpm 11.
 - 2026-11-05: did not say how a service worker or IndexedDB is tested; now the `vm` harness and `fake-indexeddb`, because the offline feature added both.
 - 2026-11-05: described server actions (`createSafeAction`, `{ error, debugMessage }`), route handlers, `@/generated/prisma` types and `resolvePageProps`; now `lib/data/` hooks, Cloud Functions with the guard, `page.hosting.tsx` wrappers and `toUserMessage`, because spec 2c removed the server.
@@ -99,6 +104,7 @@ verified: human:ankitp@geekyants.com
 - `./eslint.config.mjs`
 - `./.prettierrc`
 - `./.prettierignore`
+- `playwright.config.ts`
 - `tsconfig.json`
 - `package.json`
 - `app/(platform)/profile/delete-account-action.tsx`
