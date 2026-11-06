@@ -1,5 +1,7 @@
 # Repo Modernization and Security Implementation Plan
 
+**Status:** complete, commits f2d5db0..1710d2c, 2026-11-06. Record: [2026-11-05-repo-modernization.record.md](2026-11-05-repo-modernization.record.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Plan, then build; tests with each task. Say 'test-first' or 'spec it first' to work that way.
@@ -79,26 +81,26 @@ None (`run.checkpoints: none`, unattended). Each security task's summary goes to
 - Given every workflow, then no job uses `pull_request_target`, every `uses:` is SHA-pinned, and each job's `permissions` is the least it needs.
 - Given the change, when `pnpm test` and `pnpm functions:build` run, then both pass.
 
-- [ ] **Step 1: Add pnpm `overrides`** for minimatch, uuid and glob, scoped to the vulnerable ranges, in `pnpm-workspace.yaml` and `functions/pnpm-workspace.yaml`. Drop `functions/`' minimatch pins where the range override covers them.
-- [ ] **Step 2: Edit `package.json`**: firebase-tools `15.35.0`, `@playwright/test` (latest), the `test:e2e` script, and `ngrok` reading `$NGROK_DOMAIN` through a guard
-- [ ] **Step 3: Reinstall both workspaces** (`pnpm install`, then `pnpm --dir functions install`), and run the audits and `why` checks
+- [x] **Step 1: Add pnpm `overrides`** for minimatch, uuid and glob, scoped to the vulnerable ranges, in `pnpm-workspace.yaml` and `functions/pnpm-workspace.yaml`. Drop `functions/`' minimatch pins where the range override covers them.
+- [x] **Step 2: Edit `package.json`**: firebase-tools `15.35.0`, `@playwright/test` (latest), the `test:e2e` script, and `ngrok` reading `$NGROK_DOMAIN` through a guard
+- [x] **Step 3: Reinstall both workspaces** (`pnpm install`, then `pnpm --dir functions install`), and run the audits and `why` checks
 
 Run: `pnpm audit && pnpm --dir functions audit`
 Expected: no vulnerabilities in either
 
-- [ ] **Step 4: Update `.prettierignore`**, delete `docker-compose.yml`, and run `pnpm prettier --write` on exactly the files `--check` lists
-- [ ] **Step 5: Edit the workflows and `dependabot.yml`**, create `secrets-scan.yml`, and update the README's CI section
-- [ ] **Step 6: Validate the workflows**
+- [x] **Step 4: Update `.prettierignore`**, delete `docker-compose.yml`, and run `pnpm prettier --write` on exactly the files `--check` lists
+- [x] **Step 5: Edit the workflows and `dependabot.yml`**, create `secrets-scan.yml`, and update the README's CI section
+- [x] **Step 6: Validate the workflows**
 
 Run: `pnpm dlx @action-validator/cli .github/workflows/ci.yml` (and for each workflow changed), or a YAML parse of each if that tool can't run
 Expected: no errors
 
-- [ ] **Step 7: Run the acceptance commands**
+- [x] **Step 7: Run the acceptance commands**
 
 Run: `pnpm prettier --check . && pnpm test && pnpm functions:build`
 Expected: PASS
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add package.json pnpm-lock.yaml pnpm-workspace.yaml functions/package.json functions/pnpm-lock.yaml functions/pnpm-workspace.yaml .prettierignore docker-compose.yml .github/workflows/ci.yml .github/workflows/deploy.yml .github/workflows/secrets-scan.yml .github/dependabot.yml README.md
@@ -141,19 +143,19 @@ git commit -m "Close the open Dependabot alerts, raise firebase-tools to 15.35.0
 - Given `scrollTo`, then `performance.now()` runs only inside the animation callback.
 - Given these four component files, when `pnpm eslint` runs on them with `react-hooks/set-state-in-effect` and `react-hooks/purity` at `error` (`--rule`), then neither rule reports.
 
-- [ ] **Step 1: Write the failing tests** for the drawer, global error and expense-form reset cases
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for the drawer, global error and expense-form reset cases
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run app/global-error.test.tsx "app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.test.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/form.test.tsx"`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Make the fixes**, delete the test page and `app/sw.ts`, and edit `next.config.mjs`
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Make the fixes**, delete the test page and `app/sw.ts`, and edit `next.config.mjs`
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run app/global-error.test.tsx "app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.test.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/form.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/payment-drawer.test.tsx" app/global-error.tsx app/global-error.test.tsx "app/(platform)/(app)/webauthn/test/page.hosting.tsx" "app/(platform)/(app)/webauthn/test/page.tsx" "app/(platform)/(app)/webauthn/test/authn.tsx" "app/(platform)/(app)/webauthn/test/authn.css" app/sw.ts next.config.mjs "app/(platform)/(app)/(forms)/expense/add/(form)/form.tsx" "app/(platform)/(app)/(forms)/expense/add/(form)/form.test.tsx" "app/(platform)/profile/notification-action.tsx" components/biometric/biometric.tsx components/scroll-to.tsx
@@ -208,20 +210,20 @@ git commit -m "Fix the nested button in the payment drawer, hide error details o
 - Given a signed-in page such as `/groups/`, then no `adsbygoogle.js` script is in the page. Given `/` and `/privacy/` with a publisher id set, then it is.
 - Given the iOS sources, then no `evaluateJavaScript` call interpolates a URL; host checks compare `url.host` exactly (or as a `.splitify.spanion.in` suffix); `NSAllowsArbitraryLoads` is absent or false; and `WKAppBoundDomains` lists `splitify.spanion.in` and `accounts.google.com`. These are checked by reading the code: there is no iOS test target.
 
-- [ ] **Step 1: Write the failing tests** for the sign-in, CSP and HSTS, and header `back` cases
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing tests** for the sign-in, CSP and HSTS, and header `back` cases
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run lib/firebase/auth.test.ts lib/security/csp.test.ts components/container/header.test.tsx`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Implement the web fixes**: sign-in, the forms, ESLint, both Firebase configs, `back`, AdSense
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Implement the web fixes**: sign-in, the forms, ESLint, both Firebase configs, `back`, AdSense
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run lib/firebase/auth.test.ts lib/security/csp.test.ts components/container/header.test.tsx`
 Expected: PASS
 
-- [ ] **Step 5: Make the iOS fixes**, and check each Acceptance line against the Swift and plist
-- [ ] **Step 6: Commit**
+- [x] **Step 5: Make the iOS fixes**, and check each Acceptance line against the Swift and plist
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/firebase/auth.ts lib/firebase/auth.test.ts "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx" eslint.config.mjs firebase.emulators.json firebase.json lib/security/csp.test.ts "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/edit-contact.tsx" "app/(platform)/(app)/(forms)/friends/[id]/edit/contact/form.tsx" "app/(platform)/(app)/(forms)/friends/add/page.tsx" "app/(platform)/(app)/(forms)/friends/add/search.tsx" components/container/header.tsx components/container/header.test.tsx app/layout.tsx app/adsense.tsx packages/ios/src/Splitify/SceneDelegate.swift packages/ios/src/Splitify/WebView.swift packages/ios/src/Splitify/Info.plist
@@ -274,19 +276,19 @@ git commit -m "Clear the Auth session when a failed Google sign-in can't sign ou
 - Given `deleteMyAccount` with an ID token whose `auth_time` is older than `300` seconds, then it answers `401 { message: "Sign in again to delete your account." }` and deletes nothing. Given a fresh token, then it deletes as before and calls `revokeRefreshTokens(uid)`.
 - Given `functions/src/index.ts`, then the global options set `maxInstances` to `10`, and the kill switch keeps its own `1` (its test still passes).
 
-- [ ] **Step 1: Write the failing rule tests** in the four `*.test.ts` beside the `.gql` files, and the function tests for CSV and account deletion
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 1: Write the failing rule tests** in the four `*.test.ts` beside the `.gql` files, and the function tests for CSV and account deletion
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm test:rules` and `pnpm vitest run functions/src/reports/reports.test.ts functions/src/account/delete-my-account.test.ts`
 Expected: FAIL on the assertions
 
-- [ ] **Step 3: Tighten the operations**, run `pnpm dataconnect:generate`, and change the two functions and the global options
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 3: Tighten the operations**, run `pnpm dataconnect:generate`, and change the two functions and the global options
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm test:rules` and `pnpm vitest run functions/src/reports/reports.test.ts functions/src/account/delete-my-account.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add dataconnect/app/people.gql dataconnect/app/people.test.ts dataconnect/app/expenses.gql dataconnect/app/expenses.test.ts dataconnect/app/groups.gql dataconnect/app/groups.test.ts dataconnect/app/activity.gql dataconnect/app/activity.test.ts functions/src/reports/csv.ts functions/src/reports/reports.test.ts functions/src/account/delete-my-account.ts functions/src/account/delete-my-account.test.ts functions/src/index.ts
@@ -322,19 +324,19 @@ git commit -m "Stop group-mates taking over someone else's contact, bound query 
 - Given `pnpm test`, then Vitest doesn't pick up `tests/e2e/`.
 - Given `fixtures.ts`, then it refuses to run unless the Auth emulator host is set, so it can never create a user on a real project.
 
-- [ ] **Step 1: Write the spec and fixtures**
-- [ ] **Step 2: Run it to verify it fails** on a locator or an assertion, not on a missing module
+- [x] **Step 1: Write the spec and fixtures**
+- [x] **Step 2: Run it to verify it fails** on a locator or an assertion, not on a missing module
 
 Run: `pnpm test:e2e`
 Expected: FAIL
 
-- [ ] **Step 3: Write `playwright.config.ts`**, the `.gitignore` and Vitest exclusions, and set `checks.commands.e2e`
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 3: Write `playwright.config.ts`**, the `.gitignore` and Vitest exclusions, and set `checks.commands.e2e`
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `pnpm test:e2e`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add playwright.config.ts tests/e2e/main-flow.spec.ts tests/e2e/fixtures.ts .gitignore vitest.config.mts .ga/config.json
