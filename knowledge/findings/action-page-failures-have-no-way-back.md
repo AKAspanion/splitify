@@ -1,33 +1,36 @@
 ---
 type: Finding
-title: The action page offers only "Try again" for errors a retry can't fix
-description: On /auth/action/, a failure such as a turned-off account lands in a state whose only action is Try again, with no link back to sign in.
+title: "Fixed: the action page offered only Try again for errors a retry can't fix"
+description: On /auth/action/, a failure such as a turned-off account landed in a state whose only action was Try again; the failed and saved states now also offer Go home.
 generated:
   by: agent:after-finish
   at: 2026-11-05T19:30:00Z
 ---
 
-# The action page offers only "Try again" for errors a retry can't fix
+# Fixed: the action page offered only Try again for errors a retry can't fix
 
 ## Finding
 
-On `/auth/action/`, `auth/user-disabled` (worded "This account is turned off.") and any unmapped code land in the
-`failed` state of the reset form and of the verify result. That state's only action is "Try again", so for an error a
-retry can't fix the person has no way back to sign in.
+On `/auth/action/`, `auth/user-disabled` (worded "This account is turned off.") and any unmapped code landed in the
+`failed` state of the reset form and of the verify result. That state's only action was "Try again", so for an error a
+retry can't fix the person had no way back.
 
 ## Evidence
 
 - `.ga/runs/2026-11-05-password-reset-flow/reviews/final-reviewer.md`, Minor 8: "`auth/user-disabled` ... and any
   unmapped code land in `failed`, whose only action is 'Try again'. For a turned-off account that is a dead end with no
-  way back (no 'Back to sign in')." Suggested a "Back to sign in" link, or "Try again" only for
-  `auth/network-request-failed` and `auth/too-many-requests`.
-- `app/(platform)/(auth)/auth/action/reset-password-form.tsx:204` and `verify-email-result.tsx:153` render the
-  "Try again" button. Still true at d7ad71f.
+  way back (no 'Back to sign in')."
 - Ledger: "Final review: minor (deferred): Try again is the only action for errors a retry can't fix".
 
 ## Status
 
-Open.
+Fixed. The reset form's failed and saved states and the verify result's failed state each render a "Go home" link to
+`/` beside their other action (`GoHomeLink` in `reset-password-form.tsx`), and `/` redirects by sign-in state
+([sign in](../features/sign-in.md)).
+
+## History
+
+- 2026-11-06: was open; now fixed, because the auth-screens-and-bug-fixes plan added Go home to those states.
 
 ## Sources
 

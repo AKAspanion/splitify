@@ -14,15 +14,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 _Generated from `knowledge/`. Do not edit by hand._
 
-_121 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
+_129 concepts, so sections other than project/ and apps/ show counts. Follow `knowledge/index.md` into them._
 
 - [api/](knowledge/api/) — 5 concepts
 - [data/](knowledge/data/) — 4 concepts
-- [decisions/](knowledge/decisions/) — 31 concepts
+- [decisions/](knowledge/decisions/) — 34 concepts
 - [design-system/](knowledge/design-system/) — 2 concepts
 - [domain/](knowledge/domain/) — 4 concepts
 - [features/](knowledge/features/) — 13 concepts
-- [findings/](knowledge/findings/) — 33 concepts
+- [findings/](knowledge/findings/) — 38 concepts
 - [integrations/](knowledge/integrations/) — 5 concepts
 - [operations/](knowledge/operations/) — 6 concepts
 - [questions/](knowledge/questions/) — 7 concepts
@@ -34,7 +34,7 @@ _121 concepts, so sections other than project/ and apps/ show counts. Follow `kn
 - [Android app](knowledge/apps/android.md) _(Application)_ — A Trusted Web Activity, in.spanion.splitify.twa, that opens the deployed web app at /groups.
 - [Cloud Functions](knowledge/apps/functions.md) _(Application)_ — The Firebase Cloud Functions in functions/: the reports and webauthn HTTP functions, deleteMyAccount, the contact merge, the push senders and the budget kill switch.
 - [iOS app](knowledge/apps/ios.md) _(Application)_ — A Swift WebView wrapper that opens the deployed web app, with Firebase push messaging.
-- [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the landing page, the signed-in app and the sign-in screens.
+- [Splitify web app](knowledge/apps/splitify.md) _(Application)_ — The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the signed-in app, the sign-in screens and the privacy and delete-account pages; / redirects by sign-in state.
 
 ### project
 

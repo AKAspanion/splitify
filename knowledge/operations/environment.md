@@ -17,7 +17,10 @@ or secret on the functions, never a file in the repository. The groups:
 
 - **Firebase (browser):** `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`,
   `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`, read by `lib/firebase/app.ts`
-  (the auth domain is `splitify.spanion.in` in production, so Google's redirect runs on the site's own host;
+  (the auth domain is `splitify.spanion.in` in production, so Google's redirect runs on the site's own host; the
+  GitHub repository Variable of the same name overrides the code's default and **must equal the site's host**: set to
+  `splitify-416321.firebaseapp.com` it put the handler on another origin and browsers that partition third-party
+  storage lost the redirect result, so Google sign-in failed ([deploy setup](deploy-setup.md));
   `.env.sample` still holds the old value until the developer changes it, since agents may not edit `.env` files);
   `NEXT_PUBLIC_FIREBASE_VAPID_KEY`, the public Web Push key `lib/push/register.ts` reads (missing from `.env.sample`
   until the developer adds it); and `NEXT_PUBLIC_USE_FIREBASE_EMULATORS`, which points the browser at `127.0.0.1` on the Auth, SQL
@@ -38,6 +41,7 @@ those services and lib/logger.ts are removed ([Clerk](../integrations/clerk.md),
 
 ## History
 
+- 2026-11-06: the auth domain Variable had no stated rule; now it must equal `splitify.spanion.in`, because a repository Variable set to the firebaseapp.com domain overrode the code and broke Google sign-in in production. See [deploy setup](deploy-setup.md).
 - 2026-11-06: `NEXT_PUBLIC_GOOGLE_ADSENSE_ID` was read in `app/layout.tsx`; now in `app/adsense.tsx`, because the layout no longer passes it. See [AdSense](../integrations/google-adsense.md).
 - 2026-11-05: `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` carried no stated value; now it is `splitify.spanion.in` in production, because Google sign-in became a redirect on the site's own host. See [sign-in](../features/sign-in.md).
 - 2026-11-05: `NEXT_PUBLIC_USE_FIREBASE_EMULATORS` was set by hand in `.env`; now `pnpm dev` sets it with demo Firebase keys and the ports come from `firebase.json`, because local development moved onto the emulators.

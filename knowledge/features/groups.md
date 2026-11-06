@@ -15,7 +15,7 @@ verified: human:ankitp@geekyants.com
 A group is where shared expenses live. A person creates one with a title, a type (`GROUP_TYPES` in
 `constants/ui.ts`: trip, home, couple, project, event, other), a description and a placeholder image, and becomes its
 first member. The group screen has three tabs, Expenses, Balances and Totals (`app/(platform)/(app)/(screens)/groups/[id]/expenses-tabs.tsx`),
-plus its activity, its members and settings.
+plus its activity, its members and settings. The groups list (`/groups`) shows the [verify-email banner](../decisions/verify-banner-placement.md) above it while the email is unverified, dismissable for 7 days.
 
 ## Screens and routes
 
@@ -52,6 +52,7 @@ Creating, deleting and changing a group are online-only: `OnlineOnly` disables t
 
 ## History
 
+- 2026-11-06: the groups list had no banner; now it mounts the dismissable verify-email banner, because the banner moved out of the signed-in shell. See [the decision](../decisions/verify-banner-placement.md).
 - 2026-11-05: had nothing about offline; now group changes are online-only and screens read the saved cache, because the offline feature was built. See [offline](offline.md).
 - 2026-11-05: Download report was hidden, any signed-in user could change any group and pushes came from the push API; now the report is back, only members can change a group and triggers push, because spec 2c removed the server.
 - 2026-11-05: read through the API and server actions; now through `lib/data/groups.ts`, with Download report hidden, because spec 2b moved the screens onto SQL Connect.
