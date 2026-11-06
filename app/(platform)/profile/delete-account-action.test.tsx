@@ -74,10 +74,7 @@ function elements(node: unknown): ReactElement<AnyProps>[] {
   if (Array.isArray(node)) return node.flatMap(elements);
   if (!isValidElement<AnyProps>(node)) return [];
   const { children } = node.props;
-  return [
-    node,
-    ...(typeof children === "function" ? [] : elements(children)),
-  ];
+  return [node, ...(typeof children === "function" ? [] : elements(children))];
 }
 
 function render() {
@@ -87,9 +84,7 @@ function render() {
 }
 
 const confirm = () =>
-  render()
-    .find((el) => el.type === DeleteAccountDialog)!
-    .props.onConfirm!();
+  render().find((el) => el.type === DeleteAccountDialog)!.props.onConfirm!();
 
 // The Delete account button, as an online person sees it.
 const deleteButton = () => {

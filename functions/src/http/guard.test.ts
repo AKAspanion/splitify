@@ -8,6 +8,8 @@ import {
   initializeAuth,
 } from "firebase/auth";
 import {
+  AppErrorCode,
+  FirebaseAppError,
   getApps as getAdminApps,
   initializeApp as initializeAdminApp,
 } from "firebase-admin/app";
@@ -26,7 +28,7 @@ import {
   type TestUser,
 } from "../../../dataconnect/test-utils/emulator";
 import { AUTH_HOST } from "../../../dataconnect/test-utils/emulator-ports";
-import { guard, MAX_BODY_BYTES } from "./guard";
+import { guard, MAX_BODY_BYTES, REFUSED_SIGN_IN_CODES } from "./guard";
 
 vi.mock("firebase-functions/logger", () => ({
   error: vi.fn(),
@@ -222,17 +224,125 @@ describe("guard", () => {
   });
 });
 
+/** Makes the admin SDK's check throw `error`, whatever token it is given. */
+const verifyThrows = (error: unknown) =>
+  vi.spyOn(BaseAuth.prototype, "verifyIdToken").mockImplementation(async () => {
+    throw error;
+  });
+
+const authError = (code: string) =>
+  new FirebaseAuthError({ code, message: `secret detail ${token}` });
+
+describe("guard when the sign-in check itself fails", () => {
+  const TRY_AGAIN = { message: "Something went wrong. Try again." };
+
+  it("lists the admin SDK's refusal codes as one constant", () => {
+    expect([...REFUSED_SIGN_IN_CODES].sort()).toEqual(
+      [
+        "auth/argument-error",
+        "auth/id-token-expired",
+        "auth/id-token-revoked",
+        "auth/invalid-id-token",
+        "auth/user-disabled",
+        "auth/user-not-found",
+      ].sort(),
+    );
+  });
+
+  it.each([
+    AuthErrorCode.INVALID_ARGUMENT,
+    AuthErrorCode.ID_TOKEN_EXPIRED,
+    AuthErrorCode.ID_TOKEN_REVOKED,
+    AuthErrorCode.INVALID_ID_TOKEN,
+    AuthErrorCode.USER_NOT_FOUND,
+    AuthErrorCode.USER_DISABLED,
+  ])(
+    "answers 401 for auth/%s, logging the refusal with its code",
+    async (code) => {
+      verifyThrows(authError(code));
+      vi.mocked(logger.warn).mockClear();
+      vi.mocked(logger.error).mockClear();
+      const { result, answer, reads } = await run(
+        { ...bearer(), ...json },
+        '{"a":1}',
+      );
+      expect(result).toBeNull();
+      expect(answer).toEqual({ status: 401, body: SIGN_IN });
+      expect(reads.count).toBe(0);
+      expect(logger.warn).toHaveBeenCalledWith("guard: sign-in refused", {
+        cause: "FirebaseAuthError",
+        code: `auth/${code}`,
+      });
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(JSON.stringify(vi.mocked(logger.warn).mock.calls)).not.toContain(
+        token,
+      );
+    },
+  );
+
+  it.each([
+    [
+      "auth/internal-error",
+      () => authError(AuthErrorCode.INTERNAL_ERROR),
+      "FirebaseAuthError",
+      "auth/internal-error",
+    ],
+    [
+      "auth/quota-exceeded",
+      () => authError(AuthErrorCode.QUOTA_EXCEEDED),
+      "FirebaseAuthError",
+      "auth/quota-exceeded",
+    ],
+    [
+      "a FirebaseAppError from a network timeout",
+      () =>
+        new FirebaseAppError(
+          { code: AppErrorCode.NETWORK_TIMEOUT, message: "timed out" },
+          `fetching keys for ${token}`,
+        ),
+      "FirebaseAppError",
+      "app/network-timeout",
+    ],
+    ["an unknown error", () => new Error(`boom ${token}`), "Error", undefined],
+  ])(
+    "answers 500 for %s, logging the failure, before reading the body",
+    async (_name, makeError, cause, code) => {
+      verifyThrows(makeError());
+      vi.mocked(logger.warn).mockClear();
+      vi.mocked(logger.error).mockClear();
+      const { result, answer, reads } = await run(
+        { ...bearer(), ...json },
+        '{"a":1}',
+      );
+      expect(result).toBeNull();
+      expect(answer).toEqual({ status: 500, body: TRY_AGAIN });
+      expect(reads.count).toBe(0);
+      expect(logger.error).toHaveBeenCalledWith("guard: sign-in check failed", {
+        cause,
+        code,
+      });
+      expect(logger.warn).not.toHaveBeenCalled();
+      // The class and the code, and nothing else: no message or token.
+      expect(JSON.stringify(vi.mocked(logger.error).mock.calls)).not.toContain(
+        token,
+      );
+    },
+  );
+});
+
 describe("guard and revoked sign-ins", () => {
   const expectRefusedAndLogged = (
     outcome: Awaited<ReturnType<typeof run>>,
     leaked: string,
+    code: string,
   ) => {
     expect(outcome.result).toBeNull();
     expect(outcome.answer).toEqual({ status: 401, body: SIGN_IN });
     expect(outcome.reads.count).toBe(0);
-    // The cause's class, and nothing else: no code, message or token.
+    // The cause's class and its code, and nothing else: no message or token.
     expect(logger.warn).toHaveBeenCalledWith("guard: sign-in refused", {
       cause: "FirebaseAuthError",
+      code,
     });
     expect(JSON.stringify(vi.mocked(logger.warn).mock.calls)).not.toContain(
       leaked,
@@ -268,10 +378,13 @@ describe("guard and revoked sign-ins", () => {
       );
       vi.mocked(logger.warn).mockClear();
       const outcome = await run({ ...bearer(), ...json }, '{"a":1}');
-      expectRefusedAndLogged(outcome, token);
+      expectRefusedAndLogged(outcome, token, `auth/${code}`);
     },
   );
 
+  // These three run against the Auth emulator, and the admin SDK always checks revocation there
+  // (`checkRevoked || isEmulator` in BaseAuth.verifyIdToken): they would pass without the fix. What guards the fix is
+  // the stubbed cases above and the `checkRevoked` argument asserted in the first test of this block.
   it("answers 401 for a token issued before the user's refresh tokens were revoked", async () => {
     const user = await freshUser();
     // Revocation counts in whole seconds after the token's auth_time, so let one pass.
@@ -279,7 +392,7 @@ describe("guard and revoked sign-ins", () => {
     await adminAuth().revokeRefreshTokens(user.uid);
     vi.mocked(logger.warn).mockClear();
     const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
-    expectRefusedAndLogged(outcome, user.token);
+    expectRefusedAndLogged(outcome, user.token, "auth/id-token-revoked");
   });
 
   it("answers 401 for a token whose user was deleted", async () => {
@@ -287,7 +400,7 @@ describe("guard and revoked sign-ins", () => {
     await adminAuth().deleteUser(user.uid);
     vi.mocked(logger.warn).mockClear();
     const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
-    expectRefusedAndLogged(outcome, user.token);
+    expectRefusedAndLogged(outcome, user.token, "auth/user-not-found");
   });
 
   it("answers 401 for a token whose user was disabled", async () => {
@@ -295,6 +408,6 @@ describe("guard and revoked sign-ins", () => {
     await adminAuth().updateUser(user.uid, { disabled: true });
     vi.mocked(logger.warn).mockClear();
     const outcome = await run({ ...bearer(user.token), ...json }, '{"a":1}');
-    expectRefusedAndLogged(outcome, user.token);
+    expectRefusedAndLogged(outcome, user.token, "auth/user-disabled");
   });
 });
