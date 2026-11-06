@@ -21,6 +21,11 @@ const REQUEST_TIMEOUT_MS = 10_000;
 const POLL_TIMEOUT_MS = 2_000;
 const POLL_INTERVAL_MS = 1_000;
 
+// The SQL Connect service on the demo project: `serviceId` and `location` in dataconnect/dataconnect.yaml, and the
+// project `pnpm dev` runs the emulators as (scripts/dev.mjs).
+const DATA_CONNECT_GRAPHQL_PATH =
+  "/v1/projects/demo-splitify/locations/asia-south1/services/splitify:executeGraphql";
+
 // The Auth emulator takes any API key; this is the one the app is built with on the demo project (scripts/dev-env.mjs).
 const API_KEY = "demo-key";
 
@@ -74,15 +79,26 @@ export async function waitForEmulators(
   fetchImpl: typeof fetch = fetch,
 ): Promise<void> {
   const deadline = Date.now() + EMULATOR_WAIT_MS;
-  // The Auth emulator answers 200 at its root once it is ready; any answer from SQL Connect means it is listening.
-  const checks: [string, (response: Response) => boolean][] = [
-    [`http://${hosts.auth}/`, (response) => response.ok],
-    [`http://${hosts.dataConnect}/`, () => true],
+  // The Auth emulator answers 200 at its root once it is ready. SQL Connect's port answers as soon as its Postgres is
+  // up, but its GraphQL endpoint answers 404 "no schema found for service" until the schema has loaded, so wait for a
+  // 200 from the service itself.
+  const checks: [string, RequestInit, (response: Response) => boolean][] = [
+    [`http://${hosts.auth}/`, {}, (response) => response.ok],
+    [
+      `http://${hosts.dataConnect}${DATA_CONNECT_GRAPHQL_PATH}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ query: "query { __typename }" }),
+      },
+      (response) => response.ok,
+    ],
   ];
-  for (const [url, ready] of checks) {
+  for (const [url, init, ready] of checks) {
     for (;;) {
       try {
         const response = await fetchImpl(url, {
+          ...init,
           signal: AbortSignal.timeout(POLL_TIMEOUT_MS),
         });
         await response.body?.cancel();

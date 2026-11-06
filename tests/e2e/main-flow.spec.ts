@@ -1,7 +1,13 @@
 // The main flow (knowledge/decisions/e2e-playwright-main-flow.md): sign in, create a group, add an expense split
 // equally with a contact, and see the balance. Runs with `pnpm test:e2e` on the emulators.
 import { randomUUID } from "node:crypto";
-import { createTestUser, emulatorHosts, expect, test } from "./fixtures";
+import {
+  createTestUser,
+  emulatorHosts,
+  expect,
+  test,
+  waitForEmulators,
+} from "./fixtures";
 
 // A group's page: /groups/<uuid>/, the uuid with or without its dashes.
 const GROUP_URL = /\/groups\/([0-9a-f]{32}|[0-9a-f-]{36})\/?$/i;
@@ -160,6 +166,34 @@ test.describe("the test user fixture", () => {
         DATA_CONNECT_EMULATOR_HOST: "firebasedataconnect.googleapis.com:443",
       }),
     ).toThrow(/DATA_CONNECT_EMULATOR_HOST/);
+  });
+
+  test("waits until SQL Connect has loaded the splitify schema, not just until its port answers", async () => {
+    // The emulator answers its port as soon as Postgres is up, and its GraphQL endpoint 404s "no schema found for
+    // service" until the schema has loaded; the first CI run started the tests in that window.
+    const graphql: string[] = [];
+    let schemaLoaded = false;
+    const fetchStub: typeof fetch = async (input, init) => {
+      const url = String(input);
+      if (url.includes(":executeGraphql")) {
+        graphql.push(`${init?.method ?? "GET"} ${url}`);
+        if (graphql.length >= 3) schemaLoaded = true;
+        return new Response(null, { status: schemaLoaded ? 200 : 404 });
+      }
+      // The Auth emulator, and SQL Connect's bare port, answer at once.
+      return new Response(null, { status: 200 });
+    };
+
+    await waitForEmulators(
+      { auth: "127.0.0.1:2142", dataConnect: "127.0.0.1:2143" },
+      fetchStub,
+    );
+
+    expect(schemaLoaded).toBe(true);
+    expect(graphql).toHaveLength(3);
+    expect(graphql[0]).toBe(
+      "POST http://127.0.0.1:2143/v1/projects/demo-splitify/locations/asia-south1/services/splitify:executeGraphql",
+    );
   });
 
   test("keeps a local Auth emulator host as given", () => {
