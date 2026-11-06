@@ -1,6 +1,5 @@
 "use client";
 
-import useConfirm from "@/components/confirm/useConfirm";
 import { Button } from "@/components/ui/button";
 import { OnlineOnly } from "@/components/offline/online-only";
 import { markSignOutIntended } from "@/lib/auth-redirect";
@@ -18,6 +17,7 @@ import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DeleteAccountDialog } from "./delete-account-dialog";
 import {
   deleteAccountFailure,
   SIGN_IN_AGAIN_PATH,
@@ -44,9 +44,9 @@ function deleteMyAccount() {
 }
 
 export default function DeleteAccountAction() {
-  const { getConfirmation } = useConfirm();
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   // The function wants a recent sign-in. Signed out first, so the sign-in screen shows its form rather than going
   // straight on to `next`; it then brings the person back here to finish.
@@ -62,13 +62,7 @@ export default function DeleteAccountAction() {
   };
 
   const handleDelete = async () => {
-    const confirmed = await getConfirmation({
-      title: "Delete your account?",
-      subtitle:
-        "Your shared expenses stay, shown as Deleted user. This can't be undone.",
-    });
-    if (!confirmed) return;
-
+    setConfirming(false);
     setDeleting(true);
     try {
       await deleteMyAccount();
@@ -95,7 +89,7 @@ export default function DeleteAccountAction() {
         {(offline) => (
           <Button
             variant="destructive"
-            onClick={handleDelete}
+            onClick={() => setConfirming(true)}
             disabled={deleting || offline}
           >
             <Trash2Icon />
@@ -103,6 +97,11 @@ export default function DeleteAccountAction() {
           </Button>
         )}
       </OnlineOnly>
+      <DeleteAccountDialog
+        open={confirming}
+        onCancel={() => setConfirming(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
