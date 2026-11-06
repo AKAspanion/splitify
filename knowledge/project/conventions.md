@@ -48,7 +48,8 @@ verified: human:ankitp@geekyants.com
 ## Tests
 
 - Unit tests are Vitest (`vitest.config.mts`), in a `*.test.ts` file beside the file they cover
-  (`lib/data/expenses.test.ts`, `functions/src/http/guard.test.ts`), run by `pnpm test`.
+  (`lib/data/expenses.test.ts`), run by `pnpm test`. `functions/src/http/guard.test.ts` is one too, but it runs
+  under `pnpm test:rules` on the Auth emulator (`vitest.rules.config.mts`), not in `pnpm test`.
 - A service worker file can't be imported, so `lib/offline/sw-navigation.test.ts` runs `public/sw.js` in a Node `vm` context with fake globals; follow it for worker code ([service worker](../operations/service-worker.md)). Tests that touch IndexedDB use `fake-indexeddb` (`lib/firebase/auth.test.ts`).
 - SQL Connect rule tests sit beside their `.gql` file under `dataconnect/` and run on the emulators with `pnpm test:rules`, not in `pnpm test` ([run locally](../operations/run-locally.md)).
 - End-to-end tests are Playwright specs in `tests/e2e/*.spec.ts`, run by `pnpm test:e2e` against the emulators
@@ -79,6 +80,7 @@ verified: human:ankitp@geekyants.com
 
 ## History
 
+- 2026-11-06: said `functions/src/http/guard.test.ts` runs under `pnpm test`; now says it runs under `pnpm test:rules` on the emulators, because that is where `vitest.rules.config.mts` includes it.
 - 2026-11-06: ESLint had two React Compiler rules at warn, Prettier was not in CI and there was no e2e command; now the rules are at the preset's level, the format check runs in CI over everything but prose and generated files, and e2e is `pnpm test:e2e`, because the repository-modernization run fixed the warnings and added Playwright. See [the runner](../decisions/e2e-playwright-main-flow.md).
 - 2026-11-05: the package manager was yarn and the commands `yarn test` and `yarn test:rules`; now pnpm, because the repository moved to pnpm 11.
 - 2026-11-05: did not say how a service worker or IndexedDB is tested; now the `vm` harness and `fake-indexeddb`, because the offline feature added both.

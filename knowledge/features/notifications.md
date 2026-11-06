@@ -23,7 +23,10 @@ person can allow notifications in the browser. Who gets which push is in [Cloud 
   over in its `push-token` event; `unregisterThisDevice` removes this device's token. None of them ever rejects, and
   they log only the error's class, never a token.
 - The token is kept in `localStorage` under `splitify.pushToken` so sign-out knows which one to remove; sign-out
-  (`lib/firebase/auth.ts`) removes it before signing out, and goes on whatever happens.
+  (`lib/firebase/auth.ts`) removes it before signing out, and goes on whatever happens: the removal gets
+  `PUSH_REMOVAL_DEADLINE_MS = 5000`, after which it logs "token removal" with `TimeoutError`, the stored token is
+  dropped and sign-out continues. A removal that times out or fails leaves the `PushToken` row and the browser's FCM
+  subscription behind ([finding](../findings/push-token-removal-failure-leaves-signed-out-device-subscribed.md)).
 - `app/launch.tsx` starts the iOS listener for a signed-in person and re-registers the browser's token when permission is already granted, without ever raising the prompt; `app/(platform)/profile/notification-action.tsx`
   is the profile's control, which now only turns notifications on (its "Turn off" action went with OneSignal).
 - A token belongs to whoever is signed in on that device now: registering one another person holds moves it.
@@ -38,6 +41,7 @@ person can allow notifications in the browser. Who gets which push is in [Cloud 
 
 ## History
 
+- 2026-11-06: sign-out waited for the token removal with no deadline; now it waits at most 5 seconds, because a removal that never answered left Sign out loading. See [the fixed finding](../findings/sign-out-can-hang-on-push-token-removal.md).
 - 2026-11-05: the browser's push worker was `public/firebase-messaging-sw.js`; now `public/sw.js`, shared with the offline cache. See [service worker](../operations/service-worker.md).
 - 2026-11-05: was a OneSignal push, sent by server actions, with OneSignal service workers; now FCM, sent by Cloud Functions, with tokens registered per device, because of [the decision](../decisions/firebase-cloud-messaging.md).
 

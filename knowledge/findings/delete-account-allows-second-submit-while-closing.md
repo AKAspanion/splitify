@@ -1,21 +1,21 @@
 ---
 type: Finding
-title: Delete account has no guard against a second submit while the dialog closes
-description: handleDelete in the profile's delete-account action closes the dialog and sets deleting in the same step, so a second Enter or click during the dialog's exit animation can call deleteMyAccount twice.
+title: "Fixed: delete account had no guard against a second submit while the dialog closed"
+description: handleDelete in the profile's delete-account action closed the dialog and set deleting in the same step, so a second Enter or click during the dialog's exit animation could call deleteMyAccount twice; a ref now ignores it.
 generated:
   by: agent:knowledge-job
   at: 2026-11-06T18:00:00Z
 ---
 
-# Delete account has no guard against a second submit while the dialog closes
+# Fixed: delete account had no guard against a second submit while the dialog closed
 
 ## Finding
 
-`handleDelete` (`app/(platform)/profile/delete-account-action.tsx`) calls `setConfirming(false)` and
-`setDeleting(true)` and then starts `deleteMyAccount`. It never checks `deleting` first, and the dialog stays mounted
-for its exit animation, so a second Enter or click on its Delete account button in that moment calls the function a
-second time. The function is built to be retried (it finishes a half-done deletion), so the second call is harmless
-in effect, but it can show a second error toast.
+`handleDelete` (`app/(platform)/profile/delete-account-action.tsx`) called `setConfirming(false)` and
+`setDeleting(true)` and then started `deleteMyAccount`. It never checked `deleting` first, and the dialog stays mounted
+for its exit animation, so a second Enter or click on its Delete account button in that moment called the function a
+second time. The function is built to be retried (it finishes a half-done deletion), so the second call was harmless
+in effect, but it could show a second error toast.
 
 ## Evidence
 
@@ -23,7 +23,8 @@ Final review of the auth-screens-and-bug-fixes plan, Minor 4 (`.ga/runs/2026-11-
 
 ## Status
 
-Open.
+Fixed: a ref makes a second confirm while a delete is in flight do nothing. The ref is released on failure, including
+when the sign-out that sends the person to sign in again fails, so they can try again.
 
 ## Sources
 

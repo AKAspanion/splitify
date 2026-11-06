@@ -25,7 +25,7 @@ it through `callFunction`.
 ## Rules
 
 - Every route runs the guard first and acts only on the caller's own devices, by the uid in the verified ID token: `401`
-  without one ([auth](../security/auth.md)). An unknown path is `404`, a wrong method `405`, anything unexpected `500`.
+  without one, with a refused or revoked one, and `500` when the sign-in check itself fails ([auth](../security/auth.md)). An unknown path is `404`, a wrong method `405`, anything unexpected `500`.
 - A failed verification, or a verification with no challenge in progress, answers `400`: it is the caller's error, not the
   server's.
 - The challenge between the two steps is kept in an iron-session cookie named `__session`, because Hosting forwards only
@@ -44,6 +44,7 @@ it through `callFunction`.
 
 ## History
 
+- 2026-11-06: the guard accepted a revoked ID token and answered `401` for any failed check; now it refuses a revoked one and answers `500` when the check itself fails, because of the guard fix. See [Cloud Functions](../apps/functions.md).
 - 2026-11-05: was six Next.js route handlers behind Clerk, sealing the challenge in a cookie named `challenge` with a hard-coded password and never saving the counter; now one function behind the guard, with the `__session` cookie, a secret, a saved counter and `400` for a failed verification, because spec 2c removed the server. See [static build decision](../decisions/static-build-on-firebase-hosting.md).
 
 ## Sources

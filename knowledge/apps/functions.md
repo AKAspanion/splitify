@@ -68,11 +68,15 @@ overrides it with `maxInstances: 1`.
 ## The guard
 
 Every HTTP function the browser calls runs `guard` (`functions/src/http/guard.ts`) first: it verifies the Firebase ID
-token from `Authorization: Bearer` with the admin SDK, then reads the JSON body (at most 65536 bytes), and answers
-`401`, `413`, `415` or `400` itself. The callable gets its caller from Firebase. The browser side is
-`lib/functions/call.ts` ([auth](../security/auth.md)). Logs carry an error's class, never its message. The guard
-doesn't ask Auth whether the token was revoked, so a token from before an account deletion still passes for up to an
-hour ([finding](../findings/guard-accepts-revoked-id-tokens.md)).
+token from `Authorization: Bearer` with the admin SDK (`verifyIdToken(token, true)`, so Auth is asked about revocation,
+one lookup per request), then reads the JSON body (at most 65536 bytes), and answers `401`, `413`, `415` or `400`
+itself. A missing token, or a check error whose code is in `REFUSED_SIGN_IN_CODES`, is `401` "Sign in again to
+continue." (logged `guard: sign-in refused`); any other failure of the check (an Auth outage, quota, the network) is
+`500` "Something went wrong. Try again." (logged `guard: sign-in check failed`). Both logs carry the error's class and
+code. The callable gets its caller from Firebase, which doesn't check revocation, and neither does SQL Connect
+([finding](../findings/callable-and-sql-connect-accept-revoked-id-tokens.md)). The browser side is
+`lib/functions/call.ts` ([auth](../security/auth.md)). Logs carry an error's class, never its message. The Auth
+emulator always checks revocation, so an emulator test can't show the check is missing.
 
 ## Who may invoke them
 
@@ -83,6 +87,7 @@ restored by hand ([deploy setup](../operations/deploy-setup.md)).
 
 ## History
 
+- 2026-11-06: the guard didn't ask Auth about revocation and answered `401` for every failed check; now it passes `checkRevoked`, answers `401` only for a missing token or a refused credential and `500` when the check itself fails, because a token revoked by an account deletion still worked for an hour and an Auth outage looked like a bad sign-in. See [the fixed finding](../findings/guard-accepts-revoked-id-tokens.md).
 - 2026-11-06: the HTTP functions relied on Cloud Run's default policy and production answered 403 before any code ran; now `reports` and `webauthn` declare `invoker: "public"` and the callable's binding is restored by hand if lost, because the services had empty IAM policies. See [deploy setup](../operations/deploy-setup.md).
 
 - 2026-11-06: functions had no instance cap and `deleteMyAccount` took any sign-in; now every function is capped at 10 instances and deleting needs a sign-in from the last 5 minutes, because the security review found both gaps.

@@ -1,30 +1,38 @@
 ---
 type: Finding
-title: The HTTP guard accepts an ID token revoked by an account deletion
-description: guard calls verifyIdToken without checkRevoked, so an ID token issued before an account was deleted still passes on reports and webauthn for up to an hour.
+title: "Fixed: the HTTP guard accepted an ID token revoked by an account deletion"
+description: guard called verifyIdToken without checkRevoked, so an ID token issued before an account was deleted still passed on reports and webauthn for up to an hour; it now checks revocation. The callable and SQL Connect still don't.
 generated:
   by: agent:knowledge-job
   at: 2026-11-06T18:00:00Z
 ---
 
-# The HTTP guard accepts an ID token revoked by an account deletion
+# Fixed: the HTTP guard accepted an ID token revoked by an account deletion
 
 ## Finding
 
-`guard` in `functions/src/http/guard.ts` calls `verifyIdToken(token)` without `checkRevoked`. `deleteMyAccount`
+`guard` in `functions/src/http/guard.ts` called `verifyIdToken(token)` without `checkRevoked`. `deleteMyAccount`
 revokes the person's refresh tokens and deletes their Auth user, but an ID token already issued stays valid until it
-expires, up to an hour, so a copy of it still gets through `reports` and `webauthn` in that time. What it can reach
-is bounded: the person's row is anonymised and their groups are gone, so there is little left to read.
+expires, up to an hour, so a copy of it still got through `reports` and `webauthn` in that time. What it could reach
+was bounded: the person's row is anonymised and their groups are gone, so there was little left to read.
 
 ## Evidence
 
 - Security review of the auth-screens-and-bug-fixes plan, Minor M3 (`.ga/runs/2026-11-06-auth-screens-and-bug-fixes/reviews/`).
-- `functions/src/http/guard.ts` calls `getAuth(adminApp()).verifyIdToken(token)` with one argument.
+- Final security review of the open-findings-fixes plan, M3, which asks that this be marked Fixed for the HTTP guard
+  only (`.ga/runs/2026-11-06-open-findings-fixes/reviews/final-security-reviewer.md`).
 
 ## Status
 
-Open. Passing `true` as the second argument makes each call ask Auth about revocation, at the cost of one more lookup
-per request.
+Fixed for the HTTP functions (`reports`, `webauthn`) only: `guard` calls `verifyIdToken(token, true)`. A missing token,
+or an error whose code is in `REFUSED_SIGN_IN_CODES`, answers `401` "Sign in again to continue." and logs
+`guard: sign-in refused` with the cause class and code. Any other failure of the check (an Auth outage, quota, the
+network) answers `500` "Something went wrong. Try again." and logs `guard: sign-in check failed` with the same two
+fields. Each guarded request makes one Auth lookup. The Auth emulator always checks revocation, so emulator tests can't
+show that the second argument is missing; a code review has to.
+
+Not covered: the `deleteMyAccount` callable and SQL Connect still accept a revoked token
+([finding](callable-and-sql-connect-accept-revoked-id-tokens.md)).
 
 ## Sources
 

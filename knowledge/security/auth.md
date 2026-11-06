@@ -44,10 +44,13 @@ proxy ([Clerk](../integrations/clerk.md)).
   [roles](roles.md)).
 - **Cloud Functions over HTTP** (`reports`, `webauthn`) run the guard first (`functions/src/http/guard.ts`): it verifies
   the Firebase ID token from `Authorization: Bearer` with the admin SDK, then reads a JSON body of at most `65536`
-  bytes, and answers `401`, `413`, `415` or `400` itself ([Cloud Functions](../apps/functions.md)). The browser sends
+  bytes, and answers `401`, `413`, `415` or `400` itself, or `500` when the token check itself fails
+  ([Cloud Functions](../apps/functions.md)). The browser sends
   the token through `callFunction` (`lib/functions/call.ts`), which throws before any request when nobody is signed in
-  and turns a failure into a message a person can read. The guard doesn't check revocation, so a token issued before
-  an account deletion works for up to an hour ([finding](../findings/guard-accepts-revoked-id-tokens.md)). The two
+  and turns a failure into a message a person can read. The guard checks revocation (`verifyIdToken(token, true)`), so
+  a token issued before an account deletion is refused on these two functions
+  ([finding](../findings/guard-accepts-revoked-id-tokens.md)); the callable and SQL Connect don't check it
+  ([finding](../findings/callable-and-sql-connect-accept-revoked-id-tokens.md)). The two
   functions are publicly invokable at Cloud Run (`invoker: "public"`) because this guard is the check
   ([Cloud Functions](../apps/functions.md)).
 - **The `deleteMyAccount` callable** takes its caller from Firebase's own check (`request.auth`), and refuses an ID
@@ -65,6 +68,7 @@ proxy ([Clerk](../integrations/clerk.md)).
 
 ## History
 
+- 2026-11-06: the HTTP guard accepted an ID token revoked by an account deletion for up to an hour; now it checks revocation on `reports` and `webauthn`, and answers `500` rather than `401` when the check itself fails, because the security review found the gap. The callable and SQL Connect still accept one. See [the fixed finding](../findings/guard-accepts-revoked-id-tokens.md).
 - 2026-11-06: the verify banner sat above every screen with "I've verified" and a sign-out went home; now it shows on Groups (dismissable) and Profile with Resend only, Sign out and a finished deletion leave for `/sign-in/` by a full page load, and the HTTP functions are publicly invokable at Cloud Run with the guard as the check, because of the banner and landing decisions and the production 403s. See [banner](../decisions/verify-banner-placement.md), [landing](../decisions/remove-landing-page.md).
 - 2026-11-06: the account deletion took any signed-in caller and a sign-out always went home; now deleting needs a sign-in from the last 5 minutes and `signOut({ toSignIn: true })` sends the person to sign in, because the security review found a left-open session could delete the account.
 - 2026-11-05: had nothing about the email-link page; now `onUserChanged` is built on `onIdTokenChanged`, so the verify banner clears when a verify link is applied without a reload, and `/auth/action/` finishes reset and verify. See [sign in](../features/sign-in.md).

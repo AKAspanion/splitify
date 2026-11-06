@@ -22,7 +22,8 @@ answered on 2026-11-06 that it should show on Groups with a way to dismiss it, a
   `writeVerifyBannerDismissal` writes (an ISO string), shows it, so no stored value can hide it for more than 7 days.
 - The date is kept per person in localStorage under `splitify:verify-banner-dismissed:<uid>`
   (`lib/auth/verify-banner-dismissal.ts`), so a shared device keeps people apart. Blocked storage means the banner
-  hides for that visit only.
+  hides for that visit only, and the failed read or write logs `console.warn("[verify-banner] read|write failed", <class>)`
+  ([the fixed finding](../findings/verify-banner-storage-failures-are-silent.md)).
 - Profile always shows it, with Resend only.
 - No other screen shows it, and "I've verified" is gone: once the email is verified the banner clears on the next token
   refresh or sign-in (`onUserChanged` is built on `onIdTokenChanged`). There is no re-check on window focus.
@@ -31,6 +32,10 @@ answered on 2026-11-06 that it should show on Groups with a way to dismiss it, a
 
 - Someone who verifies in another tab sees the banner until their token refreshes (up to an hour) or they sign in again.
 - A person whose clock moves back sees the banner again after dismissing it.
+
+## History
+
+- 2026-11-06: a storage failure was swallowed silently; now it logs a warning with the error's class, because the banner returning each visit had nothing in the console to explain it. The decision itself is unchanged.
 
 ## Sources
 
