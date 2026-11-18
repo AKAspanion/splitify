@@ -35,7 +35,8 @@ verified: human:ankitp@geekyants.com
 - A back link a page is given in the URL goes through `backHref` and `safeNextPath` (`components/container/header.tsx`,
   `lib/auth/next-path.ts`), so a `javascript:` or off-site target falls back to the page's own default. On the ad pages
   (`/privacy`, `/delete-account`) the back arrow is a plain anchor (`fullPageLoad`), so leaving is a full page load
-  and the ad script can't follow into the app ([AdSense](../integrations/google-adsense.md)).
+  and the ad script can't follow into the app ([AdSense](../integrations/google-adsense.md)). `/terms` is public too
+  but carries no ads ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
 - Hosting sends the security headers in `firebase.json`: `X-Content-Type-Options`, `X-Frame-Options: DENY`,
   `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (`max-age=63072000; includeSubDomains`) and a
   Content-Security-Policy that limits scripts, connections and frames to
@@ -57,6 +58,7 @@ verified: human:ankitp@geekyants.com
 
 ## History
 
+- 2026-11-18: named only the privacy and delete-account pages as public; now it notes that `/terms` is public with no ads, because the terms page was added. See [decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 - 2026-11-06: the ad pages' back arrow was a client link; now it is a full page load, because of the AdSense decision. See [decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 - 2026-11-06: described the AdSense exclusion for `/auth/action` as the only ad rule; now it points to the AdSense integration for the rest (public pages, signed-out only), because main's rule was merged in. See [decision](../decisions/adsense-on-public-pages-only.md).
 - 2026-11-06: sent no HSTS header, trusted a back link as given and called the iOS config an open finding; now Hosting sends HSTS, back links are checked and the config is untracked, because the repository-modernization run fixed each.

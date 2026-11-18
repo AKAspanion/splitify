@@ -9,6 +9,7 @@
 - [Feedback](feedback.md) - A signed-in person can send one piece of feedback, a title and a description.
 - [Friends and contacts](friends-and-contacts.md) - Find a signed-up person by email and add them as a friend, or add someone who hasn't signed up as an offline contact.
 - [Groups](groups.md) - Create a group, see its expenses, balances and totals, edit it, add members, and delete it.
+- [Legal pages](legal-pages.md) - The public Privacy Policy, Terms of Service and delete-account pages, why they are public, where each is linked from, and what the terms deliberately leave out.
 - [Push notifications](notifications.md) - Members get a push through Firebase Cloud Messaging when an expense, settlement, group or membership changes; each device registers its token on the signed-in account, and the profile lets a person allow them.
 - [Offline use](offline.md) - What a person sees and can do with no connection: saved groups and expenses, queued expenses and settlements, online-only actions disabled, and a banner saying so.
 - [Profile](profile.md) - The profile screen of the hosted site: who is signed in, notifications, the biometric lock, feedback, theme, sign out and a link to delete the account.

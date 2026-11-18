@@ -14,7 +14,8 @@ verified: human:ankitp@geekyants.com
 
 `app/adsense.tsx` loads Google's `adsbygoogle.js` with the publisher id, only when `NODE_ENV` is `production` and
 an id is given (`NEXT_PUBLIC_GOOGLE_ADSENSE_ID`). Only the privacy page (`app/(platform)/privacy/page.tsx`) and the
-delete-account page (`app/(platform)/delete-account/page.tsx`) mount it, not the root layout and no other layout. It
+delete-account page (`app/(platform)/delete-account/page.tsx`) mount it, not the root layout and no other layout; the
+public terms page does not ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)). It
 renders the script only while Firebase Auth reports the visitor as signed out, so a signed-in person never loads it
 ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
 
@@ -42,6 +43,7 @@ With no id, nothing is loaded.
 
 ## History
 
+- 2026-11-18: said nothing about a terms page; now it names `/terms` as public without ads, because the terms page was added. See [the decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 - 2026-11-06: the script was mounted by the landing page and the privacy page; now by the privacy and delete-account pages, with every exit a full page load, because the landing page was removed and the developer confirmed which pages carry ads. See [the decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 - 2026-11-06: the script loaded on every page; now only for signed-out visitors, with the public pages leaving for the app by full page loads, because of [the earlier decision](../decisions/adsense-on-public-pages-only.md) and the final review's finding that client navigation kept the script running.
 - 2026-11-05: loaded on every page in production; now not in a document that started on `/auth/action`, because that URL carries a one-time code. See [sign in](../features/sign-in.md).

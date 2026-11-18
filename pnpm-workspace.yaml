@@ -8,6 +8,12 @@ overrides:
   'glob@>=9.0.0 <=14.0.1': ^14.0.2
   'uuid@<11.1.1': ^11.1.1
   '@opentelemetry/core@<2.8.0': ^2.8.0
+auditConfig:
+  ignoreGhsas:
+    # picomatch ReDoS: every release up to 4.0.7 is affected, and the patched 4.0.8 isn't published yet. picomatch
+    # reaches only the dev tooling (`pnpm audit --prod` is clean). Remove once 4.0.8 is out and overridden.
+    # knowledge/decisions/ignore-picomatch-redos-until-patched.md
+    - GHSA-fc5q-39xc-vjpf
 allowBuilds:
   '@firebase/util': true
   protobufjs: true

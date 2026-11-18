@@ -110,12 +110,21 @@ export function SignInForm() {
               Sign up
             </Link>
           </p>
-          <a
-            href="/privacy/"
-            className="text-muted-foreground underline-offset-4 hover:underline"
-          >
-            Privacy policy
-          </a>
+          <p className="text-muted-foreground">
+            <a
+              href="/privacy/"
+              className="text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Privacy policy
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a
+              href="/terms/"
+              className="text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Terms of service
+            </a>
+          </p>
         </>
       }
     >

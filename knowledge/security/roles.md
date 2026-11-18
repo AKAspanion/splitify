@@ -12,7 +12,7 @@ verified: human:ankitp@geekyants.com
 
 ## Roles
 
-- **Signed out:** `/privacy`, `/delete-account` and the sign-in screens (`/` redirects to sign-in).
+- **Signed out:** `/privacy`, `/terms`, `/delete-account` and the sign-in screens (`/` redirects to sign-in).
 - **Signed in:** everything else, limited by the rules below. The schema has no role field, and group membership
   (`GroupMember`) carries no role, so the group's creator is not recorded as its owner ([SQL Connect
   schema](../data/sql-connect.md)).
@@ -46,6 +46,8 @@ The findings that once listed what any signed-in person could do, all fixed by t
 
 ## History
 
+- 2026-11-18: said signed-out visitors reach `/privacy`, `/delete-account` and the sign-in screens; now `/terms` too, because the terms page was added. See [legal pages](../features/legal-pages.md).
+
 - 2026-11-06: signed-out visitors had a landing page; now `/` redirects them to sign-in, because the landing page was removed. See [the decision](../decisions/remove-landing-page.md).
 - 2026-11-06: said search returns another user on an exact match and listed no bounds; now search hides other people's offline contacts, a contact's email changes only by its sole friend and every list is bounded, because the repository-modernization run hardened the rules.
 - 2026-11-05: listed what the server's actions and routes let any signed-in person do; now says SQL Connect's rules and the functions enforce member-only access, because spec 2c removed those actions and routes.
@@ -58,3 +60,7 @@ The findings that once listed what any signed-in person could do, all fixed by t
 - `functions/src/reports/index.ts`
 - `functions/src/webauthn/index.ts`
 - `functions/src/account/delete-my-account.ts`
+- `scripts/hosting-pages/public.json`
+- `app/(platform)/privacy/page.tsx`
+- `app/(platform)/terms/page.tsx`
+- `app/(platform)/delete-account/page.tsx`

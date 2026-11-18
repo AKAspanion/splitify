@@ -22,17 +22,27 @@ and the delete-account page. The developer confirmed on 2026-11-06 that those tw
   no layout mounts it.
 - Every exit from those pages is a full page load, so the loaded script can't follow into the app beside the Auth
   tokens and saved data: the `Header` back arrow (`fullPageLoad`), `HomeRedirect` (`window.location.replace`), and the
-  sign-in and sign-up "Privacy policy" links, which are plain anchors so the privacy page opens in a fresh document.
+  sign-in and sign-up "Privacy policy" and "Terms of service" links, which are plain anchors so the privacy page opens
+  in a fresh document.
 - The privacy policy has an Advertising section and lists the processors in use: Firebase Auth, SQL Connect on Cloud
   SQL, Cloud Functions, Firebase Hosting, FCM and Google AdSense.
+- `/terms` (`app/(platform)/terms/page.tsx`) is public like them but mounts no `Adsense`: the developer approved
+  that on 2026-11-18 with the plan. Links between it and the ad pages stay plain anchors: the terms page links
+  `/privacy/` and `/delete-account/`, and the privacy and delete-account pages link `/terms/`, so a visit never
+  carries the ad script across.
 
 ## Consequences
 
-- No ads on the signed-in app or the sign-in screens.
+- No ads on the signed-in app, the sign-in screens or the terms page.
 - The site-wide CSP still lists the ad hosts, because Hosting headers apply to every path.
+
+## History
+
+- 2026-11-18: said nothing about a terms page; now `/terms` is public with no ads and the pages link it by plain anchors, because the developer approved that with the plan for the terms page. See [legal pages](../features/legal-pages.md).
 
 ## Sources
 
+- `app/(platform)/terms/page.tsx`
 - `app/adsense.tsx`
 - `app/(platform)/privacy/page.tsx`
 - `app/(platform)/delete-account/page.tsx`

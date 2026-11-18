@@ -25,13 +25,20 @@ const PrivacyPage = () => {
         <Header backTo="/" fullPageLoad title="Privacy Policy" />
       </div>
       <article className="w-full max-w-2xl space-y-6 px-6 pb-12 text-sm leading-relaxed">
-        <p className="text-muted-foreground">Effective date: 6 November 2026</p>
+        <p className="text-muted-foreground">
+          Effective date: 18 November 2026
+        </p>
 
         <Section title="Who we are">
           <p>
             Splitify helps people split shared expenses in groups. It is
             available on the web at splitify.spanion.in and as Android and iOS
-            apps. This policy covers all three.
+            apps. This policy covers all three. Using Splitify is also governed
+            by our{" "}
+            <a className="underline" href="/terms/">
+              Terms of Service
+            </a>
+            .
           </p>
         </Section>
 
