@@ -1,5 +1,7 @@
 # Terms of Service Page Implementation Plan
 
+**Status:** complete, commits ad646de..89b0a14, 2026-11-18. Record: [2026-11-17-terms-page.record.md](2026-11-17-terms-page.record.md)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: the project's workflow policy names the executor (`run.executor`): ga:feature-build-team by default, or ga:feature-build. Follow the policy and this plan's Checkpoints. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a public Terms of Service page at `/terms`, beside the existing public `/privacy` page, and link it everywhere the privacy policy is linked.
@@ -81,21 +83,21 @@ Both `sw-routing.js` copies (they are identical; `public/` is the one `next dev`
 - Given the terms page renders, then it contains `mailto:panditankit1995@gmail.com`.
 - Given the service worker routing, when `cacheStrategy` is asked about `/terms/`, then it answers `network-first-page` (add `/terms/` to the existing `it.each` list in `lib/offline/sw-routing.test.ts`; add that file to the commit).
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/terms/page.test.tsx` (mock `@/app/adsense` and `Header` the way `app/(platform)/privacy/page.test.tsx` does) and the `/terms/` entry in `lib/offline/sw-routing.test.ts`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/terms/page.test.tsx` (mock `@/app/adsense` and `Header` the way `app/(platform)/privacy/page.test.tsx` does) and the `/terms/` entry in `lib/offline/sw-routing.test.ts`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/terms/page.test.tsx" lib/offline/sw-routing.test.ts`
 Expected: FAIL on the assertions. Create `page.tsx` with an empty default export first, so the tests fail on behaviour, not on a missing module.
 
-- [ ] **Step 3: Write the page, the hosting wrapper, the manifest entries and the service-worker entry** until they pass
+- [x] **Step 3: Write the page, the hosting wrapper, the manifest entries and the service-worker entry** until they pass
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/terms/page.test.tsx" lib/offline/sw-routing.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/terms/page.tsx" "app/(platform)/terms/page.hosting.tsx" "app/(platform)/terms/page.test.tsx" scripts/hosting-pages/public.json lib/offline/sw-routing.js public/sw-routing.js lib/offline/sw-routing.test.ts
@@ -131,21 +133,21 @@ delete-account page links it next to its existing privacy link.
 - Given the delete-account page renders, then it contains `<a class="underline" href="/terms/">` and still contains `<a class="underline" href="/privacy">`.
 - Given the existing privacy-page tests, then they all still pass unchanged.
 
-- [ ] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/privacy/page.test.tsx`
+- [x] **Step 1: Write the failing tests** for each Acceptance case, in `app/(platform)/privacy/page.test.tsx`
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run "app/(platform)/privacy/page.test.tsx"`
 Expected: FAIL on the two new assertions
 
-- [ ] **Step 3: Add the links** to the four files
+- [x] **Step 3: Add the links** to the four files
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `pnpm vitest run "app/(platform)/privacy/page.test.tsx"`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add "app/(platform)/(auth)/sign-in/sign-in-form.tsx" "app/(platform)/(auth)/sign-up/sign-up-form.tsx" "app/(platform)/privacy/page.tsx" "app/(platform)/delete-account/page.tsx" "app/(platform)/privacy/page.test.tsx"
