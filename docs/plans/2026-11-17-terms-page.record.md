@@ -18,3 +18,14 @@ Task 2: complete (commits ab8f2c3..89b0a14, not reviewed)
 Progress: 2/2 tasks — Task 2 Link the terms beside the privacy policy — Task 2 Link the terms — sign-in, sign-up, privacy and delete-account link /terms/ with plain anchors
 Ruling: smoke and check:hosting's emulator phase replaced by next build, a page-by-page check of out/ against every hosting manifest, and a signed-out browser check of /terms, /privacy and /sign-in on next dev — another worktree's dev stack holds ports 2140-2150 — the Hosting emulator's 200 and headers for /terms aren't checked locally; CI's hosting check is the first run of that phase
 Run: finished 2026-11-18 10:16
+Note: Final review: yes, this time (developer: 'Yes, review it')
+Final review: Ruling: Final Important 2 (no e2e for the screen tasks) is fixed: one Playwright spec walks sign-in → Terms → privacy as full page loads — CI runs test:e2e, and it also covers the footer half of security Minor 1 — the spec's first run is CI's, since local ports are taken
+Final review: Ruling: Minors 1-4 promoted to the fix wave — each misleads a reader of the policy, the terms or the knowledge base — a small extra diff
+Final review: minor (deferred): delete-account links /privacy without and /terms/ with a trailing slash (final Minor 5)
+Final review: minor (deferred): unit tests named 'plain anchors' can't tell <a> from next/link <Link> (security Minor 1); the new e2e spec covers the sign-in footer
+Final review: minor (deferred): e2e 'no ad script on /terms' step can't fail under next dev, where Adsense renders null (re-review Minor 1)
+Final review: minor (deferred): e2e never clicks the sign-in 'Privacy policy' link to the ad page (re-review Minor 2)
+Final review: minor (deferred): security/roles.md: blank line splits its History list (re-review Minor 3)
+Note: Open for the developer: privacy page still says ads show on 'the public pages' while the terms now name only privacy and delete-account (legal wording, left as is)
+Note: CI fix: .mcp.json, rewritten by the ga plugin refresh, failed prettier --check .; formatted it. End checks on the fixed tree: prettier --check . pass, lint pass, tsc pass, pnpm test 483/483 pass; test:rules and e2e not run locally (ports taken)
+Final review: complete (8 findings (2 Important, 6 Minor), 6 fixed, 0 parked, 2 deferred; re-review: all addressed, 3 new Minors deferred)
