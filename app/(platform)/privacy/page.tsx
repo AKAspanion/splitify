@@ -31,7 +31,12 @@ const PrivacyPage = () => {
           <p>
             Splitify helps people split shared expenses in groups. It is
             available on the web at splitify.spanion.in and as Android and iOS
-            apps. This policy covers all three.
+            apps. This policy covers all three. Using Splitify is also governed
+            by our{" "}
+            <a className="underline" href="/terms/">
+              Terms of Service
+            </a>
+            .
           </p>
         </Section>
 

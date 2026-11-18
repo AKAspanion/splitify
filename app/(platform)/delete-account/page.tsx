@@ -70,6 +70,10 @@ const DeleteAccountPage = () => {
           See also our{" "}
           <a className="underline" href="/privacy">
             privacy policy
+          </a>{" "}
+          and{" "}
+          <a className="underline" href="/terms/">
+            terms of service
           </a>
           .
         </p>

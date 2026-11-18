@@ -81,6 +81,10 @@ describe("privacy page", () => {
   it("keeps the contact address", () => {
     expect(privacy).toContain("mailto:panditankit1995@gmail.com");
   });
+
+  it("links the terms of service with a plain anchor", () => {
+    expect(privacy).toContain('<a class="underline" href="/terms/">');
+  });
 });
 
 describe("delete-account page", () => {
@@ -91,5 +95,10 @@ describe("delete-account page", () => {
     );
     expect(deleteAccount).toContain('<a class="underline" href="/privacy">');
     expect(deleteAccount).toContain("Your account is deleted straight");
+  });
+
+  it("links the terms of service beside the privacy policy, with plain anchors", () => {
+    expect(deleteAccount).toContain('<a class="underline" href="/terms/">');
+    expect(deleteAccount).toContain('<a class="underline" href="/privacy">');
   });
 });
