@@ -2,6 +2,7 @@
   "pages": [
     "index.html",
     "privacy/index.html",
+    "terms/index.html",
     "delete-account/index.html",
     "sign-in/index.html",
     "sign-up/index.html",
@@ -17,6 +18,10 @@
     {
       "path": "/privacy",
       "expectText": "Privacy Policy"
+    },
+    {
+      "path": "/terms",
+      "expectText": "Terms of Service"
     },
     {
       "path": "/delete-account",

@@ -12,9 +12,15 @@ describe("cacheStrategy", () => {
     (p) => expect(cacheStrategy(at(p), ORIGIN)).toBe("precache-first"),
   );
 
-  it.each(["/", "/groups/", "/groups/abc/", "/privacy/", "/sw-manifest.js"])(
-    "tries the network first for %s",
-    (p) => expect(cacheStrategy(at(p), ORIGIN)).toBe("network-first-page"),
+  it.each([
+    "/",
+    "/groups/",
+    "/groups/abc/",
+    "/privacy/",
+    "/terms/",
+    "/sw-manifest.js",
+  ])("tries the network first for %s", (p) =>
+    expect(cacheStrategy(at(p), ORIGIN)).toBe("network-first-page"),
   );
 
   it.each([
