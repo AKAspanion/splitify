@@ -7,6 +7,7 @@
 - [Is more than one currency planned?](currency.md) - Every currency field defaults to inr and amounts are always shown with the rupee symbol. Should groups or expenses have their own currency?
 - [Should editing an expense change more than its description?](expense-edit-scope.md) - updateExpense only changes the description; amounts, payers and splits can't be edited, only deleted and re-added.
 - [Who may change a group, an expense or a contact?](group-permissions.md) - The code lets any signed-in person change anything. What should the rules be: any member, the creator, or an owner role?
+- [Which law governs the terms, and who operates Splitify?](terms-governing-law-and-operator.md) - The Terms of Service name no governing law and no operator, because neither is recorded; which country's law applies and which person or entity runs Splitify?
 - [How should changes be tested?](testing-approach.md) - The repository has no tests, test runner or CI; ga's workflow is test-first. Which tests should new work add, and with what?
 - [Should 'You owe' show the net amount?](your-share-owe-amount.md) - On one expense, a person who paid part and owes more is told they owe their whole split, not the difference. Is that intended?
 

@@ -24,8 +24,8 @@ The three screens are one centred `AuthCard` (`app/(platform)/(auth)/_components
 todo.spanion.in: the mark over "Splitify", a muted subtitle, the actions and small footer links. Google sign-in is
 the first button; the email and password fields open behind a "Sign in with email" button, so the card first offers
 only the two ways in. The card has no theme toggle: the screens follow the system or the saved theme. The sign-in and
-sign-up footers link to "Privacy policy" with a plain anchor, a full page load, because the privacy page loads the ad
-script and the sign-in screens must not run beside it ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
+sign-up footers link to "Privacy policy" and "Terms of service" with plain anchors, full page loads, because the privacy
+page loads the ad script and the sign-in screens must not run beside it ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
 
 ## Rules
 
@@ -94,7 +94,8 @@ no "I've verified" button: once verified, the banner clears on the next token re
 why: [the decision](../decisions/verify-banner-placement.md). Provisional: the banner's wording awaits the developer.
 - `recoverEmail`, `verifyAndChangeEmail` and `revertSecondFactorAddition` go on to Firebase's own `/__/auth/action`;
   `continueUrl` is never read.
-- The sign-in and sign-up screens end with a plain "Privacy policy" link to `/privacy/`, with no consent line.
+- The sign-in and sign-up footers show "Privacy policy · Terms of service", both plain anchors (`/privacy/`, `/terms/`),
+  with no consent line ([legal pages](legal-pages.md)).
   Provisional: the developer may want consent wording on sign-up.
 - Open edges: [offline note wording](../findings/reset-offline-note-says-sign-in.md),
   [the biometric lock over the page](../findings/biometric-lock-covers-action-page.md),
@@ -108,6 +109,7 @@ The sign-in, sign-up and forgot-password screens say "You're offline. Connect to
 
 ## History
 
+- 2026-11-18: the sign-in and sign-up footers linked only "Privacy policy"; now they show "Privacy policy · Terms of service", both plain anchors, because a Terms of Service page was added. See [legal pages](legal-pages.md).
 - 2026-11-06: the three screens were separate pages under a landing page and the verify banner sat above every screen with "I've verified"; now they are one centred `AuthCard` with email behind "Sign in with email" and no theme toggle, `/` redirects by sign-in state, and the banner shows on Groups (dismissable for 7 days) and Profile, because the developer asked to remove the landing page and settled where the banner shows. See [the landing decision](../decisions/remove-landing-page.md) and [the banner decision](../decisions/verify-banner-placement.md).
 - 2026-11-06: the action page cleaned the address bar during render and its header and failed states had no way home; now it cleans in a queued microtask, forwards a Firebase link even if the cleanup throws, and offers a back link and Go home, because of the console errors and two deferred Minors. See [the fixed finding](../findings/action-page-updates-router-during-render.md).
 - 2026-11-06: said the query provider's key flip remounted pages and the action page's guards were for that; now the provider has no key and the guards are only a safeguard, because sign-in no longer remounts the page.

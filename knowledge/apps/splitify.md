@@ -1,7 +1,7 @@
 ---
 type: Application
 title: Splitify web app
-description: The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the signed-in app, the sign-in screens and the privacy and delete-account pages; / redirects by sign-in state.
+description: The Next.js 16 app at the repository root, built as one static site for Firebase Hosting: the signed-in app, the sign-in screens and the privacy, terms and delete-account pages; / redirects by sign-in state.
 generated:
   by: claude-code/claude-opus-5-5
   at: 2026-11-04T07:18:08Z
@@ -30,6 +30,9 @@ Functions, Hosting), react-query and zustand on the client. Versions are in `pac
 - `/`: `HomeRedirect` (`app/(platform)/(auth)/home-redirect.tsx`), the logo loading state (`AppLoading`) that leaves by `window.location.replace`
   to `/groups/` when signed in and `/sign-in/` when signed out. There is no landing page
   ([decision](../decisions/remove-landing-page.md)).
+- `/terms`: `app/(platform)/terms/page.tsx`, a public page outside the signed-in `(app)` group. It is built in the
+  hosting build (`scripts/hosting-pages/public.json`), is one of the service worker's `STATIC_PAGES`
+  (`lib/offline/sw-routing.js`) and loads no ads ([legal pages](../features/legal-pages.md)).
 - `app/(platform)/layout.tsx`: wraps the signed-in app and mounts the [biometric lock](../features/biometric-lock.md).
 - `app/(platform)/(app)/layout.tsx`: the top and bottom navigation bars.
 - `app/manifest.webmanifest`: the PWA manifest.
@@ -101,6 +104,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 - `/groups/add`: `app/(platform)/(app)/(forms)/groups/add/page.tsx`
 - `/privacy`: `app/(platform)/privacy/page.tsx`
 - `/profile`: `app/(platform)/profile/page.tsx`
+- `/terms`: `app/(platform)/terms/page.tsx`
 - `/webauthn/register`: `app/(platform)/(app)/webauthn/register/page.tsx`
 
 <!-- GA-GENERATED:END -->
@@ -116,6 +120,7 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 
 ## History
 
+- 2026-11-18: the public pages were privacy, delete-account and the sign-in screens; now `/terms` is one too, in the hosting build and the service worker's static pages, with no ads, because the developer asked for a Terms of Service page. See [legal pages](../features/legal-pages.md).
 - 2026-11-06: `/` showed a spinner while loading; now it shows the logo (`AppLoading`), because the developer asked for the logo instead. See [decision](../decisions/logo-as-loading-state.md).
 - 2026-11-06: had a landing page, a redirect in `app/launch.tsx` and the verify banner in the signed-in shell; now `/` is `HomeRedirect`, `launch.tsx` redirects nobody and Groups and Profile mount the banner, because the developer removed the landing page and settled where the banner shows. See [the landing decision](../decisions/remove-landing-page.md) and [the banner decision](../decisions/verify-banner-placement.md).
 - 2026-11-06: the query provider was keyed by uid; now it has no key and follows the saved cache, because the key remounted every page when sign-in finished. See [the fixed finding](../findings/query-provider-remounts-pages-at-auth-restore.md).
@@ -146,6 +151,8 @@ The functions' routes are in [reports](../api/generate.md) and [WebAuthn](../api
 - `app/manifest.webmanifest`
 - `app/(platform)/(app)/(screens)/layout.hosting.tsx`
 - `scripts/hosting-pages/public.json`
+- `app/(platform)/terms/page.tsx`
+- `lib/offline/sw-routing.js`
 - `scripts/emulator-firebase-config.mjs`
 - `firebase.json`
 - `app/not-found.hosting.tsx`
