@@ -26,7 +26,6 @@ and the delete-account page. The developer confirmed on 2026-11-06 that those tw
   in a fresh document.
 - The privacy policy has an Advertising section and lists the processors in use: Firebase Auth, SQL Connect on Cloud
   SQL, Cloud Functions, Firebase Hosting, FCM and Google AdSense.
-
 - `/terms` (`app/(platform)/terms/page.tsx`) is public like them but mounts no `Adsense`: the developer approved
   that on 2026-11-18 with the plan. Links between it and the ad pages stay plain anchors: the terms page links
   `/privacy/` and `/delete-account/`, and the privacy and delete-account pages link `/terms/`, so a visit never

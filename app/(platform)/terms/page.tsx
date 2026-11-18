@@ -82,7 +82,8 @@ const TermsPage = () => {
 
         <Section title="Advertising">
           <p>
-            The public pages show ads from Google AdSense, as the{" "}
+            The privacy policy and delete-account pages show ads from Google
+            AdSense, as the{" "}
             <a className="underline" href="/privacy/">
               privacy policy
             </a>{" "}

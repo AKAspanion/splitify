@@ -31,8 +31,8 @@ const privacy = renderToStaticMarkup(<PrivacyPage />);
 const deleteAccount = renderToStaticMarkup(<DeleteAccountPage />);
 
 describe("privacy page", () => {
-  it("has the 6 November 2026 effective date", () => {
-    expect(privacy).toContain("Effective date: 6 November 2026");
+  it("has the 18 November 2026 effective date", () => {
+    expect(privacy).toContain("Effective date: 18 November 2026");
   });
 
   it("goes back to / by a full page load, so the ad script never follows into the app", () => {

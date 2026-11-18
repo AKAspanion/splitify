@@ -54,6 +54,13 @@ describe("terms page", () => {
     expect(terms).toContain("13 or older");
   });
 
+  it("says only the privacy policy and delete-account pages show ads", () => {
+    expect(terms).toContain(
+      "The privacy policy and delete-account pages show ads from Google AdSense",
+    );
+    expect(terms).not.toContain("The public pages show ads");
+  });
+
   it("has the contact address", () => {
     expect(terms).toContain("mailto:panditankit1995@gmail.com");
   });

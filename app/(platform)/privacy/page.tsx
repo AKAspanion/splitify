@@ -25,7 +25,9 @@ const PrivacyPage = () => {
         <Header backTo="/" fullPageLoad title="Privacy Policy" />
       </div>
       <article className="w-full max-w-2xl space-y-6 px-6 pb-12 text-sm leading-relaxed">
-        <p className="text-muted-foreground">Effective date: 6 November 2026</p>
+        <p className="text-muted-foreground">
+          Effective date: 18 November 2026
+        </p>
 
         <Section title="Who we are">
           <p>

@@ -27,20 +27,23 @@ person needs before they have an account or after they have lost access to it.
 
 - The sign-in and sign-up footers show "Privacy policy · Terms of service", plain anchors (`/privacy/`, `/terms/`)
   ([sign in](sign-in.md)).
-- The privacy page links `/terms/`; the delete-account page links `/privacy/` and `/terms/`; the terms page links
-  `/privacy/` and `/delete-account/`.
+- The privacy page links `/terms/` and `/delete-account`; the delete-account page links `/privacy` and `/terms/`; the
+  terms page links `/privacy/` (twice) and `/delete-account/`. Each page also links the contact address.
 - All these links are plain anchors, full page loads, so the ad script on the privacy and delete-account pages never
   carries into another document ([decision](../decisions/adsense-on-privacy-and-delete-account-pages.md)).
 
 ## Rules
 
 - Privacy and delete-account load ads for signed-out visitors; the terms page loads none (same decision).
-- The terms' effective date is `17 November 2026`; the page says that changing the terms changes that date.
+- The terms' effective date is `17 November 2026`; the page says that changing the terms changes that date. The
+  privacy policy's is `18 November 2026`, moved from 6 November when it gained the sentence linking the terms, because
+  the policy says a change moves its date.
 - The terms deliberately name no governing law and no operator legal name, because neither is recorded. Both are
   open: [which law and which operator](../questions/terms-governing-law-and-operator.md).
 
 ## History
 
+- 2026-11-18: the privacy policy's effective date was 6 November 2026; now 18 November 2026, because its text gained a link to the terms. Its Advertising wording is unchanged; the terms now name only the privacy and delete-account pages as showing ads.
 - 2026-11-18: had the privacy and delete-account pages only; now the Terms of Service page `/terms` too, linked beside the privacy policy, because the developer asked for one. See [the AdSense decision](../decisions/adsense-on-privacy-and-delete-account-pages.md).
 
 ## Sources
@@ -54,3 +57,4 @@ person needs before they have an account or after they have lost access to it.
 - `app/(platform)/(auth)/sign-up/sign-up-form.tsx`
 - `scripts/hosting-pages/public.json`
 - `lib/offline/sw-routing.js`
+- `tests/e2e/legal-pages.spec.ts`

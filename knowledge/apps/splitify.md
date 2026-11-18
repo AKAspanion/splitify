@@ -69,7 +69,7 @@ no server action and no middleware. The `*.hosting.tsx` entries re-export the pa
 - A signed-out person goes to `/sign-in/?next=<path>`, or home (`/`, which then redirects to sign-in) after a sign-out
   they chose (`lib/auth-redirect.ts`). Profile's Sign out and a finished account deletion skip that and leave for
   `/sign-in/` by a full page load (`leaveForSignIn`).
-- Known and harmless: on `/privacy` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
+- Known and harmless: on `/privacy`, `/terms` and `/delete-account` the biometric lock calls `/api/webauthn/devices` with no
   signed-in person, so `callFunction` throws before any request and the lock stays off.
 - `scripts/emulator-firebase-config.mjs` writes `firebase.emulators.json`: `firebase.json` with the Auth, SQL Connect and
   Functions emulators' addresses added to the CSP's `connect-src`, so the app served by the Hosting emulator may call
